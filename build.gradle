@@ -1,0 +1,30 @@
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+    id "com.moowork.node" version "1.1.0"
+}
+
+repositories {
+    jcenter()
+}
+
+configurations {
+    testPlugins {}
+}
+
+dependencies {
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.8.1'
+}
+
+apply from: 'gradle/license.gradle'
+
+task licenseFormatNode(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
+    source = fileTree(dir: "src").include("**/*")
+}
+licenseFormat.dependsOn licenseFormatNode
+
+task licenseCheckNode(type: com.hierynomus.gradle.license.tasks.LicenseCheck) {
+    source = fileTree(dir: "src").include("**/*")
+}

@@ -24,3 +24,10 @@
 
 # Mac
 .DS_Store
+
+# Gradle
+.gradle
+
+# NodeJs
+node_modules/
+package-lock.json
