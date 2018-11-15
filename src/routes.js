@@ -20,8 +20,62 @@ function Loading() {
   return <div>Loading...</div>;
 }
 
+// Management Modules
+
+const Clusters = Loadable({
+  loader: () => import('./views/Management/Clusters'),
+  loading: Loading
+});
+
+const Settings = Loadable({
+  loader: () => import('./views/Management/Settings'),
+  loading: Loading
+});
+
+const Users = Loadable({
+  loader: () => import('./views/Management/Users'),
+  loading: Loading
+});
+
+const Connectors = Loadable({
+  loader: () => import('./views/Management/Connectors'),
+  loading: Loading
+});
+
+const Topics = Loadable({
+  loader: () => import('./views/Management/Topics'),
+  loading: Loading
+});
+
+const Functions = Loadable({
+  loader: () => import('./views/Management/Functions'),
+  loading: Loading
+});
+
+const SQL = Loadable({
+  loader: () => import('./views/Management/SQL'),
+  loading: Loading
+});
+
+// Monitoring Modules
+
+const Health = Loadable({
+  loader: () => import('./views/Monitoring/Health'),
+  loading: Loading
+});
+
 const routes = [
   { path: '/', exact: true, name: 'Home', component: DefaultLayout },
+  // management modules
+  { path: '/management/clusters', name: 'Clusters', component: Clusters },
+  { path: '/management/settings', name: 'Settings', component: Settings },
+  { path: '/management/users', name: 'Users', component: Users },
+  { path: '/management/connectors', name: 'Connectors', component: Connectors },
+  { path: '/management/topics', name: 'Topics', component: Topics },
+  { path: '/management/functions', name: 'Functions', component: Functions },
+  { path: '/management/sql', name: 'SQL', component: SQL },
+  // monitoring modules
+  { path: '/monitoring/health', name: 'System Health', component: Health },
 ]
 
 export default routes;

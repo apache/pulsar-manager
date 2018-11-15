@@ -1,0 +1,6 @@
+{
+  "name": "Connectors",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Connectors.js"
+}

@@ -42,13 +42,13 @@ class DefaultHeader extends Component {
 
         <Nav className="d-md-down-none" navbar>
           <NavItem className="px-3">
-            <NavLink href="/">Clusters</NavLink>
+            <NavLink href="#/management/clusters">Clusters</NavLink>
           </NavItem>
           <NavItem className="px-3">
-            <NavLink href="#/users">Users</NavLink>
+            <NavLink href="#/management/users">Users</NavLink>
           </NavItem>
           <NavItem className="px-3">
-            <NavLink href="#">Settings</NavLink>
+            <NavLink href="#/management/settings">Settings</NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto" navbar>

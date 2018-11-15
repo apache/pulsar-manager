@@ -1,0 +1,6 @@
+{
+  "name": "Clusters",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Clusters.js"
+}

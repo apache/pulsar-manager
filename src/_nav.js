@@ -63,8 +63,6 @@ export default {
       name: 'System Health',
       url: '/monitoring/health',
       icon: 'icon-speedometer',
-      children: [
-      ],
     },
     {
       name: 'Namespaces',
