@@ -34,22 +34,22 @@ export default {
     {
       name: 'Connectors',
       url: '/management/connectors',
-      icon: 'icon-drop',
+      icon: 'icon-shuffle',
     },
     {
       name: 'Topics',
       url: '/management/topics',
-      icon: 'icon-pencil',
+      icon: 'icon-grid',
     },
     {
       name: 'Functions',
       url: '/management/functions',
-      icon: 'icon-pencil',
+      icon: 'icon-graph',
     },
     {
       name: 'SQL',
       url: '/management/sql',
-      icon: 'icon-pencil',
+      icon: 'icon-energy',
     },
     {
       title: true,
@@ -62,14 +62,14 @@ export default {
     {
       name: 'System Health',
       url: '/monitoring/health',
-      icon: 'icon-puzzle',
+      icon: 'icon-speedometer',
       children: [
       ],
     },
     {
       name: 'Namespaces',
       url: '/monitoring/namespaces',
-      icon: 'icon-cursor',
+      icon: 'icon-layers',
       children: [
       ],
     },
@@ -84,9 +84,37 @@ export default {
     {
       name: 'Overview',
       url: '/alerts/overview',
-      icon: 'icon-star',
+      icon: 'icon-bell',
       children: [
       ],
+    },
+    {
+      title: true,
+      name: 'Resources',
+      wrapper: {
+        element: '',
+        attributes: {},
+      },
+    },
+    {
+      name: 'Documentation',
+      url: 'https://pulsar.apache.org',
+      icon: 'icon-docs',
+    },
+    {
+      name: 'Slack',
+      url: 'https://pulsar.apache.org',
+      icon: 'icon-bubble',
+    },
+    {
+      name: 'Github',
+      url: 'https://github.com/apache/pulsar',
+      icon: 'icon-social-github'
+    },
+    {
+      name: 'Contact Us',
+      url: 'http://pulsar.apache.org/en/contact/',
+      icon: 'icon-envelope',
     },
   ],
 };
