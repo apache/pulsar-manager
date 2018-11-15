@@ -3,15 +3,18 @@ allprojects {
     license {
         includes(["**/*"])
         excludes(["**/*.json"])
+        excludes(["**/*.svg"])
+        excludes(["**/.gitkeep"])
         header rootProject.file('gradle/license.template')
         strictCheck true
         skipExistingHeaders false
         ext {
           year = Calendar.getInstance().get(Calendar.YEAR)
-          name = "StreamNative"
+          name = "Pulsar Contributors"
         }
         mapping('conf', 'SCRIPT_STYLE')
         mapping('gdsl', 'DOUBLESLASH_STYLE')
         mapping('javascript', 'JAVADOC_STYLE')
+        mapping('scss', 'DOUBLESLASH_STYLE')
     }
 }
