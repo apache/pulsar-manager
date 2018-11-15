@@ -32,6 +32,19 @@ export default {
       class: ''             // optional class names space delimited list for title item ex: "text-center"
     },
     {
+      name: 'Tenants',
+      url: '/management/tenants',
+      icon: 'icon-people',
+    },
+    {
+      name: 'Namespaces',
+      url: '/management/namespaces',
+      icon: 'icon-list',
+    },
+    {
+      divider: true,
+    },
+    {
       name: 'Connectors',
       url: '/management/connectors',
       icon: 'icon-shuffle',

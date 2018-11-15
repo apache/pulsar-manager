@@ -37,6 +37,16 @@ const Users = Loadable({
   loading: Loading
 });
 
+const Tenants = Loadable({
+  loader: () => import('./views/Management/Tenants'),
+  loading: Loading
+});
+
+const Namespaces = Loadable({
+  loader: () => import('./views/Management/Namespaces'),
+  loading: Loading
+});
+
 const Connectors = Loadable({
   loader: () => import('./views/Management/Connectors'),
   loading: Loading
@@ -71,6 +81,8 @@ const routes = [
   { path: '/management/settings', name: 'Settings', component: Settings },
   { path: '/management/users', name: 'Users', component: Users },
   { path: '/management/connectors', name: 'Connectors', component: Connectors },
+  { path: '/management/tenants', name: 'Tenants', component: Tenants },
+  { path: '/management/namespaces', name: 'Namespaces', component: Namespaces },
   { path: '/management/topics', name: 'Topics', component: Topics },
   { path: '/management/functions', name: 'Functions', component: Functions },
   { path: '/management/sql', name: 'SQL', component: SQL },
