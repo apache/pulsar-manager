@@ -1,10 +1,10 @@
 {
-  "name": "@coreui/coreui-free-react-admin-template",
-  "version": "2.0.13",
-  "description": "CoreUI React Open Source Bootstrap 4 Admin Template",
-  "author": "Łukasz Holeczek",
-  "homepage": "https://coreui.io",
-  "copyright": "Copyright 2018 creativeLabs Łukasz Holeczek",
+  "name": "@pulsar/apache-pulsar-admin-ui",
+  "version": "0.0.1",
+  "description": "Apache Pulsar Admin UI",
+  "author": "Pulsar Contributors",
+  "homepage": "https://pulsar.apache.org",
+  "copyright": "Copyright 2018",
   "license": "MIT",
   "private": true,
   "repository": {
