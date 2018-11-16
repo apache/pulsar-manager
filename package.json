@@ -16,14 +16,17 @@
     "@coreui/coreui-plugin-chartjs-custom-tooltips": "^1.2.0",
     "@coreui/icons": "0.3.0",
     "@coreui/react": "^2.0.9",
+    "axios": "^0.18.0",
     "bootstrap": "^4.1.3",
     "chart.js": "^2.7.2",
     "classnames": "^2.2.6",
     "core-js": "^2.5.7",
+    "datatables.net": "^1.10.19",
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.6.0",
     "flag-icon-css": "^3.2.0",
     "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1",
     "node-sass": "^4.9.3",
     "prop-types": "^15.6.2",
     "react": "^16.5.2",
@@ -53,6 +56,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
+  "proxy": "http://localhost:8080",
   "browserslist": [
     ">0.2%",
     "not dead",

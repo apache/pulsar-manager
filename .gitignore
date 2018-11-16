@@ -35,3 +35,4 @@ build/
 
 # Yarn
 yarn.lock
+yarn-error.log
