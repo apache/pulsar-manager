@@ -25,4 +25,6 @@ $ npm run build
 
 ```
 
+#### Development
 
+You can start a pulsar standalone. The Pulsar Admin UI will automatically connect to pulsar standalone via `http://localhost:8080`. Now you try to go to `tenants` page and create `teant`.
