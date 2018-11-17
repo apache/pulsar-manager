@@ -11,6 +11,9 @@ The admin UI is based on [CoreUI React](https://coreui.io/).
 # install app's dependencies
 $ npm install
 
+# or
+$ yarn install
+
 ```
 
 #### Usage
@@ -19,6 +22,8 @@ $ npm install
 
 # start to serve with hot reload at localhost:3000
 $ npm start
+# or
+# yarn start
 
 # build for production with minification
 $ npm run build
