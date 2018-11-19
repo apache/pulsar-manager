@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import {
   Badge,
   Button,
@@ -31,36 +31,47 @@ import { AppSwitch } from '@coreui/react'
 import API from '../../../api'
 import PULSAR from '../../../utils'
 
-class Tenants extends Component {
+class Tenant extends Component {
 
-  state = {
-    loading: true,
-    tenants: [],
-  };
+  constructor(props) {
+    super(props);
+    this.tenant = this.props.match.params.tenant;
+    this.state = {
+      loading: true,
+      namespaces: [],
+    };
+  }
 
   componentDidMount() {
-    this._asyncRequest = API.getTenants().then(
-      tenants => {
+    this.setState({
+      loading: true,
+      namespaces: [],
+    })
+    this._asyncRequest = API.getNamespaces(this.tenant).then(
+      namespaces => {
         this._asyncRequest = null;
-        this.setState({ loading: false, tenants: tenants.data });
+        this.setState({
+          loading: false,
+          namespaces: namespaces.data,
+        });
     });
   }
 
-  handleDeleteTenant(tenant, event) {
-    API.deleteTenant(tenant).then(
+  handleDeleteNamespace(fully_qualified_namespace, event) {
+    API.deleteNamespace(fully_qualified_namespace).then(
       ignored => {
         this.props.history.push('/');
       }
     )
     .catch(
       error => {
-        alert(`Failed to delete tenant '${tenant}' : ${error}`);
+        alert(`Failed to delete namespace '${fully_qualified_namespace}' : ${error}`);
       }
     );
     event.preventDefault();
   }
 
-  renderTenants() {
+  renderNamespaces() {
     return (
       <Table responsive size="sm">
         <thead>
@@ -70,12 +81,12 @@ class Tenants extends Component {
         </tr>
         </thead>
         <tbody>
-        {this.state.tenants.map(tenant => (
-          <tr key={tenant}>
+        {this.state.namespaces.map(PULSAR.getNamespaceName).map(ns => (
+          <tr key={ns.fully_qualified_namespace}>
             <td>
-            <Link to={PULSAR.getTenantUrl(tenant)}>
-              {tenant}
-            </Link>
+            <Link to={PULSAR.getTenantUrl(ns.tenant)}>{ns.tenant}</Link>
+            <strong>/</strong>
+            <Link to={PULSAR.getNamespaceUrl(ns.tenant, ns.namespace)}>{ns.namespace}</Link>
             </td>
             <td>
             <Button color="danger">
@@ -89,12 +100,16 @@ class Tenants extends Component {
     )
   }
 
-  listTenants() {
+  listNamespaces() {
     return (
-      this.state.tenants.length > 0 ? this.renderTenants() : (
-        !this.state.loading && <p class="card-text">No tenants in this cluster</p>
+      this.state.namespaces.length > 0 ? this.renderNamespaces() : (
+        !this.state.loading && <p className="card-text">No namespaces in this cluster</p>
       )
     );
+  }
+
+  getCreateNamespaceUrl() {
+    return `/management/tenant/${this.tenant}/namespaces/create`;
   }
 
   render() {
@@ -104,15 +119,17 @@ class Tenants extends Component {
           <Col>
             <Card>
               <CardHeader>
-                Tenants
+                Tenant <Link to={PULSAR.getTenantUrl(this.tenant)}>
+                {this.tenant}
+                </Link>
                 <div className="card-header-actions">
-                  <Link to="/management/tenants/create" color="success">
+                  <Link to={this.getCreateNamespaceUrl()} color="success">
                     <i className="fa fa-plus"></i>
                   </Link>
                 </div>
               </CardHeader>
               <CardBody>
-                {this.listTenants()}
+                {this.listNamespaces()}
               </CardBody>
             </Card>
           </Col>
@@ -123,4 +140,4 @@ class Tenants extends Component {
 
 }
 
-export default Tenants;
+export default withRouter(Tenant);

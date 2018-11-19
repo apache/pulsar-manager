@@ -26,6 +26,7 @@
     "enzyme-adapter-react-16": "^1.6.0",
     "flag-icon-css": "^3.2.0",
     "font-awesome": "^4.7.0",
+    "http-proxy-middleware": "^0.19.0",
     "jquery": "^3.3.1",
     "node-sass": "^4.9.3",
     "prop-types": "^15.6.2",
@@ -56,7 +57,6 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "http://localhost:8080",
   "browserslist": [
     ">0.2%",
     "not dead",

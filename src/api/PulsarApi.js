@@ -18,6 +18,9 @@ class PulsarApi {
 
   constructor() {
     this.apiPath = PULSAR_ADMIN_API;
+    axios.defaults.headers.get['Content-Type'] = 'application/json';
+    axios.defaults.headers.post['Content-Type'] = 'application/json';
+    axios.defaults.headers.put['Content-Type'] = 'application/json';
   }
 
   // tenants
@@ -26,12 +29,27 @@ class PulsarApi {
     return axios.get(`${this.apiPath}/tenants`);
   }
 
-  createTenant(tenant) {
-    return axios.put(`${this.apiPath}/tenants/${tenant}`);
+  createTenant(tenant, tenantInfo) {
+    return axios.put(`${this.apiPath}/tenants/${tenant}`, tenantInfo);
   }
 
   deleteTenant(tenant) {
     return axios.delete(`${this.apiPath}/tenants/${tenant}`);
+  }
+
+  // Namespaces
+
+  getNamespaces(tenant) {
+    return axios.get(`${this.apiPath}/namespaces/${tenant}`);
+  }
+
+  deleteNamespace(fully_qualified_namespace) {
+    return axios.delete(`${this.apiPath}/namespaces/${fully_qualified_namespace}`);
+  }
+
+  createNamespace(tenant, namespace, policies) {
+    console.log("Create name space : " + tenant + "/" + namespace);
+    return axios.put(`${this.apiPath}/namespaces/${tenant}/${namespace}`, policies);
   }
 
 }

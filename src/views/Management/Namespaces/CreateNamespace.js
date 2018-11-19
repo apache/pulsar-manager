@@ -35,31 +35,37 @@ import {
 import { AppSwitch } from '@coreui/react'
 
 import API from '../../../api'
+import PULSAR from '../../../utils'
 
-class CreateTenant extends Component {
+class CreateNamespace extends Component {
 
   constructor(props) {
-    super(props)
+    super(props);
+    this.tenant = this.props.match.params.tenant;
     this.state = {
-      value: ''
+      namespace: '',
+      policies: {}
     };
     this.handleNameChange = this.handleNameChange.bind(this);
-    this.handleCreateTenant = this.handleCreateTenant.bind(this);
+    this.handleCreateNamespace = this.handleCreateNamespace.bind(this);
   }
 
   handleNameChange(event) {
-    this.setState({value: event.target.value});
+    this.setState({
+      namespace: event.target.value,
+      policies: this.state.policies,
+    });
   }
 
-  handleCreateTenant(event) {
-    API.createTenant(this.state.value, {}).then(
+  handleCreateNamespace(event) {
+    API.createNamespace(this.tenant, this.state.namespace, this.state.policies).then(
       ignored => {
-        this.props.history.push('/management/tenants');
+        this.props.history.push(PULSAR.getTenantUrl(this.tenant));
       }
     )
     .catch(
       error => {
-        alert(`Failed to create tenant '${this.state.value}' : ${error}`);
+        alert(`Failed to create namespace '${this.tenant}/${this.state.namespace}' : ${error}`);
       }
     );
     event.preventDefault();
@@ -72,10 +78,10 @@ class CreateTenant extends Component {
           <Col>
             <Card>
               <CardHeader>
-                <strong>Create Tenant</strong>
+                <strong>Create Namespace for Tenant {this.tenant}</strong>
               </CardHeader>
               <CardBody>
-                <Form onSubmit={this.handleCreateTenant} method="post" className="form-horizontal">
+                <Form onSubmit={this.handleCreateNamespace} method="post" className="form-horizontal">
                   <FormGroup row>
                     <Col md="3">
                       <Label htmlFor="name">Name</Label>
@@ -84,18 +90,18 @@ class CreateTenant extends Component {
                       <Input
                         type="text"
                         id="name"
-                        value={this.state.value}
+                        value={this.state.namespace}
                         onChange={this.handleNameChange}
-                        placeholder="Tenant name"
+                        placeholder="Namespace name"
                         required/>
-                      <FormText className="help-block">Please enter tenant name</FormText>
+                      <FormText className="help-block">Please enter namespace name</FormText>
                     </Col>
                   </FormGroup>
                   <FormGroup>
                     <Button type="submit" size="sm" color="primary" onClick={this.createTenant}>
                       <i className="fa fa-dot-circle-o"></i> Create
                     </Button>
-                    <Link to="/management/tenants">
+                    <Link to={PULSAR.getTenantUrl(this.tenant)}>
                       <Button type="reset" size="sm" color="danger">
                         <i className="fa fa-ban"></i> Cancel
                       </Button>
@@ -112,4 +118,4 @@ class CreateTenant extends Component {
 
 }
 
-export default withRouter(CreateTenant);
+export default withRouter(CreateNamespace);

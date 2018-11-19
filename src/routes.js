@@ -47,8 +47,18 @@ const CreateTenant = Loadable({
   loading: Loading
 });
 
+const Tenant = Loadable({
+  loader: () => import('./views/Management/Tenant'),
+  loading: Loading
+});
+
 const Namespaces = Loadable({
   loader: () => import('./views/Management/Namespaces'),
+  loading: Loading
+});
+
+const CreateNamespace = Loadable({
+  loader: () => import('./views/Management/Namespaces/CreateNamespace'),
   loading: Loading
 });
 
@@ -90,6 +100,8 @@ const routes = [
   // tenants
   { path: '/management/tenants/create', name: 'CreateTenant', component: CreateTenant },
   { path: '/management/tenants', name: 'Tenants', component: Tenants },
+  { path: '/management/tenant/:tenant/namespaces/create', name: 'CreateNamespace', component: CreateNamespace },
+  { path: '/management/tenant/:tenant', name: 'Tenant', component: Tenant },
 
   { path: '/management/namespaces', name: 'Namespaces', component: Namespaces },
   { path: '/management/topics', name: 'Topics', component: Topics },
