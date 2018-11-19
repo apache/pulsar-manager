@@ -22,6 +22,24 @@ class PulsarUtils {
     };
   }
 
+  normalizeTopic(topic) {
+    return {
+      'name': topic,
+      'is_partitioned': false
+    };
+  }
+
+  normalizeParititonedTopic(topic) {
+    return {
+      'name': topic,
+      'is_partitioned': true
+    };
+  }
+
+  normalizeTopics(topics, partitioned_topics) {
+    return topics.map(this.normalizeTopic) + partitioned_topics.map(this.normalizeParititonedTopic);
+  }
+
   // Urls
 
   getTenantUrl(tenant) {
@@ -30,6 +48,18 @@ class PulsarUtils {
 
   getNamespaceUrl(tenant, namespace) {
     return `/management/namespace/${tenant}/${namespace}`;
+  }
+
+  getCreateNamespaceUrl(tenant) {
+    return `/management/tenant/${tenant}/namespaces/create`;
+  }
+
+  getCreateTopicUrl(tenant, namespace) {
+    return `/management/namespace/${tenant}/${namespace}/topics/create`;
+  }
+
+  getTopicUrl(tenant, namespace, topic) {
+    return `/management/topic/${tenant}/${namespace}/${topic}`;
   }
 
 }

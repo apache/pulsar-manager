@@ -52,6 +52,16 @@ class PulsarApi {
     return axios.put(`${this.apiPath}/namespaces/${tenant}/${namespace}`, policies);
   }
 
+  // Topics
+
+  getTopics(tenant, namespace) {
+    return axios.get(`${this.apiPath}/persistent/${tenant}/${namespace}`);
+  }
+
+  getPartitionedTopics(tenant, namespace) {
+    return axios.get(`${this.apiPath}/persistent/${tenant}/${namespace}/partitioned`);
+  }
+
 }
 
 const API = new PulsarApi();

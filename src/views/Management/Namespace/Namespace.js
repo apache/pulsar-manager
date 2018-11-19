@@ -31,62 +31,69 @@ import { AppSwitch } from '@coreui/react'
 import API from '../../../api'
 import PULSAR from '../../../utils'
 
-class Tenant extends Component {
+class Namespace extends Component {
 
   constructor(props) {
     super(props);
     this.tenant = this.props.match.params.tenant;
+    this.namespace = this.props.match.params.namespace;
     this.state = {
-      loading: true,
-      namespaces: [],
+      topics_loading: true,
+      topics: [],
+      partitioned_topics_loading: true,
+      partitioned_topics: [],
     };
   }
 
   componentDidMount() {
-    this.setState({
-      loading: true,
-      namespaces: [],
-    })
-    this._asyncRequest = API.getNamespaces(this.tenant).then(
-      namespaces => {
-        this._asyncRequest = null;
+    this._asyncGetTopicsRequest = API.getTopics(this.tenant, this.namespace).then(
+      topics => {
+        this._asyncGetTopicsRequest = null;
         this.setState({
-          loading: false,
-          namespaces: namespaces.data,
+          topics_loading: false,
+          topics: topics.data,
+          partitioned_topics_loading: this.state.partitioned_topics_loading,
+          partitioned_topics: this.state.partitioned_topics,
+        });
+    });
+
+    this._asyncGetPartitionedTopicsRequest = API.getPartitionedTopics(this.tenant, this.namespace).then(
+      topics => {
+        this._asyncGetPartitionedTopicsRequest = null;
+        this.setState({
+          topics_loading: this.state.topics_loading,
+          topics: this.state.topics,
+          partitioned_topics_loading: false,
+          partitioned_topics: topics.data,
         });
     });
   }
 
-  handleDeleteNamespace(fully_qualified_namespace, event) {
-    API.deleteNamespace(fully_qualified_namespace).then(
-      ignored => {
-        this.props.history.push('/');
-      }
-    )
-    .catch(
-      error => {
-        alert(`Failed to delete namespace '${fully_qualified_namespace}' : ${error}`);
-      }
-    );
-    event.preventDefault();
+  handleDeleteTopic(topic, is_partitioned, event) {
   }
 
-  renderNamespaces() {
+  renderTopics() {
     return (
       <Table responsive size="sm">
         <thead>
         <tr>
           <th>Name</th>
+          <th>Type</th>
           <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        {this.state.namespaces.map(PULSAR.getNamespaceName).map(ns => (
-          <tr key={ns.fully_qualified_namespace}>
+        {PULSAR.normalizeTopics(this.state.topics, this.state.partitioned_topics).map(t => (
+          <tr key={t.name}>
             <td>
-            <Link to={PULSAR.getTenantUrl(ns.tenant)}>{ns.tenant}</Link>
-            <strong>/</strong>
-            <Link to={PULSAR.getNamespaceUrl(ns.tenant, ns.namespace)}>{ns.namespace}</Link>
+            <Link to={PULSAR.getTopicUrl(this.tenant, this.namespace, t.name)}>
+            {t.name}
+            </Link>
+            </td>
+            {
+              t.is_partitioned ? <b>partitioned</b> : <b>non-partitioned</b>
+            }
+            <td>
             </td>
             <td>
             <Button color="danger">
@@ -100,10 +107,10 @@ class Tenant extends Component {
     )
   }
 
-  listNamespaces() {
+  listTopics() {
     return (
-      this.state.namespaces.length > 0 ? this.renderNamespaces() : (
-        !this.state.loading && <p className="card-text">No namespaces in this cluster</p>
+      this.state.topics.length > 0 || this.state.partitioned_topics.length > 0 ? this.renderTopics() : (
+        !this.state.topics_loading && !this.state.partitioned_topics_loading && <p className="card-text">No topics in this namespace</p>
       )
     );
   }
@@ -115,17 +122,19 @@ class Tenant extends Component {
           <Col>
             <Card>
               <CardHeader>
-                Tenant <Link to={PULSAR.getTenantUrl(this.tenant)}>
+                Namespace <Link to={PULSAR.getTenantUrl(this.tenant)}>
                 {this.tenant}
+                </Link>/<Link to={PULSAR.getNamespaceUrl(this.tenant, this.namespace)}>
+                {this.namespace}
                 </Link>
                 <div className="card-header-actions">
-                  <Link to={PULSAR.getCreateNamespaceUrl(this.tenant)} color="success">
+                  <Link to={PULSAR.getCreateTopicUrl(this.tenant, this.namespace)} color="success">
                     <i className="fa fa-plus"></i>
                   </Link>
                 </div>
               </CardHeader>
               <CardBody>
-                {this.listNamespaces()}
+                {this.listTopics()}
               </CardBody>
             </Card>
           </Col>
@@ -136,4 +145,4 @@ class Tenant extends Component {
 
 }
 
-export default withRouter(Tenant);
+export default withRouter(Namespace);
