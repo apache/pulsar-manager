@@ -24,7 +24,8 @@ import {
   Collapse,
   Fade,
   Row,
-  Table
+  Table,
+  Alert,
 } from 'reactstrap';
 import { AppSwitch } from '@coreui/react'
 
@@ -33,10 +34,34 @@ import PULSAR from '../../../utils'
 
 class Tenants extends Component {
 
-  state = {
-    loading: true,
-    tenants: [],
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      loading: true,
+      tenants: [],
+      visible: false,
+      message: '',
+    };
+
+    this.onDismiss = this.onDismiss.bind(this);
+    this.onDisplay = this.onDisplay.bind(this);
+
+  }
+
+  onDisplay(message) {
+    this.setState({
+      visible: true,
+      message: message
+    })
+  }
+  
+  onDismiss() {
+    this.setState({
+      visible: false,
+      message: ''
+    });
+  }
 
   componentDidMount() {
     this._asyncRequest = API.getTenants().then(
@@ -49,13 +74,14 @@ class Tenants extends Component {
   handleDeleteTenant(tenant, event) {
     API.deleteTenant(tenant).then(
       ignored => {
+        // Avoid Warning: You cannot PUSH the same path using hash history
         this.props.history.push('/');
         this.props.history.push('/management/tenants/');
       }
     )
     .catch(
       error => {
-        alert(`Failed to delete tenant '${tenant}' : ${error}`);
+        this.onDisplay(`Failed to delete tenant '${tenant}' : ${error}`)
       }
     );
     event.preventDefault();
@@ -90,6 +116,14 @@ class Tenants extends Component {
     )
   }
 
+  renderAlert() {
+    return (
+        <Alert color="danger" isOpen={this.state.visible} toggle={this.onDismiss}>
+          {this.state.message}
+        </Alert>
+      )
+  }
+
   listTenants() {
     return (
       this.state.tenants.length > 0 ? this.renderTenants() : (
@@ -113,6 +147,7 @@ class Tenants extends Component {
                 </div>
               </CardHeader>
               <CardBody>
+                {this.renderAlert()}
                 {this.listTenants()}
               </CardBody>
             </Card>
