@@ -50,6 +50,7 @@ class Tenants extends Component {
     API.deleteTenant(tenant).then(
       ignored => {
         this.props.history.push('/');
+        this.props.history.push('/management/tenants/');
       }
     )
     .catch(
@@ -78,7 +79,7 @@ class Tenants extends Component {
             </Link>
             </td>
             <td>
-            <Button color="danger">
+            <Button color="danger" onClick={this.handleDeleteTenant.bind(this, tenant)}>
               <i className="fa fa-trash-o"></i>
             </Button>
             </td>
