@@ -32,7 +32,6 @@ out/
 # NodeJs
 node_modules/
 package-lock.json
-build/
 
 # Yarn
 yarn.lock
