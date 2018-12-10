@@ -94,12 +94,13 @@ export default {
     return {
       tableKey: 0,
       list: null,
+      localList: [],
       total: 0,
       listLoading: true,
       jsonValue: {},
       listQuery: {
         page: 1,
-        limit: 20
+        limit: 10
       },
       temp: {
         id: undefined,
@@ -127,16 +128,28 @@ export default {
   },
   methods: {
     getClusters() {
-      this.listLoading = true
-      fetchClusters(this.listQuery).then(response => {
-        this.list = response.items
-        this.total = response.total
-
-        // Just to simulate the time of the request
+      if (this.localList.length > 0) {
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.localPaging()
+        }, 0.5 * 1000)
+      } else {
+        this.listLoading = true
+        fetchClusters(this.listQuery).then(response => {
+          this.localList = response.items
+          this.total = this.localList.length
+          this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+          // Just to simulate the time of the request
+          setTimeout(() => {
+            this.listLoading = false
+          }, 1.5 * 1000)
+        })
+      }
+    },
+    localPaging() {
+      this.listLoading = true
+      this.total = this.localList.length
+      this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+      this.listLoading = false
     },
     handleGetConfig(row) {
       this.temp = Object.assign({}, row) // copy obj

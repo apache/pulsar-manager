@@ -78,6 +78,7 @@ export default {
       tableKey: 0,
       tenant: '',
       list: null,
+      localList: [],
       total: 0,
       jsonValue: {},
       listLoading: true,
@@ -105,15 +106,28 @@ export default {
   },
   methods: {
     getNamespaces() {
-      this.listLoading = true
-      fetchNamespaces(this.tenant, this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-        // Just to simulate the time of the request
+      if (this.localList.length > 0) {
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.localPaging()
+        }, 0.5 * 1000)
+      } else {
+        this.listLoading = true
+        fetchNamespaces(this.tenant, this.listQuery).then(response => {
+          this.localList = response.items
+          this.total = this.localList.length
+          this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+          // Just to simulate the time of the request
+          setTimeout(() => {
+            this.listLoading = false
+          }, 1.5 * 1000)
+        })
+      }
+    },
+    localPaging() {
+      this.listLoading = true
+      this.total = this.localList.length
+      this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+      this.listLoading = false
     },
     getNamespacePolicies(namespace) {
       // this.policiesListLoading = true

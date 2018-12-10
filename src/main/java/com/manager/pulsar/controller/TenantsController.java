@@ -33,10 +33,10 @@ public class TenantsController {
   @RequestMapping(value = "/tenants/{tenant}", method = RequestMethod.POST)
   public ResponseEntity create(@PathVariable("tenant") String tenant) {
 //    checkInput(createUserParam, bindingResult);
-    TenantsEntity tenantEntity = new TenantsEntity(tenant);
-    Integer tenantId = tenantsRepository.save(tenantEntity);
-    return ResponseEntity.ok(new HashMap<String, Object>() {{
-      put("tenant", tenantsRepository.findById(tenantId));
-    }});
+      TenantsEntity tenantEntity = new TenantsEntity(tenant);
+      Integer tenantId = tenantsRepository.save(tenantEntity);
+      return ResponseEntity.ok(new HashMap<String, Object>() {{
+        put("tenant", tenantsRepository.findById(tenantId));
+      }});
   }
 }
