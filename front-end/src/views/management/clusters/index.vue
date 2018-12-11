@@ -72,6 +72,7 @@ import { fetchClusters, putCluster, updateCluster, fetchClusterConfig } from '@/
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
+import { validateEmpty } from '@/utils/validate'
 
 export default {
   name: 'Clusters',
@@ -95,10 +96,12 @@ export default {
       tableKey: 0,
       list: null,
       localList: [],
+      searchList: [],
       total: 0,
       listLoading: true,
       jsonValue: {},
       listQuery: {
+        name: '',
         page: 1,
         limit: 10
       },
@@ -147,8 +150,19 @@ export default {
     },
     localPaging() {
       this.listLoading = true
-      this.total = this.localList.length
-      this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+      if (!validateEmpty(this.listQuery.name)) {
+        this.searchList = []
+        for (var i = 0; i < this.localList.length; i++) {
+          if (this.localList[i]['name'].indexOf(this.listQuery.name) !== -1) {
+            this.searchList.push(this.localList[i])
+          }
+        }
+        this.total = this.searchList.length
+        this.list = this.searchList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+      } else {
+        this.total = this.localList.length
+        this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+      }
       this.listLoading = false
     },
     handleGetConfig(row) {

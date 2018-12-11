@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input :placeholder="$t('table.tenant')" v-model="listQuery.tenant" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input :placeholder="$t('table.name')" v-model="listQuery.name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
     </div>
@@ -72,6 +72,7 @@ import { fetchTenantsInfo, updateTenant, putTenant, fetchTenants } from '@/api/t
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
+import { validateEmpty } from '@/utils/validate'
 
 export default {
   name: 'Tenants',
@@ -95,10 +96,12 @@ export default {
       tableKey: 0,
       list: null,
       localList: [],
+      searchList: [],
       total: 0,
       listLoading: true,
       jsonValue: {},
       listQuery: {
+        tenant: '',
         page: 1,
         limit: 10
       },
@@ -126,7 +129,7 @@ export default {
       if (this.localList.length > 0) {
         setTimeout(() => {
           this.localPaging()
-        }, 0.5 * 1000)
+        }, 0)
       } else {
         this.listLoading = true
         fetchTenantsInfo(this.listQuery).then(response => {
@@ -143,8 +146,19 @@ export default {
     },
     localPaging() {
       this.listLoading = true
-      this.total = this.localList.length
-      this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+      if (!validateEmpty(this.listQuery.name)) {
+        this.searchList = []
+        for (var i = 0; i < this.localList.length; i++) {
+          if (this.localList[i]['name'].indexOf(this.listQuery.name) !== -1) {
+            this.searchList.push(this.localList[i])
+          }
+        }
+        this.total = this.searchList.length
+        this.list = this.searchList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+      } else {
+        this.total = this.localList.length
+        this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+      }
       this.listLoading = false
     },
     handleGetConfig(row) {
@@ -157,10 +171,7 @@ export default {
         }
       })
     },
-    getTenantsConfig() {
-    },
     handleFilter() {
-      this.listQuery.page = 1
       this.getTenants()
     },
     resetTemp() {
@@ -230,9 +241,6 @@ export default {
       })
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
-    },
-    JumpToNamespace(tenant) {
-
     }
   }
 }
