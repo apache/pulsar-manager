@@ -116,6 +116,12 @@ export const constantRouterMap = [
         name: 'NamespacesPolicies',
         meta: { title: 'NamespacesPolicies', noCache: true },
         hidden: true
+      },
+      {
+        path: 'functions',
+        component: () => import('@/views/management/functions'),
+        name: 'Functions',
+        meta: { title: 'Functions', noCache: true }
       }
     ]
   }
