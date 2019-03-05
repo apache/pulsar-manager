@@ -152,7 +152,10 @@ export default {
     config: 'Config',
     policies: 'Policies',
     description: 'Description',
-    update: 'Update'
+    update: 'Update',
+    topic: 'Topic',
+    stats: 'Stats',
+    partition: 'Partition'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
