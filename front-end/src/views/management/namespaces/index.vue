@@ -1,5 +1,26 @@
 <template>
   <div class="app-container">
+    <div class="createPost-container">
+      <el-form ref="postForm" :model="postForm" class="form-container">
+        <div class="createPost-main-container">
+          <el-row>
+            <el-col :span="12">
+              <div class="postInfo-container">
+                <el-row>
+                  <el-col :span="8">
+                    <el-form-item class="postInfo-container-item">
+                      <el-select v-model="postForm.tenant" placeholder="选择租户" @change="getNamespacesList(postForm.tenant)">
+                        <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-col>
+          </el-row>
+        </div>
+      </el-form>
+    </div>
     <div class="filter-container">
       <el-input :placeholder="$t('table.name')" v-model="listQuery.name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
@@ -62,10 +83,15 @@
 
 <script>
 import { fetchNamespaces, fetchNamespacePolicies, putNamespace } from '@/api/namespaces'
+import { fetchTenantsList } from '@/api/tenants'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
+
+const defaultForm = {
+  tenant: ''
+}
 
 export default {
   name: 'Namespaces',
@@ -76,6 +102,9 @@ export default {
   directives: { waves },
   data() {
     return {
+      postForm: Object.assign({}, defaultForm),
+      loading: false,
+      tenantsListOptions: [],
       tableKey: 0,
       tenant: '',
       list: null,
@@ -106,6 +135,7 @@ export default {
   created() {
     this.tenant = this.$route.params && this.$route.params.tenant
     this.getNamespaces()
+    this.getRemoteTenantsList()
   },
   methods: {
     getNamespaces() {
@@ -193,7 +223,36 @@ export default {
       })
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
+    },
+    getRemoteTenantsList() {
+      fetchTenantsList().then(response => {
+        if (!response.data.items) return
+        this.tenantsListOptions = response.data.items.map(v => v.tenant)
+        console.log(this.userListOptions)
+      })
+    },
+    getNamespacesList(tenant) {
+      this.tenant = tenant
+      this.localList = []
+      this.getNamespaces()
     }
   }
 }
 </script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+@import "src/styles/mixin.scss";
+.createPost-container {
+  position: relative;
+  .createPost-main-container {
+    .postInfo-container {
+      position: relative;
+      @include clearfix;
+      margin-bottom: 10px;
+      .postInfo-container-item {
+        float: left;
+      }
+    }
+  }
+}
+</style>
