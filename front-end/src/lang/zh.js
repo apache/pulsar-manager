@@ -152,7 +152,10 @@ export default {
     config: '配置',
     policies: '策略',
     description: '说明',
-    update: '更新'
+    update: '更新',
+    topic: '主题',
+    stats: '统计',
+    partition: '分区'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
