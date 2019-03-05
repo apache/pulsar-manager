@@ -21,6 +21,13 @@ export function fetchTenantsAndNamespaces(query) {
   })
 }
 
+export function fetchTenantsList() {
+  return request({
+    url: '/tenants',
+    method: 'get'
+  })
+}
+
 export function fetchTenants(tenant) {
   return request({
     url: `/tenants/${tenant}`,
