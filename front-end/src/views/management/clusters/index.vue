@@ -1,10 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input :placeholder="$t('table.name')" v-model="listQuery.name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input :placeholder="$t('table.cluster')" v-model="listQuery.cluster" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">{{ $t('table.export') }}</el-button>
     </div>
 
     <el-row :gutter="8">
@@ -17,9 +16,9 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column :label="$t('table.name')" min-width="150px" align="center">
+          <el-table-column :label="$t('table.cluster')" min-width="150px" align="center">
             <template slot-scope="scope">
-              <span>{{ scope.row.name }}</span>
+              <span>{{ scope.row.cluster }}</span>
             </template>
           </el-table-column>
           <el-table-column :label="$t('table.config')" min-width="150px" align="center">
@@ -44,11 +43,11 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="130px" style="width: 400px; margin-left:50px;">
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.name')" prop="name">
-          <el-input v-model="temp.name"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.cluster')" prop="cluster">
+          <el-input v-model="temp.cluster"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.name')">
-          <span>{{ temp.name }}</span>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.cluster')">
+          <span>{{ temp.cluster }}</span>
         </el-form-item>
         <el-form-item :label="$t('table.serviceUrl')" prop="serviceUrl">
           <el-input v-model="temp.serviceUrl"/>
@@ -68,7 +67,8 @@
 </template>
 
 <script>
-import { fetchClusters, putCluster, updateCluster, fetchClusterConfig } from '@/api/clusters'
+import { fetchClusters, fetchClusterConfig } from '@/api/clusters'
+// import { fetchClusters, putCluster, updateCluster, fetchClusterConfig } from '@/api/clusters'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
@@ -101,13 +101,12 @@ export default {
       listLoading: true,
       jsonValue: {},
       listQuery: {
-        name: '',
+        cluster: '',
         page: 1,
         limit: 10
       },
       temp: {
-        id: undefined,
-        name: '',
+        cluster: '',
         serviceUrl: '',
         brokerServiceUrl: ''
       },
@@ -119,11 +118,10 @@ export default {
       },
       dialogPvVisible: false,
       rules: {
-        name: [{ required: true, message: 'name is required', trigger: 'change' }],
+        cluster: [{ required: true, message: 'cluster name is required', trigger: 'change' }],
         serviceUrl: [{ required: true, message: 'serviceUrl is required', trigger: 'change' }],
         brokerServiceUrl: [{ required: true, message: 'brokerServiceUrl is required', trigger: 'blur' }]
-      },
-      downloadLoading: false
+      }
     }
   },
   created() {
@@ -138,7 +136,9 @@ export default {
       } else {
         this.listLoading = true
         fetchClusters(this.listQuery).then(response => {
-          this.localList = response.items
+          for (var i = 0; i < response.data.length; i++) {
+            this.localList.push({ 'cluster': response.data[i] })
+          }
           this.total = this.localList.length
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
           // Just to simulate the time of the request
@@ -150,10 +150,10 @@ export default {
     },
     localPaging() {
       this.listLoading = true
-      if (!validateEmpty(this.listQuery.name)) {
+      if (!validateEmpty(this.listQuery.cluster)) {
         this.searchList = []
         for (var i = 0; i < this.localList.length; i++) {
-          if (this.localList[i]['name'].indexOf(this.listQuery.name) !== -1) {
+          if (this.localList[i]['cluster'].indexOf(this.listQuery.cluster) !== -1) {
             this.searchList.push(this.localList[i])
           }
         }
@@ -167,10 +167,10 @@ export default {
     },
     handleGetConfig(row) {
       this.temp = Object.assign({}, row) // copy obj
-      fetchClusterConfig(this.temp.tenant).then(response => {
+      fetchClusterConfig(this.temp.cluster).then(response => {
         this.jsonValue = {
-          'serviceUrl': response.serviceUrl,
-          'brokerServiceUrl': response.brokerServiceUrl
+          'serviceUrl': response.data.serviceUrl,
+          'brokerServiceUrl': response.data.brokerServiceUrl
         }
       })
     },
@@ -180,7 +180,7 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        name: '',
+        cluster: '',
         serviceUrl: '',
         brokerServiceUrl: ''
       }
@@ -195,18 +195,25 @@ export default {
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          putCluster(this.temp.name, this.temp).then(response => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'success',
-              message: 'create success',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
+        this.$notify({
+          title: 'success',
+          message: '暂不可用，敬请期待',
+          type: 'success',
+          duration: 2000
+        })
+        return
+        // if (valid) {
+        //   putCluster(this.temp.cluster, this.temp).then(response => {
+        //     this.list.unshift(this.temp)
+        //     this.dialogFormVisible = false
+        //     this.$notify({
+        //       title: 'success',
+        //       message: 'create success',
+        //       type: 'success',
+        //       duration: 2000
+        //     })
+        //   })
+        // }
       })
     },
     handleUpdate(row) {
@@ -219,54 +226,54 @@ export default {
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          fetchClusterConfig(this.temp.tenant).then(response => {
-            this.tempData.ServiceUrl = response.serviceUrl
-            this.tempData.BrokerServiceUrl = response.brokerServiceUrl
-          })
-          updateCluster(this.temp.name, tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'success',
-              message: 'update success',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
+        this.$notify({
+          title: 'success',
+          message: '暂不可用，敬请期待',
+          type: 'success',
+          duration: 2000
+        })
+        return
+        // if (valid) {
+        //   const tempData = Object.assign({}, this.temp)
+        //   fetchClusterConfig(this.temp.cluster).then(response => {
+        //     this.tempData.ServiceUrl = response.serviceUrl
+        //     this.tempData.BrokerServiceUrl = response.brokerServiceUrl
+        //   })
+        //   updateCluster(this.temp.cluster, tempData).then(() => {
+        //     for (const v of this.list) {
+        //       if (v.id === this.temp.id) {
+        //         const index = this.list.indexOf(v)
+        //         this.list.splice(index, 1, this.temp)
+        //         break
+        //       }
+        //     }
+        //     this.dialogFormVisible = false
+        //     this.$notify({
+        //       title: 'success',
+        //       message: 'update success',
+        //       type: 'success',
+        //       duration: 2000
+        //     })
+        //   })
+        // }
       })
     },
     handleDelete(row) {
       this.$notify({
         title: 'success',
-        message: 'delete success',
+        message: '暂不可用，敬请期待',
         type: 'success',
         duration: 2000
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
-    },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['id', 'name', 'serviceUrl', 'brokerServiceUrl']
-        const filterVal = ['id', 'name', 'serviceUrl', 'brokerServiceUrl']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'clusters-list'
-        })
-        this.downloadLoading = false
-      })
+      return
+      // this.$notify({
+      //   title: 'success',
+      //   message: 'delete success',
+      //   type: 'success',
+      //   duration: 2000
+      // })
+      // const index = this.list.indexOf(row)
+      // this.list.splice(index, 1)
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {

@@ -302,3 +302,10 @@ export function uniqueArr(arr) {
 export function isExternal(path) {
   return /^(https?:|mailto:|tel:)/.test(path)
 }
+
+export function parsePulsarSchema(path) {
+  if (path != null) {
+    return path.split('://')
+  }
+  return ''
+}

@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { fetchTenantsInfo, updateTenant, putTenant, fetchTenants } from '@/api/tenants'
+import { updateTenant, putTenant, fetchTenants, fetchTenantsInfo } from '@/api/tenants'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
@@ -132,8 +132,10 @@ export default {
         }, 0)
       } else {
         this.listLoading = true
-        fetchTenantsInfo(this.listQuery).then(response => {
-          this.localList = response.items
+        fetchTenants().then(response => {
+          for (var i = 0; i < response.data.length; i++) {
+            this.localList.push({ 'tenant': response.data[i] })
+          }
           this.total = this.localList.length
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
           // this.localPaging()
@@ -165,11 +167,11 @@ export default {
     },
     handleGetConfig(row) {
       this.temp = Object.assign({}, row) // copy obj
-      fetchTenants(this.temp.tenant).then(response => {
+      fetchTenantsInfo(this.temp.tenant).then(response => {
         // response
         this.jsonValue = {
-          'adminRoles': response.adminRoles,
-          'allowedClusters': response.allowedClusters
+          'adminRoles': response.data.adminRoles,
+          'allowedClusters': response.data.allowedClusters
         }
       })
     },
@@ -194,7 +196,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          putTenant(this.temp.tenant, this.temp).then(() => {
+          putTenant(this.temp.tenant).then((response) => {
             this.temp.adminRoles = 'empty'
             this.temp.allowedClusters = 'empty'
             this.list.unshift(this.temp)

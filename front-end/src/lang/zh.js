@@ -155,7 +155,10 @@ export default {
     update: '更新',
     topic: '主题',
     stats: '统计',
-    partition: '分区'
+    partition: '分区',
+    cluster: '集群',
+    subscription: '订阅',
+    unsubscription: '取消订阅'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

@@ -13,47 +13,48 @@
  */
 import request from '@/utils/request'
 
+const BASE_URL_V2 = '/admin/v2'
+
 export function fetchTenantsAndNamespaces(query) {
   return request({
-    url: '/tenants/namespaces',
+    url: BASE_URL_V2 + '/tenants/namespaces',
     method: 'get',
     params: { query }
   })
 }
 
-export function fetchTenantsList() {
+export function fetchTenants() {
   return request({
-    url: '/tenants',
+    url: BASE_URL_V2 + '/tenants',
     method: 'get'
   })
 }
 
-export function fetchTenants(tenant) {
+export function fetchTenantsInfo(tenant) {
   return request({
-    url: `/tenants/${tenant}`,
+    url: BASE_URL_V2 + `/tenants/${tenant}`,
     method: 'get'
   })
 }
 
-export function fetchTenantsInfo(query) {
-  return request({
-    url: '/manage/tenants/list',
-    method: 'get',
-    params: { query }
-  })
-}
+// export function fetchTenantsInfo(query) {
+//   return request({
+//     url: '/manage/tenants/list',
+//     method: 'get',
+//     params: { query }
+//   })
+// }
 
-export function putTenant(tenant, data) {
+export function putTenant(tenant) {
   return request({
-    url: `/tenants/${tenant}`,
-    method: 'put',
-    data
+    url: BASE_URL_V2 + `/tenants/${tenant}`,
+    method: 'put'
   })
 }
 
 export function updateTenant(tenant, data) {
   return request({
-    url: `/tenants/${tenant}`,
+    url: BASE_URL_V2 + `/tenants/${tenant}`,
     method: 'post',
     data
   })
@@ -61,7 +62,7 @@ export function updateTenant(tenant, data) {
 
 export function deleteTenant(tenant) {
   return request({
-    url: `/tenants/${tenant}`,
+    url: BASE_URL_V2 + `/tenants/${tenant}`,
     method: 'delete'
   })
 }

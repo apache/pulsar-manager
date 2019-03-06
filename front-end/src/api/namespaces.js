@@ -13,25 +13,26 @@
  */
 import request from '@/utils/request'
 
+const BASE_URL_V2 = '/admin/v2'
+
 export function fetchNamespaces(tenant, query) {
   return request({
-    url: `/namespaces/${tenant}`,
+    url: BASE_URL_V2 + `/namespaces/${tenant}`,
     method: 'get',
     params: { query }
   })
 }
 
-export function fetchNamespacePolicies(tenant, namespace, query) {
+export function fetchNamespacePolicies(tenantNamespace) {
   return request({
-    url: `/namespaces/${tenant}/${namespace}`,
-    method: 'get',
-    params: { query }
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}`,
+    method: 'get'
   })
 }
 
 export function putNamespace(tenant, namespace, data) {
   return request({
-    url: `/namespaces/${tenant}/${namespace}`,
+    url: BASE_URL_V2 + `/namespaces/${tenant}/${namespace}`,
     method: 'put',
     data
   })
@@ -39,7 +40,7 @@ export function putNamespace(tenant, namespace, data) {
 
 export function updateNamespace(tenant, namespace, data) {
   return request({
-    url: `/namespaces/${tenant}/${namespace}`,
+    url: BASE_URL_V2 + `/namespaces/${tenant}/${namespace}`,
     method: 'post',
     data
   })
@@ -47,7 +48,7 @@ export function updateNamespace(tenant, namespace, data) {
 
 export function deleteNamespace(namespace) {
   return request({
-    url: `/namespaces/${namespace}`,
+    url: BASE_URL_V2 + `/namespaces/${namespace}`,
     method: 'delete'
   })
 }

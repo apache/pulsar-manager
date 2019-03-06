@@ -43,14 +43,19 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column :label="$t('table.topic')" min-width="50px" align="center">
+          <el-table-column :label="$t('table.topic')" min-width="100px" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.topic }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.stats')" align="center" min-width="100px">
+          <el-table-column :label="$t('table.stats')" align="center" min-width="50px">
             <template slot-scope="scope">
               <span class="link-type" @click="handleGetStats(scope.row)">stats</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('table.partition')" align="center" min-width="50px">
+            <template slot-scope="scope">
+              <span>{{ scope.row.isPartition }}</span>
             </template>
           </el-table-column>
           <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
@@ -74,13 +79,13 @@
           <el-input v-model="temp.topic"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.partition')" prop="topic">
-          <el-input v-model="temp.partition"/>
+          <el-input v-model="temp.partitions"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('table.topic')">
           <span>{{ temp.topic }}</span>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('table.partition')" prop="topic">
-          <el-input v-model="temp.partition"/>
+          <el-input v-model="temp.partitions"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -92,9 +97,20 @@
 </template>
 
 <script>
-import { fetchTenantsList } from '@/api/tenants'
+import { fetchTenants } from '@/api/tenants'
 import { fetchNamespaces } from '@/api/namespaces'
-import { fetchTopics, fetchTopicStats, putTopic, updateTopic, getPartitionMetadata } from '@/api/topics'
+import {
+  fetchTopics,
+  fetchTopicStats,
+  putTopic,
+  updateTopic,
+  getPartitionMetadata,
+  fetchPartitionTopicStats,
+  fetchPersistentPartitonsTopics,
+  fetchNonPersistentPartitonsTopics,
+  deletePartitionTopic
+} from '@/api/topics'
+import { parsePulsarSchema } from '@/utils'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
@@ -149,7 +165,7 @@ export default {
       },
       temp: {
         topic: '',
-        partition: 0
+        partitions: 0
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -187,8 +203,20 @@ export default {
           this.tenant = 'public'
           this.namespace = 'default'
         }
+        fetchPersistentPartitonsTopics(this.tenant, this.namespace).then(response => {
+          for (var i = 0; i < response.data.length; i++) {
+            this.localList.push({ 'topic': response.data[i], 'isPartition': 'yes', 'partitions': 0 })
+          }
+        })
+        fetchNonPersistentPartitonsTopics(this.tenant, this.namespace).then(response => {
+          for (var i = 0; i < response.data.length; i++) {
+            this.localList.push({ 'topic': response.data[i], 'isPartition': 'yes', 'partitions': 0 })
+          }
+        })
         fetchTopics(this.tenant, this.namespace, this.listQuery).then(response => {
-          this.localList = response.data.items
+          for (var i = 0; i < response.data.length; i++) {
+            this.localList.push({ 'topic': response.data[i], 'isPartition': 'no', 'partitions': '0' })
+          }
           this.total = this.localList.length
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
           // this.localPaging()
@@ -235,8 +263,17 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          putTopic(this.tenant, this.namespace, this.temp.topic, this.temp).then(() => {
-            this.list.unshift(this.temp)
+          if (this.tenant.length <= 0 || this.namespace <= 0) {
+            this.$notify({
+              title: 'error',
+              message: 'please select tenant and namespace',
+              type: 'success',
+              duration: 2000
+            })
+          }
+          putTopic(this.tenant, this.namespace, this.temp.topic, parseInt(this.temp.partitions)).then(() => {
+            this.localList = []
+            this.getTopics()
             this.dialogFormVisible = false
             this.$notify({
               title: 'success',
@@ -252,17 +289,26 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      console.log(this.temp)
-      console.log(this.namespace)
-      getPartitionMetadata(this.tenant, this.namespace, this.temp.topic).then(response => {
-        this.temp.partition = response.data.partitions
+      const tenantNamespaceTopic = parsePulsarSchema(this.temp.topic)
+      getPartitionMetadata(tenantNamespaceTopic[1]).then(response => {
+        this.temp.partitions = response.data.partitions
       })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          updateTopic(this.tenant, this.namespace, tempData.topic, tempData.partition).then(() => {
+          if (tempData.isPartition !== 'yes') {
+            this.$notify({
+              title: 'error',
+              message: 'this partition no support update',
+              type: 'success',
+              duration: 2000
+            })
+            return
+          }
+          const tenantNamespaceTopic = parsePulsarSchema(tempData.topic)
+          updateTopic(tenantNamespaceTopic[1], parseInt(tempData.partitions)).then(() => {
             this.dialogFormVisible = false
             this.$notify({
               title: 'success',
@@ -275,33 +321,56 @@ export default {
       })
     },
     handleDelete(row) {
-      this.$notify({
-        title: 'success',
-        message: 'delete success',
-        type: 'success',
-        duration: 2000
+      this.temp = Object.assign({}, row) // copy obj
+      const tenantNamespaceTopic = parsePulsarSchema(this.temp.topic)
+      if (this.temp.isPartition !== 'yes') {
+        this.$notify({
+          title: 'error',
+          message: '非分区partition暂时不支持删除',
+          type: 'success',
+          duration: 2000
+        })
+        return
+      }
+      deletePartitionTopic(tenantNamespaceTopic[1]).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'delete success',
+          type: 'success',
+          duration: 2000
+        })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     handleGetStats(row) {
       this.temp = Object.assign({}, row) // copy obj
-      fetchTopicStats(this.tenant, this.namespace, this.temp.topic).then(response => {
-        this.jsonValue = response.data.stats
-      })
+      const tenantNamespaceTopic = parsePulsarSchema(this.temp.topic)
+      if (this.temp.isPartition !== 'yes') {
+        fetchTopicStats(tenantNamespaceTopic[1]).then(response => {
+          this.jsonValue = response.data
+        })
+      } else {
+        fetchPartitionTopicStats(tenantNamespaceTopic[1]).then(response => {
+          this.jsonValue = response.data
+        })
+      }
     },
     getRemoteTenantsList() {
-      fetchTenantsList().then(response => {
-        if (!response.data.items) return
-        this.tenantsListOptions = response.data.items.map(v => v.tenant)
-        console.log(this.userListOptions)
+      fetchTenants().then(response => {
+        if (!response.data) return
+        this.tenantsListOptions = response.data
       })
     },
     getNamespacesList(tenant) {
       this.tenant = tenant
       fetchNamespaces(tenant, this.query).then(response => {
-        this.namespacesListOptions = response.items.map(v => v.namespace)
-        console.log(response)
+        let namespace = []
+        for (var i = 0; i < response.data.length; i++) {
+          namespace = response.data[i].split('/')
+          // namespace.splice(1, namespace.length).join('/')
+          this.namespacesListOptions.push(namespace.splice(1, namespace.length).join('/'))
+        }
       })
     },
     getTopicsList(tenant, namespace) {
