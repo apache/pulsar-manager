@@ -21,6 +21,13 @@
                       </el-select>
                     </el-form-item>
                   </el-col>
+                  <el-col :span="8">
+                    <el-form-item class="postInfo-container-item">
+                      <el-select v-model="postForm.topic" placeholder="选择主题" @change="getSubscriptionsList(postForm.tenant, postForm.namespace, postForm.topic)">
+                        <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
                 </el-row>
               </div>
             </el-col>
@@ -29,12 +36,12 @@
       </el-form>
     </div>
     <div class="filter-container">
-      <el-input :placeholder="$t('table.topic')" v-model="listQuery.topic" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input :placeholder="$t('table.subscription')" v-model="listQuery.subscription" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.subscription') }}</el-button>
     </div>
     <el-row :gutter="8">
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
         <el-table
           v-loading="listLoading"
           :key="tableKey"
@@ -43,54 +50,49 @@
           fit
           highlight-current-row
           style="width: 100%;">
+          <el-table-column :label="$t('table.tenant')" min-width="100px" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.tenant }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('table.namespace')" min-width="100px" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.namespace }}</span>
+            </template>
+          </el-table-column>
           <el-table-column :label="$t('table.topic')" min-width="100px" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.topic }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.stats')" align="center" min-width="50px">
+          <el-table-column :label="$t('table.subscription')" min-width="100px" align="center">
             <template slot-scope="scope">
-              <span class="link-type" @click="handleGetStats(scope.row)">stats</span>
+              <span>{{ scope.row.subscription }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.partition')" align="center" min-width="50px">
+          <el-table-column :label="$t('table.actions')" align="center" width="360" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <span>{{ scope.row.isPartition }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-              <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
+              <el-button v-if="scope.row.status!='deleted'" class="el-button el-button--primary el-button--medium" type="danger" @click="handleDelete(scope.row)">{{ $t('table.unsubscription') }}
               </el-button>
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getTopics" />
-      </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;">
-        <jsonEditor :value="jsonValue"/>
+        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getSubscriptions" />
       </el-col>
     </el-row>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.topic')" prop="topic">
-          <el-input v-model="temp.topic"/>
+        <el-form-item v-if="dialogStatus==='create'" label="messageId" prop="messageId">
+          <el-input v-model="temp.messageId"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.partition')" prop="topic">
-          <el-input v-model="temp.partitions"/>
-        </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.topic')">
-          <span>{{ temp.topic }}</span>
-        </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.partition')" prop="topic">
-          <el-input v-model="temp.partitions"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.subscription')" prop="subscription">
+          <el-input v-model="temp.subscription"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
+        <el-button type="primary" @click="createData()">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -99,18 +101,13 @@
 <script>
 import { fetchTenants } from '@/api/tenants'
 import { fetchNamespaces } from '@/api/namespaces'
+import { fetchSubscriptions, putSubscription, deleteSubscription } from '@/api/subscriptions'
 import {
   fetchTopics,
-  fetchTopicStats,
-  putTopic,
-  updateTopic,
-  getPartitionMetadata,
-  fetchPartitionTopicStats,
   fetchPersistentPartitonsTopics,
-  fetchNonPersistentPartitonsTopics,
-  deletePartitionTopic
+  fetchNonPersistentPartitonsTopics
 } from '@/api/topics'
-import { parsePulsarSchema } from '@/utils'
+// import { parsePulsarSchema } from '@/utils'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
@@ -149,6 +146,7 @@ export default {
       loading: false,
       tenantsListOptions: [],
       namespacesListOptions: [],
+      topicsListOptions: [],
       tableKey: 0,
       list: null,
       localList: [],
@@ -158,14 +156,15 @@ export default {
       jsonValue: {},
       tenant: '',
       namespace: '',
+      topic: '',
       listQuery: {
-        topic: '',
+        subscription: '',
         page: 1,
         limit: 10
       },
       temp: {
-        topic: '',
-        partitions: 0
+        messageId: '',
+        subscription: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -182,7 +181,7 @@ export default {
   computed: {
   },
   created() {
-    this.getTopics()
+    this.getSubscriptions()
     if (this.isEdit) {
       // const id = this.$route.params && this.$route.params.id
       // this.fetchData(id)
@@ -192,30 +191,26 @@ export default {
     this.getRemoteTenantsList()
   },
   methods: {
-    getTopics() {
+    getSubscriptions() {
       if (this.localList.length > 0) {
         setTimeout(() => {
           this.localPaging()
         }, 0)
       } else {
         this.listLoading = true
-        if (this.tenant.length <= 0 || this.namespace.length <= 0) {
+        if (this.tenant.length <= 0 || this.namespace.length <= 0 || this.topic.length <= 0) {
           this.tenant = 'public'
           this.namespace = 'default'
+          this.topic = 'test'
         }
-        fetchPersistentPartitonsTopics(this.tenant, this.namespace).then(response => {
+        fetchSubscriptions(this.tenant, this.namespace, this.topic, this.listQuery).then(response => {
           for (var i = 0; i < response.data.length; i++) {
-            this.localList.push({ 'topic': response.data[i], 'isPartition': 'yes', 'partitions': 0 })
-          }
-        })
-        fetchNonPersistentPartitonsTopics(this.tenant, this.namespace).then(response => {
-          for (var i = 0; i < response.data.length; i++) {
-            this.localList.push({ 'topic': response.data[i], 'isPartition': 'yes', 'partitions': 0 })
-          }
-        })
-        fetchTopics(this.tenant, this.namespace, this.listQuery).then(response => {
-          for (var i = 0; i < response.data.length; i++) {
-            this.localList.push({ 'topic': response.data[i], 'isPartition': 'no', 'partitions': '0' })
+            this.localList.push({
+              'tenant': this.tenant,
+              'namespace': this.namespace,
+              'topic': this.topic,
+              'subscription': response.data[i]
+            })
           }
           this.total = this.localList.length
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
@@ -229,10 +224,10 @@ export default {
     },
     localPaging() {
       this.listLoading = true
-      if (!validateEmpty(this.listQuery.topic)) {
+      if (!validateEmpty(this.listQuery.subscription)) {
         this.searchList = []
         for (var i = 0; i < this.localList.length; i++) {
-          if (this.localList[i]['topic'].indexOf(this.listQuery.topic) !== -1) {
+          if (this.localList[i]['subscription'].indexOf(this.listQuery.subscription) !== -1) {
             this.searchList.push(this.localList[i])
           }
         }
@@ -245,11 +240,11 @@ export default {
       this.listLoading = false
     },
     handleFilter() {
-      this.getTopics()
+      this.getSubscriptions()
     },
     resetTemp() {
       this.temp = {
-        topic: ''
+        subscription: ''
       }
     },
     handleCreate() {
@@ -263,17 +258,22 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.tenant.length <= 0 || this.namespace <= 0) {
+          if (this.tenant.length <= 0 || this.namespace <= 0 || this.topic.length <= 0) {
             this.$notify({
               title: 'error',
-              message: 'please select tenant and namespace',
+              message: 'please select tenant and namespace and topic',
               type: 'success',
               duration: 2000
             })
           }
-          putTopic(this.tenant, this.namespace, this.temp.topic, parseInt(this.temp.partitions)).then(() => {
+          putSubscription(
+            this.tenant,
+            this.namespace,
+            this.topic,
+            this.temp.subscription
+          ).then(() => {
             this.localList = []
-            this.getTopics()
+            this.getSubscriptions()
             this.dialogFormVisible = false
             this.$notify({
               title: 'success',
@@ -285,54 +285,14 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      const tenantNamespaceTopic = parsePulsarSchema(this.temp.topic)
-      getPartitionMetadata(tenantNamespaceTopic[1]).then(response => {
-        this.temp.partitions = response.data.partitions
-      })
-    },
-    updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          if (tempData.isPartition !== 'yes') {
-            this.$notify({
-              title: 'error',
-              message: 'this partition no support update',
-              type: 'success',
-              duration: 2000
-            })
-            return
-          }
-          const tenantNamespaceTopic = parsePulsarSchema(tempData.topic)
-          updateTopic(tenantNamespaceTopic[1], parseInt(tempData.partitions)).then(() => {
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'success',
-              message: 'update success',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
     handleDelete(row) {
       this.temp = Object.assign({}, row) // copy obj
-      const tenantNamespaceTopic = parsePulsarSchema(this.temp.topic)
-      if (this.temp.isPartition !== 'yes') {
-        this.$notify({
-          title: 'error',
-          message: '非分区partition暂时不支持删除',
-          type: 'success',
-          duration: 2000
-        })
-        return
-      }
-      deletePartitionTopic(tenantNamespaceTopic[1]).then(response => {
+      deleteSubscription(
+        this.temp.tenant,
+        this.temp.namespace,
+        this.temp.topic,
+        this.temp.subscription
+      ).then(response => {
         this.$notify({
           title: 'success',
           message: 'delete success',
@@ -342,19 +302,6 @@ export default {
         const index = this.list.indexOf(row)
         this.list.splice(index, 1)
       })
-    },
-    handleGetStats(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      const tenantNamespaceTopic = parsePulsarSchema(this.temp.topic)
-      if (this.temp.isPartition !== 'yes') {
-        fetchTopicStats(tenantNamespaceTopic[1]).then(response => {
-          this.jsonValue = response.data
-        })
-      } else {
-        fetchPartitionTopicStats(tenantNamespaceTopic[1]).then(response => {
-          this.jsonValue = response.data
-        })
-      }
     },
     getRemoteTenantsList() {
       fetchTenants().then(response => {
@@ -368,7 +315,6 @@ export default {
         let namespace = []
         for (var i = 0; i < response.data.length; i++) {
           namespace = response.data[i].split('/')
-          // namespace.splice(1, namespace.length).join('/')
           this.namespacesListOptions.push(namespace.splice(1, namespace.length).join('/'))
         }
       })
@@ -376,10 +322,30 @@ export default {
     getTopicsList(tenant, namespace) {
       this.tenant = tenant
       this.namespace = namespace
+      this.topicsListOptions = []
+      fetchPersistentPartitonsTopics(this.tenant, this.namespace).then(response => {
+        for (var i = 0; i < response.data.length; i++) {
+          this.topicsListOptions.push(response.data[i].split('/' + this.namespace + '/')[1])
+        }
+      })
+      fetchNonPersistentPartitonsTopics(this.tenant, this.namespace).then(response => {
+        for (var i = 0; i < response.data.length; i++) {
+          this.topicsListOptions.push(response.data[i].split('/' + this.namespace + '/')[1])
+        }
+      })
+      fetchTopics(this.tenant, this.namespace, this.listQuery).then(response => {
+        for (var i = 0; i < response.data.length; i++) {
+          this.topicsListOptions.push(response.data[i].split('/' + this.namespace + '/')[1])
+        }
+      })
+    },
+    getSubscriptionsList(tenant, namespace, topic) {
+      this.tenant = tenant
+      this.namespace = namespace
+      this.topic = topic
       this.localList = []
-      this.getTopics()
+      this.getSubscriptions()
     }
-
   }
 }
 </script>

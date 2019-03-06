@@ -29,12 +29,12 @@
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <router-link to="/">
+          <!-- <router-link to="/">
             <el-dropdown-item>
               {{ $t('navbar.dashboard') }}
             </el-dropdown-item>
-          </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-element-admin/">
+          </router-link> -->
+          <a target="_blank" href="https://github.com/apache/pulsar">
             <el-dropdown-item>
               {{ $t('navbar.github') }}
             </el-dropdown-item>

@@ -13,9 +13,11 @@
  */
 import request from '@/utils/request'
 
+const BASE_URL_V2 = '/admin/v2'
+
 export function fetchClusters(query) {
   return request({
-    url: '/clusters',
+    url: BASE_URL_V2 + '/clusters',
     method: 'get',
     params: { query }
   })
@@ -23,14 +25,14 @@ export function fetchClusters(query) {
 
 export function fetchClusterConfig(cluster) {
   return request({
-    url: `/clusters/{cluster}`,
+    url: BASE_URL_V2 + `/clusters/${cluster}`,
     method: 'get'
   })
 }
 
 export function putCluster(cluster, data) {
   return request({
-    url: `/clusters/${cluster}`,
+    url: BASE_URL_V2 + `/clusters/${cluster}`,
     method: 'put',
     data
   })
@@ -38,7 +40,7 @@ export function putCluster(cluster, data) {
 
 export function updateCluster(cluster, data) {
   return request({
-    url: `/clusters/${cluster}`,
+    url: BASE_URL_V2 + `/clusters/${cluster}`,
     method: 'post',
     data
   })
@@ -46,7 +48,7 @@ export function updateCluster(cluster, data) {
 
 export function deleteCluster(cluster) {
   return request({
-    url: `/clusters/${cluster}`,
+    url: BASE_URL_V2 + `/clusters/${cluster}`,
     method: 'delete'
   })
 }

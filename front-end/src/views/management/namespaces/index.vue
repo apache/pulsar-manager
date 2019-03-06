@@ -22,7 +22,7 @@
       </el-form>
     </div>
     <div class="filter-container">
-      <el-input :placeholder="$t('table.name')" v-model="listQuery.name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input :placeholder="$t('table.namespace')" v-model="listQuery.namespace" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
     </div>
@@ -45,7 +45,7 @@
             </el-table-column>
             <el-table-column :label="$t('table.policies')" min-width="50px" align="center">
               <template slot-scope="scope">
-                <router-link :to="'/management/namespaces/' + tenant + '/' + scope.row.namespace + '/policies'" class="link-type">
+                <router-link :to="'/management/namespaces/' + scope.row.namespace + '/policies'" class="link-type">
                   <span>policies</span>
                 </router-link>
               </template>
@@ -82,8 +82,8 @@
 </template>
 
 <script>
-import { fetchNamespaces, fetchNamespacePolicies, putNamespace } from '@/api/namespaces'
-import { fetchTenantsList } from '@/api/tenants'
+import { fetchNamespaces, fetchNamespacePolicies, putNamespace, deleteNamespace } from '@/api/namespaces'
+import { fetchTenants } from '@/api/tenants'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
@@ -115,7 +115,7 @@ export default {
       listLoading: true,
       policiesListLoading: false,
       listQuery: {
-        name: '',
+        namespace: '',
         page: 1,
         limit: 20
       },
@@ -134,6 +134,7 @@ export default {
   },
   created() {
     this.tenant = this.$route.params && this.$route.params.tenant
+    console.log(this.tenant)
     this.getNamespaces()
     this.getRemoteTenantsList()
   },
@@ -145,8 +146,13 @@ export default {
         }, 0.5 * 1000)
       } else {
         this.listLoading = true
+        if (this.tenant == null || this.tenant.length <= 0) {
+          this.tenant = 'public'
+        }
         fetchNamespaces(this.tenant, this.listQuery).then(response => {
-          this.localList = response.items
+          for (var i = 0; i < response.data.length; i++) {
+            this.localList.push({ 'namespace': response.data[i] })
+          }
           this.total = this.localList.length
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
           // Just to simulate the time of the request
@@ -158,10 +164,10 @@ export default {
     },
     localPaging() {
       this.listLoading = true
-      if (!validateEmpty(this.listQuery.name)) {
+      if (!validateEmpty(this.listQuery.namespace)) {
         this.searchList = []
         for (var i = 0; i < this.localList.length; i++) {
-          if (this.localList[i]['name'].indexOf(this.listQuery.name) !== -1) {
+          if (this.localList[i]['namespace'].indexOf(this.listQuery.namespace) !== -1) {
             this.searchList.push(this.localList[i])
           }
         }
@@ -175,8 +181,8 @@ export default {
     },
     getNamespacePolicies(namespace) {
       // this.policiesListLoading = true
-      fetchNamespacePolicies(this.tenant, namespace, this.temp).then(response => {
-        this.jsonValue = response.data.policies
+      fetchNamespacePolicies(namespace).then(response => {
+        this.jsonValue = response.data
         // Just to simulate the time of the request
         setTimeout(() => {
           this.policiesListLoading = false
@@ -202,7 +208,8 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           putNamespace(this.tenant, this.temp.namespace, this.temp).then(() => {
-            this.list.unshift(this.temp)
+            this.localList = []
+            this.getNamespaces()
             this.dialogFormVisible = false
             this.$notify({
               title: 'success',
@@ -215,20 +222,22 @@ export default {
       })
     },
     handleDelete(row) {
-      this.$notify({
-        title: 'success',
-        message: 'delete success',
-        type: 'success',
-        duration: 2000
+      deleteNamespace(row.namespace).then((response) => {
+        this.$notify({
+          title: 'success',
+          message: 'delete success',
+          type: 'success',
+          duration: 2000
+        })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     getRemoteTenantsList() {
-      fetchTenantsList().then(response => {
-        if (!response.data.items) return
-        this.tenantsListOptions = response.data.items.map(v => v.tenant)
-        console.log(this.userListOptions)
+      fetchTenants().then(response => {
+        if (!response.data) return
+        this.tenantsListOptions = response.data
+        console.log(this.tenantsListOptions)
       })
     },
     getNamespacesList(tenant) {

@@ -9,7 +9,12 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/admin/*': {
+        target: 'http://localhost:8080/',
+        changeOrigin: true
+      }
+    },
 
     // Various Dev Server settings
 

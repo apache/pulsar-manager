@@ -52,8 +52,8 @@ service.interceptors.response.use(
   response => {
     // const res = response.data
     console.log(response)
-    if (response.status <= 300) {
-      return response.data
+    if (response.status < 500 && response.status >= 200) {
+      return response
     } else {
       return Promise.reject('error')
     }

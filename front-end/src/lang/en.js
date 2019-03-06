@@ -155,7 +155,10 @@ export default {
     update: 'Update',
     topic: 'Topic',
     stats: 'Stats',
-    partition: 'Partition'
+    partition: 'Partition',
+    cluster: 'Cluster',
+    subscription: 'Subscription',
+    unsubscription: 'Unsubscription'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
