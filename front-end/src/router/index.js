@@ -116,9 +116,15 @@ export const constantRouterMap = [
         meta: { title: 'Topics', noCache: true }
       },
       {
+        path: 'subscriptions',
+        component: () => import('@/views/management/subscriptions/index'),
+        name: 'Subscriptions',
+        meta: { title: 'Subscriptions', noCache: true }
+      },
+      {
         path: 'namespaces/:tenant',
         component: () => import('@/views/management/namespaces/index'),
-        name: 'Namespaces',
+        name: 'NamespacesTenant',
         meta: { title: 'Namespaces', noCache: true },
         hidden: true
       },
