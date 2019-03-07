@@ -299,8 +299,8 @@ export default {
           type: 'success',
           duration: 2000
         })
-        const index = this.list.indexOf(row)
-        this.list.splice(index, 1)
+        this.localList = []
+        this.getSubscriptions()
       })
     },
     getRemoteTenantsList() {
