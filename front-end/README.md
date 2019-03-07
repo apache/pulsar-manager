@@ -31,6 +31,16 @@ docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pul
 # build for production with minification
 $ npm run dev
 
+# open browers visit following address
+# login
+http://localhost:9527/#/login
+# tenant
+http://localhost:9527/#/management/tenants
+# namespaces
+http://localhost:9527/#/management/namespaces
+# topics
+http://localhost:9527/#/management/topics
+
 ```
 
 #### Development
