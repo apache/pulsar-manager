@@ -9,21 +9,21 @@
                 <el-row>
                   <el-col :span="8">
                     <el-form-item class="postInfo-container-item">
-                      <el-select v-model="postForm.tenant" placeholder="选择租户" @change="getNamespacesList(postForm.tenant)">
+                      <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
                         <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
                       </el-select>
                     </el-form-item>
                   </el-col>
                   <el-col :span="8">
                     <el-form-item class="postInfo-container-item">
-                      <el-select v-model="postForm.namespace" placeholder="选择项目组" @change="getTopicsList(postForm.tenant, postForm.namespace)">
+                      <el-select v-model="postForm.namespace" placeholder="select namespace" @change="getTopicsList(postForm.tenant, postForm.namespace)">
                         <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
                       </el-select>
                     </el-form-item>
                   </el-col>
                   <el-col :span="8">
                     <el-form-item class="postInfo-container-item">
-                      <el-select v-model="postForm.topic" placeholder="选择主题" @change="getSubscriptionsList(postForm.tenant, postForm.namespace, postForm.topic)">
+                      <el-select v-model="postForm.topic" placeholder="select topic" @change="getSubscriptionsList(postForm.tenant, postForm.namespace, postForm.topic)">
                         <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
                       </el-select>
                     </el-form-item>

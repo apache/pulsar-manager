@@ -9,7 +9,7 @@
                 <el-row>
                   <el-col :span="8">
                     <el-form-item class="postInfo-container-item">
-                      <el-select v-model="postForm.tenant" placeholder="选择租户" @change="getNamespacesList(postForm.tenant)">
+                      <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
                         <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
                       </el-select>
                     </el-form-item>
