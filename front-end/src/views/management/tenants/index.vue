@@ -48,6 +48,11 @@
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.tenant')" prop="tenant">
           <el-input v-model="temp.tenant"/>
         </el-form-item>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.clusters')" prop="tenant">
+          <el-drag-select v-model="clusters" style="width:330px;" multiple placeholder="Please select">
+            <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
+          </el-drag-select>
+        </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('table.tenant')">
           <span>{{ temp.tenant }}</span>
         </el-form-item>
@@ -55,7 +60,9 @@
           <el-input v-model="temp.adminRoles"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('table.clusters')">
-          <el-input v-model="temp.allowedClusters"/>
+          <el-drag-select v-model="clusters" style="width:330px;" multiple placeholder="Please select">
+            <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
+          </el-drag-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -68,17 +75,30 @@
 </template>
 
 <script>
-import { updateTenant, putTenant, fetchTenants, fetchTenantsInfo } from '@/api/tenants'
+import {
+  updateTenant,
+  putTenant,
+  fetchTenants,
+  fetchTenantsInfo,
+  deleteTenant
+} from '@/api/tenants'
+import { fetchClusters } from '@/api/clusters'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
+import ElDragSelect from '@/components/DragSelect' // base on element-ui
+
+const defaultForm = {
+  cluster: ''
+}
 
 export default {
   name: 'Tenants',
   components: {
     Pagination,
-    jsonEditor
+    jsonEditor,
+    ElDragSelect
   },
   directives: { waves },
   filters: {
@@ -93,12 +113,15 @@ export default {
   },
   data() {
     return {
+      postForm: Object.assign({}, defaultForm),
+      clusterListOptions: [],
       tableKey: 0,
       list: null,
       localList: [],
       searchList: [],
       total: 0,
       listLoading: true,
+      clusters: [],
       jsonValue: {},
       listQuery: {
         tenant: '',
@@ -117,7 +140,8 @@ export default {
         create: 'Create'
       },
       rules: {
-        tenant: [{ required: true, message: 'tenant is required', trigger: 'blur' }]
+        tenant: [{ required: true, message: 'required', trigger: 'blur' }],
+        clusters: [{ required: true, message: 'required', trigger: 'blur' }]
       }
     }
   },
@@ -189,6 +213,13 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
+      this.clusters = []
+      this.clusterListOptions = []
+      fetchClusters(this.listQuery).then(response => {
+        for (var i = 0; i < response.data.length; i++) {
+          this.clusterListOptions.push({ 'value': response.data[i], 'label': response.data[i] })
+        }
+      })
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -196,10 +227,12 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          putTenant(this.temp.tenant).then((response) => {
+          const data = { allowedClusters: this.clusters }
+          putTenant(this.temp.tenant, data).then((response) => {
             this.temp.adminRoles = 'empty'
             this.temp.allowedClusters = 'empty'
-            this.list.unshift(this.temp)
+            this.localList = []
+            this.getTenants()
             this.dialogFormVisible = false
             this.$notify({
               title: 'success',
@@ -215,36 +248,61 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      fetchTenants(this.temp.tenant).then(response => {
-        this.temp.adminRoles = response.adminRoles.join(',')
-        this.temp.allowedClusters = response.allowedClusters.join(',')
+      fetchTenantsInfo(this.temp.tenant).then(response => {
+        this.temp.adminRoles = response.data.adminRoles.join(',')
+        this.clusters = response.data.allowedClusters
+      })
+      this.clusterListOptions = []
+      fetchClusters(this.listQuery).then(response => {
+        for (var i = 0; i < response.data.length; i++) {
+          this.clusterListOptions.push({ 'value': response.data[i], 'label': response.data[i] })
+        }
       })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          updateTenant(this.temp.tenant, tempData).then(() => {
-            this.dialogFormVisible = false
+          const data = {}
+          if (this.clusters.length > 0) {
+            data.allowedClusters = this.clusters
+          }
+          if (tempData.adminRoles.length > 0) {
+            data.adminRoles = tempData.adminRoles.split(',')
+          }
+          if (this.clusters.length > 0 || tempData.adminRoles.length > 0) {
+            updateTenant(this.temp.tenant, data).then(() => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: 'success',
+                message: 'update success',
+                type: 'success',
+                duration: 2000
+              })
+            })
+          } else {
             this.$notify({
               title: 'success',
-              message: 'update success',
+              message: 'no need update',
               type: 'success',
               duration: 2000
             })
-          })
+          }
         }
       })
     },
     handleDelete(row) {
-      this.$notify({
-        title: 'success',
-        message: 'delete success',
-        type: 'success',
-        duration: 2000
+      this.temp = Object.assign({}, row) // copy obj
+      deleteTenant(this.temp.tenant).then((response) => {
+        this.$notify({
+          title: 'success',
+          message: 'delete success',
+          type: 'success',
+          duration: 2000
+        })
+        this.localList = []
+        this.getTenants()
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     }
   }
 }

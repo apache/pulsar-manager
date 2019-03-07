@@ -9,14 +9,14 @@
                 <el-row>
                   <el-col :span="8">
                     <el-form-item class="postInfo-container-item">
-                      <el-select v-model="postForm.tenant" placeholder="选择租户" @change="getNamespacesList(postForm.tenant)">
+                      <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
                         <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
                       </el-select>
                     </el-form-item>
                   </el-col>
                   <el-col :span="8">
                     <el-form-item class="postInfo-container-item">
-                      <el-select v-model="postForm.namespace" placeholder="选择项目组" @change="getTopicsList(postForm.tenant, postForm.namespace)">
+                      <el-select v-model="postForm.namespace" placeholder="select namespace" @change="getTopicsList(postForm.tenant, postForm.namespace)">
                         <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
                       </el-select>
                     </el-form-item>
@@ -326,7 +326,7 @@ export default {
       if (this.temp.isPartition !== 'yes') {
         this.$notify({
           title: 'error',
-          message: '非分区partition暂时不支持删除',
+          message: 'non partition no support delete event',
           type: 'success',
           duration: 2000
         })
@@ -339,8 +339,8 @@ export default {
           type: 'success',
           duration: 2000
         })
-        const index = this.list.indexOf(row)
-        this.list.splice(index, 1)
+        this.localList = []
+        this.getTopics()
       })
     },
     handleGetStats(row) {
