@@ -45,15 +45,18 @@ export function fetchTenantsInfo(tenant) {
 //   })
 // }
 
-export function putTenant(tenant) {
+export function putTenant(tenant, data) {
   return request({
+    headers: { 'Content-Type': 'application/json' },
     url: BASE_URL_V2 + `/tenants/${tenant}`,
-    method: 'put'
+    method: 'put',
+    data
   })
 }
 
 export function updateTenant(tenant, data) {
   return request({
+    headers: { 'Content-Type': 'application/json' },
     url: BASE_URL_V2 + `/tenants/${tenant}`,
     method: 'post',
     data
