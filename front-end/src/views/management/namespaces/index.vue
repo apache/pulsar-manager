@@ -25,11 +25,14 @@
       <el-input :placeholder="$t('table.namespace')" v-model="listQuery.namespace" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-select v-model="postForm.otherOptions" class="filter-item" style="margin-left: 10px;" placeholder="select options" @change="moreListOptionsChange(postForm.otherOptions)">
+        <el-option v-for="(item,index) in moreListOptions" :key="item+index" :label="item" :value="item"/>
+      </el-select>
     </div>
 
     <div>
       <el-row :gutter="8">
-        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
+        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 14}" :xl="{span: 14}" style="padding-right:8px;margin-bottom:30px;">
           <el-table
             v-loading="listLoading"
             :key="tableKey"
@@ -43,7 +46,7 @@
                 <span class="link-type" @click="getNamespacePolicies(scope.row.namespace)">{{ scope.row.namespace }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.policies')" min-width="50px" align="center">
+            <el-table-column :label="$t('table.policies')" min-width="30px" align="center">
               <template slot-scope="scope">
                 <router-link :to="'/management/namespaces/' + scope.row.namespace + '/policies'" class="link-type">
                   <span>policies</span>
@@ -59,7 +62,7 @@
           </el-table>
           <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getNamespaces" />
         </el-col>
-        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;">
+        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 10}" :xl="{span: 10}" style="margin-bottom:30px;">
           <jsonEditor :value="jsonValue"/>
         </el-col>
       </el-row>
@@ -90,7 +93,8 @@ import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
 
 const defaultForm = {
-  tenant: ''
+  tenant: '',
+  otherOptions: ''
 }
 
 export default {
@@ -105,8 +109,37 @@ export default {
       postForm: Object.assign({}, defaultForm),
       loading: false,
       tenantsListOptions: [],
+      moreListOptions: [
+        'grant-permission',
+        'revoke-permission',
+        'set-clusters',
+        'set-backlog-quota',
+        'remove-backlog-quota',
+        'set-persistence',
+        'set-message-ttl',
+        'set-anti-affinity-group',
+        'delete-anti-affinity-group',
+        'set-deduplication',
+        'set-retention',
+        'unload',
+        'split-bundle',
+        'set-dispatch-rate',
+        'clear-backlog',
+        'unsubscribe',
+        'set-encryption-required',
+        'set-subscription-auth-mode',
+        'set-max-producers-per-topic',
+        'set-max-consumers-per-topic',
+        'set-max-consumers-per-subscription',
+        'set-compaction-threshold',
+        'set-offload-threshold',
+        'set-offload-deletion-lag',
+        'clear-offload-deletion-lag',
+        'set-schema-autoupdate-strategy'
+      ],
       tableKey: 0,
       tenant: '',
+      otherOptions: '',
       list: null,
       localList: [],
       searchList: [],
@@ -244,6 +277,9 @@ export default {
       this.tenant = tenant
       this.localList = []
       this.getNamespaces()
+    },
+    moreListOptionsChange(option) {
+      console.log(option)
     }
   }
 }
