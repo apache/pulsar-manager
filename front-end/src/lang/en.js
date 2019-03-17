@@ -158,7 +158,8 @@ export default {
     partition: 'Partition',
     cluster: 'Cluster',
     subscription: 'Subscription',
-    unsubscription: 'Unsubscription'
+    unsubscription: 'Unsubscription',
+    grant: 'Grant'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
