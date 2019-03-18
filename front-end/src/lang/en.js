@@ -159,7 +159,8 @@ export default {
     cluster: 'Cluster',
     subscription: 'Subscription',
     unsubscription: 'Unsubscription',
-    grant: 'Grant'
+    grant: 'Grant',
+    limit: 'Limit'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

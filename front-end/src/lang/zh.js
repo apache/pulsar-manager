@@ -159,7 +159,8 @@ export default {
     cluster: '集群',
     subscription: '订阅',
     unsubscription: '取消订阅',
-    grant: '授权'
+    grant: '授权',
+    limit: '限制'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

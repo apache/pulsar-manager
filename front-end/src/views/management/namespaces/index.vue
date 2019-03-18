@@ -31,6 +31,7 @@
         class="filter-item inline-input"
         style="margin-left: 10px;"
         placeholder="select options"
+        clearable
         @select="moreListOptionsChange"
       />
     </div>
@@ -91,6 +92,251 @@
               <el-option v-for="item in actionsListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-drag-select>
           </el-form-item>
+          <el-form-item :label="$t('table.role')" prop="role">
+            <el-input v-model="temp.role"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='revoke-permission'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('table.role')" prop="role">
+            <el-input v-model="temp.role"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-clusters'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('table.clusters')" prop="clusters">
+            <el-drag-select v-model="clusters" style="width:330px;" multiple placeholder="Please select">
+              <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
+            </el-drag-select>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-backlog-quota'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('table.limit')" prop="limit">
+            <el-input v-model="temp.limit"/>
+          </el-form-item>
+          <el-form-item :label="$t('table.policies')" prop="policies">
+            <el-drag-select v-model="temp.policies" style="width:330px;" multiple placeholder="Please select">
+              <el-option v-for="item in policiesListOptions" :label="item.label" :value="item.value" :key="item.value" />
+            </el-drag-select>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='remove-backlog-quota'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-persistence'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="ackQuorum" prop="ackQuorum">
+            <el-input v-model="temp.ackQuorum"/>
+          </el-form-item>
+          <el-form-item label="ensemble" prop="ensemble">
+            <el-input v-model="temp.ensemble"/>
+          </el-form-item>
+          <el-form-item label="writeQuorum" prop="writeQuorum">
+            <el-input v-model="temp.writeQuorum"/>
+          </el-form-item>
+          <el-form-item label="deleteMaxRate" prop="deleteMaxRate">
+            <el-input v-model="temp.deleteMaxRate"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-message-ttl'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="messageTTL" prop="messageTTL">
+            <el-input v-model="temp.messageTTL"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-anti-affinity-group'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="group" prop="group">
+            <el-input v-model="temp.group"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='delete-anti-affinity-group'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-deduplication'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="deduplication">
+            <el-switch
+              v-model="temp.deduplication"
+              active-color="#13ce66"
+              inactive-color="#ff4949"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-retention'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="retentionSize" prop="retentionSize">
+            <el-input v-model="temp.retentionSize"/>
+          </el-form-item>
+          <el-form-item label="retentionTime" prop="retentionTime">
+            <el-input v-model="temp.retentionTime"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='unload'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="unloadBundle" prop="unloadBundle">
+            <el-input v-model="temp.unloadBundle"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='split-bundle'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="splitBundle" prop="splitBundle">
+            <el-input v-model="temp.splitBundle"/>
+          </el-form-item>
+          <el-form-item label="splitBundle">
+            <el-switch
+              v-model="temp.splitBundle"
+              active-color="#13ce66"
+              inactive-color="#ff4949"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-dispatch-rate'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="byteDispatchRate" prop="byteDispatchRate">
+            <el-input v-model="temp.byteDispatchRate"/>
+          </el-form-item>
+          <el-form-item label="dispatchRatePeriod" prop="dispatchRatePeriod">
+            <el-input v-model="temp.dispatchRatePeriod"/>
+          </el-form-item>
+          <el-form-item label="msgDispatchRate" prop="msgDispatchRate">
+            <el-input v-model="temp.msgDispatchRate"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='clear-backlog'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="clearBundle" prop="clearBundle">
+            <el-input v-model="temp.clearBundle"/>
+          </el-form-item>
+          <el-form-item label="clearForce">
+            <el-switch
+              v-model="temp.clearForce"
+              active-color="#13ce66"
+              inactive-color="#ff4949"/>
+          </el-form-item>
+          <el-form-item label="clearSub" prop="clearSub">
+            <el-input v-model="temp.clearSub"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='unsubscribe'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="unsubBundle" prop="unsubBundle">
+            <el-input v-model="temp.unsubBundle"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-encryption-required'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="encryption">
+            <el-switch
+              v-model="temp.encryption"
+              active-color="#13ce66"
+              inactive-color="#ff4949"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-subscription-auth-mode'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-max-producers-per-topic'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="maxProducersPerTopic" prop="maxProducersPerTopic">
+            <el-input v-model="temp.maxProducersPerTopic"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-max-consumers-per-topic'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="maxConsumersPerTopic" prop="maxConsumersPerTopic">
+            <el-input v-model="temp.maxConsumersPerTopic"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-max-consumers-per-subscription'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="maxConsumersPerSub" prop="maxConsumersPerSub">
+            <el-input v-model="temp.maxConsumersPerSub"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-compaction-threshold'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="threshold" prop="threshold">
+            <el-input v-model="temp.threshold"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-offload-threshold'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="thresholdSize" prop="thresholdSize">
+            <el-input v-model="temp.thresholdSize"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-offload-deletion-lag'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="deletionLag" prop="deletionLag">
+            <el-input v-model="temp.deletionLag"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='clear-offload-deletion-lag'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='set-schema-autoupdate-strategy'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="compatibility" prop="compatibility">
+            <el-drag-select v-model="temp.compatibility" style="width:330px;" multiple placeholder="Please select">
+              <el-option v-for="item in compatibilityListOptions" :label="item.label" :value="item.value" :key="item.value" />
+            </el-drag-select>
+          </el-form-item>
+          <el-form-item label="autoupdateStrategy">
+            <el-switch
+              v-model="temp.autoupdateStrategy"
+              active-color="#13ce66"
+              inactive-color="#ff4949"/>
+          </el-form-item>
         </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -105,6 +351,7 @@
 <script>
 import { fetchNamespaces, fetchNamespacePolicies, putNamespace, deleteNamespace } from '@/api/namespaces'
 import { fetchTenants } from '@/api/tenants'
+import { fetchClusters } from '@/api/clusters'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
@@ -128,7 +375,10 @@ export default {
     return {
       postForm: Object.assign({}, defaultForm),
       loading: false,
+      clusters: [],
+      clusterListOptions: [],
       tenantsListOptions: [],
+      policiesListOptions: [],
       actions: [],
       actionsListOptions: [],
       moreListOptions: [],
@@ -153,13 +403,46 @@ export default {
         limit: 20
       },
       temp: {
-        namespace: ''
+        namespace: '',
+        limit: 0,
+        policies: [],
+        ackQuorum: 0,
+        ensemble: 0,
+        writeQuorum: 0,
+        deleteMaxRate: 0.0,
+        messageTTL: 0,
+        group: '',
+        deduplication: false,
+        retentionSize: '',
+        retentionTime: '',
+        unloadBundle: '',
+        splitBundle: '',
+        splitUnload: false,
+        byteDispatchRate: -1,
+        dispatchRatePeriod: 1,
+        msgDispatchRate: 1,
+        clearBundle: '',
+        clearForce: false,
+        clearSub: '',
+        unsubBundle: '',
+        encryption: false,
+        maxProducersPerTopic: 0,
+        maxConsumersPerTopic: 0,
+        maxConsumersPerSub: 0,
+        threshold: 0,
+        thresholdSize: -1,
+        deletionLag: -1,
+        compatibility: [],
+        autoupdateStrategy: false
       },
       dialogFormVisible: false,
       dialogStatus: '',
       rules: {
         namespace: [{ required: true, message: 'namespace is required', trigger: 'blur' }],
-        grant: [{ required: true, message: 'grant is required', trigger: 'blur' }]
+        grant: [{ required: true, message: 'grant is required', trigger: 'blur' }],
+        clusters: [{ required: true, message: 'clusters is required', trigger: 'blur' }],
+        limit: [{ required: true, message: 'limit is required', trigger: 'blur' }],
+        policies: [{ required: true, message: 'policies is required', trigger: 'blur' }]
       }
     }
   },
@@ -172,6 +455,22 @@ export default {
   mounted() {
     this.moreListOptions = this.loadAllOptions()
     this.actionsListOptions = [{ value: 'produce', label: 'produce' }, { value: 'consume', label: 'consume' }]
+    this.clusterListOptions = []
+    fetchClusters(this.listQuery).then(response => {
+      for (var i = 0; i < response.data.length; i++) {
+        this.clusterListOptions.push({ 'value': response.data[i], 'label': response.data[i] })
+      }
+    })
+    this.policiesListOptions = [
+      { value: 'producer_request_hold', label: 'producer_request_hold' },
+      { value: 'producer_exception', label: 'producer_exception' },
+      { value: 'consumer_backlog_eviction', label: 'consumer_backlog_eviction' }
+    ]
+    this.compatibilityListOptions = [
+      { value: 'Full', label: 'Full' },
+      { value: 'Backward', label: 'Backward' },
+      { value: 'Forward', label: 'Forward' }
+    ]
   },
   methods: {
     getNamespaces() {
@@ -347,6 +646,9 @@ export default {
           break
       }
     }
+    // handleClearOptions() {
+    //   this.moreListOptions = this.loadAllOptions()
+    // }
   }
 }
 </script>
