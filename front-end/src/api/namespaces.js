@@ -52,3 +52,26 @@ export function deleteNamespace(namespace) {
     method: 'delete'
   })
 }
+
+export function getPermissions(tenantNamespace) {
+  return request({
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/permissions`,
+    method: 'get'
+  })
+}
+
+export function grantPermissions(tenantNamespace, role, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/permissions/${role}`,
+    method: 'post',
+    data
+  })
+}
+
+export function revokePermissions(tenantNamespace, role) {
+  return request({
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/permissions/${role}`,
+    method: 'delete'
+  })
+}

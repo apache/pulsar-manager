@@ -88,12 +88,12 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.grant')" prop="grant">
-            <el-drag-select v-model="actions" style="width:330px;" multiple placeholder="Please select">
+            <el-drag-select v-model="temp.actions" style="width:300px;" multiple placeholder="Please select">
               <el-option v-for="item in actionsListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-drag-select>
           </el-form-item>
           <el-form-item :label="$t('table.role')" prop="role">
-            <el-input v-model="temp.role"/>
+            <el-input v-model="temp.role" style="width:300px;" />
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='revoke-permission'">
@@ -349,7 +349,13 @@
 </template>
 
 <script>
-import { fetchNamespaces, fetchNamespacePolicies, putNamespace, deleteNamespace } from '@/api/namespaces'
+import {
+  fetchNamespaces,
+  fetchNamespacePolicies,
+  putNamespace,
+  deleteNamespace,
+  grantPermissions
+} from '@/api/namespaces'
 import { fetchTenants } from '@/api/tenants'
 import { fetchClusters } from '@/api/clusters'
 import waves from '@/directive/waves' // Waves directive
@@ -379,7 +385,6 @@ export default {
       clusterListOptions: [],
       tenantsListOptions: [],
       policiesListOptions: [],
-      actions: [],
       actionsListOptions: [],
       moreListOptions: [],
       tableKey: 0,
@@ -405,6 +410,7 @@ export default {
       temp: {
         namespace: '',
         limit: 0,
+        actions: '',
         policies: [],
         ackQuorum: 0,
         ensemble: 0,
@@ -442,13 +448,13 @@ export default {
         grant: [{ required: true, message: 'grant is required', trigger: 'blur' }],
         clusters: [{ required: true, message: 'clusters is required', trigger: 'blur' }],
         limit: [{ required: true, message: 'limit is required', trigger: 'blur' }],
-        policies: [{ required: true, message: 'policies is required', trigger: 'blur' }]
+        policies: [{ required: true, message: 'policies is required', trigger: 'blur' }],
+        role: [{ required: true, message: 'role is required', trigger: 'blur' }]
       }
     }
   },
   created() {
     this.tenant = this.$route.params && this.$route.params.tenant
-    console.log(this.tenant)
     this.getNamespaces()
     this.getRemoteTenantsList()
   },
@@ -591,7 +597,6 @@ export default {
         this.postForm.otherOptions = ''
         return
       }
-      console.log(item)
       this.dialogStatus = item.value
       this.dialogFormVisible = true
     },
@@ -639,12 +644,19 @@ export default {
       this.currentNamespace = item.namespace
     },
     handleOptions() {
-      console.log(this.dialogStatus)
       switch (this.dialogStatus) {
         case 'create':
           this.createNamespace()
           break
+        case 'grant-permission':
+          this.confirmGrantPermission()
+          break
       }
+    },
+    confirmGrantPermission() {
+      grantPermissions(this.currentNamespace, this.temp.role, this.temp.actions).then(response => {
+        console.log(response)
+      })
     }
     // handleClearOptions() {
     //   this.moreListOptions = this.loadAllOptions()
