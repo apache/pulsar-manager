@@ -11,10 +11,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/admin/*': {
-        // target: 'http://localhost:8080/',
-        // changeOrigin: true
-        target: 'https://localhost:8443/',
-        secure: false,
+        // target: 'http://localhost:443/',
+        target: 'http://localhost:8080/',
         changeOrigin: true
       }
     },
