@@ -29,7 +29,7 @@
         v-model="postForm.otherOptions"
         :fetch-suggestions="querySearch"
         class="filter-item inline-input"
-        style="margin-left: 10px;"
+        style="margin-left: 10px; width:400px"
         placeholder="select options"
         clearable
         @select="moreListOptionsChange"
@@ -109,7 +109,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.clusters')" prop="clusters">
-            <el-drag-select v-model="clusters" style="width:330px;" multiple placeholder="Please select">
+            <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select">
               <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-drag-select>
           </el-form-item>
@@ -122,9 +122,9 @@
             <el-input v-model="temp.limit"/>
           </el-form-item>
           <el-form-item :label="$t('table.policies')" prop="policies">
-            <el-drag-select v-model="temp.policies" style="width:330px;" multiple placeholder="Please select">
+            <el-select v-model="temp.policy" style="width:330px;" placeholder="Please select">
               <el-option v-for="item in policiesListOptions" :label="item.label" :value="item.value" :key="item.value" />
-            </el-drag-select>
+            </el-select>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='remove-backlog-quota'">
@@ -207,9 +207,9 @@
           <el-form-item label="splitBundle" prop="splitBundle">
             <el-input v-model="temp.splitBundle"/>
           </el-form-item>
-          <el-form-item label="splitBundle">
+          <el-form-item label="splitUnload">
             <el-switch
-              v-model="temp.splitBundle"
+              v-model="temp.splitUnload"
               active-color="#13ce66"
               inactive-color="#ff4949"/>
           </el-form-item>
@@ -267,6 +267,11 @@
         <div v-else-if="dialogStatus==='set-subscription-auth-mode'">
           <el-form-item :label="$t('table.namespace')" prop="namespace">
             <span>{{ currentNamespace }}</span>
+          </el-form-item>
+          <el-form-item label="auth-mode" prop="auth-mode">
+            <el-select v-model="temp.subscriptionAuthMode" style="width:330px;" placeholder="Please select">
+              <el-option v-for="item in authModeListOptions" :label="item.label" :value="item.value" :key="item.value" />
+            </el-select>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-max-producers-per-topic'">
@@ -327,15 +332,9 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="compatibility" prop="compatibility">
-            <el-drag-select v-model="temp.compatibility" style="width:330px;" multiple placeholder="Please select">
+            <el-select v-model="temp.compatibility" style="width:330px;" placeholder="Please select">
               <el-option v-for="item in compatibilityListOptions" :label="item.label" :value="item.value" :key="item.value" />
-            </el-drag-select>
-          </el-form-item>
-          <el-form-item label="autoupdateStrategy">
-            <el-switch
-              v-model="temp.autoupdateStrategy"
-              active-color="#13ce66"
-              inactive-color="#ff4949"/>
+            </el-select>
           </el-form-item>
         </div>
       </el-form>
@@ -354,7 +353,32 @@ import {
   fetchNamespacePolicies,
   putNamespace,
   deleteNamespace,
-  grantPermissions
+  grantPermissions,
+  revokePermissions,
+  setClusters,
+  setBacklogQuota,
+  removeBacklogQuota,
+  setPersistence,
+  setMessageTtl,
+  setAntiAffinityGroup,
+  deleteAntiAffinityGroup,
+  setDeduplication,
+  setRetention,
+  unloadBundle,
+  splitBundle,
+  setDispatchRate,
+  clearBundleBacklogForSubscription,
+  unsubscribe,
+  setEncryptionRequired,
+  setSubscriptionAuthMode,
+  setMaxProducersPerTopic,
+  setMaxConsumersPerTopic,
+  setMaxConsumersPerSubscription,
+  setCompactionThreshold,
+  setOffloadThreshold,
+  setOffloadDeletionLag,
+  clearOffloadDeletionLag,
+  setSchemaAutoupdateStrategy
 } from '@/api/namespaces'
 import { fetchTenants } from '@/api/tenants'
 import { fetchClusters } from '@/api/clusters'
@@ -386,6 +410,7 @@ export default {
       tenantsListOptions: [],
       policiesListOptions: [],
       actionsListOptions: [],
+      authModeListOptions: [],
       moreListOptions: [],
       tableKey: 0,
       tenant: '',
@@ -409,9 +434,11 @@ export default {
       },
       temp: {
         namespace: '',
-        limit: 0,
-        actions: '',
-        policies: [],
+        limit: '',
+        actions: [],
+        clusters: [],
+        subscriptionAuthMode: '',
+        policy: '',
         ackQuorum: 0,
         ensemble: 0,
         writeQuorum: 0,
@@ -438,8 +465,7 @@ export default {
         threshold: 0,
         thresholdSize: -1,
         deletionLag: -1,
-        compatibility: [],
-        autoupdateStrategy: false
+        compatibility: 0
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -473,9 +499,14 @@ export default {
       { value: 'consumer_backlog_eviction', label: 'consumer_backlog_eviction' }
     ]
     this.compatibilityListOptions = [
-      { value: 'Full', label: 'Full' },
-      { value: 'Backward', label: 'Backward' },
-      { value: 'Forward', label: 'Forward' }
+      { value: 0, label: 'AutoUpdateDisabled' },
+      { value: 1, label: 'Backward' },
+      { value: 2, label: 'Forward' },
+      { value: 3, label: 'Full' }
+    ]
+    this.authModeListOptions = [
+      { value: 0, label: 'None' },
+      { value: 1, label: 'Prefix' }
     ]
   },
   methods: {
@@ -651,11 +682,384 @@ export default {
         case 'grant-permission':
           this.confirmGrantPermission()
           break
+        case 'revoke-permission':
+          this.confirmRevokePermissions()
+          break
+        case 'set-clusters':
+          this.confirmSetClusters()
+          break
+        case 'set-backlog-quota':
+          this.confirmSetBacklogQuota()
+          break
+        case 'remove-backlog-quota':
+          this.confirmRemoveBacklogQuota()
+          break
+        case 'set-persistence':
+          this.confirmSetPersistence()
+          break
+        case 'set-message-ttl':
+          this.confirmSetMessageTtl()
+          break
+        case 'set-anti-affinity-group':
+          this.confirmSetAntiAffinityGroup()
+          break
+        case 'delete-anti-affinity-group':
+          this.confirmDeleteAntiAffinityGroup()
+          break
+        case 'set-deduplication':
+          this.confirmSetDeduplication()
+          break
+        case 'set-retention':
+          this.confirmSetRetention()
+          break
+        case 'unload':
+          this.confirmUnload()
+          break
+        case 'split-bundle':
+          this.confirmSplitBundle()
+          break
+        case 'set-dispatch-rate':
+          this.confirmSetDispatchRate()
+          break
+        case 'clear-backlog':
+          this.confirmClearBacklog()
+          break
+        case 'unsubscribe':
+          this.confirmUnsubscribe()
+          break
+        case 'set-encryption-required':
+          this.confirmSetEncryptionRequired()
+          break
+        case 'set-subscription-auth-mode':
+          this.confirmSetSubscriptionAuthMode()
+          break
+        case 'set-max-producers-per-topic':
+          this.confirmSetMaxProducersPerTopic()
+          break
+        case 'set-max-consumers-per-topic':
+          this.confirmSetMaxConsumersPerTopic()
+          break
+        case 'set-max-consumers-per-subscription':
+          this.confirmSetMaxConsumersPerSubscription()
+          break
+        case 'set-compaction-threshold':
+          this.confirmSetCompactionThreshold()
+          break
+        case 'set-offload-threshold':
+          this.confirmSetOffloadThreshold()
+          break
+        case 'set-offload-deletion-lag':
+          this.confirmSetOffloadDeletionLag()
+          break
+        case 'clear-offload-deletion-lag':
+          this.confirmClearOffloadDeletionLag()
+          break
+        case 'set-schema-autoupdate-strategy':
+          this.confirmSetSchemaAutoupdateStrategy()
+          break
       }
     },
     confirmGrantPermission() {
       grantPermissions(this.currentNamespace, this.temp.role, this.temp.actions).then(response => {
-        console.log(response)
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Add success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmRevokePermissions() {
+      revokePermissions(this.currentNamespace, this.temp.role).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Delete success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetClusters() {
+      setClusters(this.currentNamespace, this.temp.clusters).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Add clusters success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetBacklogQuota() {
+      setBacklogQuota(this.currentNamespace, this.temp).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Add Backlog Quota success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmRemoveBacklogQuota() {
+      removeBacklogQuota(this.currentNamespace).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Delete Backlog Quota success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetPersistence() {
+      const data = {
+        'bookkeeper_ack_quorum': this.temp.ackQuorum,
+        'bookkeeper_ensemble': this.temp.ensemble,
+        'bookkeeper_write_quorum': this.temp.writeQuorum,
+        'ml_mark_delete_max_rate': this.temp.deleteMaxRate
+      }
+      setPersistence(this.currentNamespace, data).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set persistence success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetMessageTtl() {
+      setMessageTtl(this.currentNamespace, parseInt(this.temp.messageTTL)).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set messageTTL success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetAntiAffinityGroup() {
+      setAntiAffinityGroup(this.currentNamespace, this.temp.group).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set AntiAffinityGroup success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmDeleteAntiAffinityGroup() {
+      deleteAntiAffinityGroup(this.currentNamespace).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Delete AntiAffinityGroup success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetDeduplication() {
+      setDeduplication(this.currentNamespace, this.temp.deduplication).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set deduplication success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetRetention() {
+      const data = { 'size': this.temp.retentionSize, 'time': this.temp.retentionTime }
+      setRetention(this.currentNamespace, data).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set Retention success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmUnload() {
+      unloadBundle(this.currentNamespace, this.temp.unloadBundle).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set Retention success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSplitBundle() {
+      const data = { 'unload': this.temp.splitUnload }
+      // problem split http 412
+      // to do solve
+      splitBundle(this.currentNamespace, this.temp.splitBundle, data).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'splitBundle success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetDispatchRate() {
+      const data = {
+        'dispatchThrottlingRateInByte': this.temp.byteDispatchRate,
+        'ratePeriodInSecond': this.temp.dispatchRatePeriod,
+        'dispatchThrottlingRateInMsg': this.temp.msgDispatchRate
+      }
+      setDispatchRate(this.currentNamespace, data).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'set DispatchRate success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmClearBacklog() {
+      // to do test
+      clearBundleBacklogForSubscription(this.currentNamespace, this.temp.clearBundle, this.temp.clearSub).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'clearBundleBacklogForSubscription success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmUnsubscribe() {
+      unsubscribe(this.currentNamespace, this.temp.unsubBundle, this.temp.unsubscribe).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'unsubscribe success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetEncryptionRequired() {
+      setEncryptionRequired(this.currentNamespace, this.temp.encryption).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetSubscriptionAuthMode() {
+      setSubscriptionAuthMode(this.currentNamespace, this.temp.subscriptionAuthMode).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetMaxProducersPerTopic() {
+      setMaxProducersPerTopic(this.currentNamespace, this.temp.maxProducersPerTopic).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set max producers per topic success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetMaxConsumersPerTopic() {
+      setMaxConsumersPerTopic(this.currentNamespace, this.temp.maxConsumersPerTopic).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set max consumers per topic success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetMaxConsumersPerSubscription() {
+      setMaxConsumersPerSubscription(this.currentNamespace, this.temp.maxConsumersPerSub).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set max subscription per topic success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetCompactionThreshold() {
+      setCompactionThreshold(this.currentNamespace, this.temp.threshold).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set threshold success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetOffloadThreshold() {
+      setOffloadThreshold(this.currentNamespace, this.temp.thresholdSize).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set threshold success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetOffloadDeletionLag() {
+      setOffloadDeletionLag(this.currentNamespace, this.temp.deletionLag).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set DeletionLag success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmClearOffloadDeletionLag() {
+      clearOffloadDeletionLag(this.currentNamespace).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Clear DeletionLag success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmSetSchemaAutoupdateStrategy() {
+      // todo put method not allowed
+      setSchemaAutoupdateStrategy(this.currentNamespace, this.temp.compatibility).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Set SchemaAutoupdateStrategy success',
+          type: 'success',
+          duration: 3000
+        })
       })
     }
     // handleClearOptions() {
