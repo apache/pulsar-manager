@@ -52,3 +52,244 @@ export function deleteNamespace(namespace) {
     method: 'delete'
   })
 }
+
+export function getPermissions(tenantNamespace) {
+  return request({
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/permissions`,
+    method: 'get'
+  })
+}
+
+export function grantPermissions(tenantNamespace, role, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/permissions/${role}`,
+    method: 'post',
+    data
+  })
+}
+
+export function revokePermissions(tenantNamespace, role) {
+  return request({
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/permissions/${role}`,
+    method: 'delete'
+  })
+}
+
+export function setClusters(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/replication`,
+    method: 'post',
+    data
+  })
+}
+
+export function setBacklogQuota(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/backlogQuota`,
+    method: 'post',
+    data
+  })
+}
+
+export function removeBacklogQuota(tenantNamespace) {
+  return request({
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/backlogQuota`,
+    method: 'delete'
+  })
+}
+
+export function setPersistence(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/persistence`,
+    method: 'post',
+    data
+  })
+}
+
+export function setMessageTtl(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/messageTTL`,
+    method: 'post',
+    data
+  })
+}
+
+export function setAntiAffinityGroup(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/antiAffinity`,
+    method: 'post',
+    data
+  })
+}
+
+export function deleteAntiAffinityGroup(tenantNamespace) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/antiAffinity`,
+    method: 'delete'
+  })
+}
+
+export function setDeduplication(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/deduplication`,
+    method: 'post',
+    data
+  })
+}
+
+export function setRetention(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/retention`,
+    method: 'post',
+    data
+  })
+}
+
+export function unload(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/unload`,
+    method: 'put',
+    data
+  })
+}
+
+export function unloadBundle(tenantNamespace, bundle) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/unload`,
+    method: 'put'
+  })
+}
+
+export function splitBundle(tenantNamespace, bundle, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/split`,
+    method: 'put',
+    data
+  })
+}
+
+export function setDispatchRate(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/dispatchRate`,
+    method: 'post',
+    data
+  })
+}
+
+export function clearBundleBacklogForSubscription(tenantNamespace, bundle, subscription) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/clearBacklog/${subscription}`,
+    method: 'post'
+  })
+}
+
+export function unsubscribe(tenantNamespace, bundle, subscription) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/unsubscribe/${subscription}`,
+    method: 'post'
+  })
+}
+
+export function setEncryptionRequired(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/encryptionRequired`,
+    method: 'post',
+    data
+  })
+}
+
+export function setSubscriptionAuthMode(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/subscriptionAuthMode`,
+    method: 'post',
+    data
+  })
+}
+
+export function setMaxProducersPerTopic(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/maxProducersPerTopic`,
+    method: 'post',
+    data
+  })
+}
+
+export function setMaxConsumersPerTopic(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/maxConsumersPerTopic`,
+    method: 'post',
+    data
+  })
+}
+
+export function setMaxConsumersPerSubscription(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/maxConsumersPerSubscription`,
+    method: 'post',
+    data
+  })
+}
+
+export function setCompactionThreshold(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/compactionThreshold`,
+    method: 'put',
+    data
+  })
+}
+
+export function setOffloadThreshold(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/offloadThreshold`,
+    method: 'put',
+    data
+  })
+}
+
+export function setOffloadDeletionLag(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/offloadDeletionLagMs`,
+    method: 'put',
+    data
+  })
+}
+
+export function clearOffloadDeletionLag(tenantNamespace) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/offloadDeletionLagMs`,
+    method: 'delete'
+  })
+}
+
+export function setSchemaAutoupdateStrategy(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/schemaAutoUpdateCompatibilityStrategy`,
+    method: 'put',
+    data
+  })
+}

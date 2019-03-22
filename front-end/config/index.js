@@ -11,6 +11,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/admin/*': {
+        // target: 'http://localhost:443/',
         target: 'http://localhost:8080/',
         changeOrigin: true
       }
