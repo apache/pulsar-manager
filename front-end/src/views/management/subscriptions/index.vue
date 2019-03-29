@@ -105,7 +105,11 @@ import { fetchSubscriptions, putSubscription, deleteSubscription } from '@/api/s
 import {
   fetchTopics,
   fetchPersistentPartitonsTopics,
-  fetchNonPersistentPartitonsTopics
+  fetchNonPersistentPartitonsTopics,
+  skip,
+  expireMessage,
+  expireMessagesAllSubscriptions,
+  resetCursor
 } from '@/api/topics'
 // import { parsePulsarSchema } from '@/utils'
 import waves from '@/directive/waves' // Waves directive
@@ -345,6 +349,51 @@ export default {
       this.topic = topic
       this.localList = []
       this.getSubscriptions()
+    },
+    confirmSkip() {
+      skip(this.currentTopic, this.temp.subName, this.temp.numMessages).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Skip success for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmExpireMessage() {
+      expireMessage(this.currentTopic, this.temp.subName, this.temp.expireTimeInSeconds).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Expire message for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmExpireMessagesAllSubscriptions() {
+      expireMessagesAllSubscriptions(this.currentTopic, this.temp.expireTimeInSeconds).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Expire message for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmResetCursor() {
+      const data = {}
+      resetCursor(this.currentTopic, this.temp.subName, this.temp.timestamp, data).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'resetCursor for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
     }
   }
 }
