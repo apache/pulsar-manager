@@ -32,6 +32,15 @@
       <el-input :placeholder="$t('table.topic')" v-model="listQuery.topic" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-autocomplete
+        v-model="postForm.otherOptions"
+        :fetch-suggestions="querySearch"
+        class="filter-item inline-input"
+        style="margin-left: 10px; width:400px"
+        placeholder="select options"
+        clearable
+        @select="moreListOptionsChange"
+      />
     </div>
     <el-row :gutter="8">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
@@ -42,7 +51,8 @@
           border
           fit
           highlight-current-row
-          style="width: 100%;">
+          style="width: 100%;"
+          @row-click="getCurrentRow">
           <el-table-column :label="$t('table.topic')" min-width="100px" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.topic }}</span>
@@ -73,24 +83,72 @@
       </el-col>
     </el-row>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.topic')" prop="topic">
-          <el-input v-model="temp.topic"/>
-        </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.partition')" prop="topic">
-          <el-input v-model="temp.partitions"/>
-        </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.topic')">
-          <span>{{ temp.topic }}</span>
-        </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.partition')" prop="topic">
-          <el-input v-model="temp.partitions"/>
-        </el-form-item>
+        <div v-if="dialogStatus==='create'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <el-input v-model="temp.topic"/>
+          </el-form-item>
+          <el-form-item :label="$t('table.partition')" prop="partition">
+            <el-input v-model="temp.partitions"/>
+          </el-form-item>
+        </div>
+        <div v-if="dialogStatus==='update'">
+          <el-form-item :label="$t('table.topic')">
+            <span>{{ temp.topic }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('table.partition')" prop="partition">
+            <el-input v-model="temp.partitions"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='grant-permission'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('table.grant')" prop="grant">
+            <el-drag-select v-model="temp.actions" style="width:300px;" multiple placeholder="Please select">
+              <el-option v-for="item in actionsListOptions" :label="item.label" :value="item.value" :key="item.value" />
+            </el-drag-select>
+          </el-form-item>
+          <el-form-item :label="$t('table.role')" prop="role">
+            <el-input v-model="temp.role" style="width:300px;" />
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='revoke-permission'">
+          <el-form-item :label="$t('table.namespace')" prop="namespace">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('table.role')" prop="role">
+            <el-input v-model="temp.role"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='unload'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='terminate'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='compact'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='offload'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+          <el-form-item label="Size" prop="thresholdSize">
+            <el-input v-model="temp.thresholdSize"/>
+          </el-form-item>
+        </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
+        <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -108,23 +166,33 @@ import {
   fetchPartitionTopicStats,
   fetchPersistentPartitonsTopics,
   fetchNonPersistentPartitonsTopics,
-  deletePartitionTopic
+  deletePartitionTopic,
+  grantPermissions,
+  revokePermissions,
+  unload,
+  terminate,
+  compact,
+  compactionStatus,
+  offload
 } from '@/api/topics'
 import { parsePulsarSchema } from '@/utils'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
+import ElDragSelect from '@/components/DragSelect' // base on element-ui
 const defaultForm = {
   tenant: '',
-  namespace: ''
+  namespace: '',
+  otherOptions: ''
 }
 
 export default {
   name: 'Topics',
   components: {
     Pagination,
-    jsonEditor
+    jsonEditor,
+    ElDragSelect
   },
   directives: { waves },
   filters: {
@@ -149,6 +217,8 @@ export default {
       loading: false,
       tenantsListOptions: [],
       namespacesListOptions: [],
+      actionsListOptions: [],
+      moreListOptions: [],
       tableKey: 0,
       list: null,
       localList: [],
@@ -158,6 +228,8 @@ export default {
       jsonValue: {},
       tenant: '',
       namespace: '',
+      currentTopic: '',
+      isPartitioned: '',
       listQuery: {
         topic: '',
         page: 1,
@@ -165,7 +237,10 @@ export default {
       },
       temp: {
         topic: '',
-        partitions: 0
+        partitions: 0,
+        role: '',
+        actions: [],
+        thresholdSize: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -191,6 +266,10 @@ export default {
     }
     this.getRemoteTenantsList()
   },
+  mounted() {
+    this.moreListOptions = this.loadAllOptions()
+    this.actionsListOptions = [{ value: 'produce', label: 'produce' }, { value: 'consume', label: 'consume' }]
+  },
   methods: {
     getTopics() {
       if (this.localList.length > 0) {
@@ -199,6 +278,12 @@ export default {
         }, 0)
       } else {
         this.listLoading = true
+        if (this.postForm.tenant.length > 0) {
+          this.tenant = this.postForm.tenant
+        }
+        if (this.postForm.namespace.length > 0) {
+          this.namespace = this.postForm.namespace
+        }
         if (this.tenant.length <= 0 || this.namespace.length <= 0) {
           this.tenant = 'public'
           this.namespace = 'default'
@@ -215,7 +300,7 @@ export default {
         })
         fetchTopics(this.tenant, this.namespace, this.listQuery).then(response => {
           for (var i = 0; i < response.data.length; i++) {
-            this.localList.push({ 'topic': response.data[i], 'isPartition': 'no', 'partitions': '0' })
+            this.localList.push({ 'topic': response.data[i], 'isPartition': 'no', 'partitions': 0 })
           }
           this.total = this.localList.length
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
@@ -260,7 +345,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createTopic() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           if (this.tenant.length <= 0 || this.namespace <= 0) {
@@ -378,8 +463,180 @@ export default {
       this.namespace = namespace
       this.localList = []
       this.getTopics()
+    },
+    moreListOptionsChange(item) {
+      if (this.currentTopic.length <= 0) {
+        this.$notify({
+          title: 'error',
+          message: 'Please select any one namespace in table',
+          type: 'error',
+          duration: 3000
+        })
+        this.postForm.otherOptions = ''
+        return
+      }
+      this.dialogStatus = item.value
+      this.dialogFormVisible = true
+    },
+    querySearch(queryString, cb) {
+      var moreListOptions = this.moreListOptions
+      var results = moreListOptions.filter(this.createFilterOptions(queryString))
+      cb(results)
+    },
+    createFilterOptions(queryString) {
+      return (moreListOptions) => {
+        return (moreListOptions.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
+    loadAllOptions() {
+      return [
+        { 'value': 'grant-permission' },
+        { 'value': 'revoke-permission' },
+        { 'value': 'unload' },
+        // No find document for this interface
+        // { 'value': 'clear-backlog' },
+        { 'value': 'terminate' },
+        { 'value': 'compact' },
+        { 'value': 'offload' }
+      ]
+    },
+    getCurrentRow(item) {
+      this.currentTopic = parsePulsarSchema(item.topic)[1]
+      this.isPartitioned = item.isPartition
+    },
+    handleOptions() {
+      switch (this.dialogStatus) {
+        case 'create':
+          this.createTopic()
+          break
+        case 'update':
+          this.updateData()
+          break
+        case 'grant-permission':
+          this.confirmGrantPermission()
+          break
+        case 'revoke-permission':
+          this.confirmRevokePermissions()
+          break
+        case 'unload':
+          this.confirmUnload()
+          break
+        case 'terminate':
+          this.confirmTerminate()
+          break
+        case 'compact':
+          this.confirmCompact()
+          break
+        case 'offload':
+          this.confirmOffload()
+          break
+      }
+    },
+    confirmGrantPermission() {
+      grantPermissions(this.currentTopic, this.temp.role, this.temp.actions).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Grant Permissions success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmRevokePermissions() {
+      revokePermissions(this.currentTopic, this.temp.role).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Revoke Permissions success',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmUnload() {
+      unload(this.currentTopic).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Unload success for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmTerminate() {
+      if (this.isPartitioned === 'yes') {
+        this.$notify({
+          title: 'warning',
+          message: 'Termination of a partitioned topic is not allowed',
+          type: 'warning',
+          duration: 3000
+        })
+        return
+      }
+      terminate(this.currentTopic).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Terminate for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmCompact() {
+      if (this.isPartitioned === 'yes') {
+        this.$notify({
+          title: 'warning',
+          message: 'no support in partitioned topic',
+          type: 'warning',
+          duration: 3000
+        })
+        return
+      }
+      compact(this.currentTopic).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Compact for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmOffload() {
+      if (this.isPartitioned === 'yes') {
+        this.$notify({
+          title: 'warning',
+          message: 'no support in partitioned topic',
+          type: 'warning',
+          duration: 3000
+        })
+        return
+      }
+      offload(this.currentTopic, this.temp.thresholdSize).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Compact for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    confirmCompactionStatus() {
+      const data = this.temp.data
+      compactionStatus(this.currentTopic, data).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'compactionStatus for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
     }
-
   }
 }
 </script>
