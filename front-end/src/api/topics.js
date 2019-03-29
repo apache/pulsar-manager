@@ -69,3 +69,115 @@ export function deletePartitionTopic(tenantNamespaceTopic) {
     method: 'delete'
   })
 }
+
+export function getPermissions(tenantNamespaceTopic) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/permissions`,
+    method: 'get'
+  })
+}
+
+export function grantPermissions(tenantNamespaceTopic, role, data) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/permissions/${role}`,
+    method: 'post',
+    data
+  })
+}
+
+export function revokePermissions(tenantNamespaceTopic, role) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/permissions/${role}`,
+    method: 'delete'
+  })
+}
+
+export function unload(tenantNamespaceTopic) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/unload`,
+    method: 'put'
+  })
+}
+
+export function skip(tenantNamespaceTopic, subName, numMessages) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/subscription/${subName}/skip/${numMessages}`,
+    method: 'post'
+  })
+}
+
+// no find document
+// export function clearBacklog(tenantNamespaceTopic) {
+//   return request({
+//     url: `persistent/${tenantNamespaceTopic}/permissions/${role}`,
+//     method: 'delete'
+//   })
+// }
+
+export function expireMessage(tenantNamespaceTopic, subName, expireTimeInSeconds) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/subscription/${subName}/expireMessages/${expireTimeInSeconds}`,
+    method: 'post'
+  })
+}
+
+export function expireMessagesAllSubscriptions(tenantNamespaceTopic, expireTimeInSeconds) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/all_subscription/expireMessages/${expireTimeInSeconds}`,
+    method: 'post'
+  })
+}
+
+export function peekMessages(tenantNamespaceTopic, subName, messagePosition) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/subscription/${subName}/position/${messagePosition}`,
+    method: 'get'
+  })
+}
+
+export function resetCursor(tenantNamespaceTopic, subName, timestamp, data) {
+  return request({
+    url: BASE_URL_V2 + `/non-persistent/${tenantNamespaceTopic}/subscription/${subName}/resetcursor/${timestamp}`,
+    method: 'put',
+    data
+  })
+}
+
+export function terminate(tenantNamespaceTopic) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/terminate`,
+    method: 'post'
+  })
+}
+
+export function compact(tenantNamespaceTopic) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/compaction`,
+    method: 'put'
+  })
+}
+
+export function compactionStatus(tenantNamespaceTopic, data) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/compaction`,
+    method: 'get',
+    data
+  })
+}
+
+export function offload(tenantNamespaceTopic, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/offload`,
+    method: 'put',
+    data
+  })
+}
+
+export function offloadStatus(tenantNamespaceTopic, data) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/offload`,
+    method: 'get',
+    data
+  })
+}
