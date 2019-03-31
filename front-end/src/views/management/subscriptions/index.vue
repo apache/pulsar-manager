@@ -39,6 +39,15 @@
       <el-input :placeholder="$t('table.subscription')" v-model="listQuery.subscription" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.subscription') }}</el-button>
+      <el-autocomplete
+        v-model="postForm.otherOptions"
+        :fetch-suggestions="querySearch"
+        class="filter-item inline-input"
+        style="margin-left: 10px; width:400px"
+        placeholder="select options"
+        clearable
+        @select="moreListOptionsChange"
+      />
     </div>
     <el-row :gutter="8">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
@@ -49,7 +58,8 @@
           border
           fit
           highlight-current-row
-          style="width: 100%;">
+          style="width: 100%;"
+          @row-click="getCurrentRow">
           <el-table-column :label="$t('table.tenant')" min-width="100px" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.tenant }}</span>
@@ -82,17 +92,42 @@
     </el-row>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item v-if="dialogStatus==='create'" label="messageId" prop="messageId">
-          <el-input v-model="temp.messageId"/>
-        </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.subscription')" prop="subscription">
-          <el-input v-model="temp.subscription"/>
-        </el-form-item>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="90px" style="width: 400px; margin-left:50px;">
+        <div v-if="dialogStatus==='create'">
+          <el-form-item label="messageId" prop="messageId">
+            <el-input v-model="temp.messageId"/>
+          </el-form-item>
+          <el-form-item :label="$t('table.subscription')" prop="subscription">
+            <el-input v-model="temp.subscription"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='skip'">
+          <el-form-item label="count" prop="count">
+            <el-input v-model="temp.count"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='expire-messages'">
+          <el-form-item label="expireTime" prop="expireTime">
+            <el-input v-model="temp.expireTime"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='expire-messages-all-subscriptions'">
+          <el-form-item label="expireTime" prop="expireTime">
+            <el-input v-model="temp.expireTime"/>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='reset-cursor'">
+          <el-form-item label="messageId" prop="messageId">
+            <el-input v-model="temp.messageId"/>
+          </el-form-item>
+          <el-form-item label="time" prop="time">
+            <el-input v-model="temp.time"/>
+          </el-form-item>
+        </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="createData()">{{ $t('table.confirm') }}</el-button>
+        <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -109,7 +144,7 @@ import {
   skip,
   expireMessage,
   expireMessagesAllSubscriptions,
-  resetCursor
+  resetPersistentCursor
 } from '@/api/topics'
 // import { parsePulsarSchema } from '@/utils'
 import waves from '@/directive/waves' // Waves directive
@@ -118,7 +153,8 @@ import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
 const defaultForm = {
   tenant: '',
-  namespace: ''
+  namespace: '',
+  otherOptions: ''
 }
 
 export default {
@@ -151,6 +187,7 @@ export default {
       tenantsListOptions: [],
       namespacesListOptions: [],
       topicsListOptions: [],
+      moreListOptions: [],
       tableKey: 0,
       list: null,
       localList: [],
@@ -161,6 +198,10 @@ export default {
       tenant: '',
       namespace: '',
       topic: '',
+      currentSub: '',
+      currentTenant: '',
+      currentNamespace: '',
+      currentTopic: '',
       listQuery: {
         subscription: '',
         page: 1,
@@ -168,7 +209,10 @@ export default {
       },
       temp: {
         messageId: '',
-        subscription: ''
+        subscription: '',
+        count: 0,
+        expireTime: 0,
+        time: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -193,6 +237,9 @@ export default {
       this.postForm = Object.assign({}, defaultForm)
     }
     this.getRemoteTenantsList()
+  },
+  mounted() {
+    this.moreListOptions = this.loadAllOptions()
   },
   methods: {
     getSubscriptions() {
@@ -350,8 +397,71 @@ export default {
       this.localList = []
       this.getSubscriptions()
     },
+    moreListOptionsChange(item) {
+      if (item.value === 'expire-messages-all-subscriptions') {
+        this.dialogStatus = item.value
+        this.dialogFormVisible = true
+        return
+      }
+      if (this.currentSub.length <= 0) {
+        this.$notify({
+          title: 'error',
+          message: 'Please select any one namespace in table',
+          type: 'error',
+          duration: 3000
+        })
+        this.postForm.otherOptions = ''
+        return
+      }
+      this.dialogStatus = item.value
+      this.dialogFormVisible = true
+    },
+    querySearch(queryString, cb) {
+      var moreListOptions = this.moreListOptions
+      var results = moreListOptions.filter(this.createFilterOptions(queryString))
+      cb(results)
+    },
+    createFilterOptions(queryString) {
+      return (moreListOptions) => {
+        return (moreListOptions.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
+    loadAllOptions() {
+      return [
+        { 'value': 'skip' },
+        { 'value': 'expire-messages' },
+        { 'value': 'expire-messages-all-subscriptions' },
+        { 'value': 'reset-cursor' }
+      ]
+    },
+    getCurrentRow(item) {
+      this.currentTenant = item.tenant
+      this.currentNamespace = item.namespace
+      this.currentTopic = item.topic
+      this.currentSub = item.subscription
+    },
+    handleOptions() {
+      switch (this.dialogStatus) {
+        case 'create':
+          this.createData()
+          break
+        case 'skip':
+          this.confirmSkip()
+          break
+        case 'expire-messages':
+          this.confirmExpireMessage()
+          break
+        case 'expire-messages-all-subscriptions':
+          this.confirmExpireMessagesAllSubscriptions()
+          break
+        case 'reset-cursor':
+          this.confirmResetCursor()
+          break
+      }
+    },
     confirmSkip() {
-      skip(this.currentTopic, this.temp.subName, this.temp.numMessages).then(response => {
+      const tenantNamespaceTopic = this.currentTenant + '/' + this.currentNamespace + '/' + this.currentTopic
+      skip(tenantNamespaceTopic, this.currentSub, this.temp.count).then(response => {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
@@ -362,7 +472,8 @@ export default {
       })
     },
     confirmExpireMessage() {
-      expireMessage(this.currentTopic, this.temp.subName, this.temp.expireTimeInSeconds).then(response => {
+      const tenantNamespaceTopic = this.currentTenant + '/' + this.currentNamespace + '/' + this.currentTopic
+      expireMessage(tenantNamespaceTopic, this.currentSub, this.temp.expireTime).then(response => {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
@@ -373,19 +484,20 @@ export default {
       })
     },
     confirmExpireMessagesAllSubscriptions() {
-      expireMessagesAllSubscriptions(this.currentTopic, this.temp.expireTimeInSeconds).then(response => {
+      const tenantNamespaceTopic = this.tenant + '/' + this.namespace + '/' + this.topic
+      expireMessagesAllSubscriptions(tenantNamespaceTopic, this.temp.expireTime).then(response => {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
-          message: 'Expire message for this topic',
+          message: 'Expire all message for this topic',
           type: 'success',
           duration: 3000
         })
       })
     },
     confirmResetCursor() {
-      const data = {}
-      resetCursor(this.currentTopic, this.temp.subName, this.temp.timestamp, data).then(response => {
+      const tenantNamespaceTopic = this.currentTenant + '/' + this.currentNamespace + '/' + this.currentTopic
+      resetPersistentCursor(tenantNamespaceTopic, this.currentSub, this.temp.time, this.temp.messageId).then(response => {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
