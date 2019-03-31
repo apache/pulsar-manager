@@ -135,10 +135,18 @@ export function peekMessages(tenantNamespaceTopic, subName, messagePosition) {
   })
 }
 
-export function resetCursor(tenantNamespaceTopic, subName, timestamp, data) {
+export function resetPersistentCursor(tenantNamespaceTopic, subName, timestamp, data) {
+  return request({
+    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/subscription/${subName}/resetcursor/${timestamp}`,
+    method: 'post',
+    data
+  })
+}
+
+export function resetNonPersistentCursor(tenantNamespaceTopic, subName, timestamp, data) {
   return request({
     url: BASE_URL_V2 + `/non-persistent/${tenantNamespaceTopic}/subscription/${subName}/resetcursor/${timestamp}`,
-    method: 'put',
+    method: 'post',
     data
   })
 }
