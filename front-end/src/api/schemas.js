@@ -2,9 +2,9 @@ import request from '@/utils/request'
 
 const BASE_URL_V2 = '/admin/v2'
 
-export function schemasGet(tenantNamespaceTopic) {
+export function schemasGet(tenantNamespaceTopic, version) {
   return request({
-    url: BASE_URL_V2 + `/schemas/${tenantNamespaceTopic}/schema`,
+    url: BASE_URL_V2 + `/schemas/${tenantNamespaceTopic}/schema/${version}`,
     method: 'get'
   })
 }

@@ -669,7 +669,7 @@ export default {
       })
     },
     confirmSchemasGet() {
-      schemasGet(this.currentTopic).then(response => {
+      schemasGet(this.currentTopic, 0).then(response => {
         this.$notify({
           title: 'success',
           message: 'Schemas get success for this topic',
@@ -693,6 +693,7 @@ export default {
       const file = ev.target.files[0]
       var reader = new FileReader()
       reader.onload = e => {
+        this.temp.currentJsonFile = ''
         this.temp.currentJsonFile = e.target.result
       }
       reader.readAsText(file)
@@ -704,7 +705,7 @@ export default {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
-          message: 'Schemas delete success for this topic',
+          message: 'Schemas upload success for this topic',
           type: 'success',
           duration: 3000
         })
