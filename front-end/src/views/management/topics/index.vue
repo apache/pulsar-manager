@@ -39,6 +39,7 @@
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="schemas-get">get</el-dropdown-item>
           <el-dropdown-item command="schemas-delete">delete</el-dropdown-item>
+          <el-dropdown-item command="schemas-upload">upload</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       <el-autocomplete
@@ -159,6 +160,14 @@
             <span>{{ currentTopic }}</span>
           </el-form-item>
         </div>
+        <div v-else-if="dialogStatus==='schemas-upload'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+          <label class="text-reader">
+            <input type="file" @change="loadTextFromFile">
+          </label>
+        </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -196,7 +205,6 @@ import Pagination from '@/components/Pagination' // Secondary package based on e
 import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
 import ElDragSelect from '@/components/DragSelect' // base on element-ui
-import jQuery from 'jquery'
 const defaultForm = {
   tenant: '',
   namespace: '',
@@ -259,7 +267,8 @@ export default {
         role: '',
         actions: [],
         thresholdSize: '',
-        schemasFilenamePath: ''
+        schemasFilenamePath: '',
+        currentJsonFile: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -680,20 +689,24 @@ export default {
         })
       })
     },
+    loadTextFromFile(ev) {
+      const file = ev.target.files[0]
+      var reader = new FileReader()
+      reader.onload = e => {
+        this.temp.currentJsonFile = e.target.result
+      }
+      reader.readAsText(file)
+    },
     confirmSchemasUpload() {
       // don't read json file
       this.dialogFormVisible = true
-      console.log(this.temp.schemasFilenamePath)
-      jQuery.getJSON(this.temp.schemasFilenamePath, function(data) {
-        console.log(data)
-        schemasUpload(this.currentTopic, data).then(response => {
-          this.dialogFormVisible = false
-          this.$notify({
-            title: 'success',
-            message: 'Schemas delete success for this topic',
-            type: 'success',
-            duration: 3000
-          })
+      schemasUpload(this.currentTopic, this.temp.currentJsonFile).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Schemas delete success for this topic',
+          type: 'success',
+          duration: 3000
         })
       })
     },
