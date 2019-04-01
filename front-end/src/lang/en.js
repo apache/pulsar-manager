@@ -160,7 +160,8 @@ export default {
     subscription: 'Subscription',
     unsubscription: 'Unsubscription',
     grant: 'Grant',
-    limit: 'Limit'
+    limit: 'Limit',
+    schemas: 'Schemas'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

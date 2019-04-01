@@ -32,6 +32,16 @@
       <el-input :placeholder="$t('table.topic')" v-model="listQuery.topic" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-dropdown class="filter-item" style="margin-left: 10px;" @command="handleCommand">
+        <el-button type="primary">
+          Schemas<i class="el-icon-arrow-down el-icon--right"/>
+        </el-button>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="schemas-get">get</el-dropdown-item>
+          <el-dropdown-item command="schemas-delete">delete</el-dropdown-item>
+          <el-dropdown-item command="schemas-upload">upload</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
       <el-autocomplete
         v-model="postForm.otherOptions"
         :fetch-suggestions="querySearch"
@@ -43,7 +53,7 @@
       />
     </div>
     <el-row :gutter="8">
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 16}" :xl="{span: 16}" style="padding-right:8px;margin-bottom:30px;">
         <el-table
           v-loading="listLoading"
           :key="tableKey"
@@ -78,7 +88,7 @@
         </el-table>
         <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getTopics" />
       </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 8}" :xl="{span: 8}" style="margin-bottom:30px;">
         <jsonEditor :value="jsonValue"/>
       </el-col>
     </el-row>
@@ -145,6 +155,19 @@
             <el-input v-model="temp.thresholdSize"/>
           </el-form-item>
         </div>
+        <div v-else-if="dialogStatus==='schemas-delete'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='schemas-upload'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <span>{{ currentTopic }}</span>
+          </el-form-item>
+          <label class="text-reader">
+            <input type="file" @change="loadTextFromFile">
+          </label>
+        </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -175,6 +198,7 @@ import {
   compactionStatus,
   offload
 } from '@/api/topics'
+import { schemasGet, schemasDelete, schemasUpload } from '@/api/schemas'
 import { parsePulsarSchema } from '@/utils'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -219,6 +243,7 @@ export default {
       namespacesListOptions: [],
       actionsListOptions: [],
       moreListOptions: [],
+      fileList: [],
       tableKey: 0,
       list: null,
       localList: [],
@@ -229,6 +254,7 @@ export default {
       tenant: '',
       namespace: '',
       currentTopic: '',
+      currentCommand: '',
       isPartitioned: '',
       listQuery: {
         topic: '',
@@ -240,7 +266,9 @@ export default {
         partitions: 0,
         role: '',
         actions: [],
-        thresholdSize: ''
+        thresholdSize: '',
+        schemasFilenamePath: '',
+        currentJsonFile: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -530,6 +558,9 @@ export default {
         case 'offload':
           this.confirmOffload()
           break
+        case 'schemas-upload':
+          this.confirmSchemasUpload()
+          break
       }
     },
     confirmGrantPermission() {
@@ -636,6 +667,73 @@ export default {
           duration: 3000
         })
       })
+    },
+    confirmSchemasGet() {
+      schemasGet(this.currentTopic, 0).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Schemas get success for this topic',
+          type: 'success',
+          duration: 3000
+        })
+        this.jsonValue = response.data
+      })
+    },
+    confirmSchemasDelete() {
+      schemasDelete(this.currentTopic).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Schemas delete success for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    loadTextFromFile(ev) {
+      const file = ev.target.files[0]
+      var reader = new FileReader()
+      reader.onload = e => {
+        this.temp.currentJsonFile = ''
+        this.temp.currentJsonFile = e.target.result
+      }
+      reader.readAsText(file)
+    },
+    confirmSchemasUpload() {
+      // don't read json file
+      this.dialogFormVisible = true
+      schemasUpload(this.currentTopic, this.temp.currentJsonFile).then(response => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'Schemas upload success for this topic',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    handleCommand(command) {
+      this.currentCommand = command
+      if (this.currentTopic.lenght <= 0) {
+        this.$notify({
+          title: 'error',
+          message: 'Please select any one topic in table',
+          type: 'error',
+          duration: 3000
+        })
+        return
+      }
+      switch (this.currentCommand) {
+        case 'schemas-get':
+          this.confirmSchemasGet()
+          break
+        case 'schemas-upload':
+          this.dialogFormVisible = true
+          this.dialogStatus = 'schemas-upload'
+          break
+        case 'schemas-delete':
+          this.confirmSchemasDelete()
+          break
+      }
     }
   }
 }

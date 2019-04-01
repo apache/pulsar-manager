@@ -160,7 +160,8 @@ export default {
     subscription: '订阅',
     unsubscription: '取消订阅',
     grant: '授权',
-    limit: '限制'
+    limit: '限制',
+    schemas: '模型'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
