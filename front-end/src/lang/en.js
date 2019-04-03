@@ -161,7 +161,12 @@ export default {
     unsubscription: 'Unsubscription',
     grant: 'Grant',
     limit: 'Limit',
-    schemas: 'Schemas'
+    schemas: 'Schemas',
+    functions: 'Functions',
+    start: 'Start',
+    stop: 'Stop',
+    restart: 'Restart',
+    trigger: 'Trigger'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

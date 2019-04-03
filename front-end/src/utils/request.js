@@ -51,7 +51,6 @@ service.interceptors.response.use(
    */
   response => {
     // const res = response.data
-    console.log(response)
     if (response.status < 500 && response.status >= 200) {
       return response
     } else {
@@ -85,7 +84,7 @@ service.interceptors.response.use(
   error => {
     console.log('err' + error) // for debug
     Message({
-      message: error.message,
+      message: error.response.data.reason,
       type: 'error',
       duration: 5 * 1000
     })
