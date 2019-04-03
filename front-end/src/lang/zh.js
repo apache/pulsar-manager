@@ -166,7 +166,12 @@ export default {
     internalConfig: '内部配置',
     runtimeConfig: '运行配置',
     dynamicConfig: '动态配置',
-    healthCheck: '健康检查'
+    healthCheck: '健康检查',
+    functions: '函数',
+    start: '启动',
+    stop: '停止',
+    restart: '重启',
+    trigger: '触发器'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

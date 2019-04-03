@@ -166,7 +166,12 @@ export default {
     internalConfig: 'InternalConfig',
     runtimeConfig: 'RuntimeConfig',
     dynamicConfig: 'DynamicConfig',
-    healthCheck: 'HealthCheck'
+    healthCheck: 'HealthCheck',
+    functions: 'Functions',
+    start: 'Start',
+    stop: 'Stop',
+    restart: 'Restart',
+    trigger: 'Trigger'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
