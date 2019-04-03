@@ -50,10 +50,10 @@ export function deleteFunction(tenant, namespace, functionName) {
   })
 }
 
-export function restartFunction(tenant, namespace, functionName) {
+export function restartFunctionInstance(tenant, namespace, functionName, instanceId) {
   return request({
     headers: { 'Content-Type': 'application/json' },
-    url: BASE_URL_V2 + `/functions/${tenant}/${namespace}/${functionName}/restart`,
+    url: BASE_URL_V2 + `/functions/${tenant}/${namespace}/${functionName}/${instanceId}/restart`,
     method: 'post'
   })
 }
@@ -91,7 +91,7 @@ export function fetchFunctionInstanceStatus(tenant, namespace, functionName, ins
 export function startFunctionInstance(tenant, namespace, functionName, instanceId) {
   return request({
     headers: { 'Content-Type': 'application/json' },
-    url: BASE_URL_V2 + `/functions/${tenant}/${namespace}/${functionName}/${instanceId}/stop`,
+    url: BASE_URL_V2 + `/functions/${tenant}/${namespace}/${functionName}/${instanceId}/start`,
     method: 'post'
   })
 }
@@ -101,6 +101,15 @@ export function stopFunctionInstance(tenant, namespace, functionName, instanceId
     headers: { 'Content-Type': 'application/json' },
     url: BASE_URL_V2 + `/functions/${tenant}/${namespace}/${functionName}/${instanceId}/stop`,
     method: 'post'
+  })
+}
+
+export function triggerFunction(tenant, namespace, functionName, data) {
+  return request({
+    headers: { 'Content-Type': 'multipart/form-data' },
+    url: BASE_URL_V2 + `/functions/${tenant}/${namespace}/${functionName}/trigger`,
+    method: 'post',
+    data
   })
 }
 

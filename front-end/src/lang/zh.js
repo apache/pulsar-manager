@@ -162,7 +162,11 @@ export default {
     grant: '授权',
     limit: '限制',
     schemas: '模型',
-    functions: '函数'
+    functions: '函数',
+    start: '启动',
+    stop: '停止',
+    restart: '重启',
+    trigger: '触发器'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

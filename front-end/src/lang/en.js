@@ -162,7 +162,11 @@ export default {
     grant: 'Grant',
     limit: 'Limit',
     schemas: 'Schemas',
-    functions: 'Functions'
+    functions: 'Functions',
+    start: 'Start',
+    stop: 'Stop',
+    restart: 'Restart',
+    trigger: 'Trigger'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
