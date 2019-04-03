@@ -161,7 +161,12 @@ export default {
     unsubscription: '取消订阅',
     grant: '授权',
     limit: '限制',
-    schemas: '模型'
+    schemas: '模型',
+    brokers: '代理',
+    internalConfig: '内部配置',
+    runtimeConfig: '运行配置',
+    dynamicConfig: '动态配置',
+    healthCheck: '健康检查'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
