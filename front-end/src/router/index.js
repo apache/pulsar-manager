@@ -136,6 +136,12 @@ export const constantRouterMap = [
         hidden: true
       },
       {
+        path: 'brokers',
+        component: () => import('@/views/management/brokers'),
+        name: 'Brokers',
+        meta: { title: 'Brokers', noCache: true }
+      },
+      {
         path: 'functions',
         component: () => import('@/views/management/functions'),
         name: 'Functions',
