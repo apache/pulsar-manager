@@ -162,11 +162,18 @@ export default {
     grant: 'Grant',
     limit: 'Limit',
     schemas: 'Schemas',
+    brokers: 'Brokers',
+    internalConfig: 'InternalConfig',
+    runtimeConfig: 'RuntimeConfig',
+    dynamicConfig: 'DynamicConfig',
+    healthCheck: 'HealthCheck',
     functions: 'Functions',
     start: 'Start',
     stop: 'Stop',
     restart: 'Restart',
-    trigger: 'Trigger'
+    trigger: 'Trigger',
+    configName: 'ConfigName',
+    configValue: 'ConfigValue'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
