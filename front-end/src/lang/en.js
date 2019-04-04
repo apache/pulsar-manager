@@ -166,7 +166,9 @@ export default {
     start: 'Start',
     stop: 'Stop',
     restart: 'Restart',
-    trigger: 'Trigger'
+    trigger: 'Trigger',
+    sources: 'Sources',
+    builtin: 'Builtin'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
