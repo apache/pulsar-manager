@@ -51,6 +51,11 @@
                 <span class="link-type" @click="getBrokersNamespaceConfig(scope.row)">{{ scope.row.namespace }}</span>
               </template>
             </el-table-column>
+            <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
+              <template slot-scope="scope">
+                <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+              </template>
+            </el-table-column>
           </el-table>
           <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getBrokers" />
         </el-col>
@@ -58,6 +63,22 @@
           <jsonEditor :value="jsonValue"/>
         </el-col>
       </el-row>
+      <el-dialog :visible.sync="dialogFormVisible">
+        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+          <div v-if="dialogStatus==='update'">
+            <el-form-item :label="$t('table.configName')" prop="configName">
+              <el-input v-model="temp.configName"/>
+            </el-form-item>
+            <el-form-item :label="$t('table.configValue')" prop="configValue">
+              <el-input v-model="temp.configValue"/>
+            </el-form-item>
+          </div>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          <el-button type="primary" @click="confirmUpdate()">{{ $t('table.confirm') }}</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -74,7 +95,8 @@ import {
   fetchBrokersRuntimeConfiguration,
   fetchBrokersOwnedNamespaces,
   fetchBrokersDynamicConfiguration,
-  fetchBrokersHealth
+  fetchBrokersHealth,
+  updateBrokersDynamicConfiguration
 } from '@/api/brokers'
 import { validateEmpty } from '@/utils/validate'
 import waves from '@/directive/waves' // Waves directive
@@ -102,7 +124,17 @@ export default {
         limit: 20
       },
       total: 0,
-      jsonValue: {}
+      jsonValue: {},
+      dialogFormVisible: false,
+      dialogStatus: '',
+      temp: {
+        configName: '',
+        configValue: ''
+      },
+      rules: {
+        configName: [{ required: true, message: 'config name is required', trigger: 'blur' }],
+        configValue: [{ required: true, message: 'config value is required', trigger: 'blur' }]
+      }
     }
   },
   mounted() {
@@ -164,6 +196,21 @@ export default {
     },
     handleFilter() {
       this.getBrokers()
+    },
+    handleUpdate() {
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+    },
+    confirmUpdate() {
+      updateBrokersDynamicConfiguration(this.temp.configName, this.temp.configValue).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Set config success',
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+      })
     },
     getBrokerConfig() {
       fetchBrokersConfiguration().then(response => {

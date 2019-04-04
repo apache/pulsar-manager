@@ -171,7 +171,9 @@ export default {
     start: 'Start',
     stop: 'Stop',
     restart: 'Restart',
-    trigger: 'Trigger'
+    trigger: 'Trigger',
+    configName: 'ConfigName',
+    configValue: 'ConfigValue'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

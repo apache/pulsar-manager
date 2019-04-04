@@ -37,6 +37,13 @@ export function fetchBrokersDynamicConfiguration() {
   })
 }
 
+export function updateBrokersDynamicConfiguration(configName, configValue) {
+  return request({
+    url: BASE_URL_V2 + `/brokers/configuration/${configName}/${configValue}`,
+    method: 'post'
+  })
+}
+
 export function fetchBrokersOwnedNamespaces(cluster, broker) {
   return request({
     url: BASE_URL_V2 + `/brokers/${cluster}/${broker}/ownedNamespaces`,

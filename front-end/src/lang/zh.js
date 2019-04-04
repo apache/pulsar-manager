@@ -171,7 +171,9 @@ export default {
     start: '启动',
     stop: '停止',
     restart: '重启',
-    trigger: '触发器'
+    trigger: '触发器',
+    configName: '配置名称',
+    configValue: '配置值'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
