@@ -173,7 +173,8 @@ export default {
     restart: 'Restart',
     trigger: 'Trigger',
     configName: 'ConfigName',
-    configValue: 'ConfigValue'
+    configValue: 'ConfigValue',
+    sinks: 'Sink'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

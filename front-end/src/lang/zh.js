@@ -173,7 +173,8 @@ export default {
     restart: '重启',
     trigger: '触发器',
     configName: '配置名称',
-    configValue: '配置值'
+    configValue: '配置值',
+    sinks: 'sink'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
