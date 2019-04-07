@@ -174,7 +174,9 @@ export default {
     trigger: '触发器',
     configName: '配置名称',
     configValue: '配置值',
-    sinks: 'sink'
+    sources: '源',
+    builtin: '内建',
+    sinks: 'Sink'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

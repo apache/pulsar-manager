@@ -174,6 +174,8 @@ export default {
     trigger: 'Trigger',
     configName: 'ConfigName',
     configValue: 'ConfigValue',
+    sources: 'Sources',
+    builtin: 'Builtin',
     sinks: 'Sink'
   },
   errorLog: {
