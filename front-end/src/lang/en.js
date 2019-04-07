@@ -173,7 +173,9 @@ export default {
     restart: 'Restart',
     trigger: 'Trigger',
     configName: 'ConfigName',
-    configValue: 'ConfigValue'
+    configValue: 'ConfigValue',
+    sources: 'Sources',
+    builtin: 'Builtin'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

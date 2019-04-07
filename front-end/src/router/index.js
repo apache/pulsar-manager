@@ -146,6 +146,12 @@ export const constantRouterMap = [
         component: () => import('@/views/management/functions'),
         name: 'Functions',
         meta: { title: 'Functions', noCache: true }
+      },
+      {
+        path: 'sources',
+        component: () => import('@/views/management/sources'),
+        name: 'Sources',
+        meta: { title: 'Sources', noCache: true }
       }
     ]
   }
