@@ -152,6 +152,12 @@ export const constantRouterMap = [
         component: () => import('@/views/management/sources'),
         name: 'Sources',
         meta: { title: 'Sources', noCache: true }
+      },
+      {
+        path: 'sinks',
+        component: () => import('@/views/management/sinks'),
+        name: 'Sinks',
+        meta: { title: 'Sinks', noCache: true }
       }
     ]
   }

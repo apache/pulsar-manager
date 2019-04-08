@@ -175,7 +175,8 @@ export default {
     configName: '配置名称',
     configValue: '配置值',
     sources: '源',
-    builtin: '内建'
+    builtin: '内建',
+    sinks: 'Sink'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
