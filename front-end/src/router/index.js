@@ -152,6 +152,12 @@ export const constantRouterMap = [
         component: () => import('@/views/management/sources'),
         name: 'Sources',
         meta: { title: 'Sources', noCache: true }
+      },
+      {
+        path: 'bookies',
+        component: () => import('@/views/management/bookies'),
+        name: 'Bookies',
+        meta: { title: 'Bookies', noCache: true }
       }
     ]
   }
