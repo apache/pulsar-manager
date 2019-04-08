@@ -50,14 +50,14 @@
             @row-click="getCurrentRow">
             <el-table-column :label="$t('table.namespace')" min-width="50px" align="center">
               <template slot-scope="scope">
-                <span class="link-type" @click="getNamespacePolicies(scope.row.namespace)">{{ scope.row.namespace }}</span>
+                <router-link :to="'/management/tenantNamespace/' + scope.row.namespace" class="link-type">
+                  <span>{{ scope.row.namespace }}</span>
+                </router-link>
               </template>
             </el-table-column>
             <el-table-column :label="$t('table.policies')" min-width="30px" align="center">
               <template slot-scope="scope">
-                <router-link :to="'/management/namespaces/' + scope.row.namespace + '/policies'" class="link-type">
-                  <span>policies</span>
-                </router-link>
+                <span class="link-type" @click="getNamespacePolicies(scope.row.namespace)">stats</span>
               </template>
             </el-table-column>
             <el-table-column :label="$t('table.actions')" align="center" width="150" class-name="small-padding fixed-width">
