@@ -25,6 +25,16 @@
       <el-input :placeholder="$t('table.namespace')" v-model="listQuery.namespace" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-dropdown @command="handleCommand">
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary">
+          {{ $t('table.quotas') }}<i class="el-icon-arrow-down el-icon--right"/>
+        </el-button>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="quotas-get">get</el-dropdown-item>
+          <el-dropdown-item command="quotas-set">set</el-dropdown-item>
+          <el-dropdown-item command="quotas-reset">reset</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
       <el-autocomplete
         v-model="postForm.otherOptions"
         :fetch-suggestions="querySearch"
@@ -50,14 +60,14 @@
             @row-click="getCurrentRow">
             <el-table-column :label="$t('table.namespace')" min-width="50px" align="center">
               <template slot-scope="scope">
-                <span class="link-type" @click="getNamespacePolicies(scope.row.namespace)">{{ scope.row.namespace }}</span>
+                <router-link :to="'/management/tenantNamespace/' + scope.row.namespace" class="link-type">
+                  <span>{{ scope.row.namespace }}</span>
+                </router-link>
               </template>
             </el-table-column>
             <el-table-column :label="$t('table.policies')" min-width="30px" align="center">
               <template slot-scope="scope">
-                <router-link :to="'/management/namespaces/' + scope.row.namespace + '/policies'" class="link-type">
-                  <span>policies</span>
-                </router-link>
+                <span class="link-type" @click="getNamespacePolicies(scope.row.namespace)">stats</span>
               </template>
             </el-table-column>
             <el-table-column :label="$t('table.actions')" align="center" width="150" class-name="small-padding fixed-width">
@@ -77,14 +87,14 @@
     </div>
 
     <el-dialog :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="110px" style="width: 400px; margin-left:50px;">
         <div v-if="dialogStatus==='create'">
           <el-form-item :label="$t('table.namespace')" prop="namespace">
             <el-input v-model="temp.namespace"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='grant-permission'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.grant')" prop="grant">
@@ -97,7 +107,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='revoke-permission'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.role')" prop="role">
@@ -105,7 +115,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-clusters'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.clusters')" prop="clusters">
@@ -115,7 +125,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-backlog-quota'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.limit')" prop="limit">
@@ -128,12 +138,12 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='remove-backlog-quota'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-persistence'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="ackQuorum" prop="ackQuorum">
@@ -150,7 +160,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-message-ttl'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="messageTTL" prop="messageTTL">
@@ -166,12 +176,12 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='delete-anti-affinity-group'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-deduplication'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="deduplication">
@@ -182,7 +192,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-retention'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="retentionSize" prop="retentionSize">
@@ -193,7 +203,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='unload'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="unloadBundle" prop="unloadBundle">
@@ -201,7 +211,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='split-bundle'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="splitBundle" prop="splitBundle">
@@ -215,7 +225,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-dispatch-rate'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="byteDispatchRate" prop="byteDispatchRate">
@@ -229,7 +239,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='clear-backlog'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="clearBundle" prop="clearBundle">
@@ -246,7 +256,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='unsubscribe'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="unsubBundle" prop="unsubBundle">
@@ -254,7 +264,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-encryption-required'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="encryption">
@@ -265,7 +275,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-subscription-auth-mode'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="auth-mode" prop="auth-mode">
@@ -275,7 +285,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-max-producers-per-topic'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="maxProducersPerTopic" prop="maxProducersPerTopic">
@@ -283,7 +293,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-max-consumers-per-topic'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="maxConsumersPerTopic" prop="maxConsumersPerTopic">
@@ -291,7 +301,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-max-consumers-per-subscription'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="maxConsumersPerSub" prop="maxConsumersPerSub">
@@ -299,7 +309,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-compaction-threshold'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="threshold" prop="threshold">
@@ -307,7 +317,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-offload-threshold'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="thresholdSize" prop="thresholdSize">
@@ -315,7 +325,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-offload-deletion-lag'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="deletionLag" prop="deletionLag">
@@ -323,18 +333,63 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='clear-offload-deletion-lag'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-schema-autoupdate-strategy'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="compatibility" prop="compatibility">
             <el-select v-model="temp.compatibility" style="width:330px;" placeholder="Please select">
               <el-option v-for="item in compatibilityListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-select>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='quotas-get'||dialogStatus==='quotas-reset'">
+          <el-form-item label="startBundle" prop="startBundle">
+            <el-select v-model="temp.startBundle" style="width:330px;" placeholder="Please select startBundle" @focus="getBundleList()">
+              <el-option v-for="(item,index) in startBundleListOptions" :key="item+index" :label="item" :value="item"/>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="stopBundle" prop="stopBundle">
+            <el-select v-model="temp.stopBundle" style="width:330px;" placeholder="Please select stopBundle" @focus="getBundleList()">
+              <el-option v-for="(item,index) in stopBundleListOptions" :key="item+index" :label="item" :value="item"/>
+            </el-select>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='quotas-set'">
+          <el-form-item label="startBundle" prop="setStartBundle">
+            <el-select v-model="temp.setStartBundle" style="width:330px;" placeholder="Please select startBundle" @focus="getBundleList()">
+              <el-option v-for="(item,index) in startBundleListOptions" :key="item+index" :label="item" :value="item"/>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="stopBundle" prop="setsStopBundle">
+            <el-select v-model="temp.setStopBundle" style="width:330px;" placeholder="Please select stopBundle" @focus="getBundleList()">
+              <el-option v-for="(item,index) in stopBundleListOptions" :key="item+index" :label="item" :value="item"/>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="dynamic">
+            <el-switch
+              v-model="temp.dynamic"
+              active-color="#13ce66"
+              inactive-color="#ff4949"/>
+          </el-form-item>
+          <el-form-item label="bandwidthIn" prop="bandwidthIn">
+            <el-input v-model="temp.bandwidthIn" placeholder="expected inbound bandwidth (bytes/second)"/>
+          </el-form-item>
+          <el-form-item label="bandwidthOut" prop="bandwidthOut">
+            <el-input v-model="temp.bandwidthOut" placeholder="expected outbound bandwidth (bytes/second)"/>
+          </el-form-item>
+          <el-form-item label="memory" prop="memory">
+            <el-input v-model="temp.memory" placeholder="expected memory usage (Mbytes)"/>
+          </el-form-item>
+          <el-form-item label="msgRateIn" prop="msgRateIn">
+            <el-input v-model="temp.msgRateIn" placeholder="expected incoming messages per second"/>
+          </el-form-item>
+          <el-form-item label="msgRateOut" prop="msgRateOut">
+            <el-input v-model="temp.msgRateOut" placeholder="expected outgoing messages per second"/>
           </el-form-item>
         </div>
       </el-form>
@@ -380,6 +435,13 @@ import {
   clearOffloadDeletionLag,
   setSchemaAutoupdateStrategy
 } from '@/api/namespaces'
+import {
+  getResourceQuotasByNamespace,
+  getResourceQuotas,
+  setResourceQuotas,
+  setResourceQuotasByNamespace,
+  removeResourceQuotasByNamespace
+} from '@/api/resource-quotas'
 import { fetchTenants } from '@/api/tenants'
 import { fetchClusters } from '@/api/clusters'
 import waves from '@/directive/waves' // Waves directive
@@ -412,6 +474,8 @@ export default {
       actionsListOptions: [],
       authModeListOptions: [],
       moreListOptions: [],
+      startBundleListOptions: [],
+      stopBundleListOptions: [],
       tableKey: 0,
       tenant: '',
       otherOptions: '',
@@ -465,7 +529,17 @@ export default {
         threshold: 0,
         thresholdSize: -1,
         deletionLag: -1,
-        compatibility: 0
+        compatibility: 0,
+        startBundle: '',
+        stopBundle: '',
+        setStartBundle: '',
+        setStopBundle: '',
+        bandwidthIn: 0,
+        bandwidthOut: 0,
+        memory: '',
+        msgRateIn: 0,
+        msgRateOut: 0,
+        dynamic: false
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -475,7 +549,14 @@ export default {
         clusters: [{ required: true, message: 'clusters is required', trigger: 'blur' }],
         limit: [{ required: true, message: 'limit is required', trigger: 'blur' }],
         policies: [{ required: true, message: 'policies is required', trigger: 'blur' }],
-        role: [{ required: true, message: 'role is required', trigger: 'blur' }]
+        role: [{ required: true, message: 'role is required', trigger: 'blur' }],
+        stopBundle: [{ required: true, message: 'stopBundle is required', trigger: 'blur' }],
+        startBundle: [{ required: true, message: 'startBundle is required', trigger: 'blur' }],
+        bandwidthIn: [{ required: true, message: 'bandwidthIn is required', trigger: 'blur' }],
+        bandwidthOut: [{ required: true, message: 'bandwidthOut is required', trigger: 'blur' }],
+        memory: [{ required: true, message: 'memory is required', trigger: 'blur' }],
+        msgRateIn: [{ required: true, message: 'msgRateIn is required', trigger: 'blur' }],
+        msgRateOut: [{ required: true, message: 'msgRateOut is required', trigger: 'blur' }]
       }
     }
   },
@@ -572,25 +653,18 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
     },
     createNamespace() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          putNamespace(this.tenant, this.temp.namespace, this.temp).then(() => {
-            this.localList = []
-            this.getNamespaces()
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'success',
-              message: 'create success',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
+      putNamespace(this.tenant, this.temp.namespace, this.temp).then(() => {
+        this.localList = []
+        this.getNamespaces()
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'create success',
+          type: 'success',
+          duration: 2000
+        })
       })
     },
     handleDelete(row) {
@@ -630,6 +704,9 @@ export default {
       }
       this.dialogStatus = item.value
       this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['temp'].clearValidate()
+      })
     },
     querySearch(queryString, cb) {
       var moreListOptions = this.moreListOptions
@@ -675,89 +752,103 @@ export default {
       this.currentNamespace = item.namespace
     },
     handleOptions() {
-      switch (this.dialogStatus) {
-        case 'create':
-          this.createNamespace()
-          break
-        case 'grant-permission':
-          this.confirmGrantPermission()
-          break
-        case 'revoke-permission':
-          this.confirmRevokePermissions()
-          break
-        case 'set-clusters':
-          this.confirmSetClusters()
-          break
-        case 'set-backlog-quota':
-          this.confirmSetBacklogQuota()
-          break
-        case 'remove-backlog-quota':
-          this.confirmRemoveBacklogQuota()
-          break
-        case 'set-persistence':
-          this.confirmSetPersistence()
-          break
-        case 'set-message-ttl':
-          this.confirmSetMessageTtl()
-          break
-        case 'set-anti-affinity-group':
-          this.confirmSetAntiAffinityGroup()
-          break
-        case 'delete-anti-affinity-group':
-          this.confirmDeleteAntiAffinityGroup()
-          break
-        case 'set-deduplication':
-          this.confirmSetDeduplication()
-          break
-        case 'set-retention':
-          this.confirmSetRetention()
-          break
-        case 'unload':
-          this.confirmUnload()
-          break
-        case 'split-bundle':
-          this.confirmSplitBundle()
-          break
-        case 'set-dispatch-rate':
-          this.confirmSetDispatchRate()
-          break
-        case 'clear-backlog':
-          this.confirmClearBacklog()
-          break
-        case 'unsubscribe':
-          this.confirmUnsubscribe()
-          break
-        case 'set-encryption-required':
-          this.confirmSetEncryptionRequired()
-          break
-        case 'set-subscription-auth-mode':
-          this.confirmSetSubscriptionAuthMode()
-          break
-        case 'set-max-producers-per-topic':
-          this.confirmSetMaxProducersPerTopic()
-          break
-        case 'set-max-consumers-per-topic':
-          this.confirmSetMaxConsumersPerTopic()
-          break
-        case 'set-max-consumers-per-subscription':
-          this.confirmSetMaxConsumersPerSubscription()
-          break
-        case 'set-compaction-threshold':
-          this.confirmSetCompactionThreshold()
-          break
-        case 'set-offload-threshold':
-          this.confirmSetOffloadThreshold()
-          break
-        case 'set-offload-deletion-lag':
-          this.confirmSetOffloadDeletionLag()
-          break
-        case 'clear-offload-deletion-lag':
-          this.confirmClearOffloadDeletionLag()
-          break
-        case 'set-schema-autoupdate-strategy':
-          this.confirmSetSchemaAutoupdateStrategy()
-          break
-      }
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          console.log(valid)
+          switch (this.dialogStatus) {
+            case 'create':
+              this.createNamespace()
+              break
+            case 'grant-permission':
+              this.confirmGrantPermission()
+              break
+            case 'revoke-permission':
+              this.confirmRevokePermissions()
+              break
+            case 'set-clusters':
+              this.confirmSetClusters()
+              break
+            case 'set-backlog-quota':
+              this.confirmSetBacklogQuota()
+              break
+            case 'remove-backlog-quota':
+              this.confirmRemoveBacklogQuota()
+              break
+            case 'set-persistence':
+              this.confirmSetPersistence()
+              break
+            case 'set-message-ttl':
+              this.confirmSetMessageTtl()
+              break
+            case 'set-anti-affinity-group':
+              this.confirmSetAntiAffinityGroup()
+              break
+            case 'delete-anti-affinity-group':
+              this.confirmDeleteAntiAffinityGroup()
+              break
+            case 'set-deduplication':
+              this.confirmSetDeduplication()
+              break
+            case 'set-retention':
+              this.confirmSetRetention()
+              break
+            case 'unload':
+              this.confirmUnload()
+              break
+            case 'split-bundle':
+              this.confirmSplitBundle()
+              break
+            case 'set-dispatch-rate':
+              this.confirmSetDispatchRate()
+              break
+            case 'clear-backlog':
+              this.confirmClearBacklog()
+              break
+            case 'unsubscribe':
+              this.confirmUnsubscribe()
+              break
+            case 'set-encryption-required':
+              this.confirmSetEncryptionRequired()
+              break
+            case 'set-subscription-auth-mode':
+              this.confirmSetSubscriptionAuthMode()
+              break
+            case 'set-max-producers-per-topic':
+              this.confirmSetMaxProducersPerTopic()
+              break
+            case 'set-max-consumers-per-topic':
+              this.confirmSetMaxConsumersPerTopic()
+              break
+            case 'set-max-consumers-per-subscription':
+              this.confirmSetMaxConsumersPerSubscription()
+              break
+            case 'set-compaction-threshold':
+              this.confirmSetCompactionThreshold()
+              break
+            case 'set-offload-threshold':
+              this.confirmSetOffloadThreshold()
+              break
+            case 'set-offload-deletion-lag':
+              this.confirmSetOffloadDeletionLag()
+              break
+            case 'clear-offload-deletion-lag':
+              this.confirmClearOffloadDeletionLag()
+              break
+            case 'set-schema-autoupdate-strategy':
+              this.confirmSetSchemaAutoupdateStrategy()
+              break
+            case 'quotas-get':
+              this.confirmQuotasGet()
+              break
+            case 'quotas-set':
+              this.confirmQuotasSet()
+              break
+            case 'quotas-reset':
+              this.confirmQuotasReset()
+              break
+          }
+        }
+      })
     },
     confirmGrantPermission() {
       grantPermissions(this.currentNamespace, this.temp.role, this.temp.actions).then(response => {
@@ -1061,10 +1152,143 @@ export default {
           duration: 3000
         })
       })
-    }
+    },
     // handleClearOptions() {
     //   this.moreListOptions = this.loadAllOptions()
     // }
+    handleCommand(command) {
+      this.currentCommand = command
+      switch (this.currentCommand) {
+        case 'quotas-get':
+          this.handleQuotasGet()
+          break
+        case 'quotas-set':
+          this.handleQuotasSet()
+          break
+        case 'quotas-reset':
+          this.handleQuotasReset()
+          break
+      }
+    },
+    handleQuotasGet() {
+      if (this.currentNamespace.length > 0) {
+        this.dialogStatus = 'quotas-get'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['temp'].clearValidate()
+        })
+      } else {
+        this.confirmQuotasGet()
+      }
+    },
+    handleQuotasSet() {
+      this.dialogStatus = 'quotas-set'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['temp'].clearValidate()
+      })
+    },
+    handleQuotasReset() {
+      this.dialogStatus = 'quotas-reset'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['temp'].clearValidate()
+      })
+    },
+    confirmQuotasGet() {
+      if (this.currentNamespace.length > 0) {
+        const bundle = this.temp.startBundle + '_' + this.temp.stopBundle
+        getResourceQuotasByNamespace(this.currentNamespace, bundle).then(response => {
+          this.jsonValue = response.data
+          this.dialogFormVisible = false
+          return
+        })
+        return
+      }
+      getResourceQuotas().then(response => {
+        this.jsonValue = response.data
+      })
+    },
+    confirmQuotasSet() {
+      const data = {
+        'msgRateIn': this.temp.msgRateIn,
+        'msgRateOut': this.temp.msgRateOut,
+        'bandwidthIn': this.temp.bandwidthIn,
+        'bandwidthOut': this.temp.bandwidthOut,
+        'memory': this.temp.memory,
+        'dynamic': this.temp.dynamic
+      }
+      if (this.currentNamespace.length > 0) {
+        if (this.temp.setStartBundle.length <= 0 || this.temp.setStopBundle <= 0) {
+          this.$notify({
+            title: 'error',
+            message: 'Please select startBundle and stopBundle',
+            type: 'error',
+            duration: 3000
+          })
+          return
+        }
+        const bundle = this.temp.setStartBundle + '_' + this.temp.setStopBundle
+        setResourceQuotasByNamespace(this.currentNamespace, bundle, data).then(response => {
+          this.$notify({
+            title: 'success',
+            message: 'Set resource quotas success for namespace',
+            type: 'success',
+            duration: 3000
+          })
+          this.dialogFormVisible = false
+        })
+        return
+      }
+      setResourceQuotas(data).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Set resource quotas success',
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+      })
+    },
+    confirmQuotasReset() {
+      if (this.currentNamespace.length <= 0) {
+        this.$notify({
+          title: 'error',
+          message: 'Please select any one namespace in table',
+          type: 'error',
+          duration: 3000
+        })
+        return
+      }
+      const bundle = this.temp.startBundle + '_' + this.temp.stopBundle
+      removeResourceQuotasByNamespace(this.currentNamespace, bundle).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Remove resource quotas success',
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+        return
+      })
+    },
+    getBundleList() {
+      this.startBundleListOptions = []
+      this.stopBundleListOptions = []
+      if (this.currentNamespace.length <= 0) {
+        this.$notify({
+          title: 'error',
+          message: 'Please select any one namespace in table',
+          type: 'error',
+          duration: 3000
+        })
+        return
+      }
+      fetchNamespacePolicies(this.currentNamespace).then(response => {
+        this.startBundleListOptions = response.data.bundles.boundaries
+        this.stopBundleListOptions = response.data.bundles.boundaries
+      })
+    }
   }
 }
 </script>
