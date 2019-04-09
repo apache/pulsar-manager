@@ -44,12 +44,12 @@
     </el-row>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.tenant')" prop="tenant">
           <el-input v-model="temp.tenant"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.clusters')" prop="tenant">
-          <el-drag-select v-model="clusters" style="width:330px;" multiple placeholder="Please select">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.clusters')" prop="clusters">
+          <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
             <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
           </el-drag-select>
         </el-form-item>
@@ -60,7 +60,7 @@
           <el-input v-model="temp.adminRoles"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('table.clusters')">
-          <el-drag-select v-model="clusters" style="width:330px;" multiple placeholder="Please select">
+          <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
             <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
           </el-drag-select>
         </el-form-item>
@@ -121,7 +121,6 @@ export default {
       searchList: [],
       total: 0,
       listLoading: true,
-      clusters: [],
       jsonValue: {},
       listQuery: {
         tenant: '',
@@ -131,7 +130,8 @@ export default {
       temp: {
         tenant: '',
         adminRoles: '',
-        allowedClusters: ''
+        allowedClusters: '',
+        clusters: []
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -140,8 +140,8 @@ export default {
         create: 'Create'
       },
       rules: {
-        tenant: [{ required: true, message: 'required', trigger: 'blur' }],
-        clusters: [{ required: true, message: 'required', trigger: 'blur' }]
+        tenant: [{ required: true, message: 'Tenant is required', trigger: 'blur' }],
+        clusters: [{ required: true, message: 'Cluster is required', trigger: 'blur' }]
       }
     }
   },
@@ -190,8 +190,7 @@ export default {
       this.listLoading = false
     },
     handleGetConfig(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      fetchTenantsInfo(this.temp.tenant).then(response => {
+      fetchTenantsInfo(row.tenant).then(response => {
         // response
         this.jsonValue = {
           'adminRoles': response.data.adminRoles,
@@ -206,14 +205,15 @@ export default {
       this.temp = {
         tenant: '',
         adminRoles: '',
-        allowedClusters: ''
+        allowedClusters: '',
+        clusters: []
       }
     },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.clusters = []
+      this.temp.clusters = []
       this.clusterListOptions = []
       fetchClusters(this.listQuery).then(response => {
         for (var i = 0; i < response.data.length; i++) {
@@ -221,13 +221,13 @@ export default {
         }
       })
       this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+        this.$refs['temp'].clearValidate()
       })
     },
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['temp'].validate((valid) => {
         if (valid) {
-          const data = { allowedClusters: this.clusters }
+          const data = { allowedClusters: this.temp.clusters }
           putTenant(this.temp.tenant, data).then((response) => {
             this.temp.adminRoles = 'empty'
             this.temp.allowedClusters = 'empty'
@@ -245,12 +245,12 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-      fetchTenantsInfo(this.temp.tenant).then(response => {
+      this.temp.tenant = row.tenant
+      fetchTenantsInfo(row.tenant).then(response => {
         this.temp.adminRoles = response.data.adminRoles.join(',')
-        this.clusters = response.data.allowedClusters
+        this.temp.clusters = response.data.allowedClusters
       })
       this.clusterListOptions = []
       fetchClusters(this.listQuery).then(response => {
@@ -260,17 +260,17 @@ export default {
       })
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['temp'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           const data = {}
-          if (this.clusters.length > 0) {
-            data.allowedClusters = this.clusters
+          if (this.temp.clusters.length > 0) {
+            data.allowedClusters = this.temp.clusters
           }
           if (tempData.adminRoles.length > 0) {
             data.adminRoles = tempData.adminRoles.split(',')
           }
-          if (this.clusters.length > 0 || tempData.adminRoles.length > 0) {
+          if (this.temp.clusters.length > 0 || tempData.adminRoles.length > 0) {
             updateTenant(this.temp.tenant, data).then(() => {
               this.dialogFormVisible = false
               this.$notify({
@@ -292,8 +292,7 @@ export default {
       })
     },
     handleDelete(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      deleteTenant(this.temp.tenant).then((response) => {
+      deleteTenant(row.tenant).then((response) => {
         this.$notify({
           title: 'success',
           message: 'delete success',
