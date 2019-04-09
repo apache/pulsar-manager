@@ -176,7 +176,8 @@ export default {
     configValue: 'ConfigValue',
     sources: 'Sources',
     builtin: 'Builtin',
-    sinks: 'Sink'
+    sinks: 'Sink',
+    quotas: 'Quotas'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
