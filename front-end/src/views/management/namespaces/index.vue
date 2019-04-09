@@ -65,7 +65,7 @@
                 </router-link>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.policies')" min-width="30px" align="center">
+            <el-table-column :label="$t('table.stats')" min-width="30px" align="center">
               <template slot-scope="scope">
                 <span class="link-type" @click="getNamespacePolicies(scope.row.namespace)">stats</span>
               </template>
@@ -98,7 +98,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.grant')" prop="grant">
-            <el-drag-select v-model="temp.actions" style="width:300px;" multiple placeholder="Please select">
+            <el-drag-select v-model="temp.actions" style="width:300px;" multiple placeholder="Please select consumer or produce">
               <el-option v-for="item in actionsListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-drag-select>
           </el-form-item>
@@ -131,8 +131,8 @@
           <el-form-item :label="$t('table.limit')" prop="limit">
             <el-input v-model="temp.limit"/>
           </el-form-item>
-          <el-form-item :label="$t('table.policies')" prop="policies">
-            <el-select v-model="temp.policy" style="width:330px;" placeholder="Please select">
+          <el-form-item :label="$t('table.policies')" prop="policy">
+            <el-select v-model="temp.policy" placeholder="Please select polices">
               <el-option v-for="item in policiesListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-select>
           </el-form-item>
@@ -168,7 +168,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-anti-affinity-group'">
-          <el-form-item :label="$t('table.namespace')" prop="namespace">
+          <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="group" prop="group">
@@ -202,14 +202,14 @@
             <el-input v-model="temp.retentionTime"/>
           </el-form-item>
         </div>
-        <div v-else-if="dialogStatus==='unload'">
+        <!-- <div v-else-if="dialogStatus==='unload'">
           <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="unloadBundle" prop="unloadBundle">
             <el-input v-model="temp.unloadBundle"/>
           </el-form-item>
-        </div>
+        </div> -->
         <div v-else-if="dialogStatus==='split-bundle'">
           <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
@@ -238,29 +238,15 @@
             <el-input v-model="temp.msgDispatchRate"/>
           </el-form-item>
         </div>
-        <div v-else-if="dialogStatus==='clear-backlog'">
-          <el-form-item :label="$t('table.namespace')">
-            <span>{{ currentNamespace }}</span>
-          </el-form-item>
-          <el-form-item label="clearBundle" prop="clearBundle">
-            <el-input v-model="temp.clearBundle"/>
-          </el-form-item>
-          <el-form-item label="clearForce">
-            <el-switch
-              v-model="temp.clearForce"
-              active-color="#13ce66"
-              inactive-color="#ff4949"/>
-          </el-form-item>
-          <el-form-item label="clearSub" prop="clearSub">
-            <el-input v-model="temp.clearSub"/>
-          </el-form-item>
-        </div>
         <div v-else-if="dialogStatus==='unsubscribe'">
           <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="unsubBundle" prop="unsubBundle">
             <el-input v-model="temp.unsubBundle"/>
+          </el-form-item>
+          <el-form-item label="subName" prop="subName">
+            <el-input v-model="temp.subName"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-encryption-required'">
@@ -278,7 +264,7 @@
           <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
-          <el-form-item label="auth-mode" prop="auth-mode">
+          <el-form-item label="auth-mode" prop="subscriptionAuthMode">
             <el-select v-model="temp.subscriptionAuthMode" style="width:330px;" placeholder="Please select">
               <el-option v-for="item in authModeListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-select>
@@ -288,24 +274,24 @@
           <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
-          <el-form-item label="maxProducersPerTopic" prop="maxProducersPerTopic">
-            <el-input v-model="temp.maxProducersPerTopic"/>
+          <el-form-item label="Topic" prop="maxProducersPerTopic">
+            <el-input v-model="temp.maxProducersPerTopic" placeholder="maxProducersPerTopic for a namespace"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-max-consumers-per-topic'">
           <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
-          <el-form-item label="maxConsumersPerTopic" prop="maxConsumersPerTopic">
-            <el-input v-model="temp.maxConsumersPerTopic"/>
+          <el-form-item label="Topic" prop="maxConsumersPerTopic">
+            <el-input v-model="temp.maxConsumersPerTopic" placeholder="maxConsumersPerTopic for a namespace"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-max-consumers-per-subscription'">
           <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
           </el-form-item>
-          <el-form-item label="maxConsumersPerSub" prop="maxConsumersPerSub">
-            <el-input v-model="temp.maxConsumersPerSub"/>
+          <el-form-item label="subName" prop="maxConsumersPerSub">
+            <el-input v-model="temp.maxConsumersPerSub" placeholder="Get maxConsumersPerSubscription for a namespace"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-compaction-threshold'">
@@ -313,7 +299,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="threshold" prop="threshold">
-            <el-input v-model="temp.threshold"/>
+            <el-input v-model="temp.threshold" placeholder="Set compactionThreshold for a namespace"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-offload-threshold'">
@@ -321,7 +307,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="thresholdSize" prop="thresholdSize">
-            <el-input v-model="temp.thresholdSize"/>
+            <el-input v-model="temp.thresholdSize" placeholder="Set offloadThreshold for a namespace"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-offload-deletion-lag'">
@@ -329,7 +315,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="deletionLag" prop="deletionLag">
-            <el-input v-model="temp.deletionLag"/>
+            <el-input v-model="temp.deletionLag" placeholder="Get offloadDeletionLag, in minutes, for a namespace"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='clear-offload-deletion-lag'">
@@ -347,7 +333,17 @@
             </el-select>
           </el-form-item>
         </div>
-        <div v-else-if="dialogStatus==='quotas-get'||dialogStatus==='quotas-reset'">
+        <div v-else-if="dialogStatus==='clear-backlog'">
+          <el-form-item :label="$t('table.namespace')">
+            <span>{{ currentNamespace }}</span>
+          </el-form-item>
+        </div>
+        <div v-else-if="dialogStatus==='quotas-get'||dialogStatus==='quotas-reset'||dialogStatus==='unload'">
+          <div v-if="dialogStatus==='unload'">
+            <el-form-item :label="$t('table.namespace')">
+              <span>{{ currentNamespace }}</span>
+            </el-form-item>
+          </div>
           <el-form-item label="startBundle" prop="startBundle">
             <el-select v-model="temp.startBundle" style="width:330px;" placeholder="Please select startBundle" @focus="getBundleList()">
               <el-option v-for="(item,index) in startBundleListOptions" :key="item+index" :label="item" :value="item"/>
@@ -422,8 +418,9 @@ import {
   unloadBundle,
   splitBundle,
   setDispatchRate,
-  clearBundleBacklogForSubscription,
+  clearBacklog,
   unsubscribe,
+  unsubscribeByBundle,
   setEncryptionRequired,
   setSubscriptionAuthMode,
   setMaxProducersPerTopic,
@@ -539,7 +536,8 @@ export default {
         memory: '',
         msgRateIn: 0,
         msgRateOut: 0,
-        dynamic: false
+        dynamic: false,
+        subName: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -548,15 +546,31 @@ export default {
         grant: [{ required: true, message: 'grant is required', trigger: 'blur' }],
         clusters: [{ required: true, message: 'clusters is required', trigger: 'blur' }],
         limit: [{ required: true, message: 'limit is required', trigger: 'blur' }],
-        policies: [{ required: true, message: 'policies is required', trigger: 'blur' }],
+        policy: [{ required: true, message: 'policy is required', trigger: 'blur' }],
         role: [{ required: true, message: 'role is required', trigger: 'blur' }],
+        ackQuorum: [{ required: true, message: 'ackQuorum is required', trigger: 'blur' }],
+        ensemble: [{ required: true, message: 'ensemble is required', trigger: 'blur' }],
+        writeQuorum: [{ required: true, message: 'writeQuorum is required', trigger: 'blur' }],
+        deleteMaxRate: [{ required: true, message: 'deleteMaxRate is required', trigger: 'blur' }],
+        messageTTL: [{ required: true, message: 'messageTTL is required', trigger: 'blur' }],
+        group: [{ required: true, message: 'group is required', trigger: 'blur' }],
+        retentionSize: [{ required: true, message: 'retentionSize is required', trigger: 'blur' }],
+        retentionTime: [{ required: true, message: 'retentionTime is required', trigger: 'blur' }],
         stopBundle: [{ required: true, message: 'stopBundle is required', trigger: 'blur' }],
         startBundle: [{ required: true, message: 'startBundle is required', trigger: 'blur' }],
         bandwidthIn: [{ required: true, message: 'bandwidthIn is required', trigger: 'blur' }],
         bandwidthOut: [{ required: true, message: 'bandwidthOut is required', trigger: 'blur' }],
         memory: [{ required: true, message: 'memory is required', trigger: 'blur' }],
         msgRateIn: [{ required: true, message: 'msgRateIn is required', trigger: 'blur' }],
-        msgRateOut: [{ required: true, message: 'msgRateOut is required', trigger: 'blur' }]
+        msgRateOut: [{ required: true, message: 'msgRateOut is required', trigger: 'blur' }],
+        subName: [{ required: true, message: 'subName is required', trigger: 'blur' }],
+        subscriptionAuthMode: [{ required: true, message: 'subscriptionAuthMode is required', trigger: 'blur' }],
+        maxProducersPerTopic: [{ required: true, message: 'maxProducersPerTopic is required', trigger: 'blur' }],
+        maxConsumersPerTopic: [{ required: true, message: 'maxConsumersPerTopic is required', trigger: 'blur' }],
+        maxConsumersPerSub: [{ required: true, message: 'maxConsumersPerTopic is required', trigger: 'blur' }],
+        threshold: [{ required: true, message: 'threshold is required', trigger: 'blur' }],
+        thresholdSize: [{ required: true, message: 'thresholdSize is required', trigger: 'blur' }],
+        deletionLag: [{ required: true, message: 'deletionLag is required', trigger: 'blur' }]
       }
     }
   },
@@ -719,9 +733,7 @@ export default {
       }
     },
     loadAllOptions() {
-      return [
-        { 'value': 'grant-permission' },
-        { 'value': 'revoke-permission' },
+      const options = [
         { 'value': 'set-clusters' },
         { 'value': 'set-backlog-quota' },
         { 'value': 'remove-backlog-quota' },
@@ -747,6 +759,11 @@ export default {
         { 'value': 'clear-offload-deletion-lag' },
         { 'value': 'set-schema-autoupdate-strategy' }
       ]
+      if (process.env.USE_TLS) {
+        options.push({ 'value': 'grant-permission' })
+        options.push({ 'value': 'revoke-permission' })
+      }
+      return options
     },
     getCurrentRow(item) {
       this.currentNamespace = item.namespace
@@ -754,7 +771,6 @@ export default {
     handleOptions() {
       this.$refs['temp'].validate((valid) => {
         if (valid) {
-          console.log(valid)
           switch (this.dialogStatus) {
             case 'create':
               this.createNamespace()
@@ -979,11 +995,12 @@ export default {
       })
     },
     confirmUnload() {
-      unloadBundle(this.currentNamespace, this.temp.unloadBundle).then(response => {
+      const bundle = this.temp.startBundle + '_' + this.temp.stopBundle
+      unloadBundle(this.currentNamespace, bundle).then(response => {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
-          message: 'Set Retention success for namespace',
+          message: 'Unload success for namespace',
           type: 'success',
           duration: 3000
         })
@@ -1020,27 +1037,38 @@ export default {
       })
     },
     confirmClearBacklog() {
-      // to do test
-      clearBundleBacklogForSubscription(this.currentNamespace, this.temp.clearBundle, this.temp.clearSub).then(response => {
+      clearBacklog(this.currentNamespace).then(response => {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
-          message: 'clearBundleBacklogForSubscription success for namespace',
+          message: 'clearBacklog success for namespace',
           type: 'success',
           duration: 3000
         })
       })
     },
     confirmUnsubscribe() {
-      unsubscribe(this.currentNamespace, this.temp.unsubBundle, this.temp.unsubscribe).then(response => {
-        this.dialogFormVisible = false
-        this.$notify({
-          title: 'success',
-          message: 'unsubscribe success for namespace',
-          type: 'success',
-          duration: 3000
+      if (this.temp.unsubBundle.length > 0) {
+        unsubscribeByBundle(this.currentNamespace, this.temp.unsubBundle, this.temp.unsubscribe).then(response => {
+          this.dialogFormVisible = false
+          this.$notify({
+            title: 'success',
+            message: 'unsubscribe success for namespace',
+            type: 'success',
+            duration: 3000
+          })
         })
-      })
+      } else {
+        unsubscribe(this.currentNamespace, this.temp.subName).then(response => {
+          this.dialogFormVisible = false
+          this.$notify({
+            title: 'success',
+            message: 'unsubscribe success for namespace',
+            type: 'success',
+            duration: 3000
+          })
+        })
+      }
     },
     confirmSetEncryptionRequired() {
       setEncryptionRequired(this.currentNamespace, this.temp.encryption).then(response => {
@@ -1153,9 +1181,6 @@ export default {
         })
       })
     },
-    // handleClearOptions() {
-    //   this.moreListOptions = this.loadAllOptions()
-    // }
     handleCommand(command) {
       this.currentCommand = command
       switch (this.currentCommand) {
