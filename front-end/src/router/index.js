@@ -72,13 +72,23 @@ export const constantRouterMap = [
   {
     path: '',
     component: Layout,
-    redirect: 'dashboard',
+    redirect: 'prometheus',
+    meta: {
+      title: 'Dashboard',
+      icon: 'dashboard'
+    },
     children: [
       {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+        path: 'prometheus',
+        component: () => import('@/views/dashboard/prometheus/index'),
+        name: 'Prometheus',
+        meta: { title: 'prometheus', noCache: true }
+      },
+      {
+        path: 'grafana',
+        component: () => import('@/views/dashboard/grafana/index'),
+        name: 'Grafana',
+        meta: { title: 'grafana', noCache: true }
       }
     ]
   },
