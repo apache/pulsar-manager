@@ -171,12 +171,11 @@ export function unloadBundle(tenantNamespace, bundle) {
   })
 }
 
-export function splitBundle(tenantNamespace, bundle, data) {
+export function splitBundle(tenantNamespace, bundle, unload) {
   return request({
     headers: { 'Content-Type': 'application/json' },
-    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/split`,
-    method: 'put',
-    data
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/split?unload=${unload}`,
+    method: 'put'
   })
 }
 

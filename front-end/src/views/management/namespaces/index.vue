@@ -202,28 +202,6 @@
             <el-input v-model="temp.retentionTime"/>
           </el-form-item>
         </div>
-        <!-- <div v-else-if="dialogStatus==='unload'">
-          <el-form-item :label="$t('table.namespace')">
-            <span>{{ currentNamespace }}</span>
-          </el-form-item>
-          <el-form-item label="unloadBundle" prop="unloadBundle">
-            <el-input v-model="temp.unloadBundle"/>
-          </el-form-item>
-        </div> -->
-        <div v-else-if="dialogStatus==='split-bundle'">
-          <el-form-item :label="$t('table.namespace')">
-            <span>{{ currentNamespace }}</span>
-          </el-form-item>
-          <el-form-item label="splitBundle" prop="splitBundle">
-            <el-input v-model="temp.splitBundle"/>
-          </el-form-item>
-          <el-form-item label="splitUnload">
-            <el-switch
-              v-model="temp.splitUnload"
-              active-color="#13ce66"
-              inactive-color="#ff4949"/>
-          </el-form-item>
-        </div>
         <div v-else-if="dialogStatus==='set-dispatch-rate'">
           <el-form-item :label="$t('table.namespace')">
             <span>{{ currentNamespace }}</span>
@@ -338,10 +316,24 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
         </div>
-        <div v-else-if="dialogStatus==='quotas-get'||dialogStatus==='quotas-reset'||dialogStatus==='unload'">
+        <div v-else-if="dialogStatus==='quotas-get'||dialogStatus==='quotas-reset'||dialogStatus==='unload'||dialogStatus==='split-bundle'">
           <div v-if="dialogStatus==='unload'">
             <el-form-item :label="$t('table.namespace')">
               <span>{{ currentNamespace }}</span>
+            </el-form-item>
+          </div>
+          <div v-else-if="dialogStatus==='split-bundle'">
+            <el-form-item :label="$t('table.namespace')">
+              <span>{{ currentNamespace }}</span>
+            </el-form-item>
+            <!-- <el-form-item label="splitBundle" prop="splitBundle">
+              <el-input v-model="temp.splitBundle"/>
+            </el-form-item> -->
+            <el-form-item label="splitUnload">
+              <el-switch
+                v-model="temp.splitUnload"
+                active-color="#13ce66"
+                inactive-color="#ff4949"/>
             </el-form-item>
           </div>
           <el-form-item label="startBundle" prop="startBundle">
@@ -744,7 +736,7 @@ export default {
         { 'value': 'set-deduplication' },
         { 'value': 'set-retention' },
         { 'value': 'unload' },
-        // { 'value': 'split-bundle' },
+        { 'value': 'split-bundle' },
         { 'value': 'set-dispatch-rate' },
         { 'value': 'clear-backlog' },
         { 'value': 'unsubscribe' },
@@ -1007,10 +999,11 @@ export default {
       })
     },
     confirmSplitBundle() {
-      const data = { 'unload': this.temp.splitUnload }
+      // const data = { 'unload': this.temp.splitUnload }
       // problem split http 412
       // to do solve
-      splitBundle(this.currentNamespace, this.temp.splitBundle, data).then(response => {
+      const bundle = this.temp.startBundle + '_' + this.temp.stopBundle
+      splitBundle(this.currentNamespace, bundle, this.temp.splitUnload).then(response => {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
