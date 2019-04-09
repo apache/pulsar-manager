@@ -1,7 +1,7 @@
 <template>
-  <div class="dashboard-prometheus">
+  <div class="dashboard-grafana">
     <div v-if="iframe==='yes'">
-      <iframe ref="iframe" :src="src" class="dashboard-prometheus-iframe"/>
+      <iframe ref="iframe" :src="src" class="dashboard-grafana-iframe"/>
     </div>
     <div v-if="iframe==='no'">
       <span>Apache Pulsar</span>
@@ -29,12 +29,12 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-.dashboard-prometheus {
+.dashboard-grafana {
   padding: 10px;
   height: 1000px;
   width: auto;
 }
-.dashboard-prometheus-iframe {
+.dashboard-grafana-iframe {
   width: 100%;
   height: 1000px;
 }
