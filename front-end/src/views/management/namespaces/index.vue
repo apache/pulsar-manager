@@ -744,7 +744,7 @@ export default {
         { 'value': 'set-deduplication' },
         { 'value': 'set-retention' },
         { 'value': 'unload' },
-        { 'value': 'split-bundle' },
+        // { 'value': 'split-bundle' },
         { 'value': 'set-dispatch-rate' },
         { 'value': 'clear-backlog' },
         { 'value': 'unsubscribe' },
