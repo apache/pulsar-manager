@@ -4,20 +4,18 @@ front end base on [vue-element-admin](https://panjiachen.github.io/vue-element-a
 
 back end base on spring boot.
 
-### Build
+### Feature
+
+* Tenants manage
+* Namespace manage
+* Topics manage
+* Subscription manage
+* Function manage
+* Source manage
+* Sink manage
+
 
 #### front end
 
-```bash
-cd .front-end
-npm install
-npm run dev
-```
+[front-end-deploy](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md)
 
-#### backend
-
-todo
-
-#### Development
-
-You can start a pulsar standalone. The Pulsar Admin UI will automatically connect to pulsar standalone via `http://localhost:8080`. Now you try to go to `tenants` page and create `teant`.
