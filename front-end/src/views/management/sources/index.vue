@@ -81,7 +81,7 @@
       </el-row>
 
       <el-dialog :visible.sync="dialogFormVisible">
-        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
           <div v-if="dialogStatus==='create'||dialogStatus==='update'">
             <div v-if="dialogStatus==='create'">
               <el-form-item label="name" prop="source">
@@ -89,7 +89,7 @@
               </el-form-item>
             </div>
             <div v-if="dialogStatus==='update'">
-              <el-form-item label="name" prop="source">
+              <el-form-item label="name">
                 <span>{{ currentSource }}</span>
               </el-form-item>
             </div>
@@ -98,6 +98,14 @@
             </el-form-item>
             <el-form-item label="class" prop="className">
               <el-input v-model="temp.className"/>
+            </el-form-item>
+            <el-form-item label="configFile" prop="sourceConfigFile">
+              <input type="file" @change="loadSourceConfigFile">
+            </el-form-item>
+            <el-form-item label="output" prop="outputTopic">
+              <el-select v-model="temp.outputTopic" placeholder="select topic" @focus="getTopicsList()">
+                <el-option v-for="(item,index) in outputTopicsListOptions" :key="item+index" :label="item" :value="item"/>
+              </el-select>
             </el-form-item>
             <el-form-item label="cpu" prop="cpu">
               <el-input v-model="temp.cpu"/>
@@ -127,14 +135,6 @@
             </el-form-item>
             <el-form-item label="sourceConfig" prop="sourceConfig">
               <el-input v-model="temp.sourceConfig"/>
-            </el-form-item>
-            <el-form-item label="configFile" prop="sourceConfigFile">
-              <input type="file" @change="loadSourceConfigFile">
-            </el-form-item>
-            <el-form-item label="output" prop="outputTopics">
-              <el-select v-model="temp.outputTopic" placeholder="select topic" @focus="getTopicsList()">
-                <el-option v-for="(item,index) in outputTopicsListOptions" :key="item+index" :label="item" :value="item"/>
-              </el-select>
             </el-form-item>
           </div>
           <div v-if="dialogStatus==='start'||dialogStatus==='stop'||dialogStatus==='restart'||dialogStatus==='status'">
@@ -243,7 +243,9 @@ export default {
         guarantees: ''
       },
       rules: {
-        source: [{ required: true, message: 'sources name is required', trigger: 'blur' }]
+        source: [{ required: true, message: 'sources name is required', trigger: 'blur' }],
+        className: [{ required: true, message: 'className is required', trigger: 'blur' }],
+        outputTopic: [{ required: true, message: 'outputTopic is required', trigger: 'blur' }]
       }
     }
   },
@@ -310,6 +312,9 @@ export default {
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.resetTemp()
+      this.$nextTick(() => {
+        this.$refs['temp'].clearValidate()
+      })
     },
     getCurrentRow(item) {
       this.currentSource = item.source
@@ -336,17 +341,21 @@ export default {
       })
     },
     confirmCreateSource() {
-      const formData = this.prepareSourceParams(this.temp.source)
-      createSource(this.tenant, this.namespace, this.temp.source, formData).then(response => {
-        this.$notify({
-          title: 'success',
-          message: 'create source success',
-          type: 'success',
-          duration: 2000
-        })
-        this.dialogFormVisible = false
-        this.localList = []
-        this.getSources()
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          const formData = this.prepareSourceParams(this.temp.source)
+          createSource(this.tenant, this.namespace, this.temp.source, formData).then(response => {
+            this.$notify({
+              title: 'success',
+              message: 'create source success',
+              type: 'success',
+              duration: 2000
+            })
+            this.dialogFormVisible = false
+            this.localList = []
+            this.getSources()
+          })
+        }
       })
     },
     handleUpdate() {
@@ -515,15 +524,19 @@ export default {
       return formData
     },
     confirmUpdate() {
-      const formData = this.prepareSourceParams('')
-      updateSource(this.tenant, this.namespace, this.currentSource, formData).then(response => {
-        this.$notify({
-          title: 'success',
-          message: 'update source success',
-          type: 'success',
-          duration: 2000
-        })
-        this.dialogFormVisible = false
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          const formData = this.prepareSourceParams('')
+          updateSource(this.tenant, this.namespace, this.currentSource, formData).then(response => {
+            this.$notify({
+              title: 'success',
+              message: 'update source success',
+              type: 'success',
+              duration: 2000
+            })
+            this.dialogFormVisible = false
+          })
+        }
       })
     },
     getSourcesList() {

@@ -92,7 +92,7 @@
     </el-row>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="90px" style="width: 400px; margin-left:50px;">
+      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <div v-if="dialogStatus==='create'">
           <el-form-item label="messageId" prop="messageId">
             <el-input v-model="temp.messageId"/>
@@ -193,7 +193,7 @@ export default {
       localList: [],
       searchList: [],
       total: 0,
-      listLoading: true,
+      listLoading: false,
       jsonValue: {},
       tenant: '',
       namespace: '',
@@ -221,7 +221,11 @@ export default {
         create: 'Create'
       },
       rules: {
-        tenant: [{ required: true, message: 'tenant is required', trigger: 'blur' }]
+        messageId: [{ required: true, message: 'messageId is required', trigger: 'blur' }],
+        subscription: [{ required: true, message: 'subscription is required', trigger: 'blur' }],
+        count: [{ required: true, message: 'count is required', trigger: 'blur' }],
+        expireTime: [{ required: true, message: 'expireTime is required', trigger: 'blur' }],
+        time: [{ required: true, message: 'time is required', trigger: 'blur' }]
       }
       // tempRoute: {}
     }
@@ -229,7 +233,6 @@ export default {
   computed: {
   },
   created() {
-    this.getSubscriptions()
     if (this.isEdit) {
       // const id = this.$route.params && this.$route.params.id
       // this.fetchData(id)
@@ -268,9 +271,9 @@ export default {
           // this.localPaging()
           // Just to simulate the time of the request
           setTimeout(() => {
-            this.listLoading = false
           }, 1.5 * 1000)
         })
+        this.listLoading = false
       }
     },
     localPaging() {
@@ -302,38 +305,32 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
     },
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          if (this.tenant.length <= 0 || this.namespace <= 0 || this.topic.length <= 0) {
-            this.$notify({
-              title: 'error',
-              message: 'please select tenant and namespace and topic',
-              type: 'success',
-              duration: 2000
-            })
-          }
-          putSubscription(
-            this.tenant,
-            this.namespace,
-            this.topic,
-            this.temp.subscription
-          ).then(() => {
-            this.localList = []
-            this.getSubscriptions()
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'success',
-              message: 'create success',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
+      if (this.tenant.length <= 0 || this.namespace <= 0 || this.topic.length <= 0) {
+        this.$notify({
+          title: 'error',
+          message: 'please select tenant and namespace and topic',
+          type: 'success',
+          duration: 2000
+        })
+        return
+      }
+      putSubscription(
+        this.tenant,
+        this.namespace,
+        this.topic,
+        this.temp.subscription
+      ).then(() => {
+        this.localList = []
+        this.getSubscriptions()
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'success',
+          message: 'create success',
+          type: 'success',
+          duration: 2000
+        })
       })
     },
     handleDelete(row) {
@@ -415,6 +412,9 @@ export default {
       }
       this.dialogStatus = item.value
       this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['temp'].clearValidate()
+      })
     },
     querySearch(queryString, cb) {
       var moreListOptions = this.moreListOptions
@@ -441,23 +441,27 @@ export default {
       this.currentSub = item.subscription
     },
     handleOptions() {
-      switch (this.dialogStatus) {
-        case 'create':
-          this.createData()
-          break
-        case 'skip':
-          this.confirmSkip()
-          break
-        case 'expire-messages':
-          this.confirmExpireMessage()
-          break
-        case 'expire-messages-all-subscriptions':
-          this.confirmExpireMessagesAllSubscriptions()
-          break
-        case 'reset-cursor':
-          this.confirmResetCursor()
-          break
-      }
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          switch (this.dialogStatus) {
+            case 'create':
+              this.createData()
+              break
+            case 'skip':
+              this.confirmSkip()
+              break
+            case 'expire-messages':
+              this.confirmExpireMessage()
+              break
+            case 'expire-messages-all-subscriptions':
+              this.confirmExpireMessagesAllSubscriptions()
+              break
+            case 'reset-cursor':
+              this.confirmResetCursor()
+              break
+          }
+        }
+      })
     },
     confirmSkip() {
       const tenantNamespaceTopic = this.currentTenant + '/' + this.currentNamespace + '/' + this.currentTopic

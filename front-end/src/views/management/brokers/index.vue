@@ -64,7 +64,7 @@
         </el-col>
       </el-row>
       <el-dialog :visible.sync="dialogFormVisible">
-        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
           <div v-if="dialogStatus==='update'">
             <el-form-item :label="$t('table.configName')" prop="configName">
               <el-input v-model="temp.configName"/>
@@ -200,16 +200,23 @@ export default {
     handleUpdate() {
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['temp'].clearValidate()
+      })
     },
     confirmUpdate() {
-      updateBrokersDynamicConfiguration(this.temp.configName, this.temp.configValue).then(response => {
-        this.$notify({
-          title: 'success',
-          message: 'Set config success',
-          type: 'success',
-          duration: 3000
-        })
-        this.dialogFormVisible = false
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          updateBrokersDynamicConfiguration(this.temp.configName, this.temp.configValue).then(response => {
+            this.$notify({
+              title: 'success',
+              message: 'Set config success',
+              type: 'success',
+              duration: 3000
+            })
+            this.dialogFormVisible = false
+          })
+        }
       })
     },
     getBrokerConfig() {

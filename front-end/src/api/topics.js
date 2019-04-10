@@ -41,6 +41,15 @@ export function fetchPartitionTopicStats(tenantNamespaceTopic) {
 export function putTopic(tenant, namespace, topic, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/persistent/${tenant}/${namespace}/${topic}`,
+    method: 'put',
+    data
+  })
+}
+
+export function putTopicByPartition(tenant, namespace, topic, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
     url: BASE_URL_V2 + `/persistent/${tenant}/${namespace}/${topic}/partitions`,
     method: 'put',
     data
