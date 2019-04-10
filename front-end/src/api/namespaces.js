@@ -171,12 +171,11 @@ export function unloadBundle(tenantNamespace, bundle) {
   })
 }
 
-export function splitBundle(tenantNamespace, bundle, data) {
+export function splitBundle(tenantNamespace, bundle, unload) {
   return request({
     headers: { 'Content-Type': 'application/json' },
-    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/split`,
-    method: 'put',
-    data
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/split?unload=${unload}`,
+    method: 'put'
   })
 }
 
@@ -189,6 +188,14 @@ export function setDispatchRate(tenantNamespace, data) {
   })
 }
 
+export function clearBacklog(tenantNamespace) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/clearBacklog`,
+    method: 'post'
+  })
+}
+
 export function clearBundleBacklogForSubscription(tenantNamespace, bundle, subscription) {
   return request({
     headers: { 'Content-Type': 'application/json' },
@@ -197,7 +204,15 @@ export function clearBundleBacklogForSubscription(tenantNamespace, bundle, subsc
   })
 }
 
-export function unsubscribe(tenantNamespace, bundle, subscription) {
+export function unsubscribe(tenantNamespace, subscription) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/unsubscribe/${subscription}`,
+    method: 'post'
+  })
+}
+
+export function unsubscribeByBundle(tenantNamespace, bundle, subscription) {
   return request({
     headers: { 'Content-Type': 'application/json' },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/unsubscribe/${subscription}`,

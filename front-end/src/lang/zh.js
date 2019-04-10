@@ -176,7 +176,8 @@ export default {
     configValue: '配置值',
     sources: '源',
     builtin: '内建',
-    sinks: 'Sink'
+    sinks: 'Sink',
+    quotas: '配额'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
