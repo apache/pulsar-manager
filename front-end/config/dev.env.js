@@ -5,5 +5,6 @@ module.exports = {
   USE_TLS: 'false',
   GRAFANA_ADDRESS: '"http://localhost:3000"',
   PROMETHEUS_ADDRESS: '"http://localhost:9090"',
-  GRAFANA_TOKEN: '"eyJrIjoiRFljeFNBaW8wWXJEMlRaMjlKTXdNZHBRSkxWY2RIYm8iLCJuIjoicHVsc2FyIiwiaWQiOjF9"'
+  GRAFANA_ENABLE: 'false',
+  GRAFANA_TOKEN: '"eyJrIjoiNlY2eVJOdWF2QzJka1BrdzdsNk1oOWFBY2NsT2hSVGgiLCJuIjoicHVsc2FyIiwiaWQiOjF9"'
 }

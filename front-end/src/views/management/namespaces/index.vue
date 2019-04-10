@@ -70,6 +70,13 @@
                 <span class="link-type" @click="getNamespacePolicies(scope.row.namespace)">stats</span>
               </template>
             </el-table-column>
+            <div v-if="monitorEnable">
+              <el-table-column :label="$t('table.monitor')" min-width="30px" align="center">
+                <template slot-scope="scope">
+                  <a :href="scope.row.monitor" class="link-type">monitor</a>
+                </template>
+              </el-table-column>
+            </div>
             <el-table-column :label="$t('table.actions')" align="center" width="150" class-name="small-padding fixed-width">
               <template slot-scope="scope">
                 <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
@@ -431,6 +438,7 @@ import {
   setResourceQuotasByNamespace,
   removeResourceQuotasByNamespace
 } from '@/api/resource-quotas'
+import { grafanaSearch } from '@/api/grafana'
 import { fetchTenants } from '@/api/tenants'
 import { fetchClusters } from '@/api/clusters'
 import waves from '@/directive/waves' // Waves directive
@@ -476,6 +484,8 @@ export default {
       listLoading: true,
       policiesListLoading: false,
       currentNamespace: '',
+      grafanaUrl: '',
+      monitorEnable: false,
       listQuery: {
         namespace: '',
         page: 1,
@@ -567,8 +577,12 @@ export default {
     }
   },
   created() {
+    if (process.env.GRAFANA_ENABLE) {
+      this.getGrafanaSearch()
+    } else {
+      this.getNamespaces()
+    }
     this.tenant = this.$route.params && this.$route.params.tenant
-    this.getNamespaces()
     this.getRemoteTenantsList()
   },
   mounted() {
@@ -609,7 +623,12 @@ export default {
         }
         fetchNamespaces(this.tenant, this.listQuery).then(response => {
           for (var i = 0; i < response.data.length; i++) {
-            this.localList.push({ 'namespace': response.data[i] })
+            if (this.monitorEnable) {
+              const monitorUrl = process.env.GRAFANA_ADDRESS + this.grafanaUrl + '?refresh=1m&' + 'var-namespace=' + response.data[i]
+              this.localList.push({ 'namespace': response.data[i], 'monitor': monitorUrl })
+            } else {
+              this.localList.push({ 'namespace': response.data[i] })
+            }
           }
           this.total = this.localList.length
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
@@ -1305,6 +1324,17 @@ export default {
       fetchNamespacePolicies(this.currentNamespace).then(response => {
         this.startBundleListOptions = response.data.bundles.boundaries
         this.stopBundleListOptions = response.data.bundles.boundaries
+      })
+    },
+    getGrafanaSearch() {
+      grafanaSearch('', 'messaging').then(response => {
+        for (var i = 0; i < response.data.length; i++) {
+          if (response.data[i]['uri'] === 'db/messaging-metrics') {
+            this.grafanaUrl = response.data[i]['url']
+            this.monitorEnable = true
+            this.getNamespaces()
+          }
+        }
       })
     }
   }
