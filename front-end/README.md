@@ -18,7 +18,7 @@ $ npm install
 
 ```
 
-#### Set route redirect
+#### Set cross domain
 Add [proxyTable](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/index.js).
 For localhost debug
 ```bash
@@ -53,7 +53,42 @@ password: admin
 ```
 
 #### Support grafana and prometheus
-To do 
+
+##### Start grafana and prometheus
+(Apache Pulsar Grafana Dashboard)[https://github.com/streamnative/apache-pulsar-grafana-dashboard]
+
+##### Set admin UI for dev or prod
+(dev.env.js)[https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js] or (prod.env.js)[https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js]
+
+* GRAFANA_ADDRESS: Grafana service address.
+* PROMETHEUS_ADDRESS: Grometheus service address.
+* GRAFANA_ENABLE: Do you want to turn on service monitor, default false.
+* GRAFANA_TOKEN: Token for visit grafana api. Via (Token)[https://grafana.com/docs/http_api/auth/]
+```
+GRAFANA_ADDRESS: '"http://localhost:3000"',
+PROMETHEUS_ADDRESS: '"http://localhost:9090"',
+GRAFANA_ENABLE: 'false',
+GRAFANA_TOKEN: '""'
+```
+
+#### Support permissions
+
+* grant-permission for topics and namespaces
+* revoke-permission for topics and namespaces
+
+##### Prepare
+
+* Start Pulsar with TLS
+(Pulsar with TLS)[http://pulsar.apache.org/docs/en/security-overview/]
+
+* Start Nginx with TLS
+(Nginx with TLS)[http://nginx.org/en/docs/http/configuring_https_servers.html]
+
+###### Set front end
+Add USE_TLS in file (dev.env.js)[https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js] or (prod.env.js)[https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js]
+```
+USE_TLS: 'true'
+```
 
 #### Development
 
