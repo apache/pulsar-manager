@@ -177,7 +177,8 @@ export default {
     sources: 'Sources',
     builtin: 'Builtin',
     sinks: 'Sink',
-    quotas: 'Quotas'
+    quotas: 'Quotas',
+    monitor: 'Monitor'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

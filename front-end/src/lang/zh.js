@@ -177,7 +177,8 @@ export default {
     sources: '源',
     builtin: '内建',
     sinks: 'Sink',
-    quotas: '配额'
+    quotas: '配额',
+    monitor: '监控'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
