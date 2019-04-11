@@ -19,7 +19,7 @@ $ npm install
 ```
 
 #### Set route redirect
-Add [proxyTable](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/index.js)
+Add [proxyTable](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/index.js).
 For localhost debug
 ```bash
     proxyTable: {
@@ -57,4 +57,4 @@ To do
 
 #### Development
 
-You can start a pulsar standalone. The Pulsar Admin UI will automatically connect to pulsar standalone via `http://localhost:8080`. Now you try to go to `tenants` page and create `tenant`.
+You can start a Pulsar standalone. The Pulsar Admin UI will automatically connect to pulsar standalone via `http://localhost:8080`.

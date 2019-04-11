@@ -7,16 +7,16 @@ Back end base on spring boot.
 ### Feature
 
 * Tenants Management
-* Namespace Management
+* Namespaces Management
 * Topics Management
-* Subscription Management
-* Function Management
-* Source Management
-* Sink Management
-* Broker Management
-* Cluster Management
-* Bookie Management
-* Schema Management
+* Subscriptions Management
+* Functions Management
+* Sources Management
+* Sinks Management
+* Brokers Management
+* Clusters Management
+* Bookies Management
+* Schemas Management
 * Integration grafana and prometheus
 
 
