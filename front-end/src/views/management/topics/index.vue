@@ -94,7 +94,7 @@
     </el-row>
 
     <el-dialog :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <div v-if="dialogStatus==='create'">
           <el-form-item :label="$t('table.topic')" prop="topic">
             <el-input v-model="temp.topic"/>
@@ -112,7 +112,7 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='grant-permission'">
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('table.topic')">
             <span>{{ currentTopic }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.grant')" prop="grant">
@@ -133,22 +133,22 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='unload'">
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('table.topic')">
             <span>{{ currentTopic }}</span>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='terminate'">
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('table.topic')">
             <span>{{ currentTopic }}</span>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='compact'">
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('table.topic')">
             <span>{{ currentTopic }}</span>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='offload'">
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('table.topic')">
             <span>{{ currentTopic }}</span>
           </el-form-item>
           <el-form-item label="Size" prop="thresholdSize">
@@ -156,12 +156,12 @@
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='schemas-delete'">
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('table.topic')">
             <span>{{ currentTopic }}</span>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='schemas-upload'">
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('table.topic')">
             <span>{{ currentTopic }}</span>
           </el-form-item>
           <label class="text-reader">
@@ -184,6 +184,7 @@ import {
   fetchTopics,
   fetchTopicStats,
   putTopic,
+  putTopicByPartition,
   updateTopic,
   getPartitionMetadata,
   fetchPartitionTopicStats,
@@ -277,7 +278,8 @@ export default {
         create: 'Create'
       },
       rules: {
-        tenant: [{ required: true, message: 'tenant is required', trigger: 'blur' }]
+        topic: [{ required: true, message: 'topic is required', trigger: 'blur' }],
+        thresholdSize: [{ required: true, message: 'thresholdSize is required', trigger: 'blur' }]
       }
       // tempRoute: {}
     }
@@ -369,34 +371,42 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
     },
     createTopic() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          if (this.tenant.length <= 0 || this.namespace <= 0) {
-            this.$notify({
-              title: 'error',
-              message: 'please select tenant and namespace',
-              type: 'success',
-              duration: 2000
-            })
-          }
-          putTopic(this.tenant, this.namespace, this.temp.topic, parseInt(this.temp.partitions)).then(() => {
-            this.localList = []
-            this.getTopics()
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'success',
-              message: 'create success',
-              type: 'success',
-              duration: 2000
-            })
+      if (this.tenant.length <= 0 || this.namespace <= 0) {
+        this.$notify({
+          title: 'error',
+          message: 'please select tenant and namespace',
+          type: 'success',
+          duration: 2000
+        })
+        return
+      }
+      if (parseInt(this.temp.partitions) > 0) {
+        putTopicByPartition(this.tenant, this.namespace, this.temp.topic, parseInt(this.temp.partitions)).then(() => {
+          this.localList = []
+          this.getTopics()
+          this.dialogFormVisible = false
+          this.$notify({
+            title: 'success',
+            message: 'create parition topic success',
+            type: 'success',
+            duration: 2000
           })
-        }
-      })
+        })
+      } else {
+        putTopic(this.tenant, this.namespace, this.temp.topic, parseInt(this.temp.partitions)).then(() => {
+          this.localList = []
+          this.getTopics()
+          this.dialogFormVisible = false
+          this.$notify({
+            title: 'success',
+            message: 'create topic success',
+            type: 'success',
+            duration: 2000
+          })
+        })
+      }
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -408,7 +418,7 @@ export default {
       })
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs['temp'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           if (tempData.isPartition !== 'yes') {
@@ -505,6 +515,9 @@ export default {
       }
       this.dialogStatus = item.value
       this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['temp'].clearValidate()
+      })
     },
     querySearch(queryString, cb) {
       var moreListOptions = this.moreListOptions
@@ -517,9 +530,7 @@ export default {
       }
     },
     loadAllOptions() {
-      return [
-        { 'value': 'grant-permission' },
-        { 'value': 'revoke-permission' },
+      const options = [
         { 'value': 'unload' },
         // No find document for this interface
         // { 'value': 'clear-backlog' },
@@ -527,41 +538,50 @@ export default {
         { 'value': 'compact' },
         { 'value': 'offload' }
       ]
+      if (process.env.USE_TLS) {
+        options.push({ 'value': 'grant-permission' })
+        options.push({ 'value': 'revoke-permission' })
+      }
+      return options
     },
     getCurrentRow(item) {
       this.currentTopic = parsePulsarSchema(item.topic)[1]
       this.isPartitioned = item.isPartition
     },
     handleOptions() {
-      switch (this.dialogStatus) {
-        case 'create':
-          this.createTopic()
-          break
-        case 'update':
-          this.updateData()
-          break
-        case 'grant-permission':
-          this.confirmGrantPermission()
-          break
-        case 'revoke-permission':
-          this.confirmRevokePermissions()
-          break
-        case 'unload':
-          this.confirmUnload()
-          break
-        case 'terminate':
-          this.confirmTerminate()
-          break
-        case 'compact':
-          this.confirmCompact()
-          break
-        case 'offload':
-          this.confirmOffload()
-          break
-        case 'schemas-upload':
-          this.confirmSchemasUpload()
-          break
-      }
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          switch (this.dialogStatus) {
+            case 'create':
+              this.createTopic()
+              break
+            case 'update':
+              this.updateData()
+              break
+            case 'grant-permission':
+              this.confirmGrantPermission()
+              break
+            case 'revoke-permission':
+              this.confirmRevokePermissions()
+              break
+            case 'unload':
+              this.confirmUnload()
+              break
+            case 'terminate':
+              this.confirmTerminate()
+              break
+            case 'compact':
+              this.confirmCompact()
+              break
+            case 'offload':
+              this.confirmOffload()
+              break
+            case 'schemas-upload':
+              this.confirmSchemasUpload()
+              break
+          }
+        }
+      })
     },
     confirmGrantPermission() {
       grantPermissions(this.currentTopic, this.temp.role, this.temp.actions).then(response => {
@@ -712,8 +732,7 @@ export default {
       })
     },
     handleCommand(command) {
-      this.currentCommand = command
-      if (this.currentTopic.lenght <= 0) {
+      if (this.currentTopic.length <= 0) {
         this.$notify({
           title: 'error',
           message: 'Please select any one topic in table',
@@ -722,6 +741,7 @@ export default {
         })
         return
       }
+      this.currentCommand = command
       switch (this.currentCommand) {
         case 'schemas-get':
           this.confirmSchemasGet()

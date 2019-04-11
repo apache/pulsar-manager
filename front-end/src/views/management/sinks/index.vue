@@ -81,7 +81,7 @@
       </el-row>
 
       <el-dialog :visible.sync="dialogFormVisible">
-        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
           <div v-if="dialogStatus==='create'||dialogStatus==='update'">
             <div v-if="dialogStatus==='create'">
               <el-form-item label="name" prop="sink">
@@ -89,7 +89,7 @@
               </el-form-item>
             </div>
             <div v-if="dialogStatus==='update'">
-              <el-form-item label="name" prop="sink">
+              <el-form-item label="name">
                 <span>{{ currentSink }}</span>
               </el-form-item>
             </div>
@@ -98,6 +98,14 @@
             </el-form-item>
             <el-form-item label="class" prop="className">
               <el-input v-model="temp.className"/>
+            </el-form-item>
+            <el-form-item label="configFile" prop="sinkConfigFile">
+              <input type="file" @change="loadSinkConfigFile">
+            </el-form-item>
+            <el-form-item label="input" prop="inputTopic">
+              <el-select v-model="temp.inputTopic" placeholder="select topic" @focus="getTopicsList()">
+                <el-option v-for="(item,index) in inputTopicsListOptions" :key="item+index" :label="item" :value="item"/>
+              </el-select>
             </el-form-item>
             <el-form-item label="cpu" prop="cpu">
               <el-input v-model="temp.cpu"/>
@@ -127,14 +135,6 @@
             </el-form-item>
             <el-form-item label="sinkConfig" prop="sinkConfig">
               <el-input v-model="temp.sinkConfig"/>
-            </el-form-item>
-            <el-form-item label="configFile" prop="sinkConfigFile">
-              <input type="file" @change="loadSinkConfigFile">
-            </el-form-item>
-            <el-form-item label="output" prop="outputTopics">
-              <el-select v-model="temp.outputTopic" placeholder="select topic" @focus="getTopicsList()">
-                <el-option v-for="(item,index) in outputTopicsListOptions" :key="item+index" :label="item" :value="item"/>
-              </el-select>
             </el-form-item>
           </div>
           <div v-if="dialogStatus==='start'||dialogStatus==='stop'||dialogStatus==='restart'||dialogStatus==='status'">
@@ -198,7 +198,7 @@ export default {
       postForm: Object.assign({}, defaultForm),
       tenantsListOptions: [],
       namespacesListOptions: [],
-      outputTopicsListOptions: [],
+      inputTopicsListOptions: [],
       guanrateesListOptions: [],
       instancesListOptions: [],
       // codeMode: 'text/x-cython',
@@ -243,7 +243,9 @@ export default {
         guarantees: ''
       },
       rules: {
-        sink: [{ required: true, message: 'sink name is required', trigger: 'blur' }]
+        sink: [{ required: true, message: 'sink name is required', trigger: 'blur' }],
+        className: [{ required: true, message: 'className is required', trigger: 'blur' }],
+        inputTopic: [{ required: true, message: 'inputTopic is required', trigger: 'blur' }]
       }
     }
   },
@@ -310,6 +312,9 @@ export default {
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.resetTemp()
+      this.$nextTick(() => {
+        this.$refs['temp'].clearValidate()
+      })
     },
     getCurrentRow(item) {
       this.currentSink = item.sink
@@ -336,17 +341,21 @@ export default {
       })
     },
     confirmCreateSink() {
-      const formData = this.prepareSinkParams(this.temp.sink)
-      createSink(this.tenant, this.namespace, this.temp.sink, formData).then(response => {
-        this.$notify({
-          title: 'success',
-          message: 'create sink success',
-          type: 'success',
-          duration: 2000
-        })
-        this.dialogFormVisible = false
-        this.localList = []
-        this.getSinks()
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          const formData = this.prepareSinkParams(this.temp.sink)
+          createSink(this.tenant, this.namespace, this.temp.sink, formData).then(response => {
+            this.$notify({
+              title: 'success',
+              message: 'create sink success',
+              type: 'success',
+              duration: 2000
+            })
+            this.dialogFormVisible = false
+            this.localList = []
+            this.getSinks()
+          })
+        }
       })
     },
     handleUpdate() {
@@ -479,6 +488,7 @@ export default {
       }
       const blob = new Blob([this.temp.currentFile], { type: 'application/octet-stream' })
       sinkConfig['archive'] = this.temp.currentFileName
+      sinkConfig['inputs'] = [this.temp.inputTopic]
       formData.append('data', blob, this.temp.currentFileName)
       if (this.temp.schemaType.length > 0) {
         sinkConfig['schemaType'] = this.temp.schemaType
@@ -510,15 +520,19 @@ export default {
       return formData
     },
     confirmUpdate() {
-      const formData = this.prepareSinkParams('')
-      updateSink(this.tenant, this.namespace, this.currentSink, formData).then(response => {
-        this.$notify({
-          title: 'success',
-          message: 'update sink success',
-          type: 'success',
-          duration: 2000
-        })
-        this.dialogFormVisible = false
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          const formData = this.prepareSinkParams('')
+          updateSink(this.tenant, this.namespace, this.currentSink, formData).then(response => {
+            this.$notify({
+              title: 'success',
+              message: 'update sink success',
+              type: 'success',
+              duration: 2000
+            })
+            this.dialogFormVisible = false
+          })
+        }
       })
     },
     getSinksList() {
@@ -547,20 +561,20 @@ export default {
       })
     },
     getTopicsList() {
-      this.outputTopicsListOptions = []
+      this.inputTopicsListOptions = []
       fetchPersistentPartitonsTopics(this.tenant, this.namespace).then(response => {
         for (var i = 0; i < response.data.length; i++) {
-          this.outputTopicsListOptions.push(response.data[i])
+          this.inputTopicsListOptions.push(response.data[i])
         }
       })
       fetchNonPersistentPartitonsTopics(this.tenant, this.namespace).then(response => {
         for (var i = 0; i < response.data.length; i++) {
-          this.outputTopicsListOptions.push(response.data[i])
+          this.inputTopicsListOptions.push(response.data[i])
         }
       })
       fetchTopics(this.tenant, this.namespace, this.listQuery).then(response => {
         for (var i = 0; i < response.data.length; i++) {
-          this.outputTopicsListOptions.push(response.data[i])
+          this.inputTopicsListOptions.push(response.data[i])
         }
       })
     },

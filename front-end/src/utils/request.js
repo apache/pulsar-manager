@@ -83,8 +83,14 @@ service.interceptors.response.use(
   },
   error => {
     console.log('err' + error) // for debug
+    let message = ''
+    if (error.response.status === 404 && error.response.data.length <= 0) {
+      message = 'not found'
+    } else {
+      message = error.response.data.reason
+    }
     Message({
-      message: error.response.data.reason,
+      message: message,
       type: 'error',
       duration: 5 * 1000
     })
