@@ -309,3 +309,7 @@ export function parsePulsarSchema(path) {
   }
   return ''
 }
+
+export function trim(str) {
+  return str.replace(/(^\s*)|(\s*$)/g, '')
+}
