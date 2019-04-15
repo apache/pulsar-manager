@@ -53,3 +53,58 @@ export function deleteCluster(cluster) {
   })
 }
 
+export function updateClusterPeer(cluster, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/clusters/${cluster}/peers`,
+    method: 'post',
+    data
+  })
+}
+
+export function getClusterPeer(cluster) {
+  return request({
+    url: BASE_URL_V2 + `/clusters/${cluster}/peers`,
+    method: 'get'
+  })
+}
+
+export function listClusterDomainName(cluster) {
+  return request({
+    url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains`,
+    method: 'get'
+  })
+}
+
+export function getClusterDomainName(cluster, domainName) {
+  return request({
+    url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains/${domainName}`,
+    method: 'get'
+  })
+}
+
+export function createClusterDomainName(cluster, domainName, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains/${domainName}`,
+    method: 'post',
+    data
+  })
+}
+
+export function updateClusterDomainName(cluster, domainName, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains/${domainName}`,
+    method: 'post',
+    data
+  })
+}
+
+export function deleteClusterDomainName(cluster, domainName) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains/${domainName}`,
+    method: 'post'
+  })
+}
