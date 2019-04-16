@@ -19,3 +19,6 @@ selenium-debug.log
 *.sln
 
 package-lock.json
+
+integration-test/report
+integration-test/*.log

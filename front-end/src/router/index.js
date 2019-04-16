@@ -114,7 +114,7 @@ export const constantRouterMap = [
         meta: { title: 'Tenants', noCache: true }
       },
       {
-        path: 'namespace',
+        path: 'namespaces',
         component: () => import('@/views/management/namespaces/index'),
         name: 'Namespaces',
         meta: { title: 'Namespaces', noCache: true }
