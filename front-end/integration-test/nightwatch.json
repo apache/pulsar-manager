@@ -1,5 +1,5 @@
 {
-  "src_folders" : ["testTenants"],
+  "src_folders" : ["testTenants", "testNamespaces"],
   "output_folder": "report",
   "webdriver" : {
     "start_process": true,
