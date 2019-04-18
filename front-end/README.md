@@ -62,8 +62,8 @@ password: admin
 
 * GRAFANA_ADDRESS: Grafana service address.
 * PROMETHEUS_ADDRESS: Grometheus service address.
-* GRAFANA_ENABLE: Do you want to turn on service monitor, default false.
-* GRAFANA_TOKEN: Token for visit grafana api. Via [Token](https://grafana.com/docs/http_api/auth/)
+* GRAFANA_ENABLE: To turn on service monitor. The default `false`.
+* GRAFANA_TOKEN: Token to visit Grafana API. Get [Token](https://grafana.com/docs/http_api/auth/).
 ```
 GRAFANA_ADDRESS: '"http://localhost:3000"',
 PROMETHEUS_ADDRESS: '"http://localhost:9090"',
@@ -92,4 +92,4 @@ USE_TLS: 'true'
 
 #### Development
 
-You can start a Pulsar standalone. The Pulsar Admin UI will automatically connect to pulsar standalone via `http://localhost:8080`.
+You can start a Pulsar standalone. The Pulsar Admin UI will automatically connect to the pulsar standalone via `http://localhost:8080`.

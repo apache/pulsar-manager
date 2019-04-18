@@ -1,10 +1,10 @@
-## Pulsar Admin Manager
+### Pulsar Admin Manager
 
-Front end base on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
+Front end is based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
 
-Back end base on spring boot.
+Back end is based on spring boot.
 
-### Feature
+#### Feature
 
 * Tenants Management
 * Namespaces Management
@@ -20,7 +20,7 @@ Back end base on spring boot.
 * Integration grafana and prometheus
 
 
-#### front end
+##### Front end
 
 [front-end-deploy](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md)
 
