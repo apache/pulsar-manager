@@ -55,7 +55,7 @@ password: admin
 #### Support grafana and prometheus
 
 ##### Start grafana and prometheus
-[Apache Pulsar Grafana Dashboard](https://github.com/streamnative/apache-pulsar-grafana-dashboard)
+For instructions on how to get started, refer to [Apache Pulsar Grafana Dashboard](https://github.com/streamnative/apache-pulsar-grafana-dashboard)
 
 ##### Set admin UI for dev or prod
 [dev.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js) or [prod.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js)
@@ -89,3 +89,49 @@ Add USE_TLS in file [dev.env.js](https://github.com/tuteng/pulsar-manager/blob/f
 ```
 USE_TLS: 'true'
 ```
+
+### Deploy to production environment
+
+#### Modify configuration file [prod.env.js](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/prod.env.js)
+```
+module.exports = {
+  NODE_ENV: '"production"',
+  ENV_CONFIG: '"prod"',
+  BASE_API: '"your nginx server address"',
+  USE_TLS: 'false',
+  GRAFANA_ADDRESS: '""',
+  PROMETHEUS_ADDRESS: '""',
+  GRAFANA_ENABLE: 'false',
+  GRAFANA_TOKEN: '""'
+}
+```
+
+#### Add config to Nginx server configuration file
+
+```
+  listen       9526;
+  server_name  localhost;
+
+
+  location / {
+    root   /usr/share/nginx/html/dist;
+    index  index.html index.htm;
+  }
+
+  location /admin {
+    proxy_pass http://pulsar-service:8080;
+  }
+```
+
+#### Build file for production
+
+```
+cd front-end
+npm run build:prod
+```
+Now copy file of dist to Nginx server /usr/share/nginx/html/dist
+
+#### Copy dist file to Nginx server and restart Nginx
+Open browers visit following address:
+
+http://nginx-server:9526/#/login
