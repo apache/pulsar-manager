@@ -84,12 +84,8 @@ GRAFANA_TOKEN: '""'
 * Start Nginx with TLS
 [Nginx with TLS](http://nginx.org/en/docs/http/configuring_https_servers.html)
 
-###### Set front end
+##### Set front end
 Add USE_TLS in file [dev.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js) or [prod.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js)
 ```
 USE_TLS: 'true'
 ```
-
-#### Development
-
-You can start a Pulsar standalone. The Pulsar Admin UI will automatically connect to the pulsar standalone via `http://localhost:8080`.
