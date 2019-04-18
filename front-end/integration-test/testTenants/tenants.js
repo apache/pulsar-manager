@@ -1,5 +1,9 @@
+var request = require('request')
+
+var serviceUrl = "http://localhost:8080"
+
 module.exports = {
-  'Tenants Create' : function (browser) {
+  'Tenants create' : function (browser) {
     browser
       .url(browser.launchUrl + '/#/management/tenants')
       .waitForElementVisible('body')
@@ -17,6 +21,16 @@ module.exports = {
       .useXpath()
       .click("//div[contains(@class, 'dialog-footer')]/button/span[text()='Confirm']")
       .pause(2000)
+  },
+  'Tenants create check': function(browser) {
+    request(serviceUrl + '/admin/v2/tenants/test-integrations', function(error, response, body) {
+        if (response.statusCode == 200) {
+          console.log("Create tenants pass")
+        } else {
+          console.log("Create tenants failed")
+        }
+      }
+    )
   },
   'Tenants search': function (browser) {
     browser
@@ -41,5 +55,15 @@ module.exports = {
       .click("//span[text()='Delete']")
       .pause(2000)
       .end();
+  },
+  'Tenants delete check': function(browser) {
+    request(serviceUrl + '/admin/v2/tenants/test-integrations', function(error, response, body) {
+        if (response.statusCode == 404) {
+          console.log("Delete tenants pass")
+        } else {
+          console.log("Delete tenants failed")
+        }
+      }
+    )
   }
 };
