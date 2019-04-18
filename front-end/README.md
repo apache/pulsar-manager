@@ -40,7 +40,7 @@ For localhost debug
 docker pull apachepulsar/pulsar:2.3.0
 docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pulsar-standalone apachepulsar/pulsar:2.3.0 bin/pulsar standalone
 
-# build for production with minification
+# build for dev with minification
 $ npm run dev
 
 # open browers visit following address
