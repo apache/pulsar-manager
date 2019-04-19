@@ -107,7 +107,7 @@ module.exports = {
 }
 ```
 
-### Add config to Nginx server configuration file
+### Add configuration to the configuration file on Nginx server
 
 ```
   listen       9526;
