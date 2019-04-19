@@ -133,6 +133,6 @@ npm run build:prod
 Copy file of dist to Nginx server /usr/share/nginx/html/dist
 
 ### Copy dist file to Nginx server and restart Nginx
-Open browers visit the following address:
+Open a browser and visit the following address:
 
 http://nginx-server:9526/#/login
