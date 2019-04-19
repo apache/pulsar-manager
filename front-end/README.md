@@ -1,10 +1,10 @@
-## Pulsar Admin UI
+# Pulsar Admin UI
 
 The admin UI is based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
 
-### Build
+## Build
 
-#### Installation
+### Installation
 
 
 ```bash
@@ -18,7 +18,7 @@ $ npm install
 
 ```
 
-#### Set cross domain
+### Set cross domain
 Add [proxyTable](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/index.js).
 For localhost debug
 ```bash
@@ -30,7 +30,7 @@ For localhost debug
     },
 ```
 
-#### Usage
+### Usage
 
 ```bash
 
@@ -52,12 +52,12 @@ password: admin
 
 ```
 
-#### Support grafana and prometheus
+### Support grafana and prometheus
 
-##### Start grafana and prometheus
+#### Start grafana and prometheus
 For instructions on how to get started, refer to [Apache Pulsar Grafana Dashboard](https://github.com/streamnative/apache-pulsar-grafana-dashboard)
 
-##### Set admin UI for dev or prod
+#### Set admin UI for dev or prod
 [dev.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js) or [prod.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js)
 
 * GRAFANA_ADDRESS: Grafana service address.
@@ -71,12 +71,12 @@ GRAFANA_ENABLE: 'false',
 GRAFANA_TOKEN: '""'
 ```
 
-#### Support permissions
+### Support permissions
 
 * grant-permission for topics and namespaces
 * revoke-permission for topics and namespaces
 
-##### Prepare
+#### Prepare
 
 * Start Pulsar with TLS
 [Pulsar with TLS](http://pulsar.apache.org/docs/en/security-overview/)
@@ -84,15 +84,15 @@ GRAFANA_TOKEN: '""'
 * Start Nginx with TLS
 [Nginx with TLS](http://nginx.org/en/docs/http/configuring_https_servers.html)
 
-##### Set front end
+#### Set front end
 Add USE_TLS in file [dev.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js) or [prod.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js)
 ```
 USE_TLS: 'true'
 ```
 
-### Deploy to production environment
+## Deploy to production environment
 
-#### Modify configuration file [prod.env.js](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/prod.env.js)
+### Modify configuration file [prod.env.js](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/prod.env.js)
 ```
 module.exports = {
   NODE_ENV: '"production"',
@@ -106,7 +106,7 @@ module.exports = {
 }
 ```
 
-#### Add config to Nginx server configuration file
+### Add config to Nginx server configuration file
 
 ```
   listen       9526;
@@ -123,7 +123,7 @@ module.exports = {
   }
 ```
 
-#### Build file for production
+### Build file for production
 
 ```
 cd front-end
@@ -131,7 +131,7 @@ npm run build:prod
 ```
 Now copy file of dist to Nginx server /usr/share/nginx/html/dist
 
-#### Copy dist file to Nginx server and restart Nginx
+### Copy dist file to Nginx server and restart Nginx
 Open browers visit the following address:
 
 http://nginx-server:9526/#/login
