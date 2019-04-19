@@ -55,7 +55,7 @@ password: admin
 ### Support grafana and prometheus
 
 #### Start grafana and prometheus
-For instructions on how to get started, refer to [Apache Pulsar Grafana Dashboard](https://github.com/streamnative/apache-pulsar-grafana-dashboard)
+For instructions on how to get started, refer to [Apache Pulsar Grafana Dashboard](https://github.com/streamnative/apache-pulsar-grafana-dashboard).
 
 #### Set admin UI for dev or prod
 [dev.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js) or [prod.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js)
@@ -85,14 +85,15 @@ GRAFANA_TOKEN: '""'
 [Nginx with TLS](http://nginx.org/en/docs/http/configuring_https_servers.html)
 
 #### Set front end
-Add USE_TLS in file [dev.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js) or [prod.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js)
+Add USE_TLS in file [dev.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/dev.env.js) or [prod.env.js](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme/front-end/config/prod.env.js).
+
 ```
 USE_TLS: 'true'
 ```
 
 ## Deploy to production environment
 
-### Modify configuration file [prod.env.js](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/prod.env.js)
+### Modify the [prod.env.js](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/prod.env.js) configuration file.
 ```
 module.exports = {
   NODE_ENV: '"production"',
@@ -129,7 +130,7 @@ module.exports = {
 cd front-end
 npm run build:prod
 ```
-Now copy file of dist to Nginx server /usr/share/nginx/html/dist
+Copy file of dist to Nginx server /usr/share/nginx/html/dist
 
 ### Copy dist file to Nginx server and restart Nginx
 Open browers visit the following address:
