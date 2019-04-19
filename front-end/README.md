@@ -43,7 +43,7 @@ docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pul
 # build for dev with minification
 $ npm run dev
 
-# open browers visit following address
+# open browers visit the following address
 # login
 http://localhost:9527/#/login
 
@@ -132,6 +132,6 @@ npm run build:prod
 Now copy file of dist to Nginx server /usr/share/nginx/html/dist
 
 #### Copy dist file to Nginx server and restart Nginx
-Open browers visit following address:
+Open browers visit the following address:
 
 http://nginx-server:9526/#/login
