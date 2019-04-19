@@ -1,23 +1,26 @@
-## Pulsar Admin Manager
+### Pulsar Admin Manager
 
-front end base on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
+Front end is based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
 
-back end base on spring boot.
+Back end is based on spring boot.
 
-### Build
+#### Feature
 
-#### front end
+* Tenants Management
+* Namespaces Management
+* Topics Management
+* Subscriptions Management
+* Functions Management
+* Sources Management
+* Sinks Management
+* Brokers Management
+* Clusters Management
+* Bookies Management
+* Schemas Management
+* Integration grafana and prometheus
 
-```bash
-cd .front-end
-npm install
-npm run dev
-```
 
-#### backend
+##### Front end
 
-todo
+[front-end-deploy](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md)
 
-#### Development
-
-You can start a pulsar standalone. The Pulsar Admin UI will automatically connect to pulsar standalone via `http://localhost:8080`. Now you try to go to `tenants` page and create `teant`.
