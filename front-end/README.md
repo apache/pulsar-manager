@@ -4,7 +4,7 @@ The admin UI is based on [vue-element-admin](https://panjiachen.github.io/vue-el
 
 ## Compatibility
 
-This pulsar-manager is developed and tested Chrome Browser.
+This pulsar-manager is tested Chrome Browser.
 
 ## Build
 
