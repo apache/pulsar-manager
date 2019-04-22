@@ -23,7 +23,7 @@ git clone https://github.com/streamnative/pulsar-manager
 cd pulsar-manger/front-end
 
 # install app's dependencies
-$ npm install
+$ npm install --save
 
 ```
 
