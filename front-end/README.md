@@ -2,7 +2,16 @@
 
 The admin UI is based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
 
+## Compatibility
+
+This pulsar-manager is developed and tested Chrome Browser.
+
 ## Build
+
+### Requirements
+
+* Node 10.15 or later
+* Npm 6.4 or later
 
 ### Installation
 
