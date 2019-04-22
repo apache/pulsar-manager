@@ -31,8 +31,7 @@
           <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-              <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-              </el-button>
+              <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -43,10 +42,10 @@
       </el-col>
     </el-row>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" class="el-dialog-for-test">
       <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.tenant')" prop="tenant">
-          <el-input v-model="temp.tenant"/>
+          <el-input v-model="temp.tenant" placeholder="Please input tenant"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.clusters')" prop="clusters">
           <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
@@ -67,7 +66,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
+        <el-button type="primary" submit="Confirm" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
 

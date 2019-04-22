@@ -26,8 +26,7 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-dropdown @command="handleCommand">
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary">
-          {{ $t('table.quotas') }}<i class="el-icon-arrow-down el-icon--right"/>
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary">{{ $t('table.quotas') }}<i class="el-icon-arrow-down el-icon--right"/>
         </el-button>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="quotas-get">get</el-dropdown-item>
@@ -79,8 +78,7 @@
             </div>
             <el-table-column :label="$t('table.actions')" align="center" width="150" class-name="small-padding fixed-width">
               <template slot-scope="scope">
-                <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-                </el-button>
+                <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -97,7 +95,7 @@
       <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="110px" style="width: 400px; margin-left:50px;">
         <div v-if="dialogStatus==='create'">
           <el-form-item :label="$t('table.namespace')" prop="namespace">
-            <el-input v-model="temp.namespace"/>
+            <el-input v-model="temp.namespace" placeholder="Please input namespace"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='grant-permission'">
@@ -126,7 +124,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.clusters')" prop="clusters">
-            <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select">
+            <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
               <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-drag-select>
           </el-form-item>
@@ -136,7 +134,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item :label="$t('table.limit')" prop="limit">
-            <el-input v-model="temp.limit"/>
+            <el-input v-model="temp.limit" placeholder="Please select limit"/>
           </el-form-item>
           <el-form-item :label="$t('table.policies')" prop="policy">
             <el-select v-model="temp.policy" placeholder="Please select polices">
@@ -179,7 +177,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="group" prop="group">
-            <el-input v-model="temp.group"/>
+            <el-input v-model="temp.group" placeholder="Please input group"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='delete-anti-affinity-group'">
@@ -203,10 +201,10 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="retentionSize" prop="retentionSize">
-            <el-input v-model="temp.retentionSize"/>
+            <el-input v-model="temp.retentionSize" placeholder="Please input retentionSize"/>
           </el-form-item>
           <el-form-item label="retentionTime" prop="retentionTime">
-            <el-input v-model="temp.retentionTime"/>
+            <el-input v-model="temp.retentionTime" placeholder="Please input retentionTime"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-dispatch-rate'">
@@ -231,7 +229,7 @@
             <el-input v-model="temp.unsubBundle"/>
           </el-form-item>
           <el-form-item label="subName" prop="subName">
-            <el-input v-model="temp.subName"/>
+            <el-input v-model="temp.subName" placeholder="Please input subName"/>
           </el-form-item>
         </div>
         <div v-else-if="dialogStatus==='set-encryption-required'">
@@ -250,7 +248,7 @@
             <span>{{ currentNamespace }}</span>
           </el-form-item>
           <el-form-item label="auth-mode" prop="subscriptionAuthMode">
-            <el-select v-model="temp.subscriptionAuthMode" style="width:330px;" placeholder="Please select">
+            <el-select v-model="temp.subscriptionAuthMode" style="width:330px;" placeholder="Please select authMode">
               <el-option v-for="item in authModeListOptions" :label="item.label" :value="item.value" :key="item.value" />
             </el-select>
           </el-form-item>
@@ -529,10 +527,10 @@ export default {
         thresholdSize: -1,
         deletionLag: -1,
         compatibility: 0,
-        startBundle: '',
-        stopBundle: '',
-        setStartBundle: '',
-        setStopBundle: '',
+        startBundle: '0x00000000',
+        stopBundle: '0x40000000',
+        setStartBundle: '0x00000000',
+        setStopBundle: '0x40000000',
         bandwidthIn: 0,
         bandwidthOut: 0,
         memory: '',
@@ -671,7 +669,50 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        namespace: ''
+        namespace: '',
+        limit: '',
+        actions: [],
+        clusters: [],
+        subscriptionAuthMode: '',
+        policy: '',
+        ackQuorum: 0,
+        ensemble: 0,
+        writeQuorum: 0,
+        deleteMaxRate: 0.0,
+        messageTTL: 0,
+        group: '',
+        deduplication: false,
+        retentionSize: '',
+        retentionTime: '',
+        unloadBundle: '',
+        splitBundle: '',
+        splitUnload: false,
+        byteDispatchRate: -1,
+        dispatchRatePeriod: 1,
+        msgDispatchRate: 1,
+        clearBundle: '',
+        clearForce: false,
+        clearSub: '',
+        unsubBundle: '',
+        encryption: false,
+        maxProducersPerTopic: 0,
+        maxConsumersPerTopic: 0,
+        maxConsumersPerSub: 0,
+        threshold: 0,
+        thresholdSize: -1,
+        deletionLag: -1,
+        compatibility: 0,
+        startBundle: '0x00000000',
+        stopBundle: '0x40000000',
+        setStartBundle: '0x00000000',
+        setStopBundle: '0x40000000',
+        bandwidthIn: 0,
+        bandwidthOut: 0,
+        memory: '',
+        msgRateIn: 0,
+        msgRateOut: 0,
+        dynamic: false,
+        subName: ''
       }
     },
     handleCreate() {
@@ -729,6 +770,7 @@ export default {
       }
       this.dialogStatus = item.value
       this.dialogFormVisible = true
+      this.postForm.otherOptions = ''
       this.$nextTick(() => {
         this.$refs['temp'].clearValidate()
       })

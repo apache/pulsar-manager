@@ -1,0 +1,18 @@
+{
+  "src_folders" : ["testTenants", "testNamespaces"],
+  "output_folder": "report",
+  "webdriver" : {
+    "start_process": true,
+    "server_path": "../node_modules/.bin/chromedriver",
+    "port": 9515
+  },
+
+  "test_settings" : {
+    "default" : {
+      "launch_url" : "http://localhost:9527",
+      "desiredCapabilities": {
+        "browserName": "chrome"
+      }
+    }
+  }
+}
