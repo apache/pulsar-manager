@@ -22,9 +22,9 @@ module.exports = {
   'Tenants create check': function (browser) {
     request(serviceUrl + '/admin/v2/persistent/public/default/test_create_topic/stats', function (error, response, body) {
       if (response.statusCode == 200) {
-        console.log("Create tenants pass")
+        console.log("Create topic pass")
       } else {
-        console.log("Create tenants failed")
+        console.log("Create topic failed")
       }
     });
   }
