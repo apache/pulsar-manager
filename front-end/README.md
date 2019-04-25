@@ -25,6 +25,9 @@ cd pulsar-manger/front-end
 # install app's dependencies
 $ npm install --save
 
+# install app's dependencies for develop
+$ npm install --save-dev
+
 ```
 
 ### Set cross domain
