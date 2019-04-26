@@ -25,7 +25,7 @@ cd pulsar-manger/front-end
 # install app's dependencies
 $ npm install --save
 
-# install app's dependencies for develop
+# install application dependencies for development
 $ npm install --save-dev
 
 ```
