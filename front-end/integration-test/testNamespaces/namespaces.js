@@ -1,3 +1,7 @@
+var request = require('request')
+
+var serviceUrl = "http://localhost:8080"
+
 module.exports = {
   'Namespaces create': function (browser) {
     browser
@@ -18,6 +22,21 @@ module.exports = {
       .useXpath()
       .click("//div[contains(@class, 'dialog-footer')]/button/span[text()='Confirm']")
       .pause(1000)
+  },
+  'Namespace create check': function(browser) {
+    request(serviceUrl + '/admin/v2/namespaces/sample/test-integrations-namespace', function(error, response, body) {
+        if (error != null) {
+          throw error;
+        }
+        console.log(response.statusCode)
+        if (response.statusCode === 200) {
+          console.log("Create namespace pass");
+        } else {
+          var err = new Error("Create namespace test-integrations-namespace error");
+          throw  err;
+        }
+      }
+    )
   },
   'Namespace search': function (browser) {
     browser
