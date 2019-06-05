@@ -51,6 +51,7 @@ task licenseCheckNode(type: com.hierynomus.gradle.license.tasks.LicenseCheck) {
 dependencyManagement {
   imports {
     mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+    mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.SR2'
   }
   applyMavenExclusions = false
 }
@@ -67,4 +68,5 @@ dependencies {
     compile('javax.validation:validation-api:2.0.0.Final')
     compile('io.jsonwebtoken:jjwt:0.9.0')
     compile('org.xerial:sqlite-jdbc:3.21.0.1')
+    compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
 }
