@@ -14,17 +14,18 @@
 package com.manager.pulsar.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class TenantsEntity {
-  private Integer tenantId;
-  private String tenantName;
+  private long tenantId;
+  private String tenant;
+  private String adminRoles;
+  private String allowedClusters;
 
-  public TenantsEntity(String tenantName) {
-    this.tenantName = tenantName;
-  }
 }
 

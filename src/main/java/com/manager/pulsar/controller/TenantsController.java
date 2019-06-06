@@ -13,16 +13,14 @@
  */
 package com.manager.pulsar.controller;
 
+import com.github.pagehelper.Page;
 import com.manager.pulsar.entity.TenantsEntity;
 import com.manager.pulsar.entity.TenantsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
 
 @RestController
 public class TenantsController {
@@ -30,13 +28,12 @@ public class TenantsController {
   @Autowired
   private TenantsRepository tenantsRepository;
 
-  @RequestMapping(value = "/tenants/{tenant}", method = RequestMethod.POST)
-  public ResponseEntity create(@PathVariable("tenant") String tenant) {
-//    checkInput(createUserParam, bindingResult);
-      TenantsEntity tenantEntity = new TenantsEntity(tenant);
-      Integer tenantId = tenantsRepository.save(tenantEntity);
-      return ResponseEntity.ok(new HashMap<String, Object>() {{
-        put("tenant", tenantsRepository.findById(tenantId));
-      }});
+  @RequestMapping(value = "/tenants", method =  RequestMethod.GET)
+  public Page<TenantsEntity> getTenants(
+          @RequestParam(name = "pageNum", defaultValue = "1")
+          Integer pageNum,
+          @RequestParam(name="pageSize", defaultValue = "10")
+          Integer pageSize) {
+      return tenantsRepository.getTenantsList(pageNum, pageSize);
   }
 }
