@@ -1,0 +1,37 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '4.0.0'
+    id 'java'
+    id 'idea'
+}
+
+version '0.0.1'
+
+sourceCompatibility = 1.8
+
+
+repositories {
+    jcenter()
+    maven {
+        url "https://dl.bintray.com/streamnative/maven"
+    }
+}
+
+shadowJar {
+    baseName = 'convert'
+    classifier = null
+    version = '0.0.1'
+    zip64 true
+
+    manifest {
+        attributes 'Main-Class': 'com.manager.pulsar.EventConvertToTable'
+    }
+}
+
+dependencies {
+    compile('org.apache.pulsar:pulsar-functions-api:2.4.0-c509f86ba')
+    compile files('libs/pulsar-system-topic-0.0.1.jar')
+    compile files('libs/pulsar-io-zookeeper-0.0.1.jar')
+    compile ('com.google.guava:guava:21.0')
+    compileOnly('org.projectlombok:lombok:1.16.20')
+    compile ('org.apache.pulsar:pulsar-client:2.4.0-c509f86ba')
+}
