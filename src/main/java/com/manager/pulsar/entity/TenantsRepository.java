@@ -21,16 +21,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TenantsRepository {
 
-  long save(TenantsEntity tenant);
+  long save(TenantsEntity tenantsEntity);
 
-  Optional<TenantsEntity> findById(long tenantId);
+  Optional<TenantsEntity> findById(int tenantId);
 
   Optional<TenantsEntity> findByName(String tenant);
 
   Page<TenantsEntity> getTenantsList(Integer pageNum, Integer pageSize);
 
-  void remove(TenantsEntity tenant);
+  void remove(TenantsEntity tenantsEntity);
 
+  void removeByTenant(TenantsEntity tenantsEntity);
+
+  void updateByTenant(TenantsEntity tenantsEntity);
 }
 
 

@@ -31,7 +31,7 @@ public class MyBatisTenantsRepository implements TenantsRepository {
     public MyBatisTenantsRepository(TenantsMapper tenantsMapper) { this.tenantsMapper = tenantsMapper; }
 
     @Override
-    public Optional<TenantsEntity> findById(long tenantId) {
+    public Optional<TenantsEntity> findById(int tenantId) {
         return Optional.ofNullable(tenantsMapper.findById(tenantId));
     }
 
@@ -57,5 +57,15 @@ public class MyBatisTenantsRepository implements TenantsRepository {
     @Override
     public void remove(TenantsEntity tenantsEntity) {
         tenantsMapper.delete(tenantsEntity);
+    }
+
+    @Override
+    public void removeByTenant(TenantsEntity tenantsEntity) {
+        tenantsMapper.deleteByTenant(tenantsEntity);
+    }
+
+    @Override
+    public void updateByTenant(TenantsEntity tenantsEntity) {
+        tenantsMapper.updateByTenant(tenantsEntity);
     }
 }

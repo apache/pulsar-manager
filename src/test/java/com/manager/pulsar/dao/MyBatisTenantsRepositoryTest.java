@@ -34,7 +34,7 @@ public class MyBatisTenantsRepositoryTest {
     public void getTenantsListTest() {
         for (int i = 0; i < 10; i++) {
             TenantsEntity tenantsEntity = new TenantsEntity(
-                    i + 1, "test" + (i + 1), "testrole" + (i + 1), "testCluster" + (i + 1));
+                    "test", "testrole", "testCluster");
             tenantsRepository.save(tenantsEntity);
         }
         Page<TenantsEntity> tenantsEntities = tenantsRepository.getTenantsList(1, 10);
@@ -42,10 +42,9 @@ public class MyBatisTenantsRepositoryTest {
         long total = tenantsEntities.getTotal();
         Assert.assertEquals(total, 10);
         tenantsEntities.getResult().forEach((result) -> {
-            long index = result.getTenantId();
-            Assert.assertEquals(result.getTenant(), "test" + index);
-            Assert.assertEquals(result.getAdminRoles(), "testrole" + index);
-            Assert.assertEquals(result.getAllowedClusters(), "testCluster" + index);
+            Assert.assertEquals(result.getTenant(), "test");
+            Assert.assertEquals(result.getAdminRoles(), "testrole");
+            Assert.assertEquals(result.getAllowedClusters(), "testCluster");
         });
         tenantsEntities.getResult().forEach((result) -> {
             tenantsRepository.remove(result);

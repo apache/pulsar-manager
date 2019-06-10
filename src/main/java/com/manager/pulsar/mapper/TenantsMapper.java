@@ -21,19 +21,25 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface TenantsMapper {
 
-  @Insert("INSERT INTO tenants(tenantId,tenant,adminRoles,allowedClusters) VALUES(#{tenantId},#{tenant},#{adminRoles},#{allowedClusters})")
+  @Insert("INSERT INTO tenants(tenant,adminRoles,allowedClusters) VALUES(#{tenant},#{adminRoles},#{allowedClusters})")
   @Options(useGeneratedKeys=true, keyProperty="tenantId", keyColumn="tenantId")
-  void insert(TenantsEntity tenant);
+  void insert(TenantsEntity tenantsEntity);
 
   @Select("SELECT tenant,adminRoles,allowedClusters FROM tenants WHERE tenantId = #{tenantId}")
-  TenantsEntity findById(long tenantId);
+  TenantsEntity findById(int tenantId);
 
-  @Select("SELECT tenantId,adminRoles,allowedClusters FROM tenants WHERE tenant_name = #{tenant}")
+  @Select("SELECT tenantId,tenant,adminRoles,allowedClusters FROM tenants WHERE tenant = #{tenant}")
   TenantsEntity findByName(String tenant);
 
   @Select("SELECT tenantId,tenant,adminRoles,allowedClusters FROM tenants")
   Page<TenantsEntity> getTenantsList();
 
   @Delete("DELETE FROM tenants WHERE tenantId = #{tenantId}")
-  void delete(TenantsEntity tenant);
+  void delete(TenantsEntity tenantsEntity);
+
+  @Delete("DELETE FROM tenants WHERE tenant = #{tenant}")
+  void deleteByTenant(TenantsEntity tenantsEntity);
+
+  @Update("UPDATE tenants set adminRoles = #{adminRoles}, allowedClusters = #{allowedClusters} where tenant = #{tenant}")
+  void updateByTenant(TenantsEntity tenantsEntity);
 }

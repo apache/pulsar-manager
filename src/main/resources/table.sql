@@ -13,22 +13,21 @@
 --
 
 CREATE TABLE tenants (
-  tenantId BIGINT PRIMARY KEY,
+  tenantId INTEGER PRIMARY KEY AUTOINCREMENT,
   tenant varchar(255) NOT NULL,
   adminRoles TEXT,
   allowedClusters TEXT
 );
 
 
-INSERT INTO tenants (tenantId, tenant) VALUES (1, 'Paul1');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (2, 'Paul2', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (3, 'Paul3', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (4, 'Paul4', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (5, 'Paul5', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (6, 'Paul6', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (7, 'Paul7', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (8, 'Paul8', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (9, 'Paul9', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (10, 'Paul10', 'role1,role2', 'standalone');
-INSERT INTO tenants (tenantId, tenant, adminRoles, allowedClusters) VALUES (11, 'Paul11', 'role1,role2', 'standalone');
-
+INSERT INTO tenants (tenant) VALUES ('Paul1');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul2', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul3', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul4', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul5', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul6', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul7', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul8', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul9', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul10', 'role1,role2', 'standalone');
+INSERT INTO tenants (tenant, adminRoles, allowedClusters) VALUES ('Paul11', 'role1,role2', 'standalone');
