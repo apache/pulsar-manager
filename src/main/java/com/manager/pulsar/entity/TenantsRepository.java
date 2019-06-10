@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TenantsRepository {
 
-  long save(TenantsEntity tenantsEntity);
+  int save(TenantsEntity tenantsEntity);
 
   Optional<TenantsEntity> findById(int tenantId);
 

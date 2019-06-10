@@ -48,7 +48,7 @@ public class MyBatisTenantsRepository implements TenantsRepository {
     }
 
     @Override
-    public long save(TenantsEntity tenantsEntity) {
+    public int save(TenantsEntity tenantsEntity) {
         tenantsMapper.insert(tenantsEntity);
         return tenantsEntity.getTenantId();
     }
