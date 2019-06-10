@@ -20,6 +20,7 @@ plugins {
 
 repositories {
     maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
+    maven { url "https://dl.bintray.com/streamnative/maven" }
     jcenter()
 }
 
@@ -62,7 +63,6 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.2')
     compile('mysql:mysql-connector-java:5.1.37')
-    compile('com.alibaba:druid:1.1.4')
     compile('org.springframework.boot:spring-boot-devtools')
     compileOnly('org.projectlombok:lombok')
     compile('javax.validation:validation-api:2.0.0.Final')
@@ -71,4 +71,7 @@ dependencies {
     compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
     compile('com.github.pagehelper:pagehelper-spring-boot-starter:1.2.4')
     compile('org.springframework.boot:spring-boot-starter-test')
+    compile files('libs/pulsar-io-zookeeper-0.0.1.jar')
+    compile files('libs/pulsar-system-topic-0.0.1.jar')
+    compile ('org.apache.pulsar:pulsar-client:2.4.0-c509f86ba')
 }
