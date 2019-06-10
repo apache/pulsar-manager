@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class EventConvertToTable implements Function<PulsarEvent, Void> {
 
-    private static final Map<String, String> properties = Maps.newHashMap();
+    private final Map<String, String> properties = Maps.newHashMap();
 
     private Logger logger;
 
@@ -79,7 +79,6 @@ public class EventConvertToTable implements Function<PulsarEvent, Void> {
     }
 
     private void setAction(ZooKeeperAction action) {
-        System.out.println(action);
         switch(action) {
             case CREATE:
                 properties.put("ACTION", "INSERT");
@@ -92,6 +91,8 @@ public class EventConvertToTable implements Function<PulsarEvent, Void> {
                 break;
             case SET_DATA:
                 properties.put("ACTION", "UPDATE");
+                break;
+            case UNKNOWN:
                 break;
         }
     }
