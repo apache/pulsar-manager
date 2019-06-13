@@ -31,9 +31,9 @@ public class MyBatisNamespacesRepository implements NamespacesRepository {
     }
 
     @Override
-    public Page<NamespacesEntity> findByTenant(Integer pageNum, Integer pageSize, String tenant) {
+    public Page<NamespacesEntity> findByTenantOrNamespace(Integer pageNum, Integer pageSize, String tenantOrNamespace) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<NamespacesEntity> namespacesEntities = namespacesMapper.findByTenant(tenant);
+        Page<NamespacesEntity> namespacesEntities = namespacesMapper.findByTenantOrNamespace(tenantOrNamespace);
         return namespacesEntities;
     }
 

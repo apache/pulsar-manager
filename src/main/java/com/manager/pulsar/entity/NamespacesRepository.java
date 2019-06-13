@@ -14,7 +14,7 @@ public interface NamespacesRepository {
 
     Optional<NamespacesEntity> findByTenantNamespace(String tenant, String namespace);
 
-    Page<NamespacesEntity> findByTenant(Integer pageNum, Integer pageSize, String tenant);
+    Page<NamespacesEntity> findByTenantOrNamespace(Integer pageNum, Integer pageSize, String tenantOrNamespace);
 
     Page<NamespacesEntity> findByNamespace(Integer pageNum, Integer pageSize, String namespace);
 

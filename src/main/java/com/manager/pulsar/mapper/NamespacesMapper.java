@@ -53,8 +53,9 @@ public interface NamespacesMapper {
             "retentionSizeInMB,deleted,antiAffinityGroup,encryptionRequired,subscriptionAuthMode," +
             "maxProducersPerTopic,maxConsumersPerTopic,maxConsumersPerSubscription,compactionThreshold," +
             "offloadThreshold,offloadDeletionLagMs,schemaValidationEnforced," +
-            "schemaAutoApdateCompatibilityStrategy FROM namespaces WHERE tenant=#{tenant}")
-    Page<NamespacesEntity> findByTenant(String tenant);
+            "schemaAutoApdateCompatibilityStrategy FROM namespaces " +
+            "WHERE tenant=#{tenantOrNamespace} or namespace=#{tenantOrNamespace}")
+    Page<NamespacesEntity> findByTenantOrNamespace(String tenantOrNamespace);
 
     @Select("SELECT namespaceId,tenant,namespace,authPolicies,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
