@@ -16,7 +16,7 @@ public class NamespacesController {
     private NamespacesRepository namespacesRepository;
 
     @RequestMapping(value = "/namespaces", method =  RequestMethod.GET)
-    public Page<NamespacesEntity> getTenants(
+    public Page<NamespacesEntity> getNamespaces(
             @RequestParam(name = "pageNum", defaultValue = "1")
                     Integer pageNum,
             @RequestParam(name="pageSize", defaultValue = "10")
