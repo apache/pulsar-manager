@@ -20,7 +20,7 @@ import org.apache.ibatis.annotations.*;
 
 public interface NamespacesMapper {
 
-    @Insert("INSERT INTO namespaces(tenant,namespace,authPolicies,replicationClusters," +
+    @Insert("INSERT INTO namespaces(tenant,namespace,authPolicies,backlogQuota,replicationClusters," +
             "numBundles,boundaries,topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate," +
             "clusterSubscribeRate,bookkeeperEnsemble,bookkeeperWriteQuorum,bookkeeperAckQuorum," +
             "managedLedgerMaxMarkDeleteRate,deduplicationEnabled,latencyStatsSampleRate,messageTtlInSeconds," +
@@ -28,7 +28,7 @@ public interface NamespacesMapper {
             "subscriptionAuthMode,maxProducersPerTopic,maxConsumersPerTopic,maxConsumersPerSubscription," +
             "compactionThreshold,offloadThreshold,offloadDeletionLagMs,schemaValidationEnforced," +
             "schemaAutoApdateCompatibilityStrategy)" +
-            "VALUES(#{tenant},#{namespace},#{authPolicies},#{replicationClusters},#{numBundles}," +
+            "VALUES(#{tenant},#{namespace},#{authPolicies},#{backlogQuota},#{replicationClusters},#{numBundles}," +
             "#{boundaries},#{topicDispatchRate},#{subscriptionDispatchRate},#{replicatorDispatchRate}," +
             "#{clusterSubscribeRate},#{bookkeeperEnsemble},#{bookkeeperWriteQuorum},#{bookkeeperAckQuorum}," +
             "#{managedLedgerMaxMarkDeleteRate},#{deduplicationEnabled},#{latencyStatsSampleRate}," +
@@ -39,7 +39,7 @@ public interface NamespacesMapper {
     @Options(useGeneratedKeys=true, keyProperty="namespaceId", keyColumn="namespaceId")
     void insert(NamespacesEntity namespacesEntity);
 
-    @Select("SELECT namespaceId,tenant,namespace,authPolicies,replicationClusters,numBundles,boundaries," +
+    @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
             "bookkeeperEnsemble,bookkeeperWriteQuorum,bookkeeperAckQuorum,managedLedgerMaxMarkDeleteRate," +
             "deduplicationEnabled,latencyStatsSampleRate,messageTtlInSeconds,retentionTimeInMinutes," +
@@ -49,7 +49,7 @@ public interface NamespacesMapper {
             "schemaAutoApdateCompatibilityStrategy FROM namespaces WHERE namespaceId = #{namespaceId}")
     NamespacesEntity findById(int namespaceId);
 
-    @Select("SELECT namespaceId,tenant,namespace,authPolicies,replicationClusters,numBundles,boundaries," +
+    @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
             "bookkeeperEnsemble,bookkeeperWriteQuorum,bookkeeperAckQuorum,managedLedgerMaxMarkDeleteRate," +
             "deduplicationEnabled,latencyStatsSampleRate,messageTtlInSeconds,retentionTimeInMinutes," +
@@ -59,7 +59,7 @@ public interface NamespacesMapper {
             "schemaAutoApdateCompatibilityStrategy FROM namespaces WHERE tenant=#{tenant} and namespace=#{namespace}")
     NamespacesEntity findByTenantNamespace(String tenant, String namespace);
 
-    @Select("SELECT namespaceId,tenant,namespace,authPolicies,replicationClusters,numBundles,boundaries," +
+    @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
             "bookkeeperEnsemble,bookkeeperWriteQuorum,bookkeeperAckQuorum,managedLedgerMaxMarkDeleteRate," +
             "deduplicationEnabled,latencyStatsSampleRate,messageTtlInSeconds,retentionTimeInMinutes," +
@@ -70,7 +70,7 @@ public interface NamespacesMapper {
             "WHERE tenant=#{tenantOrNamespace} or namespace=#{tenantOrNamespace}")
     Page<NamespacesEntity> findByTenantOrNamespace(String tenantOrNamespace);
 
-    @Select("SELECT namespaceId,tenant,namespace,authPolicies,replicationClusters,numBundles,boundaries," +
+    @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
             "bookkeeperEnsemble,bookkeeperWriteQuorum,bookkeeperAckQuorum,managedLedgerMaxMarkDeleteRate," +
             "deduplicationEnabled,latencyStatsSampleRate,messageTtlInSeconds,retentionTimeInMinutes," +
@@ -81,7 +81,7 @@ public interface NamespacesMapper {
     Page<NamespacesEntity> findByNamespace(String namespace);
 
 
-    @Select("SELECT namespaceId,tenant,namespace,authPolicies,replicationClusters,numBundles,boundaries," +
+    @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
             "bookkeeperEnsemble,bookkeeperWriteQuorum,bookkeeperAckQuorum,managedLedgerMaxMarkDeleteRate," +
             "deduplicationEnabled,latencyStatsSampleRate,messageTtlInSeconds,retentionTimeInMinutes," +
@@ -94,7 +94,8 @@ public interface NamespacesMapper {
     @Delete("DELETE FROM namespaces WHERE namespaceId = #{namespaceId}")
     void delete(NamespacesEntity namespacesEntity);
 
-    @Update("UPDATE namespaces set authPolicies=#{authPolicies},replicationClusters=#{replicationClusters}," +
+    @Update("UPDATE namespaces set authPolicies=#{authPolicies},backlogQuota=#{backlogQuota}," +
+            "replicationClusters=#{replicationClusters}," +
             "numBundles=#{numBundles},boundaries=#{boundaries},topicDispatchRate=#{topicDispatchRate}," +
             "subscriptionDispatchRate=#{subscriptionDispatchRate},replicatorDispatchRate=#{replicatorDispatchRate}," +
             "clusterSubscribeRate=#{clusterSubscribeRate},bookkeeperEnsemble=#{bookkeeperEnsemble}," +

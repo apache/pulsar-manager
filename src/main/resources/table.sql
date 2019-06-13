@@ -26,6 +26,7 @@ CREATE TABLE namespaces (
   tenant varchar(255) NOT NULL,
   namespace varchar(255) NOT NULL,
   authPolicies TEXT,
+  backlogQuota TEXT,
   replicationClusters TEXT,
   numBundles int,
   boundaries TEXT,
