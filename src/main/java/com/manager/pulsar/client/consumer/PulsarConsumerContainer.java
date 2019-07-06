@@ -61,9 +61,9 @@ public class PulsarConsumerContainer implements SmartLifecycle {
             if (this.listenerConsumer != null) {
                 this.listenerConsumer.close();
             }
-            log.info("Success close consumer");
+            log.info("Close consumer success");
         } catch (PulsarClientException e) {
-            log.error("Start consumer failed, because: {}", e.getMessage());
+            log.error("Close consumer failed, because: {}", e.getMessage());
         }
     }
 
