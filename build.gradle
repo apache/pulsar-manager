@@ -20,6 +20,7 @@ plugins {
 
 repositories {
     maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
+    maven { url "https://dl.bintray.com/streamnative/maven" }
     jcenter()
 }
 
@@ -69,4 +70,8 @@ dependencies {
     compile('io.jsonwebtoken:jjwt:0.9.0')
     compile('org.xerial:sqlite-jdbc:3.21.0.1')
     compile('org.springframework.cloud:spring-cloud-starter-netflix-zuul')
+    compile('org.apache.pulsar:pulsar-client:2.4.0-d1545bda9')
+    compile('org.apache.pulsar:pulsar-broker:2.4.0-d1545bda9')
+    compile('com.google.guava:guava:21.0')
+    compile('org.mockito:mockito-core:1.10.19')
 }
