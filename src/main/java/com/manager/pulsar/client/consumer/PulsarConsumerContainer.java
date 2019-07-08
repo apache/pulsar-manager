@@ -121,8 +121,8 @@ public class PulsarConsumerContainer implements SmartLifecycle {
         public void run() {
             try {
                 Consumer consumer = pulsarConsumer.getConsumer();
+                Preconditions.checkNotNull(consumer, "Consumer is null, this is not allowed");
                 while (isRunning()) {
-                    Preconditions.checkNotNull(consumer, "Consumer is null, this is not allowed");
                     try {
                         Message msg = consumer.receive();
                         try {
