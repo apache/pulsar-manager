@@ -55,17 +55,17 @@ public class MyBatisTenantsRepository implements TenantsRepository {
 
 
     @Override
-    public void remove(TenantsEntity tenantsEntity) {
-        tenantsMapper.delete(tenantsEntity);
+    public void remove(Integer tenantId) {
+        tenantsMapper.delete(tenantId);
     }
 
     @Override
-    public void removeByTenant(TenantsEntity tenantsEntity) {
-        tenantsMapper.deleteByTenant(tenantsEntity);
+    public void removeByTenant(String tenant) {
+        tenantsMapper.deleteByTenant(tenant);
     }
 
     @Override
-    public void updateByTenant(TenantsEntity tenantsEntity) {
-        tenantsMapper.updateByTenant(tenantsEntity);
+    public void updateByTenant(String tenant) {
+        tenantsMapper.updateByTenant(tenant);
     }
 }

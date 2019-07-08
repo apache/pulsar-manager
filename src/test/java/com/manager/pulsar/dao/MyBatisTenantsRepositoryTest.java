@@ -47,7 +47,7 @@ public class MyBatisTenantsRepositoryTest {
             Assert.assertEquals(result.getAllowedClusters(), "testCluster");
         });
         tenantsEntities.getResult().forEach((result) -> {
-            tenantsRepository.remove(result);
+            tenantsRepository.remove(result.getTenantId());
         });
     }
 }

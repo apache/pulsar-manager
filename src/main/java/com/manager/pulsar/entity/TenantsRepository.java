@@ -29,11 +29,11 @@ public interface TenantsRepository {
 
   Page<TenantsEntity> getTenantsList(Integer pageNum, Integer pageSize);
 
-  void remove(TenantsEntity tenantsEntity);
+  void remove(Integer tenantId);
 
-  void removeByTenant(TenantsEntity tenantsEntity);
+  void removeByTenant(String tenant);
 
-  void updateByTenant(TenantsEntity tenantsEntity);
+  void updateByTenant(String tenant);
 }
 
 

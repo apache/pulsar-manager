@@ -35,11 +35,11 @@ public interface TenantsMapper {
   Page<TenantsEntity> getTenantsList();
 
   @Delete("DELETE FROM tenants WHERE tenantId = #{tenantId}")
-  void delete(TenantsEntity tenantsEntity);
+  void delete(Integer tenantId);
 
   @Delete("DELETE FROM tenants WHERE tenant = #{tenant}")
-  void deleteByTenant(TenantsEntity tenantsEntity);
+  void deleteByTenant(String tenant);
 
   @Update("UPDATE tenants set adminRoles = #{adminRoles}, allowedClusters = #{allowedClusters} where tenant = #{tenant}")
-  void updateByTenant(TenantsEntity tenantsEntity);
+  void updateByTenant(String tenant);
 }
