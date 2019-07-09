@@ -112,7 +112,7 @@ public class PulsarConsumer implements AutoCloseable {
         consumerBuilder.subscriptionName(consumerConfigurationData.getSubscriptionName());
         Preconditions.checkArgument(consumerConfigurationData.getSubscriptionType() != null,
                 "The subscription type should be set correctly."
-                        + "Exclusive, Failover Shared and Key_Shared are currently supported.");
+                        + "Exclusive, Failover, Shared and Key_Shared are currently supported.");
         consumerBuilder.subscriptionType(consumerConfigurationData.getSubscriptionType());
         if (consumerConfigurationData.getTopics() != null) {
             List<String> topics = Arrays.asList(consumerConfigurationData.getTopics());
