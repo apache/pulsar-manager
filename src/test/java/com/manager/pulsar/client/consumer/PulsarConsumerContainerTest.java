@@ -97,7 +97,7 @@ public class PulsarConsumerContainerTest {
         Thread.sleep(10);
         pulsarConsumerConfigRegister.stopAllContainers();
         verify(consumer, atLeast(1)).receive();
-        verify(consumer, atLeast(1)).acknowledge(testMessage);
+        verify(consumer, atLeast(1)).acknowledgeAsync(testMessage);
     }
 
     @Test
@@ -134,6 +134,6 @@ public class PulsarConsumerContainerTest {
         Thread.sleep(10);
         pulsarConsumerConfigRegister.stopAllContainers();
         verify(consumer, atLeast(1)).receive();
-        verify(consumer, atLeast(1)).acknowledge(testMessage);
+        verify(consumer, atLeast(1)).acknowledgeAsync(testMessage);
     }
 }
