@@ -13,24 +13,33 @@
  */
 package com.manager.pulsar.mapper;
 
+import com.github.pagehelper.Page;
 import com.manager.pulsar.entity.TenantsEntity;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
+
+@Mapper
 public interface TenantsMapper {
 
-  @Insert("INSERT INTO tenants(tenant_name) VALUES(#{tenantName})")
-  @Options(useGeneratedKeys=true, keyProperty="tenantId", keyColumn="id")
-  void insert(TenantsEntity tenant);
+  @Insert("INSERT INTO tenants(tenant,adminRoles,allowedClusters) VALUES(#{tenant},#{adminRoles},#{allowedClusters})")
+  @Options(useGeneratedKeys=true, keyProperty="tenantId", keyColumn="tenantId")
+  void insert(TenantsEntity tenantsEntity);
 
-  @Select("SELECT id tenantId,tenant_name tenantName FROM tenants WHERE id = #{id}")
-  TenantsEntity findById(Integer id);
+  @Select("SELECT tenant,adminRoles,allowedClusters FROM tenants WHERE tenantId = #{tenantId}")
+  TenantsEntity findById(int tenantId);
 
-  @Select("SELECT id,tenant_name FROM tenants WHERE tenant_name = #{tenantName}")
-  TenantsEntity findByName(String tenantName);
+  @Select("SELECT tenantId,tenant,adminRoles,allowedClusters FROM tenants WHERE tenant = #{tenant}")
+  TenantsEntity findByName(String tenant);
 
-  @Delete("DELETE FROM tenants WHERE id = #{id}")
-  void delete(TenantsEntity tenant);
+  @Select("SELECT tenantId,tenant,adminRoles,allowedClusters FROM tenants")
+  Page<TenantsEntity> getTenantsList();
+
+  @Delete("DELETE FROM tenants WHERE tenantId = #{tenantId}")
+  void delete(Integer tenantId);
+
+  @Delete("DELETE FROM tenants WHERE tenant = #{tenant}")
+  void deleteByTenant(String tenant);
+
+  @Update("UPDATE tenants set adminRoles = #{adminRoles}, allowedClusters = #{allowedClusters} where tenant = #{tenant}")
+  void updateByTenant(String tenant);
 }
