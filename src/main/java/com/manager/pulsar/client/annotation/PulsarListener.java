@@ -55,7 +55,7 @@ public @interface PulsarListener {
      * Set the timeout for unacked messages, truncated to the nearest millisecond. The timeout needs to be greater than
      *  10 seconds.
      */
-    long ackTimeout() default 0L;
+    long ackTimeout() default 10L;
 
     /**
      * Set the delay to wait before re-delivering messages that have failed to be process. The default is 1 min.

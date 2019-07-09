@@ -127,9 +127,9 @@ public class PulsarConsumer implements AutoCloseable {
             consumerBuilder.topicsPattern(consumerConfigurationData.getTopicsPattern());
         }
         if (consumerConfigurationData.getAckTimeout() != null) {
-            Preconditions.checkArgument(consumerConfigurationData.getAckTimeout() >= 0,
+            Preconditions.checkArgument(consumerConfigurationData.getAckTimeout() >= 10,
                     "Parameter ackTimeout cannot be less than 0");
-            consumerBuilder.ackTimeout(consumerConfigurationData.getAckTimeout(), TimeUnit.MILLISECONDS);
+            consumerBuilder.ackTimeout(consumerConfigurationData.getAckTimeout(), TimeUnit.SECONDS);
         }
         if (consumerConfigurationData.getReceiverQueueSize() != null) {
             Preconditions.checkArgument(consumerConfigurationData.getReceiverQueueSize() > 0,
