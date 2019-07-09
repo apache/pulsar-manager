@@ -15,18 +15,25 @@ package com.manager.pulsar.entity;
 
 import java.util.Optional;
 
+import com.github.pagehelper.Page;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TenantsRepository {
 
-  Integer save(TenantsEntity tenant);
+  int save(TenantsEntity tenantsEntity);
 
-  Optional<TenantsEntity> findById(Integer id);
+  Optional<TenantsEntity> findById(int tenantId);
 
-  Optional<TenantsEntity> findByName(String tenantName);
+  Optional<TenantsEntity> findByName(String tenant);
 
-  void remove(TenantsEntity tenant);
+  Page<TenantsEntity> getTenantsList(Integer pageNum, Integer pageSize);
+
+  void remove(Integer tenantId);
+
+  void removeByTenant(String tenant);
+
+  void updateByTenant(String tenant);
 }
 
 

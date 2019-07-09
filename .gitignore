@@ -40,3 +40,5 @@ yarn-error.log
 .vscode/
 
 testdb
+build/
+*.db
