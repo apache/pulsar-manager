@@ -118,7 +118,7 @@ public class PulsarConsumer implements AutoCloseable {
             List<String> topics = Arrays.asList(consumerConfigurationData.getTopics());
             topics.forEach((topic) -> {
                 Preconditions.checkArgument(topic.length() > 0 ,
-                        "Length of topic should be greater than 10");
+                        "Length of topic should be greater than 0");
             });
             consumerBuilder.topics(topics);
         }
@@ -128,7 +128,7 @@ public class PulsarConsumer implements AutoCloseable {
         }
         if (consumerConfigurationData.getAckTimeout() != null) {
             Preconditions.checkArgument(consumerConfigurationData.getAckTimeout() >= 10,
-                    "Parameter ackTimeout cannot be less than 0");
+                    "Parameter ackTimeout cannot be less than 10s");
             consumerBuilder.ackTimeout(consumerConfigurationData.getAckTimeout(), TimeUnit.SECONDS);
         }
         if (consumerConfigurationData.getReceiverQueueSize() != null) {
