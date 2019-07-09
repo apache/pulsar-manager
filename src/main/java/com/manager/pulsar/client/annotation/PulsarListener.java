@@ -40,15 +40,11 @@ public @interface PulsarListener {
      * Unique id of the container thread.
      */
     String id() default "";
-    /**
-     * Specify the topics this consumer will subscribe on.
-     */
-    String topic() default "";
 
     /**
      * Specify multi topic that this consumer will subscribe on.
      */
-    String[] topics() default "";
+    String[] topics();
 
     /**
      * Specify a pattern for topics that this consumer will subscribe on.
@@ -59,18 +55,18 @@ public @interface PulsarListener {
      * Set the timeout for unacked messages, truncated to the nearest millisecond. The timeout needs to be greater than
      *  10 seconds.
      */
-    long ackTimeout() default 0;
+    long ackTimeout() default 0L;
 
     /**
      * Set the delay to wait before re-delivering messages that have failed to be process. The default is 1 min.
      */
-    long negativeAckRedeliveryDelay() default 0;
+    long negativeAckRedeliveryDelay() default 60000L;
 
     /**
      * Sets the size of the consumer receive queue.
      * Default value is {@code 1000} messages and should be good for most use cases.
      */
-    int receiverQueueSize() default 0;
+    int receiverQueueSize() default 1000;
 
     /**
      * Group the consumer acknowledgments for the specified time. Default is 100ms

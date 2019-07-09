@@ -16,11 +16,16 @@ package com.manager.pulsar.client.consumer;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.manager.pulsar.client.Client;
-import com.manager.pulsar.client.config.PulsarConsumerConfig;
-import org.apache.pulsar.client.api.*;
+import com.manager.pulsar.client.config.ConsumerConfigurationData;
+import org.apache.pulsar.client.api.Consumer;
+import org.apache.pulsar.client.api.ConsumerBuilder;
+import org.apache.pulsar.client.api.PulsarClient;
+import org.apache.pulsar.client.api.PulsarClientException;
+import org.apache.pulsar.client.api.Schema;
 import org.apache.pulsar.common.schema.SchemaType;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,24 +35,24 @@ public class PulsarConsumer implements AutoCloseable {
 
     private final Client client;
 
-    private final PulsarConsumerConfig pulsarConsumerConfig;
+    private final ConsumerConfigurationData consumerConfigurationData;
 
     private Schema schema;
 
     private Consumer consumer;
 
-    PulsarConsumer(Client client, PulsarConsumerConfig pulsarConsumerConfig) {
-        this.pulsarConsumerConfig = pulsarConsumerConfig;
+    PulsarConsumer(Client client, ConsumerConfigurationData consumerConfigurationData) {
+        this.consumerConfigurationData = consumerConfigurationData;
         this.client = client;
     }
 
-    public Consumer getConsumer() throws PulsarClientException{
+    public Consumer getConsumer() throws PulsarClientException {
         if (consumer != null) {
             return consumer;
         }
         PulsarClient pulsarClient = client.getPulsarClient();
         if (schema == null) {
-            schema = initSchema(pulsarConsumerConfig.getSchemaType(), pulsarConsumerConfig.getSchema());
+            schema = initSchema(consumerConfigurationData.getSchemaType(), consumerConfigurationData.getSchema());
         }
         ConsumerBuilder consumerBuilder = pulsarClient.newConsumer(schema);
         initConsumerConfig(consumerBuilder);
@@ -66,12 +71,32 @@ public class PulsarConsumer implements AutoCloseable {
 
     private Schema initSchema(SchemaType schemaType, Class schema) {
         switch (schemaType) {
-            case BYTES:
-                return Schema.BYTES;
             case INT8:
                 return Schema.INT8;
+            case INT16:
+                return Schema.INT16;
+            case INT32:
+                return Schema.INT32;
+            case INT64:
+                return Schema.INT64;
             case STRING:
                 return Schema.STRING;
+            case FLOAT:
+                return Schema.FLOAT;
+            case DOUBLE:
+                return Schema.DOUBLE;
+            case BOOLEAN:
+                return Schema.BOOL;
+            case BYTES:
+                return Schema.BYTES;
+            case DATE:
+                return Schema.DATE;
+            case TIME:
+                return Schema.TIME;
+            case TIMESTAMP:
+                return Schema.TIMESTAMP;
+            case KEY_VALUE:
+                return Schema.KV_BYTES();
             case JSON:
                 return Schema.JSON(schema);
             case AVRO:
@@ -82,37 +107,60 @@ public class PulsarConsumer implements AutoCloseable {
     }
 
     private void initConsumerConfig(ConsumerBuilder consumerBuilder) {
-        Preconditions.checkArgument(pulsarConsumerConfig.getSubscriptionName() != null
-                && pulsarConsumerConfig.getSubscriptionName().length() > 0);
-        consumerBuilder.subscriptionName(pulsarConsumerConfig.getSubscriptionName());
-        consumerBuilder.subscriptionType(pulsarConsumerConfig.getSubscriptionType());
-        if (pulsarConsumerConfig.getTopic().length() > 0) {
-            consumerBuilder.topic(pulsarConsumerConfig.getTopic());
-        } else if (pulsarConsumerConfig.getTopics().length > 0) {
-            consumerBuilder.topics(Arrays.asList(pulsarConsumerConfig.getTopics()));
+        Preconditions.checkArgument(consumerConfigurationData.getSubscriptionName() != null
+                && consumerConfigurationData.getSubscriptionName().length() > 0);
+        consumerBuilder.subscriptionName(consumerConfigurationData.getSubscriptionName());
+        Preconditions.checkArgument(consumerConfigurationData.getSubscriptionType() != null,
+                "The subscription type should be set correctly."
+                        + "Exclusive, Failover Shared and Key_Shared are currently supported.");
+        consumerBuilder.subscriptionType(consumerConfigurationData.getSubscriptionType());
+        if (consumerConfigurationData.getTopics() != null) {
+            List<String> topics = Arrays.asList(consumerConfigurationData.getTopics());
+            topics.forEach((topic) -> {
+                Preconditions.checkArgument(topic.length() > 0 ,
+                        "Length of topic should be greater than 0");
+            });
+            consumerBuilder.topics(topics);
         }
-        if (pulsarConsumerConfig.getTopicsPattern().length() > 0) {
-            consumerBuilder.topicsPattern(pulsarConsumerConfig.getTopicsPattern());
+        if (consumerConfigurationData.getTopicsPattern() != null
+                && consumerConfigurationData.getTopicsPattern().length() > 0) {
+            consumerBuilder.topicsPattern(consumerConfigurationData.getTopicsPattern());
         }
-        if (pulsarConsumerConfig.getAckTimeout() > 0) {
-            consumerBuilder.ackTimeout(pulsarConsumerConfig.getAckTimeout(), TimeUnit.MILLISECONDS);
+        if (consumerConfigurationData.getAckTimeout() != null) {
+            Preconditions.checkArgument(consumerConfigurationData.getAckTimeout() >= 0,
+                    "Parameter ackTimeout cannot be less than 0");
+            consumerBuilder.ackTimeout(consumerConfigurationData.getAckTimeout(), TimeUnit.MILLISECONDS);
         }
-        if (pulsarConsumerConfig.getReceiverQueueSize() > 0) {
-            consumerBuilder.receiverQueueSize(pulsarConsumerConfig.getReceiverQueueSize());
+        if (consumerConfigurationData.getReceiverQueueSize() != null) {
+            Preconditions.checkArgument(consumerConfigurationData.getReceiverQueueSize() > 0,
+                    "Parameter receiverQueueSize should be greater than 0");
+            consumerBuilder.receiverQueueSize(consumerConfigurationData.getReceiverQueueSize());
         }
-        if (pulsarConsumerConfig.getAcknowledgmentGroupTime() > 0) {
-            consumerBuilder.acknowledgmentGroupTime(pulsarConsumerConfig.getAcknowledgmentGroupTime(), TimeUnit.MILLISECONDS);
+
+        if (consumerConfigurationData.getAcknowledgmentGroupTime() != null) {
+            Preconditions.checkArgument(consumerConfigurationData.getAcknowledgmentGroupTime() >= 0,
+                    "Parameter acknowledgmentGroupTime cannot be less than 0");
+            consumerBuilder.acknowledgmentGroupTime(
+                    consumerConfigurationData.getAcknowledgmentGroupTime(), TimeUnit.MILLISECONDS);
         }
-        if (pulsarConsumerConfig.getConsumerName().length() > 0) {
-            consumerBuilder.consumerName(pulsarConsumerConfig.getConsumerName());
+        if (consumerConfigurationData.getConsumerName() != null
+                && consumerConfigurationData.getConsumerName().length() > 0) {
+            consumerBuilder.consumerName(consumerConfigurationData.getConsumerName());
         }
-        if (pulsarConsumerConfig.getNegativeAckRedeliveryDelay() > 0) {
-            consumerBuilder.negativeAckRedeliveryDelay(pulsarConsumerConfig.getNegativeAckRedeliveryDelay(), TimeUnit.MILLISECONDS);
+        if (consumerConfigurationData.getNegativeAckRedeliveryDelay() != null) {
+            Preconditions.checkArgument(consumerConfigurationData.getNegativeAckRedeliveryDelay() >= 0,
+                    "Parameter negativeAckRedeliveryDelay cannot be less than 0");
+            consumerBuilder.negativeAckRedeliveryDelay(
+                    consumerConfigurationData.getNegativeAckRedeliveryDelay(), TimeUnit.MILLISECONDS);
         }
-        if (pulsarConsumerConfig.getPriorityLevel() >= 0) {
-            consumerBuilder.priorityLevel(pulsarConsumerConfig.getPriorityLevel());
+        if (consumerConfigurationData.getPriorityLevel() != null) {
+            Preconditions.checkArgument(consumerConfigurationData.getPriorityLevel() >= 0,
+                    "Parameter priorityLevel cannot be less than 0");
+            consumerBuilder.priorityLevel(consumerConfigurationData.getPriorityLevel());
         }
-        consumerBuilder.subscriptionTopicsMode(pulsarConsumerConfig.getRegexSubscriptionMode());
+        if (consumerConfigurationData.getRegexSubscriptionMode() != null) {
+            consumerBuilder.subscriptionTopicsMode(consumerConfigurationData.getRegexSubscriptionMode());
+        }
     }
 
     @Override
@@ -125,17 +173,17 @@ public class PulsarConsumer implements AutoCloseable {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("subscriptionName", pulsarConsumerConfig.getSubscriptionName())
-                .add("subscriptionType", pulsarConsumerConfig.getSubscriptionType())
-                .add("topic", pulsarConsumerConfig.getTopic())
-                .add("topics", pulsarConsumerConfig.getTopics())
-                .add("topicsPattern", pulsarConsumerConfig.getTopicsPattern())
-                .add("ackTimeout", pulsarConsumerConfig.getAckTimeout())
-                .add("receiverQueueSize", pulsarConsumerConfig.getReceiverQueueSize())
-                .add("acknowledgmentGroupTime", pulsarConsumerConfig.getAcknowledgmentGroupTime())
-                .add("consumerName", pulsarConsumerConfig.getConsumerName())
-                .add("negativeAckRedeliveryDelay", pulsarConsumerConfig.getNegativeAckRedeliveryDelay())
-                .add("regexSubscriptionMode", pulsarConsumerConfig.getRegexSubscriptionMode())
+                .add("subscriptionName", consumerConfigurationData.getSubscriptionName())
+                .add("subscriptionType", consumerConfigurationData.getSubscriptionType())
+                .add("topics", consumerConfigurationData.getTopics())
+                .add("topicsPattern", consumerConfigurationData.getTopicsPattern())
+                .add("ackTimeout", consumerConfigurationData.getAckTimeout())
+                .add("receiverQueueSize", consumerConfigurationData.getReceiverQueueSize())
+                .add("acknowledgmentGroupTime", consumerConfigurationData.getAcknowledgmentGroupTime())
+                .add("consumerName", consumerConfigurationData.getConsumerName())
+                .add("priorityLevel", consumerConfigurationData.getPriorityLevel())
+                .add("negativeAckRedeliveryDelay", consumerConfigurationData.getNegativeAckRedeliveryDelay())
+                .add("regexSubscriptionMode", consumerConfigurationData.getRegexSubscriptionMode())
                 .toString();
     }
 

@@ -23,39 +23,39 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class PulsarClientConfig {
+public class ClientConfigurationData {
 
     private String serviceUrl;
 
-    private int operationTimeout;
+    private Integer operationTimeout;
 
-    private int ioThreads;
+    private Integer ioThreads;
 
-    private int listenerThreads;
+    private Integer listenerThreads;
 
-    private int connectionsPerBroker;
+    private Integer connectionsPerBroker;
 
-    private boolean enableTcpNoDelay;
+    private Boolean enableTcpNoDelay;
 
     private String tlsTrustCertsFilePath;
 
-    private boolean allowTlsInsecureConnection;
+    private Boolean allowTlsInsecureConnection;
 
-    private boolean enableTlsHostnameVerification;
+    private Boolean enableTlsHostnameVerification;
 
-    private long statsInterval;
+    private Long statsInterval;
 
-    private int maxConcurrentLookupRequests;
+    private Integer maxConcurrentLookupRequests;
 
-    private int maxLookupRequests;
+    private Integer maxLookupRequests;
 
-    private int maxNumberOfRejectedRequestPerConnection;
+    private Integer maxNumberOfRejectedRequestPerConnection;
 
-    private int keepAliveInterval;
+    private Integer keepAliveInterval;
 
-    private int connectionTimeout;
+    private Integer connectionTimeout;
 
-    private int startingBackoffInterval;
+    private Integer startingBackoffInterval;
 
-    private int maxBackoffInterval;
+    private Integer maxBackoffInterval;
 }

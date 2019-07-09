@@ -15,7 +15,7 @@ package com.manager.pulsar.client;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import com.manager.pulsar.client.config.PulsarClientConfig;
+import com.manager.pulsar.client.config.ClientConfigurationData;
 import org.apache.pulsar.client.api.ClientBuilder;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
@@ -29,10 +29,10 @@ public class Client implements AutoCloseable {
 
     private final PulsarClient pulsarClient;
 
-    private final PulsarClientConfig pulsarClientConfig;
+    private final ClientConfigurationData clientConfigurationData;
 
-    public Client(PulsarClientConfig pulsarClientConfig) throws PulsarClientException {
-        this.pulsarClientConfig = pulsarClientConfig;
+    public Client(ClientConfigurationData clientConfigurationData) throws PulsarClientException {
+        this.clientConfigurationData = clientConfigurationData;
         ClientBuilder clientBuilder = PulsarClient.builder();
         checkAndInitClientConfig(clientBuilder);
         pulsarClient = clientBuilder.build();
@@ -43,58 +43,82 @@ public class Client implements AutoCloseable {
     }
 
     private void checkAndInitClientConfig(ClientBuilder clientBuilder) {
-        Preconditions.checkArgument(pulsarClientConfig.getServiceUrl() != null
-                && pulsarClientConfig.getServiceUrl().startsWith("pulsar"));
-        clientBuilder.serviceUrl(pulsarClientConfig.getServiceUrl());
-        if (pulsarClientConfig.getOperationTimeout() > 0) {
-            clientBuilder.operationTimeout(pulsarClientConfig.getOperationTimeout(), TimeUnit.MILLISECONDS);
+        Preconditions.checkArgument(clientConfigurationData.getServiceUrl() != null
+                && clientConfigurationData.getServiceUrl().startsWith("pulsar"));
+        clientBuilder.serviceUrl(clientConfigurationData.getServiceUrl());
+        if (clientConfigurationData.getOperationTimeout() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getOperationTimeout() > 0,
+                    "Parameter operationTimeout should be greater than 0");
+            clientBuilder.operationTimeout(clientConfigurationData.getOperationTimeout(), TimeUnit.MILLISECONDS);
         }
-        if (pulsarClientConfig.isEnableTcpNoDelay()) {
-            clientBuilder.enableTcpNoDelay(true);
+        if (clientConfigurationData.getEnableTcpNoDelay() != null) {
+            clientBuilder.enableTcpNoDelay(clientConfigurationData.getEnableTcpNoDelay());
         }
-        if (pulsarClientConfig.getIoThreads() > 0) {
-            clientBuilder.ioThreads(pulsarClientConfig.getIoThreads());
+        if (clientConfigurationData.getIoThreads() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getIoThreads() > 0,
+                    "Parameter ioThreads should be greater than 0");
+            clientBuilder.ioThreads(clientConfigurationData.getIoThreads());
         }
-        if (pulsarClientConfig.getListenerThreads() > 0) {
-            clientBuilder.listenerThreads(pulsarClientConfig.getListenerThreads());
+        if (clientConfigurationData.getListenerThreads() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getListenerThreads() > 0,
+                    "Parameter listenerThreads should be greater than 0");
+            clientBuilder.listenerThreads(clientConfigurationData.getListenerThreads());
         }
-        if (pulsarClientConfig.getConnectionsPerBroker() > 0) {
-            clientBuilder.connectionsPerBroker(pulsarClientConfig.getConnectionsPerBroker());
+        if (clientConfigurationData.getConnectionsPerBroker() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getConnectionsPerBroker() > 0,
+                    "Parameter connectionsPerBroker should be greater than 0");
+            clientBuilder.connectionsPerBroker(clientConfigurationData.getConnectionsPerBroker());
         }
-        if (pulsarClientConfig.getTlsTrustCertsFilePath() != null
-                && pulsarClientConfig.getTlsTrustCertsFilePath().length() > 0) {
-            clientBuilder.tlsTrustCertsFilePath(pulsarClientConfig.getTlsTrustCertsFilePath());
+        if (clientConfigurationData.getTlsTrustCertsFilePath() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getTlsTrustCertsFilePath().length() > 0,
+                    "Parameter tlsTrustCertsFilePath should be set");
+            clientBuilder.tlsTrustCertsFilePath(clientConfigurationData.getTlsTrustCertsFilePath());
         }
-        if (pulsarClientConfig.isAllowTlsInsecureConnection()) {
-            clientBuilder.allowTlsInsecureConnection(true);
+        if (clientConfigurationData.getAllowTlsInsecureConnection() != null) {
+            clientBuilder.allowTlsInsecureConnection(clientConfigurationData.getAllowTlsInsecureConnection());
         }
-        if (pulsarClientConfig.isEnableTlsHostnameVerification()) {
-            clientBuilder.enableTlsHostnameVerification(true);
+        if (clientConfigurationData.getEnableTlsHostnameVerification() != null) {
+            clientBuilder.enableTlsHostnameVerification(clientConfigurationData.getEnableTlsHostnameVerification());
         }
-        if (pulsarClientConfig.getStatsInterval() > 0) {
-            clientBuilder.statsInterval(pulsarClientConfig.getStatsInterval(), TimeUnit.SECONDS);
+        if (clientConfigurationData.getStatsInterval() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getStatsInterval() > 0L,
+                    "Parameter statsInterval should be greater than 0");
+            clientBuilder.statsInterval(clientConfigurationData.getStatsInterval(), TimeUnit.SECONDS);
         }
-        if (pulsarClientConfig.getMaxConcurrentLookupRequests() > 0) {
-            clientBuilder.maxConcurrentLookupRequests(pulsarClientConfig.getMaxConcurrentLookupRequests());
+        if (clientConfigurationData.getMaxConcurrentLookupRequests() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getMaxConcurrentLookupRequests() > 0,
+                    "Parameter maxConcurrentLookupRequests should be greater than 0");
+            clientBuilder.maxConcurrentLookupRequests(clientConfigurationData.getMaxNumberOfRejectedRequestPerConnection());
         }
-        if (pulsarClientConfig.getMaxLookupRequests() > 0) {
-            clientBuilder.maxLookupRequests(pulsarClientConfig.getMaxLookupRequests());
+        if (clientConfigurationData.getMaxLookupRequests() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getMaxLookupRequests() > 0,
+                    "Parameter maxLookupRequests should be greater than 0");
+            clientBuilder.maxLookupRequests(clientConfigurationData.getMaxLookupRequests());
         }
-        if (pulsarClientConfig.getMaxNumberOfRejectedRequestPerConnection() > 0) {
-            clientBuilder.maxNumberOfRejectedRequestPerConnection(
-                    pulsarClientConfig.getMaxNumberOfRejectedRequestPerConnection());
+        if (clientConfigurationData.getMaxNumberOfRejectedRequestPerConnection() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getMaxNumberOfRejectedRequestPerConnection() > 0,
+                    "Parameter maxNumberOfRejectedRequestPerConnection should be greater than 0");
+            clientBuilder.maxNumberOfRejectedRequestPerConnection(clientConfigurationData.getMaxNumberOfRejectedRequestPerConnection());
         }
-        if (pulsarClientConfig.getKeepAliveInterval() > 0) {
-            clientBuilder.keepAliveInterval(pulsarClientConfig.getKeepAliveInterval(), TimeUnit.SECONDS);
+        if (clientConfigurationData.getKeepAliveInterval() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getKeepAliveInterval() > 0,
+                    "Parameter keepAliveInterval should be greater than 0");
+            clientBuilder.keepAliveInterval(clientConfigurationData.getKeepAliveInterval(), TimeUnit.SECONDS);
         }
-        if (pulsarClientConfig.getConnectionTimeout() > 0) {
-            clientBuilder.connectionTimeout(pulsarClientConfig.getConnectionTimeout(), TimeUnit.MILLISECONDS);
+        if (clientConfigurationData.getConnectionTimeout() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getConnectionTimeout() > 0,
+                    "Parameter connectionTimeout should be greater than 0");
+            clientBuilder.connectionTimeout(clientConfigurationData.getConnectionTimeout(), TimeUnit.MILLISECONDS);
         }
-        if (pulsarClientConfig.getStartingBackoffInterval() > 0) {
-            clientBuilder.startingBackoffInterval(pulsarClientConfig.getStartingBackoffInterval(), TimeUnit.MILLISECONDS);
+        if (clientConfigurationData.getStartingBackoffInterval() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getStartingBackoffInterval() > 0,
+                    "Parameter startingBackoffInterval should be greater than 0");
+            clientBuilder.startingBackoffInterval(clientConfigurationData.getStartingBackoffInterval(), TimeUnit.MILLISECONDS);
         }
-        if (pulsarClientConfig.getMaxBackoffInterval() > 0) {
-            clientBuilder.maxBackoffInterval(pulsarClientConfig.getMaxBackoffInterval(), TimeUnit.MILLISECONDS);
+        if (clientConfigurationData.getMaxBackoffInterval() != null) {
+            Preconditions.checkArgument(clientConfigurationData.getMaxBackoffInterval() > 0,
+                    "Parameter startingBackoffInterval should be greater than 0");
+            clientBuilder.maxBackoffInterval(clientConfigurationData.getMaxBackoffInterval(), TimeUnit.MILLISECONDS);
         }
     }
 
@@ -104,23 +128,24 @@ public class Client implements AutoCloseable {
         }
     }
 
+    @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("serviceUrl", pulsarClientConfig.getServiceUrl())
-                .add("operationTimeout", pulsarClientConfig.getOperationTimeout())
-                .add("ioThreads", pulsarClientConfig.getIoThreads())
-                .add("listenerThreads", pulsarClientConfig.getListenerThreads())
-                .add("connectionsPerBroker", pulsarClientConfig.getConnectionsPerBroker())
-                .add("tlsTrustCertsFilePath", pulsarClientConfig.getTlsTrustCertsFilePath())
-                .add("allowTlsInsecureConnection", pulsarClientConfig.isAllowTlsInsecureConnection())
-                .add("enableTlsHostnameVerification", pulsarClientConfig.isEnableTlsHostnameVerification())
-                .add("statsInterval", pulsarClientConfig.getStatsInterval())
-                .add("maxConcurrentLookupRequests", pulsarClientConfig.getMaxConcurrentLookupRequests())
-                .add("maxLookupRequests", pulsarClientConfig.getMaxLookupRequests())
-                .add("maxNumberOfRejectedRequestPerConnection", pulsarClientConfig.getMaxNumberOfRejectedRequestPerConnection())
-                .add("keepAliveInterval", pulsarClientConfig.getKeepAliveInterval())
-                .add("connectionTimeout", pulsarClientConfig.getConnectionTimeout())
-                .add("startingBackoffInterval", pulsarClientConfig.getStartingBackoffInterval())
-                .add("maxBackoffInterval", pulsarClientConfig.getMaxBackoffInterval()).toString();
+        return MoreObjects.toStringHelper(this).add("serviceUrl", clientConfigurationData.getServiceUrl())
+                .add("operationTimeout", clientConfigurationData.getOperationTimeout())
+                .add("ioThreads", clientConfigurationData.getIoThreads())
+                .add("listenerThreads", clientConfigurationData.getListenerThreads())
+                .add("connectionsPerBroker", clientConfigurationData.getConnectionsPerBroker())
+                .add("tlsTrustCertsFilePath", clientConfigurationData.getTlsTrustCertsFilePath())
+                .add("allowTlsInsecureConnection", clientConfigurationData.getAllowTlsInsecureConnection())
+                .add("enableTlsHostnameVerification", clientConfigurationData.getEnableTlsHostnameVerification())
+                .add("statsInterval", clientConfigurationData.getStatsInterval())
+                .add("maxConcurrentLookupRequests", clientConfigurationData.getMaxConcurrentLookupRequests())
+                .add("maxLookupRequests", clientConfigurationData.getMaxLookupRequests())
+                .add("maxNumberOfRejectedRequestPerConnection", clientConfigurationData.getMaxNumberOfRejectedRequestPerConnection())
+                .add("keepAliveInterval", clientConfigurationData.getKeepAliveInterval())
+                .add("connectionTimeout", clientConfigurationData.getConnectionTimeout())
+                .add("startingBackoffInterval", clientConfigurationData.getStartingBackoffInterval())
+                .add("maxBackoffInterval", clientConfigurationData.getMaxBackoffInterval()).toString();
     }
 
 }

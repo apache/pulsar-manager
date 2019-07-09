@@ -14,7 +14,7 @@
 package com.manager.pulsar.client.utils;
 
 import com.manager.pulsar.client.annotation.PulsarListener;
-import com.manager.pulsar.client.config.PulsarConsumerConfig;
+import com.manager.pulsar.client.config.ConsumerConfigurationData;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -31,7 +31,7 @@ import java.util.Set;
  */
 public class ParseAnnotation {
 
-    public static final List<PulsarConsumerConfig> pulsarConsumerConfigs = new ArrayList<>();
+    public static final List<ConsumerConfigurationData> CONSUMER_CONFIGURATION_DATA = new ArrayList<>();
 
     public static void parse(final Object bean) {
         Class<?> targetClass = AopUtils.getTargetClass(bean);
@@ -48,26 +48,26 @@ public class ParseAnnotation {
             for (Map.Entry<Method, Set<PulsarListener>> entry : annotatedMethods.entrySet()) {
                 Method method = entry.getKey();
                 for (PulsarListener listener : entry.getValue()) {
-                    PulsarConsumerConfig pulsarConsumerConfig = new PulsarConsumerConfig();
-                    pulsarConsumerConfig.setId(listener.id());
-                    pulsarConsumerConfig.setTopic(listener.topic());
-                    pulsarConsumerConfig.setAckTimeout(listener.ackTimeout());
-                    pulsarConsumerConfig.setSubscriptionName(listener.subscriptionName());
-                    pulsarConsumerConfig.setSubscriptionType(listener.subscriptionType());
-                    pulsarConsumerConfig.setAcknowledgmentGroupTime(listener.acknowledgmentGroupTime());
-                    pulsarConsumerConfig.setNegativeAckRedeliveryDelay(listener.negativeAckRedeliveryDelay());
-                    pulsarConsumerConfig.setReceiverQueueSize(listener.receiverQueueSize());
-                    pulsarConsumerConfig.setTopics(listener.topics());
-                    pulsarConsumerConfig.setAcknowledgmentGroupTime(listener.acknowledgmentGroupTime());
-                    pulsarConsumerConfig.setTopicsPattern(listener.topicsPattern());
-                    pulsarConsumerConfig.setAutoUpdatePartitions(listener.autoUpdatePartitions());
-                    pulsarConsumerConfig.setConsumerName(listener.consumerName());
-                    pulsarConsumerConfig.setMethod(method);
-                    pulsarConsumerConfig.setBean(bean);
-                    pulsarConsumerConfig.setRegexSubscriptionMode(listener.regexSubscriptionMode());
-                    pulsarConsumerConfig.setSchema(listener.schema());
-                    pulsarConsumerConfig.setSchemaType(listener.schemaType());
-                    pulsarConsumerConfigs.add(pulsarConsumerConfig);
+                    ConsumerConfigurationData consumerConfigurationData = new ConsumerConfigurationData();
+                    consumerConfigurationData.setId(listener.id());
+                    consumerConfigurationData.setTopics(listener.topics());
+                    consumerConfigurationData.setAckTimeout(listener.ackTimeout());
+                    consumerConfigurationData.setSubscriptionName(listener.subscriptionName());
+                    consumerConfigurationData.setSubscriptionType(listener.subscriptionType());
+                    consumerConfigurationData.setAcknowledgmentGroupTime(listener.acknowledgmentGroupTime());
+                    consumerConfigurationData.setNegativeAckRedeliveryDelay(listener.negativeAckRedeliveryDelay());
+                    consumerConfigurationData.setReceiverQueueSize(listener.receiverQueueSize());
+                    consumerConfigurationData.setTopics(listener.topics());
+                    consumerConfigurationData.setAcknowledgmentGroupTime(listener.acknowledgmentGroupTime());
+                    consumerConfigurationData.setTopicsPattern(listener.topicsPattern());
+                    consumerConfigurationData.setAutoUpdatePartitions(listener.autoUpdatePartitions());
+                    consumerConfigurationData.setConsumerName(listener.consumerName());
+                    consumerConfigurationData.setMethod(method);
+                    consumerConfigurationData.setBean(bean);
+                    consumerConfigurationData.setRegexSubscriptionMode(listener.regexSubscriptionMode());
+                    consumerConfigurationData.setSchema(listener.schema());
+                    consumerConfigurationData.setSchemaType(listener.schemaType());
+                    CONSUMER_CONFIGURATION_DATA.add(consumerConfigurationData);
                 }
             }
         }

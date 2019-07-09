@@ -23,11 +23,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * PulsarConsumerConfig register class.
+ * ConsumerConfigurationData register class.
  */
-public class PulsarConsumerConfigRegistrar implements InitializingBean {
+public class PulsarConsumerConfigRegister implements InitializingBean {
 
-    private static final Logger log = LoggerFactory.getLogger(PulsarConsumerConfigRegistrar.class);
+    private static final Logger log = LoggerFactory.getLogger(PulsarConsumerConfigRegister.class);
 
     private final Map<String, PulsarConsumerContainer> consumerContainers = new ConcurrentHashMap<>();
 
@@ -41,12 +41,12 @@ public class PulsarConsumerConfigRegistrar implements InitializingBean {
         return this.pulsarApplicationListener;
     }
 
-    public void setConsumerContainer(PulsarConsumerConfig pulsarConsumerConfig) {
+    public void setConsumerContainer(ConsumerConfigurationData consumerConfigurationData) {
         synchronized (this.consumerContainers) {
             log.info("Start init consumer execute container");
             PulsarConsumerContainer pulsarConsumerContainer = new PulsarConsumerContainer(
-                    pulsarApplicationListener.getClient(), pulsarConsumerConfig);
-            this.consumerContainers.put(pulsarConsumerConfig.getId(), pulsarConsumerContainer);
+                    pulsarApplicationListener.getClient(), consumerConfigurationData);
+            this.consumerContainers.put(consumerConfigurationData.getId(), pulsarConsumerContainer);
         }
     }
 

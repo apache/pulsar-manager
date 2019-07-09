@@ -16,8 +16,8 @@ package com.manager.pulsar.client.consumer;
 import com.manager.pulsar.client.Client;
 import com.manager.pulsar.client.PulsarApplicationListener;
 import com.manager.pulsar.client.annotation.PulsarListener;
-import com.manager.pulsar.client.config.PulsarConsumerConfig;
-import com.manager.pulsar.client.config.PulsarConsumerConfigRegistrar;
+import com.manager.pulsar.client.config.ConsumerConfigurationData;
+import com.manager.pulsar.client.config.PulsarConsumerConfigRegister;
 import com.manager.pulsar.client.utils.ParseAnnotation;
 import com.manager.pulsar.client.utils.TestMessage;
 
@@ -53,7 +53,7 @@ public class PulsarConsumerContainerTest {
 
     private class PulsarListenerAnnotationByte {
 
-        @PulsarListener(topic = "test", subscriptionName = "xxxx")
+        @PulsarListener(topics = "test", subscriptionName = "xxxx")
         public void testReceive(Message message) {
             Assert.assertEquals(new String(message.getData()), receiveMessage);
         }
@@ -61,7 +61,7 @@ public class PulsarConsumerContainerTest {
 
     private class PulsarListenerAnnotationAvro {
 
-        @PulsarListener(id = "test-container", topic = "test2",
+        @PulsarListener(id = "test-container", topics = "test2",
                 subscriptionName = "xxxx2", schema = Foo.class, schemaType = SchemaType.AVRO)
         public void testReceive(Message message) {
             Foo foo = (Foo) message.getValue();
@@ -79,13 +79,13 @@ public class PulsarConsumerContainerTest {
         Consumer consumer = mock(Consumer.class);
         ConsumerBuilder consumerBuilder = mock(ConsumerBuilder.class);
         PulsarApplicationListener pulsarApplicationListener = mock(PulsarApplicationListener.class);
-        PulsarConsumerConfigRegistrar pulsarConsumerConfigRegistrar = new PulsarConsumerConfigRegistrar();
+        PulsarConsumerConfigRegister pulsarConsumerConfigRegister = new PulsarConsumerConfigRegister();
         PulsarListenerAnnotationByte pulsarListenerAnnotation = new PulsarListenerAnnotationByte();
         when(pulsarApplicationListener.getClient()).thenReturn(client);
-        pulsarConsumerConfigRegistrar.setPulsarApplicationListener(pulsarApplicationListener);
+        pulsarConsumerConfigRegister.setPulsarApplicationListener(pulsarApplicationListener);
         ParseAnnotation.parse(pulsarListenerAnnotation);
-        for (PulsarConsumerConfig pulsarConsumerConfig : ParseAnnotation.pulsarConsumerConfigs) {
-            pulsarConsumerConfigRegistrar.setConsumerContainer(pulsarConsumerConfig);
+        for (ConsumerConfigurationData consumerConfigurationData : ParseAnnotation.CONSUMER_CONFIGURATION_DATA) {
+            pulsarConsumerConfigRegister.setConsumerContainer(consumerConfigurationData);
         }
         when(client.getPulsarClient()).thenReturn(pulsarClient);
         when(pulsarClient.newConsumer(Schema.BYTES)).thenReturn(consumerBuilder);
@@ -93,9 +93,9 @@ public class PulsarConsumerContainerTest {
         when(consumer.toString()).thenReturn("consumer");
         testMessage.setData(receiveMessage.getBytes());
         when(consumer.receive()).thenReturn(testMessage);
-        pulsarConsumerConfigRegistrar.afterPropertiesSet();
+        pulsarConsumerConfigRegister.afterPropertiesSet();
         Thread.sleep(10);
-        pulsarConsumerConfigRegistrar.stopAllContainers();
+        pulsarConsumerConfigRegister.stopAllContainers();
         verify(consumer, atLeast(1)).receive();
         verify(consumer, atLeast(1)).acknowledge(testMessage);
     }
@@ -107,18 +107,18 @@ public class PulsarConsumerContainerTest {
         Consumer consumer = mock(Consumer.class);
         ConsumerBuilder consumerBuilder = mock(ConsumerBuilder.class);
         PulsarApplicationListener pulsarApplicationListener = mock(PulsarApplicationListener.class);
-        PulsarConsumerConfigRegistrar pulsarConsumerConfigRegistrar = new PulsarConsumerConfigRegistrar();
+        PulsarConsumerConfigRegister pulsarConsumerConfigRegister = new PulsarConsumerConfigRegister();
         PulsarListenerAnnotationAvro pulsarListenerAnnotation = new PulsarListenerAnnotationAvro();
         when(pulsarApplicationListener.getClient()).thenReturn(client);
-        pulsarConsumerConfigRegistrar.setPulsarApplicationListener(pulsarApplicationListener);
+        pulsarConsumerConfigRegister.setPulsarApplicationListener(pulsarApplicationListener);
         ParseAnnotation.parse(pulsarListenerAnnotation);
-        for (PulsarConsumerConfig pulsarConsumerConfig : ParseAnnotation.pulsarConsumerConfigs) {
-            pulsarConsumerConfigRegistrar.setConsumerContainer(pulsarConsumerConfig);
+        for (ConsumerConfigurationData consumerConfigurationData : ParseAnnotation.CONSUMER_CONFIGURATION_DATA) {
+            pulsarConsumerConfigRegister.setConsumerContainer(consumerConfigurationData);
         }
         when(client.getPulsarClient()).thenReturn(pulsarClient);
 
         Schema fooSchema = Schema.AVRO(Foo.class);
-        PulsarConsumerContainer pulsarConsumerContainer = pulsarConsumerConfigRegistrar
+        PulsarConsumerContainer pulsarConsumerContainer = pulsarConsumerConfigRegister
                 .getConsumerContainer("test-container");
         pulsarConsumerContainer.getPulsarConsumer().setSchema(fooSchema);
         when(pulsarClient.newConsumer(fooSchema)).thenReturn(consumerBuilder);
@@ -130,9 +130,9 @@ public class PulsarConsumerContainerTest {
         foo.field3 = 4;
         testMessage.setValue(foo);
         when(consumer.receive()).thenReturn(testMessage);
-        pulsarConsumerConfigRegistrar.afterPropertiesSet();
+        pulsarConsumerConfigRegister.afterPropertiesSet();
         Thread.sleep(10);
-        pulsarConsumerConfigRegistrar.stopAllContainers();
+        pulsarConsumerConfigRegister.stopAllContainers();
         verify(consumer, atLeast(1)).receive();
         verify(consumer, atLeast(1)).acknowledge(testMessage);
     }

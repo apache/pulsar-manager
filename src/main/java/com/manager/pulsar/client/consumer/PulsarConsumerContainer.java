@@ -15,7 +15,7 @@ package com.manager.pulsar.client.consumer;
 
 import com.google.common.base.Preconditions;
 import com.manager.pulsar.client.Client;
-import com.manager.pulsar.client.config.PulsarConsumerConfig;
+import com.manager.pulsar.client.config.ConsumerConfigurationData;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.PulsarClientException;
@@ -36,14 +36,14 @@ public class PulsarConsumerContainer implements SmartLifecycle {
 
     private final Client client;
 
-    private final PulsarConsumerConfig pulsarConsumerConfig;
+    private final ConsumerConfigurationData consumerConfigurationData;
 
     private final ListenerConsumer listenerConsumer;
 
-    public PulsarConsumerContainer(Client client, PulsarConsumerConfig pulsarConsumerConfig) {
+    public PulsarConsumerContainer(Client client, ConsumerConfigurationData consumerConfigurationData) {
         this.client = client;
-        this.pulsarConsumerConfig = pulsarConsumerConfig;
-        this.listenerConsumer = new ListenerConsumer(this.client, this.pulsarConsumerConfig);
+        this.consumerConfigurationData = consumerConfigurationData;
+        this.listenerConsumer = new ListenerConsumer(this.client, this.consumerConfigurationData);
     }
 
     @Override
@@ -100,8 +100,8 @@ public class PulsarConsumerContainer implements SmartLifecycle {
 
         private final PulsarConsumer pulsarConsumer;
 
-        ListenerConsumer(Client client, PulsarConsumerConfig pulsarConsumerConfig) {
-            pulsarConsumer = new PulsarConsumer(client, pulsarConsumerConfig);
+        ListenerConsumer(Client client, ConsumerConfigurationData consumerConfigurationData) {
+            pulsarConsumer = new PulsarConsumer(client, consumerConfigurationData);
         }
 
         public PulsarConsumer getPulsarConsumer() {
@@ -126,8 +126,8 @@ public class PulsarConsumerContainer implements SmartLifecycle {
                     try {
                         Message msg = consumer.receive();
                         try {
-                            pulsarConsumerConfig.getMethod().invoke(pulsarConsumerConfig.getBean(), msg);
-                            consumer.acknowledge(msg);
+                            consumerConfigurationData.getMethod().invoke(consumerConfigurationData.getBean(), msg);
+                            consumer.acknowledgeAsync(msg);
                         } catch (Exception e) {
                             consumer.negativeAcknowledge(msg);
                             log.warn("Message handle failed: {}, redeliver later", msg.toString());
@@ -137,8 +137,8 @@ public class PulsarConsumerContainer implements SmartLifecycle {
                     }
                 }
             } catch (PulsarClientException e) {
-                log.error("Init consumer failed, use client=>{} and configuration=>{}",
-                        client.toString(), pulsarConsumerConfig.toString());
+                log.error("Init consumer failed, exception: {}, use client=>{} and configuration=>{}",
+                        e.getMessage(), client.toString(), consumerConfigurationData.toString());
             }
         }
     }

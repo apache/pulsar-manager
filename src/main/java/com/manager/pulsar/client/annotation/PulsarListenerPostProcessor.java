@@ -15,8 +15,8 @@ package com.manager.pulsar.client.annotation;
 
 import com.manager.pulsar.client.PulsarApplicationListener;
 import com.manager.pulsar.client.config.PulsarBootstrapConfiguration;
-import com.manager.pulsar.client.config.PulsarConsumerConfig;
-import com.manager.pulsar.client.config.PulsarConsumerConfigRegistrar;
+import com.manager.pulsar.client.config.ConsumerConfigurationData;
+import com.manager.pulsar.client.config.PulsarConsumerConfigRegister;
 import com.manager.pulsar.client.consumer.PulsarConsumerContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class PulsarListenerPostProcessor implements BeanPostProcessor, BeanFacto
 
     private BeanFactory beanFactory;
 
-    private final PulsarConsumerConfigRegistrar pulsarConsumerConfigRegistrar = new PulsarConsumerConfigRegistrar();
+    private final PulsarConsumerConfigRegister pulsarConsumerConfigRegister = new PulsarConsumerConfigRegister();
 
     private final Set<Class<?>> nonAnnotatedClasses = Collections.newSetFromMap(
             new ConcurrentHashMap<>(64));
@@ -63,13 +63,13 @@ public class PulsarListenerPostProcessor implements BeanPostProcessor, BeanFacto
         if (beanFactory instanceof ConfigurableListableBeanFactory) {
             PulsarApplicationListener pulsarApplicationListener = this.beanFactory.getBean(
                     PulsarBootstrapConfiguration.PULSAR_APPLICATION_LISTENER, PulsarApplicationListener.class);
-            this.pulsarConsumerConfigRegistrar.setPulsarApplicationListener(pulsarApplicationListener);
+            this.pulsarConsumerConfigRegister.setPulsarApplicationListener(pulsarApplicationListener);
         }
     }
 
     @Override
     public void afterSingletonsInstantiated() {
-        this.pulsarConsumerConfigRegistrar.afterPropertiesSet();
+        this.pulsarConsumerConfigRegister.afterPropertiesSet();
     }
 
     @Override
@@ -112,34 +112,34 @@ public class PulsarListenerPostProcessor implements BeanPostProcessor, BeanFacto
     }
 
     private void processPulsarListener(PulsarListener pulsarListener, Method method, Object bean, String beanName) {
-        PulsarConsumerConfig pulsarConsumerConfig = new PulsarConsumerConfig();
+        ConsumerConfigurationData consumerConfigurationData = new ConsumerConfigurationData();
         if (pulsarListener.id().length() > 0) {
-            pulsarConsumerConfig.setId(pulsarListener.id());
+            consumerConfigurationData.setId(pulsarListener.id());
         } else {
-            pulsarConsumerConfig.setId(PREFIX_ID + this.counter.getAndIncrement());
+            consumerConfigurationData.setId(PREFIX_ID + this.counter.getAndIncrement());
         }
-        pulsarConsumerConfig.setTopic(pulsarListener.topic());
-        pulsarConsumerConfig.setSubscriptionName(pulsarListener.subscriptionName());
-        pulsarConsumerConfig.setSubscriptionType(pulsarListener.subscriptionType());
-        pulsarConsumerConfig.setAckTimeout(pulsarListener.ackTimeout());
-        pulsarConsumerConfig.setAcknowledgmentGroupTime(pulsarListener.acknowledgmentGroupTime());
-        pulsarConsumerConfig.setNegativeAckRedeliveryDelay(pulsarListener.negativeAckRedeliveryDelay());
-        pulsarConsumerConfig.setReceiverQueueSize(pulsarListener.receiverQueueSize());
-        pulsarConsumerConfig.setAcknowledgmentGroupTime(pulsarListener.acknowledgmentGroupTime());
-        pulsarConsumerConfig.setTopics(pulsarListener.topics());
-        pulsarConsumerConfig.setTopicsPattern(pulsarListener.topicsPattern());
-        pulsarConsumerConfig.setAutoUpdatePartitions(pulsarListener.autoUpdatePartitions());
-        pulsarConsumerConfig.setConsumerName(pulsarListener.consumerName());
-        pulsarConsumerConfig.setRegexSubscriptionMode(pulsarListener.regexSubscriptionMode());
-        pulsarConsumerConfig.setMethod(method);
-        pulsarConsumerConfig.setBean(bean);
-        pulsarConsumerConfig.setSchema(pulsarListener.schema());
-        pulsarConsumerConfig.setSchemaType(pulsarListener.schemaType());
-        log.info("Initialization configured to {} use configuration {}", beanName, pulsarConsumerConfig.toString());
-        this.pulsarConsumerConfigRegistrar.setConsumerContainer(pulsarConsumerConfig);
+        consumerConfigurationData.setSubscriptionName(pulsarListener.subscriptionName());
+        consumerConfigurationData.setSubscriptionType(pulsarListener.subscriptionType());
+        consumerConfigurationData.setAckTimeout(pulsarListener.ackTimeout());
+        consumerConfigurationData.setAcknowledgmentGroupTime(pulsarListener.acknowledgmentGroupTime());
+        consumerConfigurationData.setNegativeAckRedeliveryDelay(pulsarListener.negativeAckRedeliveryDelay());
+        consumerConfigurationData.setReceiverQueueSize(pulsarListener.receiverQueueSize());
+        consumerConfigurationData.setAcknowledgmentGroupTime(pulsarListener.acknowledgmentGroupTime());
+        consumerConfigurationData.setTopics(pulsarListener.topics());
+        consumerConfigurationData.setPriorityLevel(pulsarListener.priorityLevel());
+        consumerConfigurationData.setTopicsPattern(pulsarListener.topicsPattern());
+        consumerConfigurationData.setAutoUpdatePartitions(pulsarListener.autoUpdatePartitions());
+        consumerConfigurationData.setConsumerName(pulsarListener.consumerName());
+        consumerConfigurationData.setRegexSubscriptionMode(pulsarListener.regexSubscriptionMode());
+        consumerConfigurationData.setMethod(method);
+        consumerConfigurationData.setBean(bean);
+        consumerConfigurationData.setSchema(pulsarListener.schema());
+        consumerConfigurationData.setSchemaType(pulsarListener.schemaType());
+        log.info("Initialization configured to {} use configuration {}", beanName, consumerConfigurationData.toString());
+        this.pulsarConsumerConfigRegister.setConsumerContainer(consumerConfigurationData);
     }
 
     public PulsarConsumerContainer getPulsarConsumerContainer(String id) {
-        return this.pulsarConsumerConfigRegistrar.getConsumerContainer(id);
+        return this.pulsarConsumerConfigRegister.getConsumerContainer(id);
     }
 }

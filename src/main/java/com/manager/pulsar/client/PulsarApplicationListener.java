@@ -13,7 +13,7 @@
  */
 package com.manager.pulsar.client;
 
-import com.manager.pulsar.client.config.PulsarClientConfig;
+import com.manager.pulsar.client.config.ClientConfigurationData;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,58 +38,58 @@ public class PulsarApplicationListener implements ApplicationContextAware, Appli
 
     private Client client;
 
-    private PulsarClientConfig pulsarClientConfig;
+    private ClientConfigurationData clientConfigurationData;
 
     @Value("${pulsar.client.serviceUrl}")
     private String pulsarServiceUrl;
 
-    @Value("${pulsar.client.operationTimeout:0}")
-    private int operationTimeout;
+    @Value("${pulsar.client.operationTimeout:30000}")
+    private Integer operationTimeout;
 
-    @Value("${pulsar.client.ioThreads:0}")
-    private int ioThreads;
+    @Value("${pulsar.client.ioThreads:1}")
+    private Integer ioThreads;
 
-    @Value("${pulsar.client.listenerThreads:0}")
-    private int listenerThreads;
+    @Value("${pulsar.client.listenerThreads:1}")
+    private Integer listenerThreads;
 
-    @Value("${pulsar.client.connectionsPerBroker:0}")
-    private int connectionsPerBroker;
+    @Value("${pulsar.client.connectionsPerBroker:1}")
+    private Integer connectionsPerBroker;
 
     @Value("${pulsar.client.enableTcpNoDelay:false}")
-    private boolean enableTcpNoDelay;
+    private Boolean enableTcpNoDelay;
 
     @Value("${pulsar.client.tlsTrustCertsFilePath:}")
     private String tlsTrustCertsFilePath;
 
     @Value("${pulsar.client.allowTlsInsecureConnection:false}")
-    private boolean allowTlsInsecureConnection;
+    private Boolean allowTlsInsecureConnection;
 
     @Value("${pulsar.client.enableTlsHostnameVerification:false}")
-    private boolean enableTlsHostnameVerification;
+    private Boolean enableTlsHostnameVerification;
 
-    @Value("${pulsar.client.statsInterval:0}")
-    private long statsInterval;
+    @Value("${pulsar.client.statsInterval:60}")
+    private Long statsInterval;
 
-    @Value("${pulsar.client.maxConcurrentLookupRequests:0}")
-    private int maxConcurrentLookupRequests;
+    @Value("${pulsar.client.maxConcurrentLookupRequests:5000}")
+    private Integer maxConcurrentLookupRequests;
 
-    @Value("${pulsar.client.maxLookupRequests:0}")
-    private int maxLookupRequests;
+    @Value("${pulsar.client.maxLookupRequests:50000}")
+    private Integer maxLookupRequests;
 
-    @Value("${pulsar.client.maxNumberOfRejectedRequestPerConnection:0}")
-    private int maxNumberOfRejectedRequestPerConnection;
+    @Value("${pulsar.client.maxNumberOfRejectedRequestPerConnection:50}")
+    private Integer maxNumberOfRejectedRequestPerConnection;
 
-    @Value("${pulsar.client.keepAliveInterval:0}")
-    private int keepAliveInterval;
+    @Value("${pulsar.client.keepAliveInterval:30}")
+    private Integer keepAliveInterval;
 
-    @Value("${pulsar.client.connectionTimeout:0}")
-    private int connectionTimeout;
+    @Value("${pulsar.client.connectionTimeout:100000}")
+    private Integer connectionTimeout;
 
-    @Value("${pulsar.client.startingBackoffInterval:0}")
-    private int startingBackoffInterval;
+    @Value("${pulsar.client.startingBackoffInterval:100}")
+    private Integer startingBackoffInterval;
 
-    @Value("${pulsar.client.maxBackoffInterval:0}")
-    private int maxBackoffInterval;
+    @Value("${pulsar.client.maxBackoffInterval:30}")
+    private Integer maxBackoffInterval;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -104,34 +104,40 @@ public class PulsarApplicationListener implements ApplicationContextAware, Appli
     }
 
     private void initPulsarClientConfig() {
-        pulsarClientConfig.setServiceUrl(pulsarServiceUrl);
-        pulsarClientConfig.setAllowTlsInsecureConnection(allowTlsInsecureConnection);
-        pulsarClientConfig.setEnableTcpNoDelay(enableTcpNoDelay);
-        pulsarClientConfig.setIoThreads(ioThreads);
-        pulsarClientConfig.setConnectionTimeout(connectionTimeout);
-        pulsarClientConfig.setEnableTcpNoDelay(enableTcpNoDelay);
-        pulsarClientConfig.setTlsTrustCertsFilePath(tlsTrustCertsFilePath);
-        pulsarClientConfig.setEnableTlsHostnameVerification(enableTlsHostnameVerification);
-        pulsarClientConfig.setStatsInterval(statsInterval);
-        pulsarClientConfig.setMaxConcurrentLookupRequests(maxConcurrentLookupRequests);
-        pulsarClientConfig.setMaxLookupRequests(maxLookupRequests);
-        pulsarClientConfig.setMaxNumberOfRejectedRequestPerConnection(maxNumberOfRejectedRequestPerConnection);
-        pulsarClientConfig.setKeepAliveInterval(keepAliveInterval);
-        pulsarClientConfig.setStartingBackoffInterval(startingBackoffInterval);
-        pulsarClientConfig.setMaxBackoffInterval(maxBackoffInterval);
+        clientConfigurationData.setServiceUrl(pulsarServiceUrl);
+        clientConfigurationData.setOperationTimeout(operationTimeout);
+        clientConfigurationData.setAllowTlsInsecureConnection(allowTlsInsecureConnection);
+        clientConfigurationData.setEnableTcpNoDelay(enableTcpNoDelay);
+        clientConfigurationData.setIoThreads(ioThreads);
+        clientConfigurationData.setListenerThreads(listenerThreads);
+        clientConfigurationData.setConnectionTimeout(connectionTimeout);
+        clientConfigurationData.setEnableTcpNoDelay(enableTcpNoDelay);
+        if (tlsTrustCertsFilePath != null && tlsTrustCertsFilePath.length() > 0) {
+            clientConfigurationData.setTlsTrustCertsFilePath(tlsTrustCertsFilePath);
+        }
+        clientConfigurationData.setEnableTlsHostnameVerification(enableTlsHostnameVerification);
+        clientConfigurationData.setStatsInterval(statsInterval);
+        clientConfigurationData.setMaxConcurrentLookupRequests(maxConcurrentLookupRequests);
+        clientConfigurationData.setMaxLookupRequests(maxLookupRequests);
+        clientConfigurationData.setMaxNumberOfRejectedRequestPerConnection(maxNumberOfRejectedRequestPerConnection);
+        clientConfigurationData.setKeepAliveInterval(keepAliveInterval);
+        clientConfigurationData.setStartingBackoffInterval(startingBackoffInterval);
+        clientConfigurationData.setMaxBackoffInterval(maxBackoffInterval);
     }
 
     public Client getClient() {
         if (client == null) {
-            pulsarClientConfig = new PulsarClientConfig();
+            clientConfigurationData = new ClientConfigurationData();
             this.initPulsarClientConfig();
             try {
-                client = new Client(pulsarClientConfig);
+                client = new Client(clientConfigurationData);
                 log.info("Init Pulsar Client success use configuration: {}", client.toString());
             } catch (PulsarClientException e) {
                 log.error("Init Pulsar Client failed throws PulsarClientException, error: {}", e.getMessage());
+                throw new RuntimeException("Init Pulsar Client failed.", e);
             } catch (Exception e) {
                 log.error("Init Pulsar Client failed because unknown error: {}", e.getMessage());
+                throw new RuntimeException("Init Pulsar Client failed because unknown error.", e);
             }
         }
         return client;

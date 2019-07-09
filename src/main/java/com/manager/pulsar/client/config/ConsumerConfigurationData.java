@@ -28,25 +28,23 @@ import java.lang.reflect.Method;
 @Getter
 @Setter
 @ToString
-public class PulsarConsumerConfig {
+public class ConsumerConfigurationData {
 
     private String id;
-
-    private String topic;
 
     private String[] topics;
 
     private String topicsPattern;
 
-    private long ackTimeout;
+    private Long ackTimeout;
 
-    private long negativeAckRedeliveryDelay;
+    private Long negativeAckRedeliveryDelay;
 
-    private int receiverQueueSize;
+    private Integer receiverQueueSize;
 
-    private long acknowledgmentGroupTime;
+    private Long acknowledgmentGroupTime;
 
-    private int priorityLevel;
+    private Integer priorityLevel;
 
     private Method method;
 
@@ -60,7 +58,7 @@ public class PulsarConsumerConfig {
 
     private SubscriptionType subscriptionType;
 
-    private boolean autoUpdatePartitions;
+    private Boolean autoUpdatePartitions;
 
     private String consumerName;
 
