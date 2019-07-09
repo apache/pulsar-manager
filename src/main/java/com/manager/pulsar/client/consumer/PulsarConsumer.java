@@ -118,7 +118,7 @@ public class PulsarConsumer implements AutoCloseable {
             List<String> topics = Arrays.asList(consumerConfigurationData.getTopics());
             topics.forEach((topic) -> {
                 Preconditions.checkArgument(topic.length() > 0 ,
-                        "Length of topic should be greater than 0");
+                        "Length of topic should be greater than 10");
             });
             consumerBuilder.topics(topics);
         }
