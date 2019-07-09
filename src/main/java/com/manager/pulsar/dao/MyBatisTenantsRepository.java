@@ -13,6 +13,8 @@
  */
 package com.manager.pulsar.dao;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.manager.pulsar.entity.TenantsRepository;
 import com.manager.pulsar.entity.TenantsEntity;
 import com.manager.pulsar.mapper.TenantsMapper;
@@ -29,23 +31,41 @@ public class MyBatisTenantsRepository implements TenantsRepository {
     public MyBatisTenantsRepository(TenantsMapper tenantsMapper) { this.tenantsMapper = tenantsMapper; }
 
     @Override
-    public Optional<TenantsEntity> findById(Integer id) {
-      return Optional.ofNullable(tenantsMapper.findById(id));
+    public Optional<TenantsEntity> findById(int tenantId) {
+        return Optional.ofNullable(tenantsMapper.findById(tenantId));
     }
 
     @Override
-    public Optional<TenantsEntity> findByName(String tenantName) {
-        return Optional.ofNullable(tenantsMapper.findByName(tenantName));
+    public Optional<TenantsEntity> findByName(String tenant) {
+        return Optional.ofNullable(tenantsMapper.findByName(tenant));
     }
 
     @Override
-    public Integer save(TenantsEntity tenantsEntity) {
+    public Page<TenantsEntity> getTenantsList(Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        Page<TenantsEntity> tenantsEntities = tenantsMapper.getTenantsList();
+        return tenantsEntities;
+    }
+
+    @Override
+    public int save(TenantsEntity tenantsEntity) {
         tenantsMapper.insert(tenantsEntity);
         return tenantsEntity.getTenantId();
     }
 
+
     @Override
-    public void remove(TenantsEntity tenantsEntity) {
-        tenantsMapper.delete(tenantsEntity);
+    public void remove(Integer tenantId) {
+        tenantsMapper.delete(tenantId);
+    }
+
+    @Override
+    public void removeByTenant(String tenant) {
+        tenantsMapper.deleteByTenant(tenant);
+    }
+
+    @Override
+    public void updateByTenant(String tenant) {
+        tenantsMapper.updateByTenant(tenant);
     }
 }
