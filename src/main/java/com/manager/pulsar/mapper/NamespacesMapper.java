@@ -92,7 +92,7 @@ public interface NamespacesMapper {
     Page<NamespacesEntity> getNamespacesList();
 
     @Delete("DELETE FROM namespaces WHERE namespaceId = #{namespaceId}")
-    void delete(NamespacesEntity namespacesEntity);
+    void deleteByNamespaceId(Integer namespaceId);
 
     @Update("UPDATE namespaces set authPolicies=#{authPolicies},backlogQuota=#{backlogQuota}," +
             "replicationClusters=#{replicationClusters}," +
@@ -114,5 +114,5 @@ public interface NamespacesMapper {
     void updateByTenantNamespace(NamespacesEntity namespacesEntity);
 
     @Delete("DELETE FROM namespaces WHERE tenant = #{tenant} and namespace = #{namespace}")
-    void deleteByTenantNamespace(NamespacesEntity namespacesEntity);
+    void deleteByTenantNamespace(@Param("tenant") String tenant, @Param("namespace") String namespace);
 }

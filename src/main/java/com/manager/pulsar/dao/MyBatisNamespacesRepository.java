@@ -65,8 +65,8 @@ public class MyBatisNamespacesRepository implements NamespacesRepository {
     }
 
     @Override
-    public void remove(NamespacesEntity namespacesEntity) {
-        namespacesMapper.delete(namespacesEntity);
+    public void remove(String tenant, String namespace) {
+        namespacesMapper.deleteByTenantNamespace(tenant, namespace);
     }
 
     @Override

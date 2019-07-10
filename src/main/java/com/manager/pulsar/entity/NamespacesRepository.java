@@ -33,7 +33,7 @@ public interface NamespacesRepository {
 
     Page<NamespacesEntity> getNamespacesList(Integer pageNum, Integer pageSize);
 
-    void remove(NamespacesEntity namespacesEntity);
+    void remove(String tenant, String namespace);
 
     void update(NamespacesEntity namespacesEntity);
 }
