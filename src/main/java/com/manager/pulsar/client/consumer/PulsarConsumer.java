@@ -23,6 +23,8 @@ import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.apache.pulsar.common.schema.SchemaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,8 @@ import java.util.concurrent.TimeUnit;
  * Pulsar Consumer initialization.
  */
 public class PulsarConsumer implements AutoCloseable {
+
+    private static final Logger log = LoggerFactory.getLogger(PulsarConsumer.class);
 
     private final Client client;
 
@@ -46,17 +50,28 @@ public class PulsarConsumer implements AutoCloseable {
         this.client = client;
     }
 
-    public Consumer getConsumer() throws PulsarClientException {
+    public Consumer getConsumer() {
         if (consumer != null) {
             return consumer;
         }
-        PulsarClient pulsarClient = client.getPulsarClient();
-        if (schema == null) {
-            schema = initSchema(consumerConfigurationData.getSchemaType(), consumerConfigurationData.getSchema());
+        try {
+            PulsarClient pulsarClient = client.getPulsarClient();
+            if (schema == null) {
+                schema = initSchema(consumerConfigurationData.getSchemaType(), consumerConfigurationData.getSchema());
+            }
+            ConsumerBuilder consumerBuilder = pulsarClient.newConsumer(schema);
+            initConsumerConfig(consumerBuilder);
+            consumer = consumerBuilder.subscribe();
+            log.info("Init pulsar client and pulsar consumer success use client configuration: {}," +
+                    "consumer configuration: {}", client.toString(), consumerConfigurationData.toString());
+        } catch (PulsarClientException e) {
+            log.error("Init pulsar client and consumer failed throws PulsarClientException, error: {}", e.getMessage());
+            throw new RuntimeException("Init Pulsar Client failed.", e);
+        } catch (Exception e) {
+            log.error("Init client and consumer failed, exception: {}, use client=>{} and configuration=>{}",
+                    e.getMessage(), client.toString(), consumerConfigurationData.toString());
+            throw new RuntimeException("Init Pulsar client failed because unknown error.", e);
         }
-        ConsumerBuilder consumerBuilder = pulsarClient.newConsumer(schema);
-        initConsumerConfig(consumerBuilder);
-        consumer = consumerBuilder.subscribe();
         return consumer;
     }
 

@@ -55,7 +55,7 @@ public class ClientConfigurationData {
 
     private Integer connectionTimeout;
 
-    private Integer startingBackoffInterval;
+    private Long startingBackoffInterval;
 
-    private Integer maxBackoffInterval;
+    private Long maxBackoffInterval;
 }

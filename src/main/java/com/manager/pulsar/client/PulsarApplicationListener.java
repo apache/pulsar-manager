@@ -86,10 +86,10 @@ public class PulsarApplicationListener implements ApplicationContextAware, Appli
     private Integer connectionTimeout;
 
     @Value("${pulsar.client.startingBackoffInterval:100}")
-    private Integer startingBackoffInterval;
+    private Long startingBackoffInterval;
 
     @Value("${pulsar.client.maxBackoffInterval:30}")
-    private Integer maxBackoffInterval;
+    private Long maxBackoffInterval;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -129,16 +129,7 @@ public class PulsarApplicationListener implements ApplicationContextAware, Appli
         if (client == null) {
             clientConfigurationData = new ClientConfigurationData();
             this.initPulsarClientConfig();
-            try {
-                client = new Client(clientConfigurationData);
-                log.info("Init Pulsar Client success use configuration: {}", client.toString());
-            } catch (PulsarClientException e) {
-                log.error("Init Pulsar Client failed throws PulsarClientException, error: {}", e.getMessage());
-                throw new RuntimeException("Init Pulsar Client failed.", e);
-            } catch (Exception e) {
-                log.error("Init Pulsar Client failed because unknown error: {}", e.getMessage());
-                throw new RuntimeException("Init Pulsar Client failed because unknown error.", e);
-            }
+            client = new Client(clientConfigurationData);
         }
         return client;
     }

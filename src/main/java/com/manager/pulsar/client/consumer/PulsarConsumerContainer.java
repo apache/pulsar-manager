@@ -119,26 +119,21 @@ public class PulsarConsumerContainer implements SmartLifecycle {
 
         @Override
         public void run() {
-            try {
-                Consumer consumer = pulsarConsumer.getConsumer();
-                Preconditions.checkNotNull(consumer, "Consumer is null, this is not allowed");
-                while (isRunning()) {
+            Consumer consumer = pulsarConsumer.getConsumer();
+            Preconditions.checkNotNull(consumer, "Consumer is null, this is not allowed");
+            while (isRunning()) {
+                try {
+                    Message msg = consumer.receive();
                     try {
-                        Message msg = consumer.receive();
-                        try {
-                            consumerConfigurationData.getMethod().invoke(consumerConfigurationData.getBean(), msg);
-                            consumer.acknowledgeAsync(msg);
-                        } catch (Exception e) {
-                            consumer.negativeAcknowledge(msg);
-                            log.warn("Message handle failed: {}, redeliver later", msg.toString());
-                        }
-                    } catch (PulsarClientException e) {
-                        log.error("Received message has a error: {}", e.getMessage());
+                        consumerConfigurationData.getMethod().invoke(consumerConfigurationData.getBean(), msg);
+                        consumer.acknowledgeAsync(msg);
+                    } catch (Exception e) {
+                        consumer.negativeAcknowledge(msg);
+                        log.warn("Message handle failed: {}, redeliver later", msg.toString());
                     }
+                } catch (PulsarClientException e) {
+                    log.error("Received message has a error: {}", e.getMessage());
                 }
-            } catch (PulsarClientException e) {
-                log.error("Init consumer failed, exception: {}, use client=>{} and configuration=>{}",
-                        e.getMessage(), client.toString(), consumerConfigurationData.toString());
             }
         }
     }

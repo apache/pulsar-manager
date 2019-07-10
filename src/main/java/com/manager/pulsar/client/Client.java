@@ -27,24 +27,26 @@ import java.util.concurrent.TimeUnit;
  */
 public class Client implements AutoCloseable {
 
-    private final PulsarClient pulsarClient;
+    private PulsarClient pulsarClient;
 
     private final ClientConfigurationData clientConfigurationData;
 
-    public Client(ClientConfigurationData clientConfigurationData) throws PulsarClientException {
+    public Client(ClientConfigurationData clientConfigurationData) {
         this.clientConfigurationData = clientConfigurationData;
-        ClientBuilder clientBuilder = PulsarClient.builder();
-        checkAndInitClientConfig(clientBuilder);
-        pulsarClient = clientBuilder.build();
     }
 
-    public PulsarClient getPulsarClient() {
+    public PulsarClient getPulsarClient() throws PulsarClientException {
+        if (pulsarClient == null) {
+            ClientBuilder clientBuilder = PulsarClient.builder();
+            checkAndInitClientConfig(clientBuilder);
+            pulsarClient = clientBuilder.build();
+        }
         return pulsarClient;
     }
 
-    private void checkAndInitClientConfig(ClientBuilder clientBuilder) {
+    public void checkAndInitClientConfig(ClientBuilder clientBuilder) {
         Preconditions.checkArgument(clientConfigurationData.getServiceUrl() != null
-                && clientConfigurationData.getServiceUrl().startsWith("pulsar"));
+                && clientConfigurationData.getServiceUrl().startsWith("pulsar"), "Serviceurl is incorrect");
         clientBuilder.serviceUrl(clientConfigurationData.getServiceUrl());
         if (clientConfigurationData.getOperationTimeout() != null) {
             Preconditions.checkArgument(clientConfigurationData.getOperationTimeout() > 0,
@@ -88,7 +90,7 @@ public class Client implements AutoCloseable {
         if (clientConfigurationData.getMaxConcurrentLookupRequests() != null) {
             Preconditions.checkArgument(clientConfigurationData.getMaxConcurrentLookupRequests() > 0,
                     "Parameter maxConcurrentLookupRequests should be greater than 0");
-            clientBuilder.maxConcurrentLookupRequests(clientConfigurationData.getMaxNumberOfRejectedRequestPerConnection());
+            clientBuilder.maxConcurrentLookupRequests(clientConfigurationData.getMaxConcurrentLookupRequests());
         }
         if (clientConfigurationData.getMaxLookupRequests() != null) {
             Preconditions.checkArgument(clientConfigurationData.getMaxLookupRequests() > 0,
@@ -117,7 +119,7 @@ public class Client implements AutoCloseable {
         }
         if (clientConfigurationData.getMaxBackoffInterval() != null) {
             Preconditions.checkArgument(clientConfigurationData.getMaxBackoffInterval() > 0,
-                    "Parameter startingBackoffInterval should be greater than 0");
+                    "Parameter maxBackoffInterval should be greater than 0");
             clientBuilder.maxBackoffInterval(clientConfigurationData.getMaxBackoffInterval(), TimeUnit.MILLISECONDS);
         }
     }
