@@ -35,32 +35,27 @@ import static org.mockito.Mockito.when;
 public class PulsarConsumerTest {
 
     @Test
-    public void testPulsarConsumer() throws PulsarClientException {
-        PulsarClient pulsarClient = mock(PulsarClient.class);
+    public void testPulsarConsumerInitConfig() {
         Client client = mock(Client.class);
         ConsumerBuilder consumerBuilder = mock(ConsumerBuilder.class);
 
         ConsumerConfigurationData consumerConfigurationData = new ConsumerConfigurationData();
-        consumerConfigurationData.setSchemaType(SchemaType.BYTES);
-        consumerConfigurationData.setSchema(null);
         PulsarConsumer pulsarConsumer = new PulsarConsumer(client, consumerConfigurationData);
 
-        when(client.getPulsarClient()).thenReturn(pulsarClient);
-        when(pulsarClient.newConsumer(Schema.BYTES)).thenReturn(consumerBuilder);
         when(consumerBuilder.subscriptionName(
                 consumerConfigurationData.getSubscriptionName())).thenReturn(consumerBuilder);
 
         // test subscription name is null
         consumerConfigurationData.setSubscriptionName(null);
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("The subscription name is incorrect", e.getMessage());
         }
         // test subscription name is ""
         consumerConfigurationData.setSubscriptionName("");
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("The subscription name is incorrect", e.getMessage());
         }
@@ -70,7 +65,7 @@ public class PulsarConsumerTest {
         // test subscriptiontype is null
         consumerConfigurationData.setSubscriptionType(null);
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("The subscription type should be set correctly." +
                     "Exclusive, Failover, Shared and Key_Shared are currently supported.", e.getMessage());
@@ -82,7 +77,7 @@ public class PulsarConsumerTest {
         String[] testNullTopics = {null};
         consumerConfigurationData.setTopics(testNullTopics);
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Length of topic should be greater than 0", e.getMessage());
         }
@@ -90,7 +85,7 @@ public class PulsarConsumerTest {
         String[] testEmptyTopics = {""};
         consumerConfigurationData.setTopics(testEmptyTopics);
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Length of topic should be greater than 0", e.getMessage());
         }
@@ -101,14 +96,14 @@ public class PulsarConsumerTest {
 
         consumerConfigurationData.setAckTimeout(-1L);
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Parameter ackTimeout cannot be less than 10s", e.getMessage());
         }
 
         consumerConfigurationData.setAckTimeout(0L);
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Parameter ackTimeout cannot be less than 10s", e.getMessage());
         }
@@ -118,7 +113,7 @@ public class PulsarConsumerTest {
 
         consumerConfigurationData.setReceiverQueueSize(-1);
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Parameter receiverQueueSize should be greater than 0", e.getMessage());
         }
@@ -129,7 +124,7 @@ public class PulsarConsumerTest {
         consumerConfigurationData.setAcknowledgmentGroupTime(-1L);
 
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Parameter acknowledgmentGroupTime cannot be less than 0", e.getMessage());
         }
@@ -143,7 +138,7 @@ public class PulsarConsumerTest {
         consumerConfigurationData.setNegativeAckRedeliveryDelay(-1L);
 
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Parameter negativeAckRedeliveryDelay cannot be less than 0", e.getMessage());
         }
@@ -154,7 +149,7 @@ public class PulsarConsumerTest {
         consumerConfigurationData.setPriorityLevel(-1);
 
         try {
-            pulsarConsumer.getConsumer();
+            pulsarConsumer.initConsumerConfig(consumerBuilder);
         } catch (IllegalArgumentException e) {
             Assert.assertEquals("Parameter priorityLevel cannot be less than 0", e.getMessage());
         }
@@ -164,7 +159,7 @@ public class PulsarConsumerTest {
         when(consumerBuilder.subscriptionTopicsMode(
                 consumerConfigurationData.getRegexSubscriptionMode())).thenReturn(consumerBuilder);
 
-        pulsarConsumer.getConsumer();
+        pulsarConsumer.initConsumerConfig(consumerBuilder);
         verify(consumerBuilder, atLeast(1))
                 .subscriptionName(consumerConfigurationData.getSubscriptionName());
         verify(consumerBuilder, atLeast(1))

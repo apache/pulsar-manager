@@ -121,7 +121,7 @@ public class PulsarConsumer implements AutoCloseable {
         }
     }
 
-    private void initConsumerConfig(ConsumerBuilder consumerBuilder) {
+    public void initConsumerConfig(ConsumerBuilder consumerBuilder) {
         Preconditions.checkArgument(consumerConfigurationData.getSubscriptionName() != null
                 && consumerConfigurationData.getSubscriptionName().length() > 0,
                 "The subscription name is incorrect");
