@@ -16,15 +16,20 @@ package com.manager.pulsar.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class TenantsEntity {
-  private Integer tenantId;
-  private String tenantName;
+  private int tenantId;
+  private String tenant;
+  private String adminRoles;
+  private String allowedClusters;
 
-  public TenantsEntity(String tenantName) {
-    this.tenantName = tenantName;
+  public TenantsEntity(String tenant, String adminRoles, String allowedClusters) {
+    this.tenant = tenant;
+    this.adminRoles = adminRoles;
+    this.allowedClusters = allowedClusters;
   }
 }
-
