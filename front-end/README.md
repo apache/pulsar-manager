@@ -2,7 +2,16 @@
 
 The admin UI is based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
 
+## Compatibility
+
+The pulsar-manager is tested with Chrome browser.
+
 ## Build
+
+### Requirements
+
+* Node 10.15 or later
+* Npm 6.4 or later
 
 ### Installation
 
@@ -14,7 +23,10 @@ git clone https://github.com/streamnative/pulsar-manager
 cd pulsar-manger/front-end
 
 # install app's dependencies
-$ npm install
+$ npm install --save
+
+# install application dependencies for development
+$ npm install --save-dev
 
 ```
 
