@@ -109,8 +109,6 @@ public class MyBatisNamespacesRepositoryTest {
         namespacesEntityPage.count(true);
         checkResult(namespacesEntityPage);
         namespacesEntityPage.getResult().forEach((result) -> {
-            System.out.println(result.getTenant());
-            System.out.println(result.getNamespace());
             namespacesRepository.remove(result.getTenant(), result.getNamespace());
         });
         Page<NamespacesEntity> deleteNamespace = namespacesRepository.getNamespacesList(1, 2);

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS tenants (
   adminRoles TEXT,
   allowedClusters TEXT
 );
+CREATE INDEX IF NOT EXISTS index_tenant ON tenants(tenant);
 
 CREATE TABLE IF NOT EXISTS namespaces (
   namespaceId INTEGER PRIMARY KEY autoincrement,
@@ -53,5 +54,8 @@ CREATE TABLE IF NOT EXISTS namespaces (
   offloadThreshold int,
   offloadDeletionLagMs INTEGER,
   schemaValidationEnforced false,
-  schemaAutoApdateCompatibilityStrategy VARCHAR(36)
-)
+  schemaAutoApdateCompatibilityStrategy VARCHAR(36),
+  UNIQUE (tenant,namespace)
+);
+CREATE INDEX IF NOT EXISTS index_tenant_namespace ON namespaces(tenant, namespace);
+CREATE INDEX IF NOT EXISTS index_namespace ON namespaces(namespace);
