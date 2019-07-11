@@ -18,3 +18,69 @@ CREATE TABLE IF NOT EXISTS tenants (
   adminRoles TEXT,
   allowedClusters TEXT
 );
+
+CREATE TABLE IF NOT EXISTS brokers (
+  brokerId INTEGER PRIMARY KEY AUTOINCREMENT,
+  broker varchar(1024) NOT NULL,
+  webServiceUrl varchar(1024),
+  webServiceUrlTls varchar(1024),
+  pulsarServiceUrl varchar(1024),
+  pulsarServiceUrlTls varchar(1024),
+  persistentTopicsEnabled true,
+  nonPersistentTopicsEnabled true,
+  cpuUsage double,
+  cpuLimit double,
+  memoryUsage double,
+  memoryLimit double,
+  directMemoryUsage double,
+  directMemoryLimit double,
+  bandwidthInUsage double,
+  bandwidthInLimit double,
+  bandwidthOutUsage double,
+  bandwidthOutLimit double,
+  msgThroughputIn double,
+  msgThroughputOut double,
+  msgRateIn double,
+  msgRateOut double,
+--   mysql use bigint
+  lastUpdate integer,
+  lastStats TEXT,
+  bundleStats TEXT,
+  numTopics integer,
+  numBundles integer,
+  numConsumers integer,
+  numProducers integer,
+  bundles TEXT,
+  lastBundleGains TEXT,
+  lastBundleLosses TEXT,
+  brokerVersionString varchar(36),
+  loadReportType varchar(36),
+  maxResourceUsage double,
+  UNIQUE (broker)
+);
+CREATE INDEX IF NOT EXISTS index_broker ON brokers(broker);
+
+CREATE TABLE IF NOT EXISTS bundles (
+  bundleId INTEGER PRIMARY KEY AUTOINCREMENT,
+  broker varchar(1024) NOT NULL,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL,
+  bundle varchar(1024) NOT NULL,
+  msgRateIn double,
+  msgThroughputIn double,
+  msgRateOut double,
+  msgThroughputOut double,
+  consumerCount integer,
+  producerCount integer,
+    --   mysql use bigint
+  topics integer,
+    --   mysql use bigint
+  cacheSize integer,
+  throughputDifferenceThreshold double,
+  msgRateDifferenceThreshold double,
+  topicConnectionDifferenceThreshold double,
+  cacheSizeDifferenceThreshold double,
+  UNIQUE (broker, tenant, namespace, bundle)
+);
+CREATE INDEX IF NOT EXISTS index_broker_tenant_namespace_bundle ON bundles(broker, tenant, namespace, bundle);
+CREATE INDEX IF NOT EXISTS index_bundle ON bundles(bundle);
