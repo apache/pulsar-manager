@@ -72,5 +72,7 @@ dependencies {
     compile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-client', version: pulsarVersion
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggeruiVersion
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 }

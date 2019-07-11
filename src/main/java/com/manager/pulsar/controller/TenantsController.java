@@ -14,26 +14,58 @@
 package com.manager.pulsar.controller;
 
 import com.github.pagehelper.Page;
+import com.google.common.collect.Maps;
 import com.manager.pulsar.entity.TenantsEntity;
 import com.manager.pulsar.entity.TenantsRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Min;
+import java.util.Map;
+
+/**
+ * Tenant Query class.
+ */
 @RestController
+@RequestMapping(value = "/pulsar-manager/admin/v2")
+@Api(description = "Support more flexible queries to tenants.")
+@Validated
 public class TenantsController {
 
   @Autowired
   private TenantsRepository tenantsRepository;
 
+  @ApiOperation(value = "Get the list of existing tenants, support paging, the default is 10 per page")
+  @ApiResponses({
+          @ApiResponse(code = 200, message = "ok"),
+          @ApiResponse(code = 404, message = "Not found"),
+          @ApiResponse(code = 500, message = "Internal server error")
+  })
   @RequestMapping(value = "/tenants", method =  RequestMethod.GET)
-  public Page<TenantsEntity> getTenants(
-          @RequestParam(name = "pageNum", defaultValue = "1")
+  public ResponseEntity<Map<String, Object>> getTenants(
+          @ApiParam(value = "page_num", defaultValue = "1", example = "1")
+          @RequestParam(name = "page_num", defaultValue = "1")
+          @Min(value = 1, message = "page_num is incorrect, should be greater than 0.")
           Integer pageNum,
-          @RequestParam(name="pageSize", defaultValue = "10")
+          @ApiParam(value = "page_size", defaultValue = "10", example = "10")
+          @RequestParam(name="page_size", defaultValue = "10")
+          @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
           Integer pageSize) {
-      return tenantsRepository.getTenantsList(pageNum, pageSize);
+    Map<String, Object> result = Maps.newHashMap();
+    Page<TenantsEntity> tenantsEntities = tenantsRepository.getTenantsList(pageNum, pageSize);
+    result.put("total", tenantsEntities.getTotal());
+    result.put("data", tenantsEntities);
+    return ResponseEntity.ok(result);
   }
 }
