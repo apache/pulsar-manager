@@ -18,3 +18,14 @@ CREATE TABLE IF NOT EXISTS tenants (
   adminRoles TEXT,
   allowedClusters TEXT
 );
+
+CREATE TABLE IF NOT EXISTS clusters (
+  clusterId INTEGER PRIMARY KEY AUTOINCREMENT,
+  cluster varchar(255),
+  serviceUrl varchar(1024),
+  serviceUrlTls varchar(1024),
+  brokerServiceUrl varchar(1024),
+  brokerServiceUrlTls varchar(1024),
+  UNIQUE (cluster)
+);
+CREATE INDEX IF NOT EXISTS index_cluster ON clusters(cluster);
