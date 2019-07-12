@@ -63,7 +63,7 @@ CREATE INDEX IF NOT EXISTS namespaces_namespace_index ON namespaces(namespace);
 
 CREATE TABLE IF NOT EXISTS brokers (
   broker varchar(1024) NOT NULL PRIMARY KEY,
-  brokerId INTEGER,
+  brokerId INTEGER NOT NULl,
   webServiceUrl varchar(1024),
   webServiceUrlTls varchar(1024),
   pulsarServiceUrl varchar(1024),
