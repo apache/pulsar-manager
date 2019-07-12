@@ -24,14 +24,14 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class MyBatisTenantsRepository implements TenantsRepository {
+public class TenantsRepositoryImpl implements TenantsRepository {
     private final TenantsMapper tenantsMapper;
 
     @Autowired
-    public MyBatisTenantsRepository(TenantsMapper tenantsMapper) { this.tenantsMapper = tenantsMapper; }
+    public TenantsRepositoryImpl(TenantsMapper tenantsMapper) { this.tenantsMapper = tenantsMapper; }
 
     @Override
-    public Optional<TenantsEntity> findById(int tenantId) {
+    public Optional<TenantsEntity> findById(long tenantId) {
         return Optional.ofNullable(tenantsMapper.findById(tenantId));
     }
 
@@ -48,14 +48,13 @@ public class MyBatisTenantsRepository implements TenantsRepository {
     }
 
     @Override
-    public int save(TenantsEntity tenantsEntity) {
+    public void save(TenantsEntity tenantsEntity) {
         tenantsMapper.insert(tenantsEntity);
-        return tenantsEntity.getTenantId();
     }
 
 
     @Override
-    public void remove(Integer tenantId) {
+    public void remove(Long tenantId) {
         tenantsMapper.delete(tenantId);
     }
 

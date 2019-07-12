@@ -23,9 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MyBatisTenantsRepositoryTest {
+public class TenantsRepositoryImplTest {
 
     @Autowired
     private TenantsRepository tenantsRepository;
@@ -33,19 +35,21 @@ public class MyBatisTenantsRepositoryTest {
     @Test
     public void getTenantsListTest() {
         for (int i = 0; i < 10; i++) {
-            TenantsEntity tenantsEntity = new TenantsEntity(
-                    "test", "testrole", "testCluster");
+            TenantsEntity tenantsEntity = new TenantsEntity(i, "test" + i,  "testrole", "testCluster");
             tenantsRepository.save(tenantsEntity);
         }
         Page<TenantsEntity> tenantsEntities = tenantsRepository.getTenantsList(1, 10);
         tenantsEntities.count(true);
         long total = tenantsEntities.getTotal();
         Assert.assertEquals(total, 10);
-        tenantsEntities.getResult().forEach((result) -> {
-            Assert.assertEquals(result.getTenant(), "test");
-            Assert.assertEquals(result.getAdminRoles(), "testrole");
-            Assert.assertEquals(result.getAllowedClusters(), "testCluster");
-        });
+        List<TenantsEntity> tenantsEntityList = tenantsEntities.getResult();
+        for (int i = 0; i < total; i ++) {
+            TenantsEntity tenantsEntity = tenantsEntityList.get(i);
+            Assert.assertEquals(tenantsEntity.getTenantId(), i);
+            Assert.assertEquals(tenantsEntity.getTenant(), "test" + i);
+            Assert.assertEquals(tenantsEntity.getAdminRoles(), "testrole");
+            Assert.assertEquals(tenantsEntity.getAllowedClusters(), "testCluster");
+        }
         tenantsEntities.getResult().forEach((result) -> {
             tenantsRepository.remove(result.getTenantId());
         });
