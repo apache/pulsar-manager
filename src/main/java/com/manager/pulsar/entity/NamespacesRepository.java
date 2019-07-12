@@ -21,9 +21,9 @@ import java.util.Optional;
 @Repository
 public interface NamespacesRepository {
 
-    int save(NamespacesEntity namespacesEntity);
+    void save(NamespacesEntity namespacesEntity);
 
-    Optional<NamespacesEntity> findById(int namespaceId);
+    Optional<NamespacesEntity> findById(long namespaceId);
 
     Optional<NamespacesEntity> findByTenantNamespace(String tenant, String namespace);
 

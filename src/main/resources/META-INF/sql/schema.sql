@@ -13,49 +13,50 @@
 --
 
 CREATE TABLE IF NOT EXISTS tenants (
-  tenantId INTEGER PRIMARY KEY AUTOINCREMENT,
-  tenant varchar(255) NOT NULL,
+  tenant varchar(255) NOT NULL PRIMARY KEY,
+  tenantId INTEGER NOT NULL,
   adminRoles TEXT,
-  allowedClusters TEXT
+  allowedClusters TEXT,
+  UNIQUE (tenantId)
 );
-CREATE INDEX IF NOT EXISTS index_tenant ON tenants(tenant);
 
 CREATE TABLE IF NOT EXISTS namespaces (
-  namespaceId INTEGER PRIMARY KEY autoincrement,
+  namespaceId INTEGER NOT NULL,
   tenant varchar(255) NOT NULL,
   namespace varchar(255) NOT NULL,
   authPolicies TEXT,
   backlogQuota TEXT,
   replicationClusters TEXT,
-  numBundles int,
+  numBundles INTEGER,
   boundaries TEXT,
   topicDispatchRate TEXT,
   subscriptionDispatchRate TEXT,
   replicatorDispatchRate TEXT,
   clusterSubscribeRate TEXT,
-  bookkeeperEnsemble int,
-  bookkeeperWriteQuorum int,
-  bookkeeperAckQuorum int,
+  bookkeeperEnsemble INTEGER,
+  bookkeeperWriteQuorum INTEGER,
+  bookkeeperAckQuorum INTEGER,
   managedLedgerMaxMarkDeleteRate double,
   deduplicationEnabled false,
   latencyStatsSampleRate TEXT,
-  messageTtlInSeconds int,
-  retentionTimeInMinutes int,
+  messageTtlInSeconds INTEGER,
+  retentionTimeInMinutes INTEGER,
 --   mysql use bigint
-  retentionSizeInMB int,
+  retentionSizeInMB INTEGER,
   deleted false,
   antiAffinityGroup VARCHAR(255),
   encryptionRequired false,
   subscriptionAuthMode VARCHAR(12),
-  maxProducersPerTopic int,
-  maxConsumersPerTopic int,
-  maxConsumersPerSubscription int,
+  maxProducersPerTopic INTEGER,
+  maxConsumersPerTopic INTEGER,
+  maxConsumersPerSubscription INTEGER,
   compactionThreshold INTEGER,
-  offloadThreshold int,
+  offloadThreshold INTEGER,
   offloadDeletionLagMs INTEGER,
   schemaValidationEnforced false,
   schemaAutoApdateCompatibilityStrategy VARCHAR(36),
-  UNIQUE (tenant,namespace)
+  CONSTRAINT FK_tenant FOREIGN KEY (tenant) References tenants(tenant),
+  CONSTRAINT PK_namespace PRIMARY KEY (tenant, namespace)
+  UNIQUE (namespaceId)
 );
-CREATE INDEX IF NOT EXISTS index_tenant_namespace ON namespaces(tenant, namespace);
-CREATE INDEX IF NOT EXISTS index_namespace ON namespaces(namespace);
+CREATE INDEX IF NOT EXISTS namespaces_namespace_index ON namespaces(namespace);

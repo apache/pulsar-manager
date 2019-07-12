@@ -21,12 +21,12 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface TenantsMapper {
 
-  @Insert("INSERT INTO tenants(tenant,adminRoles,allowedClusters) VALUES(#{tenant},#{adminRoles},#{allowedClusters})")
-  @Options(useGeneratedKeys=true, keyProperty="tenantId", keyColumn="tenantId")
+  @Insert("INSERT INTO tenants(tenant,tenantId,adminRoles,allowedClusters) " +
+          "VALUES(#{tenant},#{tenantId},#{adminRoles},#{allowedClusters})")
   void insert(TenantsEntity tenantsEntity);
 
   @Select("SELECT tenant,adminRoles,allowedClusters FROM tenants WHERE tenantId = #{tenantId}")
-  TenantsEntity findById(int tenantId);
+  TenantsEntity findById(long tenantId);
 
   @Select("SELECT tenantId,tenant,adminRoles,allowedClusters FROM tenants WHERE tenant = #{tenant}")
   TenantsEntity findByName(String tenant);
@@ -35,7 +35,7 @@ public interface TenantsMapper {
   Page<TenantsEntity> getTenantsList();
 
   @Delete("DELETE FROM tenants WHERE tenantId = #{tenantId}")
-  void delete(Integer tenantId);
+  void delete(Long tenantId);
 
   @Delete("DELETE FROM tenants WHERE tenant = #{tenant}")
   void deleteByTenant(String tenant);

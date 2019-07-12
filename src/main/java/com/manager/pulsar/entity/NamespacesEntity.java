@@ -21,7 +21,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class NamespacesEntity {
-    private int namespaceId;
+    private long namespaceId;
     private String tenant;
     private String namespace;
 

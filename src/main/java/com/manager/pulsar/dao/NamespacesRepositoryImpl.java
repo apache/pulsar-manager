@@ -24,17 +24,17 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class MyBatisNamespacesRepository implements NamespacesRepository {
+public class NamespacesRepositoryImpl implements NamespacesRepository {
 
     private final NamespacesMapper namespacesMapper;
 
     @Autowired
-    public MyBatisNamespacesRepository(NamespacesMapper namespacesMapper) {
+    public NamespacesRepositoryImpl(NamespacesMapper namespacesMapper) {
         this.namespacesMapper = namespacesMapper;
     }
 
     @Override
-    public Optional<NamespacesEntity> findById(int namespaceId) {
+    public Optional<NamespacesEntity> findById(long namespaceId) {
         return Optional.ofNullable(namespacesMapper.findById(namespaceId));
     }
 
@@ -75,8 +75,7 @@ public class MyBatisNamespacesRepository implements NamespacesRepository {
     }
 
     @Override
-    public int save(NamespacesEntity namespacesEntity) {
+    public void save(NamespacesEntity namespacesEntity) {
         namespacesMapper.insert(namespacesEntity);
-        return namespacesEntity.getNamespaceId();
     }
 }

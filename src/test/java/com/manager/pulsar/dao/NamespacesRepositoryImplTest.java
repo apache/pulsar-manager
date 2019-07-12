@@ -16,7 +16,11 @@ package com.manager.pulsar.dao;
 import com.github.pagehelper.Page;
 import com.manager.pulsar.entity.NamespacesEntity;
 import com.manager.pulsar.entity.NamespacesRepository;
+import com.manager.pulsar.entity.TenantsEntity;
+import com.manager.pulsar.entity.TenantsRepository;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +29,18 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MyBatisNamespacesRepositoryTest {
+public class NamespacesRepositoryImplTest {
+
+    @Autowired
+    private TenantsRepository tenantsRepository;
 
     @Autowired
     private NamespacesRepository namespacesRepository;
 
-    private void initNamespaceEntity(NamespacesEntity namespacesEntity) {
-        namespacesEntity.setTenant("public");
-        namespacesEntity.setNamespace("default");
+    public void initNamespaceEntity(NamespacesEntity namespacesEntity) {
+        namespacesEntity.setNamespaceId(1);
+        namespacesEntity.setTenant("test-namespace-public");
+        namespacesEntity.setNamespace("test-namespace-default");
         namespacesEntity.setAuthPolicies("{\"namespace_auth\":{},\"destination_auth\":{},\"subscription_auth_roles\":{}}");
         namespacesEntity.setReplicationClusters("[\"pulsar-cluster-1\"]");
         namespacesEntity.setBoundaries("[\"0x00000000\",\"0x40000000\",\"0x80000000\",\"0xc0000000\",\"0xffffffff\"]");
@@ -60,12 +68,13 @@ public class MyBatisNamespacesRepositoryTest {
         namespacesEntity.setBookkeeperWriteQuorum(0);
     }
 
-    private void checkResult(Page<NamespacesEntity> namespacesEntityPage) {
+    public void checkResult(Page<NamespacesEntity> namespacesEntityPage) {
         long total = namespacesEntityPage.getTotal();
         Assert.assertEquals(total, 1);
         namespacesEntityPage.getResult().forEach((result) -> {
-            Assert.assertEquals(result.getTenant(), "public");
-            Assert.assertEquals(result.getNamespace(), "default");
+            Assert.assertEquals(result.getNamespaceId(), 1);
+            Assert.assertEquals(result.getTenant(), "test-namespace-public");
+            Assert.assertEquals(result.getNamespace(), "test-namespace-default");
             Assert.assertEquals(result.getNumBundles(), 4);
             Assert.assertEquals(result.getBoundaries(),
                     "[\"0x00000000\",\"0x40000000\",\"0x80000000\",\"0xc0000000\",\"0xffffffff\"]");
@@ -95,9 +104,29 @@ public class MyBatisNamespacesRepositoryTest {
         });
     }
 
-    private void checkDeleteResult(Page<NamespacesEntity> namespacesEntityPage) {
+    public void checkDeleteResult(Page<NamespacesEntity> namespacesEntityPage) {
         long total = namespacesEntityPage.getTotal();
         Assert.assertEquals(total, 0);
+    }
+
+    @Before
+    public void setup() {
+        prepareTenant();
+    }
+
+    @After
+    public void clear() {
+        clearTenant();
+    }
+
+    public void prepareTenant() {
+        TenantsEntity tenantsEntity = new TenantsEntity(
+                1, "test-namespace-public",  "testrole", "testCluster");
+        tenantsRepository.save(tenantsEntity);
+    }
+
+    public void clearTenant() {
+        tenantsRepository.removeByTenant("test-namespace-public");
     }
 
     @Test
@@ -121,12 +150,12 @@ public class MyBatisNamespacesRepositoryTest {
         NamespacesEntity namespacesEntity = new NamespacesEntity();
         initNamespaceEntity(namespacesEntity);
         namespacesRepository.save(namespacesEntity);
-        String tenant = "public";
+        String tenant = "test-namespace-public";
         Page<NamespacesEntity> namespacesEntityPageByTenant = namespacesRepository.
                 findByTenantOrNamespace(1, 2, tenant);
         namespacesEntityPageByTenant.count(true);
         checkResult(namespacesEntityPageByTenant);
-        String namespace = "default";
+        String namespace = "test-namespace-default";
         Page<NamespacesEntity> namespacesEntityPageByNamespace = namespacesRepository.
                 findByTenantOrNamespace(1, 2, namespace);
         namespacesEntityPageByNamespace.count(true);
