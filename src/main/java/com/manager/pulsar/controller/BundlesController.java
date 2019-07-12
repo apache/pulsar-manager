@@ -71,6 +71,13 @@ public class BundlesController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * Query information a through broker or tenant b namespace or bundle.
+     * @param brokerOrtenantsOrNamespaceOrbundle This word can be abbreviated to btnb
+     * @param pageNum number of page
+     * @param pageSize size of page
+     * @return {"total": 10, "data": "[{"filed1": "value1}, {"filed2": "value2"}]"}
+     */
     @ApiOperation(value = "Query list by the name of broker or tenant or namespace or bundle," +
             "support paging, the default is 10 per page")
     @ApiResponses({
