@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS tenants (
   tenant varchar(255) NOT NULL PRIMARY KEY,
   tenantId INTEGER NOT NULL,
   adminRoles TEXT,
-  allowedClusters TEXT
+  allowedClusters TEXT,
+  UNIQUE (tenantId)
 );
 
 CREATE TABLE IF NOT EXISTS namespaces (
