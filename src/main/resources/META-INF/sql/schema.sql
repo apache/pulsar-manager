@@ -13,15 +13,56 @@
 --
 
 CREATE TABLE IF NOT EXISTS tenants (
-  tenantId INTEGER PRIMARY KEY AUTOINCREMENT,
-  tenant varchar(255) NOT NULL,
+  tenant varchar(255) NOT NULL PRIMARY KEY,
+  tenantId INTEGER NOT NULL,
   adminRoles TEXT,
   allowedClusters TEXT
 );
 
+CREATE TABLE IF NOT EXISTS namespaces (
+  namespaceId INTEGER NOT NULL,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL,
+  authPolicies TEXT,
+  backlogQuota TEXT,
+  replicationClusters TEXT,
+  numBundles INTEGER,
+  boundaries TEXT,
+  topicDispatchRate TEXT,
+  subscriptionDispatchRate TEXT,
+  replicatorDispatchRate TEXT,
+  clusterSubscribeRate TEXT,
+  bookkeeperEnsemble INTEGER,
+  bookkeeperWriteQuorum INTEGER,
+  bookkeeperAckQuorum INTEGER,
+  managedLedgerMaxMarkDeleteRate double,
+  deduplicationEnabled false,
+  latencyStatsSampleRate TEXT,
+  messageTtlInSeconds INTEGER,
+  retentionTimeInMinutes INTEGER,
+--   mysql use bigint
+  retentionSizeInMB INTEGER,
+  deleted false,
+  antiAffinityGroup VARCHAR(255),
+  encryptionRequired false,
+  subscriptionAuthMode VARCHAR(12),
+  maxProducersPerTopic INTEGER,
+  maxConsumersPerTopic INTEGER,
+  maxConsumersPerSubscription INTEGER,
+  compactionThreshold INTEGER,
+  offloadThreshold INTEGER,
+  offloadDeletionLagMs INTEGER,
+  schemaValidationEnforced false,
+  schemaAutoApdateCompatibilityStrategy VARCHAR(36),
+  CONSTRAINT FK_tenant FOREIGN KEY (tenant) References tenants(tenant),
+  CONSTRAINT PK_namespace PRIMARY KEY (tenant, namespace)
+  UNIQUE (namespaceId)
+);
+CREATE INDEX IF NOT EXISTS namespaces_namespace_index ON namespaces(namespace);
+
 CREATE TABLE IF NOT EXISTS brokers (
-  brokerId INTEGER PRIMARY KEY AUTOINCREMENT,
-  broker varchar(1024) NOT NULL,
+  broker varchar(1024) NOT NULL PRIMARY KEY,
+  brokerId INTEGER,
   webServiceUrl varchar(1024),
   webServiceUrlTls varchar(1024),
   pulsarServiceUrl varchar(1024),
@@ -56,12 +97,10 @@ CREATE TABLE IF NOT EXISTS brokers (
   brokerVersionString varchar(36),
   loadReportType varchar(36),
   maxResourceUsage double,
-  UNIQUE (broker)
+  UNIQUE (brokerId)
 );
-CREATE INDEX IF NOT EXISTS index_broker ON brokers(broker);
 
 CREATE TABLE IF NOT EXISTS bundles (
-  bundleId INTEGER PRIMARY KEY AUTOINCREMENT,
   broker varchar(1024) NOT NULL,
   tenant varchar(255) NOT NULL,
   namespace varchar(255) NOT NULL,
@@ -80,7 +119,10 @@ CREATE TABLE IF NOT EXISTS bundles (
   msgRateDifferenceThreshold double,
   topicConnectionDifferenceThreshold double,
   cacheSizeDifferenceThreshold double,
-  UNIQUE (broker, tenant, namespace, bundle)
+  CONSTRAINT FK_broker FOREIGN KEY (broker) References brokers(broker),
+  CONSTRAINT FK_tenant FOREIGN KEY (tenant) References tenants(tenant),
+  CONSTRAINT FK_namespace FOREIGN KEY (namespace) References namespaces(namespace),
+  CONSTRAINT PK_bundle PRIMARY KEY (broker, tenant, namespace, bundle)
 );
-CREATE INDEX IF NOT EXISTS index_broker_tenant_namespace_bundle ON bundles(broker, tenant, namespace, bundle);
-CREATE INDEX IF NOT EXISTS index_bundle ON bundles(bundle);
+
+CREATE INDEX IF NOT EXISTS bundles_bundle ON bundles(bundle);
