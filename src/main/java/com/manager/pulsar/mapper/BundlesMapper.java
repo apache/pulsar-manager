@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.manager.pulsar.mapper;
 
 import com.github.pagehelper.Page;
@@ -17,13 +30,7 @@ public interface BundlesMapper {
             "#{msgThroughputOut},#{consumerCount},#{producerCount},#{topics},#{cacheSize}," +
             "#{throughputDifferenceThreshold},#{msgRateDifferenceThreshold},#{topicConnectionDifferenceThreshold}," +
             "#{cacheSizeDifferenceThreshold})")
-    @Options(useGeneratedKeys = true, keyProperty = "brokerId", keyColumn = "brokerId")
     void insert(BundlesEntity bundlesEntity);
-
-    @Select("SELECT broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "consumerCount,producerCount,topics,cacheSize,throughputDifferenceThreshold,msgRateDifferenceThreshold," +
-            "topicConnectionDifferenceThreshold,cacheSizeDifferenceThreshold FROM bundles WHERE bundleId=#{bundleId}")
-    BundlesEntity findById(int bundleId);
 
     @Select("SELECT broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
             "consumerCount,producerCount,topics,cacheSize,throughputDifferenceThreshold,msgRateDifferenceThreshold," +
@@ -55,9 +62,6 @@ public interface BundlesMapper {
             "cacheSizeDifferenceThreshold=#{cacheSizeDifferenceThreshold} WHERE broker=#{broker} and tenant=#{tenant}" +
             " and namespace=#{namespace} and bundle={bundle}")
     void update(BundlesEntity bundlesEntity);
-
-    @Delete("DELETE FROM bundles WHERE bundleId=#{bundleId}")
-    void deleteByBundleId(Integer bundleId);
 
     @Delete("DELETE FROM bundles WHERE broker=#{broker} and tenant=#{tenant} " +
             "and namespace=#{namespace} and bundle=#{bundle}")

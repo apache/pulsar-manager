@@ -111,9 +111,9 @@ CREATE TABLE IF NOT EXISTS bundles (
   msgThroughputOut double,
   consumerCount integer,
   producerCount integer,
-    --   mysql use bigint
+  --   mysql use bigint
   topics integer,
-    --   mysql use bigint
+  --   mysql use bigint
   cacheSize integer,
   throughputDifferenceThreshold double,
   msgRateDifferenceThreshold double,

@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
@@ -11,21 +24,16 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * MyBatisBundlesRepository implements BundlesRepository for operation crud of bundle
+ * BundlesRepositoryImpl implements BundlesRepository for operation crud of bundle.
  */
 @Repository
-public class MyBatisBundlesRepository implements BundlesRepository {
+public class BundlesRepositoryImpl implements BundlesRepository {
 
     private final BundlesMapper bundlesMapper;
 
     @Autowired
-    public MyBatisBundlesRepository(BundlesMapper bundlesMapper) {
+    public BundlesRepositoryImpl(BundlesMapper bundlesMapper) {
         this.bundlesMapper = bundlesMapper;
-    }
-
-    @Override
-    public Optional<BundlesEntity> findById(int bundleId) {
-        return Optional.ofNullable(bundlesMapper.findById(bundleId));
     }
 
     @Override
@@ -65,8 +73,7 @@ public class MyBatisBundlesRepository implements BundlesRepository {
     }
 
     @Override
-    public int save(BundlesEntity bundlesEntity) {
+    public void save(BundlesEntity bundlesEntity) {
         bundlesMapper.insert(bundlesEntity);
-        return bundlesEntity.getBundleId();
     }
 }
