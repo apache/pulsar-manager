@@ -14,12 +14,13 @@ import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MyBatisClustersRepositoryTest {
+public class ClustersRepositoryImplTest {
 
     @Autowired
     private ClustersRepository clustersRepository;
 
     private void initClustersEntity(ClustersEntity clustersEntity) {
+        clustersEntity.setClusterId(1);
         clustersEntity.setCluster("test-cluster");
         clustersEntity.setServiceUrl("http://localhost:8080");
         clustersEntity.setServiceUrlTls("https://localhost:443");
@@ -31,6 +32,7 @@ public class MyBatisClustersRepositoryTest {
         long total = clustersEntityPage.getTotal();
         Assert.assertEquals(total, 1);
         clustersEntityPage.getResult().forEach((result) -> {
+            Assert.assertEquals(result.getClusterId(), 1);
             Assert.assertEquals(result.getCluster(), "test-cluster");
             Assert.assertEquals(result.getServiceUrl(), "http://localhost:8080");
             Assert.assertEquals(result.getServiceUrlTls(), "https://localhost:443");

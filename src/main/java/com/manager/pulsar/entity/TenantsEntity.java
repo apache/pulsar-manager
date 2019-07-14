@@ -14,22 +14,22 @@
 package com.manager.pulsar.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Tenants entity
+ * tenant -> name of tenant
+ */
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class TenantsEntity {
-  private int tenantId;
+  private long tenantId;
   private String tenant;
   private String adminRoles;
   private String allowedClusters;
-
-  public TenantsEntity(String tenant, String adminRoles, String allowedClusters) {
-    this.tenant = tenant;
-    this.adminRoles = adminRoles;
-    this.allowedClusters = allowedClusters;
-  }
 }

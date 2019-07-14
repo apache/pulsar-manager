@@ -13,19 +13,62 @@
 --
 
 CREATE TABLE IF NOT EXISTS tenants (
-  tenantId INTEGER PRIMARY KEY AUTOINCREMENT,
-  tenant varchar(255) NOT NULL,
+  tenant varchar(255) NOT NULL PRIMARY KEY,
+  tenantId INTEGER NOT NULL,
   adminRoles TEXT,
-  allowedClusters TEXT
+  allowedClusters TEXT,
+  UNIQUE (tenantId)
 );
 
+
+CREATE TABLE IF NOT EXISTS namespaces (
+  namespaceId INTEGER NOT NULL,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL,
+  authPolicies TEXT,
+  backlogQuota TEXT,
+  replicationClusters TEXT,
+  numBundles INTEGER,
+  boundaries TEXT,
+  topicDispatchRate TEXT,
+  subscriptionDispatchRate TEXT,
+  replicatorDispatchRate TEXT,
+  clusterSubscribeRate TEXT,
+  bookkeeperEnsemble INTEGER,
+  bookkeeperWriteQuorum INTEGER,
+  bookkeeperAckQuorum INTEGER,
+  managedLedgerMaxMarkDeleteRate double,
+  deduplicationEnabled false,
+  latencyStatsSampleRate TEXT,
+  messageTtlInSeconds INTEGER,
+  retentionTimeInMinutes INTEGER,
+--   mysql use bigint
+  retentionSizeInMB INTEGER,
+  deleted false,
+  antiAffinityGroup VARCHAR(255),
+  encryptionRequired false,
+  subscriptionAuthMode VARCHAR(12),
+  maxProducersPerTopic INTEGER,
+  maxConsumersPerTopic INTEGER,
+  maxConsumersPerSubscription INTEGER,
+  compactionThreshold INTEGER,
+  offloadThreshold INTEGER,
+  offloadDeletionLagMs INTEGER,
+  schemaValidationEnforced false,
+  schemaAutoApdateCompatibilityStrategy VARCHAR(36),
+  CONSTRAINT FK_tenant FOREIGN KEY (tenant) References tenants(tenant),
+  CONSTRAINT PK_namespace PRIMARY KEY (tenant, namespace)
+  UNIQUE (namespaceId)
+);
+CREATE INDEX IF NOT EXISTS namespaces_namespace_index ON namespaces(namespace);
+
 CREATE TABLE IF NOT EXISTS clusters (
-  clusterId INTEGER PRIMARY KEY AUTOINCREMENT,
-  cluster varchar(255),
+  cluster varchar(255) NOT NULL PRIMARY KEY,
+  clusterId INTEGER NOT NULL,
   serviceUrl varchar(1024),
   serviceUrlTls varchar(1024),
   brokerServiceUrl varchar(1024),
   brokerServiceUrlTls varchar(1024),
-  UNIQUE (cluster)
+  UNIQUE (clusterId)
 );
-CREATE INDEX IF NOT EXISTS index_cluster ON clusters(cluster);
+CREATE INDEX IF NOT EXISTS clusters_cluster_index ON clusters(cluster);

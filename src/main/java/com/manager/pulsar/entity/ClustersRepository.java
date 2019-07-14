@@ -8,9 +8,9 @@ import java.util.Optional;
 @Repository
 public interface ClustersRepository {
 
-    int save(ClustersEntity clustersEntity);
+    void save(ClustersEntity clustersEntity);
 
-    Optional<ClustersEntity> findById(int clusterId);
+    Optional<ClustersEntity> findById(long clusterId);
 
     Optional<ClustersEntity> findByCluster(String cluster);
 

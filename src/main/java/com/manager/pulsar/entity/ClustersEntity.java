@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ClustersEntity {
-    private int clusterId;
+    private long clusterId;
     private String cluster;
 
     private String serviceUrl;

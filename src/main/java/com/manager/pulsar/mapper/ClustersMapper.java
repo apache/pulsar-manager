@@ -7,14 +7,13 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface ClustersMapper {
 
-    @Insert("INSERT INTO clusters(cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls)" +
-            "VALUES(#{cluster},#{serviceUrl},#{serviceUrlTls},#{brokerServiceUrl},#{brokerServiceUrlTls})")
-    @Options(useGeneratedKeys=true, keyProperty="clusterId", keyColumn="clusterId")
+    @Insert("INSERT INTO clusters(clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls)" +
+            "VALUES(#{clusterId},#{cluster},#{serviceUrl},#{serviceUrlTls},#{brokerServiceUrl},#{brokerServiceUrlTls})")
     void insert(ClustersEntity clustersEntity);
 
     @Select("SELECT clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls " +
             "FROM clusters WHERE clusterId = #{clusterId}")
-    ClustersEntity findById(int clusterId);
+    ClustersEntity findById(long clusterId);
 
     @Select("SELECT clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls " +
             "FROM clusters WHERE cluster = #{cluster}")

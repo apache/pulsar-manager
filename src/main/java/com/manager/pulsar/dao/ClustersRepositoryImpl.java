@@ -11,17 +11,17 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class MyBatisClustersRepository implements ClustersRepository {
+public class ClustersRepositoryImpl implements ClustersRepository {
 
     private final ClustersMapper clustersMapper;
 
     @Autowired
-    public MyBatisClustersRepository(ClustersMapper clustersMapper) {
+    public ClustersRepositoryImpl(ClustersMapper clustersMapper) {
         this.clustersMapper = clustersMapper;
     }
 
     @Override
-    public Optional<ClustersEntity> findById(int clusterId) {
+    public Optional<ClustersEntity> findById(long clusterId) {
         return Optional.ofNullable(clustersMapper.findById(clusterId));
     }
 
@@ -38,9 +38,8 @@ public class MyBatisClustersRepository implements ClustersRepository {
     }
 
     @Override
-    public int save(ClustersEntity clustersEntity) {
+    public void save(ClustersEntity clustersEntity) {
         clustersMapper.insert(clustersEntity);
-        return clustersEntity.getClusterId();
     }
 
 
