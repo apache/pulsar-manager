@@ -31,10 +31,12 @@ public interface BundleStatsMapper {
     void insert(BundleStatsEntity bundleStatsEntity);
 
     @Select("SELECT broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "consumerCount,producerCount,topics,cacheSize,throughputDifferenceThreshold,msgRateDifferenceThreshold," +
-            "topicConnectionDifferenceThreshold,cacheSizeDifferenceThreshold FROM bundleStats WHERE broker=#{broker} and " +
+            "consumerCount,producerCount,topics,cacheSize FROM bundleStats WHERE broker=#{broker} and " +
             "tenant=#{tenant} and namespace=#{namespace} and bundle=#{bundle}")
-    BundleStatsEntity findByBrokerTenantNamespaceBundle(String broker, String tenant, String namespace, String bundle);
+    BundleStatsEntity findByBrokerTenantNamespaceBundle(@Param("broker") String broker,
+                                                        @Param("tenant") String tenant,
+                                                        @Param("namespace") String namespace,
+                                                        @Param("bundle") String bundle);
 
     @Select("SELECT broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
             "consumerCount,producerCount,topics,cacheSize FROM bundleStats WHERE broker=#{btnb} or " +
@@ -49,10 +51,10 @@ public interface BundleStatsMapper {
             "consumerCount,producerCount,topics,cacheSize FROM bundleStats")
     Page<BundleStatsEntity> getBundlesList();
 
-    @Update("UPDATE bundles set msgRateIn=#{msgRateIn},msgThroughputIn=#{msgThroughputIn},msgRateOut=#{msgRateOut}," +
+    @Update("UPDATE bundleStats set msgRateIn=#{msgRateIn},msgThroughputIn=#{msgThroughputIn},msgRateOut=#{msgRateOut}," +
             "msgThroughputOut=#{msgThroughputOut},consumerCount=#{consumerCount},producerCount=#{producerCount}," +
             "topics=#{topics},cacheSize=#{cacheSize} WHERE broker=#{broker} and tenant=#{tenant}" +
-            " and namespace=#{namespace} and bundle={bundle}")
+            " and namespace=#{namespace} and bundle=#{bundle}")
     void update(BundleStatsEntity bundleStatsEntity);
 
     @Delete("DELETE FROM bundleStats WHERE broker=#{broker} and tenant=#{tenant} " +
