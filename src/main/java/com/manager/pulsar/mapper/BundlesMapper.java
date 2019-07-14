@@ -23,45 +23,18 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface BundlesMapper {
 
-    @Insert("INSERT INTO bundles(broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "consumerCount,producerCount,topics,cacheSize,throughputDifferenceThreshold,msgRateDifferenceThreshold," +
-            "topicConnectionDifferenceThreshold,cacheSizeDifferenceThreshold) " +
-            "VALUES(#{broker},#{tenant},#{namespace},#{bundle},#{msgRateIn},#{msgThroughputIn},#{msgRateOut}," +
-            "#{msgThroughputOut},#{consumerCount},#{producerCount},#{topics},#{cacheSize}," +
-            "#{throughputDifferenceThreshold},#{msgRateDifferenceThreshold},#{topicConnectionDifferenceThreshold}," +
-            "#{cacheSizeDifferenceThreshold})")
+    @Insert("INSERT INTO bundles(broker,tenant,namespace,bundle) VALUES(#{broker},#{tenant},#{namespace},#{bundle})")
     void insert(BundlesEntity bundlesEntity);
 
-    @Select("SELECT broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "consumerCount,producerCount,topics,cacheSize,throughputDifferenceThreshold,msgRateDifferenceThreshold," +
-            "topicConnectionDifferenceThreshold,cacheSizeDifferenceThreshold FROM bundles WHERE broker=#{broker} and " +
-            "tenant=#{tenant} and namespace=#{namespace} and bundle=#{bundle}")
-    BundlesEntity findByBrokerTenantNamespaceBundle(String broker, String tenant, String namespace, String bundle);
-
-    @Select("SELECT broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "consumerCount,producerCount,topics,cacheSize,throughputDifferenceThreshold,msgRateDifferenceThreshold," +
-            "topicConnectionDifferenceThreshold,cacheSizeDifferenceThreshold FROM bundles WHERE broker=#{btnb} or " +
+    @Select("SELECT broker,tenant,namespace,bundle FROM bundles WHERE broker=#{btnb} or " +
             "tenant=#{btnb} or namespace=#{btnb} or bundle=#{btnb}")
     Page<BundlesEntity> findByBrokerOrTenantOrNamespaceOrBundle(String btnb);
 
-    @Select("SELECT broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "consumerCount,producerCount,topics,cacheSize,throughputDifferenceThreshold,msgRateDifferenceThreshold," +
-            "topicConnectionDifferenceThreshold,cacheSizeDifferenceThreshold FROM bundles WHERE bundle=#{bundle}")
+    @Select("SELECT broker,tenant,namespace,bundle FROM bundles WHERE bundle=#{bundle}")
     Page<BundlesEntity> findByBundle(String bundle);
 
-    @Select("SELECT broker,tenant,namespace,bundle,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "consumerCount,producerCount,topics,cacheSize,throughputDifferenceThreshold,msgRateDifferenceThreshold," +
-            "topicConnectionDifferenceThreshold,cacheSizeDifferenceThreshold FROM bundles")
+    @Select("SELECT broker,tenant,namespace,bundle FROM bundles")
     Page<BundlesEntity> getBundlesList();
-
-    @Update("UPDATE bundles set msgRateIn=#{msgRateIn},msgThroughputIn=#{msgThroughputIn},msgRateOut=#{msgRateOut}," +
-            "msgThroughputOut=#{msgThroughputOut},consumerCount=#{consumerCount},producerCount=#{producerCount}," +
-            "topics=#{topics},cacheSize=#{cacheSize},throughputDifferenceThreshold=#{throughputDifferenceThreshold}," +
-            "msgRateDifferenceThreshold=#{msgRateDifferenceThreshold}," +
-            "topicConnectionDifferenceThreshold=#{topicConnectionDifferenceThreshold}," +
-            "cacheSizeDifferenceThreshold=#{cacheSizeDifferenceThreshold} WHERE broker=#{broker} and tenant=#{tenant}" +
-            " and namespace=#{namespace} and bundle={bundle}")
-    void update(BundlesEntity bundlesEntity);
 
     @Delete("DELETE FROM bundles WHERE broker=#{broker} and tenant=#{tenant} " +
             "and namespace=#{namespace} and bundle=#{bundle}")

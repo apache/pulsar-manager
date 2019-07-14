@@ -42,11 +42,6 @@ public class BundlesRepositoryImpl implements BundlesRepository {
         return bundlesMapper.findByBundle(bundle);
     }
 
-    @Override
-    public Optional<BundlesEntity> findByBrokerTenantNamespaceBundle(
-            String broker, String tenant, String namespace, String bundle) {
-        return Optional.ofNullable(bundlesMapper.findByBrokerTenantNamespaceBundle(broker, tenant, namespace, bundle));
-    }
 
     @Override
     public Page<BundlesEntity> findByBrokerOrTenantOrNamespaceOrBundle(Integer pageNum, Integer pageSize, String btnb) {
@@ -65,11 +60,6 @@ public class BundlesRepositoryImpl implements BundlesRepository {
     @Override
     public void remove(String broker, String tenant, String namespace, String bundle) {
         bundlesMapper.delete(broker, tenant, namespace, bundle);
-    }
-
-    @Override
-    public void update(BundlesEntity bundlesEntity) {
-        bundlesMapper.update(bundlesEntity);
     }
 
     @Override

@@ -39,14 +39,6 @@ public class BundlesRespositoryImplTest {
         bundlesEntity.setTenant("public");
         bundlesEntity.setNamespace("default");
         bundlesEntity.setBundle("0x80000000_0x90000000");
-        bundlesEntity.setMsgRateIn(0.0);
-        bundlesEntity.setMsgRateOut(0.0);
-        bundlesEntity.setMsgThroughputIn(0.0);
-        bundlesEntity.setMsgThroughputOut(0.0);
-        bundlesEntity.setConsumerCount(1);
-        bundlesEntity.setProducerCount(1);
-        bundlesEntity.setTopics(1);
-        bundlesEntity.setCacheSize(0);
     }
 
     private void checkResult(Page<BundlesEntity> bundlesEntityPage) {
@@ -57,14 +49,6 @@ public class BundlesRespositoryImplTest {
             Assert.assertEquals(result.getTenant(), "public");
             Assert.assertEquals(result.getNamespace(), "default");
             Assert.assertEquals(result.getBundle(), "0x80000000_0x90000000");
-            Assert.assertEquals(result.getMsgRateIn(), 0.0, 1);
-            Assert.assertEquals(result.getMsgRateOut(), 0.0, 1);
-            Assert.assertEquals(result.getMsgThroughputIn(), 0.0, 1);
-            Assert.assertEquals(result.getMsgThroughputOut(), 0.0, 1);
-            Assert.assertEquals(result.getConsumerCount(), 1);
-            Assert.assertEquals(result.getProducerCount(), 1);
-            Assert.assertEquals(result.getTopics(), 1);
-            Assert.assertEquals(result.getCacheSize(), 0);
         });
     }
 

@@ -18,20 +18,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-/**
- * Interface of bundles
- */
 @Repository
-public interface BundlesRepository {
+public interface BrokerStatsRepository {
+    void save(BrokerStatsEntity brokerStatsEntity);
 
-    void save(BundlesEntity bundlesEntity);
+    Optional<BrokerStatsEntity> findByBroker(String broker);
 
-    Page<BundlesEntity> findByBrokerOrTenantOrNamespaceOrBundle(Integer pageNum, Integer pageSize, String btnt);
+    Page<BrokerStatsEntity> getBrokerStatsList(Integer pageNum, Integer pageSize);
 
-    Page<BundlesEntity> findByBundle(Integer pageNum, Integer pageSize, String bundle);
+    void remove(String broker);
 
-    Page<BundlesEntity> getBundlesList(Integer pageNum, Integer pageSize);
-
-    void remove(String broker, String tenant, String namespace, String bundle);
-
+    void update(BrokerStatsEntity brokerStatsEntity);
 }

@@ -13,25 +13,39 @@
  */
 package com.manager.pulsar.entity;
 
-import com.github.pagehelper.Page;
-import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * Interface of bundles
+ * Bundle Stats entity.
  */
-@Repository
-public interface BundlesRepository {
+@Getter
+@Setter
+@NoArgsConstructor
+public class BundleStatsEntity {
 
-    void save(BundlesEntity bundlesEntity);
+    private String broker;
 
-    Page<BundlesEntity> findByBrokerOrTenantOrNamespaceOrBundle(Integer pageNum, Integer pageSize, String btnt);
+    private String tenant;
 
-    Page<BundlesEntity> findByBundle(Integer pageNum, Integer pageSize, String bundle);
+    private String namespace;
 
-    Page<BundlesEntity> getBundlesList(Integer pageNum, Integer pageSize);
+    private String bundle;
 
-    void remove(String broker, String tenant, String namespace, String bundle);
+    private double msgRateIn;
 
+    private double msgThroughputIn;
+
+    private double msgRateOut;
+
+    private double msgThroughputOut;
+
+    private int consumerCount;
+
+    private int producerCount;
+
+    private long topics;
+
+    private long cacheSize;
 }

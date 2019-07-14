@@ -24,61 +24,32 @@ import org.apache.ibatis.annotations.*;
 public interface BrokersMapper {
 
     @Insert("INSERT INTO brokers(brokerId,broker,webServiceUrl,webServiceUrlTls,pulsarServiceUrl,pulsarServiceUrlTls," +
-            "persistentTopicsEnabled,nonPersistentTopicsEnabled,cpuUsage,cpuLimit,memoryUsage," +
-            "memoryLimit,directMemoryUsage,directMemoryLimit,bandwidthInUsage,bandwidthInLimit," +
-            "bandwidthOutUsage,bandwidthOutLimit,msgThroughputIn,msgThroughputOut,msgRateIn,msgRateOut," +
-            "lastUpdate,lastStats,bundleStats,numTopics,numBundles,numConsumers,numProducers,bundles," +
-            "lastBundleGains,lastBundleLosses,brokerVersionString,loadReportType,maxResourceUsage) " +
-            "VALUES(#{brokerId}, #{broker},#{webServiceUrl},#{webServiceUrlTls},#{pulsarServiceUrl},#{pulsarServiceUrlTls}," +
-            "#{persistentTopicsEnabled},#{nonPersistentTopicsEnabled},#{cpuUsage},#{cpuLimit}," +
-            "#{memoryUsage},#{memoryLimit},#{directMemoryUsage},#{directMemoryLimit},#{bandwidthInUsage}," +
-            "#{bandwidthInLimit},#{bandwidthOutUsage},#{bandwidthOutLimit},#{msgThroughputIn},#{msgThroughputOut}," +
-            "#{msgRateIn},#{msgRateOut},#{lastUpdate},#{lastStats},#{bundleStats},#{numTopics},#{numBundles}," +
-            "#{numConsumers},#{numProducers},#{bundles},#{lastBundleGains},#{lastBundleLosses}," +
+            "persistentTopicsEnabled,nonPersistentTopicsEnabled,brokerVersionString,loadReportType,maxResourceUsage) " +
+            "VALUES(#{brokerId}, #{broker},#{webServiceUrl},#{webServiceUrlTls},#{pulsarServiceUrl}," +
+            "#{pulsarServiceUrlTls},#{persistentTopicsEnabled},#{nonPersistentTopicsEnabled}," +
             "#{brokerVersionString},#{loadReportType},#{maxResourceUsage})")
     void insert(BrokersEntity brokersEntity);
 
     @Select("SELECT broker,webServiceUrl,webServiceUrlTls,pulsarServiceUrl,pulsarServiceUrlTls," +
-            "persistentTopicsEnabled,nonPersistentTopicsEnabled,cpuUsage,cpuLimit,memoryUsage," +
-            "memoryLimit,directMemoryUsage,directMemoryLimit,bandwidthInUsage,bandwidthInLimit," +
-            "bandwidthOutUsage,bandwidthOutLimit,msgThroughputIn,msgThroughputOut,msgRateIn,msgRateOut," +
-            "lastUpdate,lastStats,bundleStats,numTopics,numBundles,numConsumers,numProducers,bundles," +
-            "lastBundleGains,lastBundleLosses,brokerVersionString,loadReportType,maxResourceUsage FROM brokers " +
-            "WHERE brokerId=#{brokerId}")
+            "persistentTopicsEnabled,nonPersistentTopicsEnabled,brokerVersionString,loadReportType,maxResourceUsage " +
+            "FROM brokers WHERE brokerId=#{brokerId}")
     BrokersEntity findById(long brokerId);
 
     @Select("SELECT brokerId,broker,webServiceUrl,webServiceUrlTls,pulsarServiceUrl,pulsarServiceUrlTls," +
-            "persistentTopicsEnabled,nonPersistentTopicsEnabled,cpuUsage,cpuLimit,memoryUsage," +
-            "memoryLimit,directMemoryUsage,directMemoryLimit,bandwidthInUsage,bandwidthInLimit," +
-            "bandwidthOutUsage,bandwidthOutLimit,msgThroughputIn,msgThroughputOut,msgRateIn,msgRateOut," +
-            "lastUpdate,lastStats,bundleStats,numTopics,numBundles,numConsumers,numProducers,bundles," +
-            "lastBundleGains,lastBundleLosses,brokerVersionString,loadReportType,maxResourceUsage FROM brokers " +
-            "WHERE broker=#{broker}")
+            "persistentTopicsEnabled,nonPersistentTopicsEnabled,brokerVersionString,loadReportType,maxResourceUsage " +
+            "FROM brokers WHERE broker=#{broker}")
     BrokersEntity findByBroker(String broker);
 
     @Select("SELECT brokerId,broker,webServiceUrl,webServiceUrlTls,pulsarServiceUrl,pulsarServiceUrlTls," +
-            "persistentTopicsEnabled,nonPersistentTopicsEnabled,cpuUsage,cpuLimit,memoryUsage," +
-            "memoryLimit,directMemoryUsage,directMemoryLimit,bandwidthInUsage,bandwidthInLimit," +
-            "bandwidthOutUsage,bandwidthOutLimit,msgThroughputIn,msgThroughputOut,msgRateIn,msgRateOut," +
-            "lastUpdate,lastStats,bundleStats,numTopics,numBundles,numConsumers,numProducers,bundles," +
-            "lastBundleGains,lastBundleLosses,brokerVersionString,loadReportType,maxResourceUsage FROM brokers")
+            "persistentTopicsEnabled,nonPersistentTopicsEnabled,brokerVersionString,loadReportType,maxResourceUsage " +
+            "FROM brokers")
     Page<BrokersEntity> getBrokersList();
 
     @Update("UPDATE brokers set webServiceUrl=#{webServiceUrl},webServiceUrlTls=#{webServiceUrlTls}," +
             "pulsarServiceUrl=#{pulsarServiceUrl},pulsarServiceUrlTls=#{pulsarServiceUrlTls}," +
             "persistentTopicsEnabled=#{persistentTopicsEnabled}," +
-            "nonPersistentTopicsEnabled=#{nonPersistentTopicsEnabled},cpuUsage=#{cpuUsage}," +
-            "cpuLimit=#{cpuLimit},memoryUsage=#{memoryUsage},memoryLimit=#{memoryLimit}," +
-            "directMemoryUsage=#{directMemoryUsage},directMemoryLimit=#{directMemoryLimit}," +
-            "bandwidthInUsage=#{bandwidthInUsage},bandwidthInLimit=#{bandwidthInLimit}," +
-            "bandwidthOutUsage=#{bandwidthOutUsage},bandwidthOutLimit=#{bandwidthOutLimit}," +
-            "msgThroughputIn=#{msgThroughputIn},msgThroughputOut=#{msgThroughputOut}," +
-            "msgRateIn=#{msgRateIn},msgRateOut=#{msgRateOut},lastUpdate=#{lastUpdate}," +
-            "lastStats=#{lastStats},bundleStats=#{bundleStats},numTopics=#{numTopics}," +
-            "numBundles=#{numBundles},numConsumers=#{numConsumers},numProducers=#{numProducers}," +
-            "bundles=#{bundles},lastBundleGains=#{lastBundleGains},lastBundleLosses=#{lastBundleLosses}," +
-            "brokerVersionString=#{brokerVersionString},loadReportType=#{loadReportType}," +
-            "maxResourceUsage=#{maxResourceUsage} WHERE broker=#{broker}")
+            "nonPersistentTopicsEnabled=#{nonPersistentTopicsEnabled},brokerVersionString=#{brokerVersionString}," +
+            "loadReportType=#{loadReportType},maxResourceUsage=#{maxResourceUsage} WHERE broker=#{broker}")
     void update(BrokersEntity brokersEntity);
 
     @Delete("DELETE FROM brokers WHERE brokerId=#{brokerId}")

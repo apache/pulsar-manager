@@ -33,27 +33,4 @@ public class BundlesEntity {
 
     private String bundle;
 
-    private double msgRateIn;
-
-    private double msgThroughputIn;
-
-    private double msgRateOut;
-
-    private double msgThroughputOut;
-
-    private int consumerCount;
-
-    private int producerCount;
-
-    private long topics;
-
-    private long cacheSize;
-
-    private double throughputDifferenceThreshold;
-
-    private double msgRateDifferenceThreshold;
-
-    private double topicConnectionDifferenceThreshold;
-
-    private double cacheSizeDifferenceThreshold;
 }
