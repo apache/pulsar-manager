@@ -103,28 +103,4 @@ public class BundlesController {
         result.put("data", bundlesEntityPage);
         return ResponseEntity.ok(result);
     }
-
-//    @ApiOperation(value = "Query bundle info")
-//    @ApiResponses({
-//            @ApiResponse(code = 200, message = "ok"),
-//            @ApiResponse(code = 500, message = "Internal server error")
-//    })
-//    @RequestMapping(value = "/bundles/{broker}/{tenant}/{namespace}/{bundle}", method = RequestMethod.GET)
-//    public ResponseEntity<Optional<BundlesEntity>> getBundle(
-//            @ApiParam(value = "The name of broker")
-//            @Size(min = 1, max = 255)
-//            @PathVariable String broker,
-//            @ApiParam(value = "The name of tenant")
-//            @Size(min = 1, max = 255)
-//            @PathVariable String tenant,
-//            @ApiParam(value = "The name of namespace")
-//            @Size(min = 1, max = 255)
-//            @PathVariable String namespace,
-//            @ApiParam(value = "The name of bundle")
-//            @Size(min = 1, max = 255)
-//            @PathVariable String bundle) {
-//        Optional<BundlesEntity> bundlesEntity = bundlesRepository.findByBrokerTenantNamespaceBundle(
-//                broker, tenant, namespace, bundle);
-//        return ResponseEntity.ok(bundlesEntity);
-//    }
 }
