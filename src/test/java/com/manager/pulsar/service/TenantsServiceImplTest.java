@@ -13,5 +13,56 @@
  */
 package com.manager.pulsar.service;
 
+import com.google.common.collect.Maps;
+import com.manager.pulsar.utils.HttpUtil;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+
+@RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(SpringRunner.class)
+@PowerMockIgnore( {"javax.management.*", "javax.net.ssl.*"})
+@PrepareForTest(HttpUtil.class)
+@SpringBootTest
 public class TenantsServiceImplTest {
+
+    @Autowired
+    private TenantsService tenantsService;
+
+    @Test
+    public void tenantsServiceImplTest() {
+        PowerMockito.mockStatic(HttpUtil.class);
+        Map<String, String> header = Maps.newHashMap();
+        header.put("Content-Type", "application/json");
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/tenants", header)).thenReturn("[\"public\"]");
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/tenants/public", header))
+                .thenReturn("{\"adminRoles\": [\"admin\"], \"allowedClusters\": [\"standalone\"]}");
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/namespaces/public", header))
+                .thenReturn("[\"public/default\"]");
+        Map<String, Object> objectMap = tenantsService.getTenantsList(1, 2);
+        Assert.assertEquals(objectMap.get("total"), 1);
+        Assert.assertEquals(objectMap.get("pageSize"), 1);
+        Assert.assertEquals(objectMap.get("pageNum"), 1);
+        List<Map<String, Object>> tenantsArray = new ArrayList<>();
+        Map<String, Object> tenantMap = Maps.newHashMap();
+        tenantMap.put("adminRoles", "admin");
+        tenantMap.put("allowedClusters", "standalone");
+        tenantMap.put("tenant", "public");
+        tenantMap.put("namespaces", 1);
+        tenantsArray.add(tenantMap);
+        Assert.assertEquals(objectMap.get("data"), tenantsArray);
+    }
 }

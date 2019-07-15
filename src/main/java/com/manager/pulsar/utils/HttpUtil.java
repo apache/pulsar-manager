@@ -35,9 +35,9 @@ public class HttpUtil {
 
     private static final CloseableHttpClient httpClient;
 
-    private static int CONNECTION_TIMEOUT = 28*1000;
+    private static int CONNECTION_TIMEOUT = 28 * 1000;
 
-    private static int SO_TIMEOUT = 28*1000;
+    private static int SO_TIMEOUT = 28 * 1000;
 
     public static PoolingHttpClientConnectionManager cm = null;
 

@@ -75,5 +75,7 @@ dependencies {
     compile group: 'org.apache.pulsar', name: 'pulsar-common', version: pulsarVersion
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggeruiVersion
+    compile group: 'org.powermock', name: 'powermock-api-mockito', version: apiMockitoVersion
+    compile group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 }
