@@ -16,6 +16,7 @@ package com.manager.pulsar.dao;
 import com.github.pagehelper.Page;
 import com.manager.pulsar.entity.ClusterEntity;
 import com.manager.pulsar.entity.ClustersRepository;
+import org.apache.pulsar.shade.com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
@@ -32,18 +35,26 @@ public class ClustersRepositoryImplTest {
     @Autowired
     private ClustersRepository clustersRepository;
 
+    private LinkedHashSet<String> clusterNames = new LinkedHashSet<String>() {{
+        add("standalone");
+        add("pulsar-cluster-1");
+    }};
+
     private void initClustersEntity(ClusterEntity clustersEntity) {
+        Gson gson = new Gson();
         clustersEntity.setClusterId(1);
         clustersEntity.setCluster("test-cluster");
         clustersEntity.setServiceUrl("http://localhost:8080");
         clustersEntity.setServiceUrlTls("https://localhost:443");
         clustersEntity.setBrokerServiceUrl("pulsar://localhost:6650");
         clustersEntity.setBrokerServiceUrlTls("pulsar+ssl://localhost:6650");
+        clustersEntity.setPeerClusterNames(gson.toJson(clusterNames));
     }
 
     private void checkResult(Page<ClusterEntity> clustersEntityPage) {
         long total = clustersEntityPage.getTotal();
         Assert.assertEquals(total, 1);
+        Gson gson = new Gson();
         clustersEntityPage.getResult().forEach((result) -> {
             Assert.assertEquals(result.getClusterId(), 1);
             Assert.assertEquals(result.getCluster(), "test-cluster");
@@ -51,6 +62,7 @@ public class ClustersRepositoryImplTest {
             Assert.assertEquals(result.getServiceUrlTls(), "https://localhost:443");
             Assert.assertEquals(result.getBrokerServiceUrl(), "pulsar://localhost:6650");
             Assert.assertEquals(result.getBrokerServiceUrlTls(), "pulsar+ssl://localhost:6650");
+            Assert.assertEquals(result.getPeerClusterNames(), gson.toJson(clusterNames));
         });
     }
 

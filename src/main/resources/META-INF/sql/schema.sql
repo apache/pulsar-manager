@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS clusters (
   serviceUrlTls varchar(1024),
   brokerServiceUrl varchar(1024),
   brokerServiceUrlTls varchar(1024),
+  peerClusterNames varchar(1024),
   UNIQUE (clusterId)
 );
 CREATE INDEX IF NOT EXISTS clusters_cluster_index ON clusters(cluster);

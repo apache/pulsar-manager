@@ -32,4 +32,6 @@ public class ClusterEntity {
 
     private String brokerServiceUrlTls;
 
+    private String peerClusterNames;
+
 }

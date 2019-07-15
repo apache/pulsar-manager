@@ -20,19 +20,20 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface ClustersMapper {
 
-    @Insert("INSERT INTO clusters(clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls)" +
-            "VALUES(#{clusterId},#{cluster},#{serviceUrl},#{serviceUrlTls},#{brokerServiceUrl},#{brokerServiceUrlTls})")
+    @Insert("INSERT INTO clusters(clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls," +
+            "peerClusterNames) VALUES(#{clusterId},#{cluster},#{serviceUrl},#{serviceUrlTls},#{brokerServiceUrl}," +
+            "#{brokerServiceUrlTls},#{peerClusterNames})")
     void insert(ClusterEntity clustersEntity);
 
-    @Select("SELECT clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls " +
+    @Select("SELECT clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls,peerClusterNames " +
             "FROM clusters WHERE clusterId = #{clusterId}")
     ClusterEntity findById(long clusterId);
 
-    @Select("SELECT clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls " +
+    @Select("SELECT clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls,peerClusterNames " +
             "FROM clusters WHERE cluster = #{cluster}")
     ClusterEntity findByCluster(String cluster);
 
-    @Select("SELECT clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls " +
+    @Select("SELECT clusterId,cluster,serviceUrl,serviceUrlTls,brokerServiceUrl,brokerServiceUrlTls,peerClusterNames " +
             "FROM clusters")
     Page<ClusterEntity> getClustersList();
 
@@ -41,8 +42,8 @@ public interface ClustersMapper {
     void deleteByClusterId(Integer clusterId);
 
     @Update("UPDATE clusters set serviceUrl=#{serviceUrl},serviceUrlTls=#{serviceUrlTls}," +
-            "brokerServiceUrl=#{brokerServiceUrl},brokerServiceUrlTls=#{brokerServiceUrlTls} FROM clusters " +
-            "where cluster=#{cluster")
+            "brokerServiceUrl=#{brokerServiceUrl},brokerServiceUrlTls=#{brokerServiceUrlTls}," +
+            "peerClusterNames={peerClusterNames} FROM clusters where cluster=#{cluster")
     void update(ClusterEntity clustersEntity);
 
     @Delete("DELETE FROM clusters WHERE cluster=#{cluster}")
