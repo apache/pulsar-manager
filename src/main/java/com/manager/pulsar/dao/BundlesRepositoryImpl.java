@@ -15,13 +15,11 @@ package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.manager.pulsar.entity.BundlesEntity;
+import com.manager.pulsar.entity.BundleEntity;
 import com.manager.pulsar.entity.BundlesRepository;
 import com.manager.pulsar.mapper.BundlesMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 /**
  * BundlesRepositoryImpl implements BundlesRepository for operation crud of bundle.
@@ -37,23 +35,23 @@ public class BundlesRepositoryImpl implements BundlesRepository {
     }
 
     @Override
-    public Page<BundlesEntity> findByBundle(Integer pageNum, Integer pageSize, String bundle) {
+    public Page<BundleEntity> findByBundle(Integer pageNum, Integer pageSize, String bundle) {
         PageHelper.startPage(pageNum, pageSize);
         return bundlesMapper.findByBundle(bundle);
     }
 
 
     @Override
-    public Page<BundlesEntity> findByBrokerOrTenantOrNamespaceOrBundle(Integer pageNum, Integer pageSize, String btnb) {
+    public Page<BundleEntity> findByBrokerOrTenantOrNamespaceOrBundle(Integer pageNum, Integer pageSize, String btnb) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<BundlesEntity> bundlesEntities = bundlesMapper.findByBrokerOrTenantOrNamespaceOrBundle(btnb);
+        Page<BundleEntity> bundlesEntities = bundlesMapper.findByBrokerOrTenantOrNamespaceOrBundle(btnb);
         return bundlesEntities;
     }
 
     @Override
-    public Page<BundlesEntity> getBundlesList(Integer pageNum, Integer pageSize) {
+    public Page<BundleEntity> getBundlesList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<BundlesEntity> bundlesEntities = bundlesMapper.getBundlesList();
+        Page<BundleEntity> bundlesEntities = bundlesMapper.getBundlesList();
         return bundlesEntities;
     }
 
@@ -63,7 +61,7 @@ public class BundlesRepositoryImpl implements BundlesRepository {
     }
 
     @Override
-    public void save(BundlesEntity bundlesEntity) {
+    public void save(BundleEntity bundlesEntity) {
         bundlesMapper.insert(bundlesEntity);
     }
 }

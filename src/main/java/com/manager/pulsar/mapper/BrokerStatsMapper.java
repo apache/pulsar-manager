@@ -15,7 +15,6 @@ package com.manager.pulsar.mapper;
 
 import com.github.pagehelper.Page;
 import com.manager.pulsar.entity.BrokerStatsEntity;
-import com.manager.pulsar.entity.BrokersEntity;
 import org.apache.ibatis.annotations.*;
 
 /**

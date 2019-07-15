@@ -14,7 +14,7 @@
 package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
-import com.manager.pulsar.entity.BrokersEntity;
+import com.manager.pulsar.entity.BrokerEntity;
 import com.manager.pulsar.entity.BrokersRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class BrokersRepositoryImplTest {
     private BrokersRepository brokersRepository;
 
 
-    private void initBrokerEntity(BrokersEntity brokersEntity) {
+    private void initBrokerEntity(BrokerEntity brokersEntity) {
         brokersEntity.setBrokerId(1);
         brokersEntity.setBroker("test-broker");
         brokersEntity.setWebServiceUrl("http://tengdeMBP:8080");
@@ -50,7 +50,7 @@ public class BrokersRepositoryImplTest {
         brokersEntity.setMaxResourceUsage(0.185);
     }
 
-    private void checkResult(Page<BrokersEntity> brokersEntityPage) {
+    private void checkResult(Page<BrokerEntity> brokersEntityPage) {
         long total = brokersEntityPage.getTotal();
         Assert.assertEquals(total, 1);
         brokersEntityPage.getResult().forEach((result) -> {
@@ -68,40 +68,40 @@ public class BrokersRepositoryImplTest {
         });
     }
 
-    private void checkDeleteResult(Page<BrokersEntity> brokersEntityPage) {
+    private void checkDeleteResult(Page<BrokerEntity> brokersEntityPage) {
         long total = brokersEntityPage.getTotal();
         Assert.assertEquals(total, 0);
     }
 
     @Test
     public void getBrokersList() {
-        BrokersEntity brokersEntity = new BrokersEntity();
+        BrokerEntity brokersEntity = new BrokerEntity();
         initBrokerEntity(brokersEntity);
         brokersRepository.save(brokersEntity);
-        Page<BrokersEntity> brokersEntityPage = brokersRepository.getBrokersList(1, 2);
+        Page<BrokerEntity> brokersEntityPage = brokersRepository.getBrokersList(1, 2);
         brokersEntityPage.count(true);
         checkResult(brokersEntityPage);
         brokersEntityPage.getResult().forEach((result) -> {
             brokersRepository.remove(result.getBroker());
         });
-        Page<BrokersEntity> deleteBroker = brokersRepository.getBrokersList(1, 2);
+        Page<BrokerEntity> deleteBroker = brokersRepository.getBrokersList(1, 2);
         deleteBroker.count(true);
         checkDeleteResult(deleteBroker);
     }
 
     @Test
     public void getBroker() {
-        BrokersEntity brokersEntity = new BrokersEntity();
+        BrokerEntity brokersEntity = new BrokerEntity();
         initBrokerEntity(brokersEntity);
         brokersRepository.save(brokersEntity);
         String broker = "test-broker";
-        Optional<BrokersEntity> brokerEntity = brokersRepository.findByBroker(broker);
-        Page<BrokersEntity> brokersEntityPage = new Page<BrokersEntity>();
+        Optional<BrokerEntity> brokerEntity = brokersRepository.findByBroker(broker);
+        Page<BrokerEntity> brokersEntityPage = new Page<BrokerEntity>();
         brokersEntityPage.add(brokerEntity.get());
         brokersEntityPage.setTotal(1);
         checkResult(brokersEntityPage);
         brokersRepository.remove("test-broker");
-        Page<BrokersEntity> deleteBroker = brokersRepository.getBrokersList(1, 2);
+        Page<BrokerEntity> deleteBroker = brokersRepository.getBrokersList(1, 2);
         deleteBroker.count(true);
         checkDeleteResult(deleteBroker);
     }

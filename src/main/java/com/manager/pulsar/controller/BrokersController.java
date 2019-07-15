@@ -15,7 +15,7 @@ package com.manager.pulsar.controller;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
-import com.manager.pulsar.entity.BrokersEntity;
+import com.manager.pulsar.entity.BrokerEntity;
 import com.manager.pulsar.entity.BrokersRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -64,7 +64,7 @@ public class BrokersController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
                     Integer pageSize) {
-        Page<BrokersEntity> brokersEntityPage = brokersRepository.getBrokersList(pageNum, pageSize);
+        Page<BrokerEntity> brokersEntityPage = brokersRepository.getBrokersList(pageNum, pageSize);
         Map<String, Object> result = Maps.newHashMap();
         result.put("total", brokersEntityPage.getTotal());
         result.put("data", brokersEntityPage);
@@ -77,11 +77,11 @@ public class BrokersController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @RequestMapping(value = "/brokers/{broker}", method = RequestMethod.GET)
-    public ResponseEntity<Optional<BrokersEntity>> getBroker(
+    public ResponseEntity<Optional<BrokerEntity>> getBroker(
             @ApiParam(value = "The name of broker")
             @Size(min = 1, max = 255)
             @PathVariable String broker) {
-        Optional<BrokersEntity> brokersEntity = brokersRepository.findByBroker(broker);
+        Optional<BrokerEntity> brokersEntity = brokersRepository.findByBroker(broker);
         return ResponseEntity.ok(brokersEntity);
     }
 

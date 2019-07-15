@@ -23,7 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BundlesEntity {
+public class BundleEntity {
 
     private String broker;
 

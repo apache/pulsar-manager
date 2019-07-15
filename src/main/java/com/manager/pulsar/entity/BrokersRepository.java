@@ -24,15 +24,15 @@ import java.util.Optional;
 @Repository
 public interface BrokersRepository {
 
-    void save(BrokersEntity brokersEntity);
+    void save(BrokerEntity brokersEntity);
 
-    Optional<BrokersEntity> findById(long brokerId);
+    Optional<BrokerEntity> findById(long brokerId);
 
-    Optional<BrokersEntity> findByBroker(String broker);
+    Optional<BrokerEntity> findByBroker(String broker);
 
-    Page<BrokersEntity> getBrokersList(Integer pageNum, Integer pageSize);
+    Page<BrokerEntity> getBrokersList(Integer pageNum, Integer pageSize);
 
     void remove(String broker);
 
-    void update(BrokersEntity brokersEntity);
+    void update(BrokerEntity brokersEntity);
 }

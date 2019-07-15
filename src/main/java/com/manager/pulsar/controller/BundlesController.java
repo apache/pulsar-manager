@@ -15,7 +15,7 @@ package com.manager.pulsar.controller;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
-import com.manager.pulsar.entity.BundlesEntity;
+import com.manager.pulsar.entity.BundleEntity;
 import com.manager.pulsar.entity.BundlesRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -63,7 +63,7 @@ public class BundlesController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
                     Integer pageSize) {
-        Page<BundlesEntity> bundlesEntityPage = bundlesRepository.getBundlesList(pageNum, pageSize);
+        Page<BundleEntity> bundlesEntityPage = bundlesRepository.getBundlesList(pageNum, pageSize);
         Map<String, Object> result = Maps.newHashMap();
         result.put("total", bundlesEntityPage.getTotal());
         result.put("data", bundlesEntityPage);
@@ -96,7 +96,7 @@ public class BundlesController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
                     Integer pageSize) {
-        Page<BundlesEntity> bundlesEntityPage = bundlesRepository
+        Page<BundleEntity> bundlesEntityPage = bundlesRepository
                 .findByBrokerOrTenantOrNamespaceOrBundle(pageNum, pageSize, brokerOrtenantsOrNamespaceOrbundle);
         Map<String, Object> result = Maps.newHashMap();
         result.put("total", bundlesEntityPage.getTotal());

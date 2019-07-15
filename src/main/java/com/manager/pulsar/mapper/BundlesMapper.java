@@ -14,7 +14,7 @@
 package com.manager.pulsar.mapper;
 
 import com.github.pagehelper.Page;
-import com.manager.pulsar.entity.BundlesEntity;
+import com.manager.pulsar.entity.BundleEntity;
 import org.apache.ibatis.annotations.*;
 
 /**
@@ -24,17 +24,17 @@ import org.apache.ibatis.annotations.*;
 public interface BundlesMapper {
 
     @Insert("INSERT INTO bundles(broker,tenant,namespace,bundle) VALUES(#{broker},#{tenant},#{namespace},#{bundle})")
-    void insert(BundlesEntity bundlesEntity);
+    void insert(BundleEntity bundlesEntity);
 
     @Select("SELECT broker,tenant,namespace,bundle FROM bundles WHERE broker=#{btnb} or " +
             "tenant=#{btnb} or namespace=#{btnb} or bundle=#{btnb}")
-    Page<BundlesEntity> findByBrokerOrTenantOrNamespaceOrBundle(String btnb);
+    Page<BundleEntity> findByBrokerOrTenantOrNamespaceOrBundle(String btnb);
 
     @Select("SELECT broker,tenant,namespace,bundle FROM bundles WHERE bundle=#{bundle}")
-    Page<BundlesEntity> findByBundle(String bundle);
+    Page<BundleEntity> findByBundle(String bundle);
 
     @Select("SELECT broker,tenant,namespace,bundle FROM bundles")
-    Page<BundlesEntity> getBundlesList();
+    Page<BundleEntity> getBundlesList();
 
     @Delete("DELETE FROM bundles WHERE broker=#{broker} and tenant=#{tenant} " +
             "and namespace=#{namespace} and bundle=#{bundle}")

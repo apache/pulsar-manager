@@ -16,21 +16,19 @@ package com.manager.pulsar.entity;
 import com.github.pagehelper.Page;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 /**
  * Interface of bundles
  */
 @Repository
 public interface BundlesRepository {
 
-    void save(BundlesEntity bundlesEntity);
+    void save(BundleEntity bundlesEntity);
 
-    Page<BundlesEntity> findByBrokerOrTenantOrNamespaceOrBundle(Integer pageNum, Integer pageSize, String btnt);
+    Page<BundleEntity> findByBrokerOrTenantOrNamespaceOrBundle(Integer pageNum, Integer pageSize, String btnt);
 
-    Page<BundlesEntity> findByBundle(Integer pageNum, Integer pageSize, String bundle);
+    Page<BundleEntity> findByBundle(Integer pageNum, Integer pageSize, String bundle);
 
-    Page<BundlesEntity> getBundlesList(Integer pageNum, Integer pageSize);
+    Page<BundleEntity> getBundlesList(Integer pageNum, Integer pageSize);
 
     void remove(String broker, String tenant, String namespace, String bundle);
 

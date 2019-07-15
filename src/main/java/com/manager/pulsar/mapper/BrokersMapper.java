@@ -14,7 +14,7 @@
 package com.manager.pulsar.mapper;
 
 import com.github.pagehelper.Page;
-import com.manager.pulsar.entity.BrokersEntity;
+import com.manager.pulsar.entity.BrokerEntity;
 import org.apache.ibatis.annotations.*;
 
 /**
@@ -28,29 +28,29 @@ public interface BrokersMapper {
             "VALUES(#{brokerId}, #{broker},#{webServiceUrl},#{webServiceUrlTls},#{pulsarServiceUrl}," +
             "#{pulsarServiceUrlTls},#{persistentTopicsEnabled},#{nonPersistentTopicsEnabled}," +
             "#{brokerVersionString},#{loadReportType},#{maxResourceUsage})")
-    void insert(BrokersEntity brokersEntity);
+    void insert(BrokerEntity brokersEntity);
 
     @Select("SELECT broker,webServiceUrl,webServiceUrlTls,pulsarServiceUrl,pulsarServiceUrlTls," +
             "persistentTopicsEnabled,nonPersistentTopicsEnabled,brokerVersionString,loadReportType,maxResourceUsage " +
             "FROM brokers WHERE brokerId=#{brokerId}")
-    BrokersEntity findById(long brokerId);
+    BrokerEntity findById(long brokerId);
 
     @Select("SELECT brokerId,broker,webServiceUrl,webServiceUrlTls,pulsarServiceUrl,pulsarServiceUrlTls," +
             "persistentTopicsEnabled,nonPersistentTopicsEnabled,brokerVersionString,loadReportType,maxResourceUsage " +
             "FROM brokers WHERE broker=#{broker}")
-    BrokersEntity findByBroker(String broker);
+    BrokerEntity findByBroker(String broker);
 
     @Select("SELECT brokerId,broker,webServiceUrl,webServiceUrlTls,pulsarServiceUrl,pulsarServiceUrlTls," +
             "persistentTopicsEnabled,nonPersistentTopicsEnabled,brokerVersionString,loadReportType,maxResourceUsage " +
             "FROM brokers")
-    Page<BrokersEntity> getBrokersList();
+    Page<BrokerEntity> getBrokersList();
 
     @Update("UPDATE brokers set webServiceUrl=#{webServiceUrl},webServiceUrlTls=#{webServiceUrlTls}," +
             "pulsarServiceUrl=#{pulsarServiceUrl},pulsarServiceUrlTls=#{pulsarServiceUrlTls}," +
             "persistentTopicsEnabled=#{persistentTopicsEnabled}," +
             "nonPersistentTopicsEnabled=#{nonPersistentTopicsEnabled},brokerVersionString=#{brokerVersionString}," +
             "loadReportType=#{loadReportType},maxResourceUsage=#{maxResourceUsage} WHERE broker=#{broker}")
-    void update(BrokersEntity brokersEntity);
+    void update(BrokerEntity brokersEntity);
 
     @Delete("DELETE FROM brokers WHERE brokerId=#{brokerId}")
     void deleteByBrokerId(Integer brokerId);

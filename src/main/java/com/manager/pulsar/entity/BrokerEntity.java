@@ -23,7 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BrokersEntity {
+public class BrokerEntity {
     private long brokerId;
     private String broker;
     // URLs to satisfy contract of ServiceLookupData (used by NamespaceService).

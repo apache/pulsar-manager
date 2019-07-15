@@ -15,7 +15,7 @@ package com.manager.pulsar.dao;
 
 
 import com.github.pagehelper.Page;
-import com.manager.pulsar.entity.BundlesEntity;
+import com.manager.pulsar.entity.BundleEntity;
 import com.manager.pulsar.entity.BundlesRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,14 +34,14 @@ public class BundlesRespositoryImplTest {
     @Autowired
     private BundlesRepository bundlesRepository;
 
-    private void initBundleEntity(BundlesEntity bundlesEntity) {
+    private void initBundleEntity(BundleEntity bundlesEntity) {
         bundlesEntity.setBroker("test-broker");
         bundlesEntity.setTenant("public");
         bundlesEntity.setNamespace("default");
         bundlesEntity.setBundle("0x80000000_0x90000000");
     }
 
-    private void checkResult(Page<BundlesEntity> bundlesEntityPage) {
+    private void checkResult(Page<BundleEntity> bundlesEntityPage) {
         long total = bundlesEntityPage.getTotal();
         Assert.assertEquals(total, 1);
         bundlesEntityPage.getResult().forEach((result) -> {
@@ -52,52 +52,52 @@ public class BundlesRespositoryImplTest {
         });
     }
 
-    private void checkDeleteResult(Page<BundlesEntity> bundlesEntityPage) {
+    private void checkDeleteResult(Page<BundleEntity> bundlesEntityPage) {
         long total = bundlesEntityPage.getTotal();
         Assert.assertEquals(total, 0);
     }
 
     @Test
     public void getBundlesList() {
-        BundlesEntity bundlesEntity = new BundlesEntity();
+        BundleEntity bundlesEntity = new BundleEntity();
         initBundleEntity(bundlesEntity);
         bundlesRepository.save(bundlesEntity);
-        Page<BundlesEntity> bundlesEntityPage = bundlesRepository.getBundlesList(1, 2);
+        Page<BundleEntity> bundlesEntityPage = bundlesRepository.getBundlesList(1, 2);
         bundlesEntityPage.count(true);
         checkResult(bundlesEntityPage);
         bundlesEntityPage.getResult().forEach((result) -> {
             bundlesRepository.remove(result.getBroker(), result.getTenant(), result.getNamespace(), result.getBundle());
         });
-        Page<BundlesEntity> deleteBundle = bundlesRepository.getBundlesList(1, 2);
+        Page<BundleEntity> deleteBundle = bundlesRepository.getBundlesList(1, 2);
         deleteBundle.count(true);
         checkDeleteResult(deleteBundle);
     }
 
     @Test
     public void getByBrokerOrTenantOrNamespaceOrbundle() {
-        BundlesEntity bundlesEntity = new BundlesEntity();
+        BundleEntity bundlesEntity = new BundleEntity();
         initBundleEntity(bundlesEntity);
         bundlesRepository.save(bundlesEntity);
         String broker = "test-broker";
-        Page<BundlesEntity> bundlesEntityPageByBroker = bundlesRepository
+        Page<BundleEntity> bundlesEntityPageByBroker = bundlesRepository
                 .findByBrokerOrTenantOrNamespaceOrBundle(1, 2, broker);
         bundlesEntityPageByBroker.count(true);
         checkResult(bundlesEntityPageByBroker);
 
         String tenant = "public";
-        Page<BundlesEntity> bundlesEntityPageByTenant = bundlesRepository
+        Page<BundleEntity> bundlesEntityPageByTenant = bundlesRepository
                 .findByBrokerOrTenantOrNamespaceOrBundle(1, 2, tenant);
         bundlesEntityPageByTenant.count(true);
         checkResult(bundlesEntityPageByTenant);
 
         String namespace = "default";
-        Page<BundlesEntity> bundlesEntityPageByNamespace = bundlesRepository
+        Page<BundleEntity> bundlesEntityPageByNamespace = bundlesRepository
                 .findByBrokerOrTenantOrNamespaceOrBundle(1, 2, namespace);
         bundlesEntityPageByNamespace.count(true);
         checkResult(bundlesEntityPageByNamespace);
 
         String bundle = "0x80000000_0x90000000";
-        Page<BundlesEntity> bundlesEntityPageByBundle = bundlesRepository
+        Page<BundleEntity> bundlesEntityPageByBundle = bundlesRepository
                 .findByBrokerOrTenantOrNamespaceOrBundle(1,2, bundle);
         bundlesEntityPageByBundle.count(true);
         checkResult(bundlesEntityPageByBundle);
@@ -106,7 +106,7 @@ public class BundlesRespositoryImplTest {
             bundlesRepository.remove(result.getBroker(), result.getTenant(), result.getNamespace(), result.getBundle());
         });
 
-        Page<BundlesEntity> deleteBundle = bundlesRepository.getBundlesList(1, 2);
+        Page<BundleEntity> deleteBundle = bundlesRepository.getBundlesList(1, 2);
         deleteBundle.count(true);
         checkDeleteResult(deleteBundle);
     }
