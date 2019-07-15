@@ -79,7 +79,7 @@ public class SubscriptionsController {
             @ApiResponse(code = 200, message = "ok"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    @RequestMapping(value = "/namespaces/{tenantOrNamespaceOrTopicOrSub", method = RequestMethod.GET)
+    @RequestMapping(value = "/namespaces/{tenantOrNamespaceOrTopicOrSub}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getSubByTnts(
             @ApiParam(value = "The name of tenant or namespace.")
             @Size(min = 1, max = 255)
