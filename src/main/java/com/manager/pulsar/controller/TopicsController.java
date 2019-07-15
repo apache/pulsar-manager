@@ -110,7 +110,7 @@ public class TopicsController {
             @ApiParam(value = "The name of topic")
             @Size(min = 1, max = 255)
             @PathVariable String topic) {
-        Optional<TopicEntity> topicsEntity = topicsRepository.findByTenantNamespaceTopic(tenant, namespace, topic);
+        Optional<TopicEntity> topicsEntity = topicsRepository.findByFullyQualifiedTopicName(tenant, namespace, topic);
         return ResponseEntity.ok(topicsEntity);
     }
 }
