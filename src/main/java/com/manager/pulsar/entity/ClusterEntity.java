@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ClustersEntity {
+public class ClusterEntity {
     private long clusterId;
     private String cluster;
 

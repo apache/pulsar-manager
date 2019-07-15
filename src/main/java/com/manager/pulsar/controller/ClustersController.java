@@ -2,7 +2,7 @@ package com.manager.pulsar.controller;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
-import com.manager.pulsar.entity.ClustersEntity;
+import com.manager.pulsar.entity.ClusterEntity;
 import com.manager.pulsar.entity.ClustersRepository;
 import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.Range;
@@ -16,6 +16,9 @@ import javax.validation.constraints.Size;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Cluster rest api
+ */
 @RestController
 @RequestMapping(value = "/pulsar-manager/admin/v2")
 @Api(description = "Support more flexible queries to clusters.")
@@ -41,7 +44,7 @@ public class ClustersController {
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
                     Integer pageSize) {
         Map<String, Object> result = Maps.newHashMap();
-        Page<ClustersEntity> clustersEntityPage = clustersRepository.getClustersList(pageNum, pageSize);
+        Page<ClusterEntity> clustersEntityPage = clustersRepository.getClustersList(pageNum, pageSize);
         result.put("total", clustersEntityPage.getTotal());
         result.put("data", clustersEntityPage);
         return ResponseEntity.ok(result);
@@ -53,11 +56,11 @@ public class ClustersController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @RequestMapping(value = "/clusters/{cluster}", method = RequestMethod.GET)
-    public ResponseEntity<Optional<ClustersEntity>> getCluster(
+    public ResponseEntity<Optional<ClusterEntity>> getCluster(
             @ApiParam(value = "The name of cluster")
             @Size(min = 1, max = 255)
             @PathVariable String cluster) {
-        Optional<ClustersEntity> clustersEntity = clustersRepository.findByCluster(cluster);
+        Optional<ClusterEntity> clustersEntity = clustersRepository.findByCluster(cluster);
         return ResponseEntity.ok(clustersEntity);
     }
 }

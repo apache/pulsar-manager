@@ -8,15 +8,15 @@ import java.util.Optional;
 @Repository
 public interface ClustersRepository {
 
-    void save(ClustersEntity clustersEntity);
+    void save(ClusterEntity clustersEntity);
 
-    Optional<ClustersEntity> findById(long clusterId);
+    Optional<ClusterEntity> findById(long clusterId);
 
-    Optional<ClustersEntity> findByCluster(String cluster);
+    Optional<ClusterEntity> findByCluster(String cluster);
 
-    Page<ClustersEntity> getClustersList(Integer pageNum, Integer pageSize);
+    Page<ClusterEntity> getClustersList(Integer pageNum, Integer pageSize);
 
     void remove(String cluster);
 
-    void update(ClustersEntity clustersEntity);
+    void update(ClusterEntity clustersEntity);
 }
