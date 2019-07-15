@@ -16,7 +16,7 @@ package com.manager.pulsar.dao;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.manager.pulsar.entity.TenantsRepository;
-import com.manager.pulsar.entity.TenantsEntity;
+import com.manager.pulsar.entity.TenantEntity;
 import com.manager.pulsar.mapper.TenantsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,24 +31,24 @@ public class TenantsRepositoryImpl implements TenantsRepository {
     public TenantsRepositoryImpl(TenantsMapper tenantsMapper) { this.tenantsMapper = tenantsMapper; }
 
     @Override
-    public Optional<TenantsEntity> findById(long tenantId) {
+    public Optional<TenantEntity> findById(long tenantId) {
         return Optional.ofNullable(tenantsMapper.findById(tenantId));
     }
 
     @Override
-    public Optional<TenantsEntity> findByName(String tenant) {
+    public Optional<TenantEntity> findByName(String tenant) {
         return Optional.ofNullable(tenantsMapper.findByName(tenant));
     }
 
     @Override
-    public Page<TenantsEntity> getTenantsList(Integer pageNum, Integer pageSize) {
+    public Page<TenantEntity> getTenantsList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<TenantsEntity> tenantsEntities = tenantsMapper.getTenantsList();
+        Page<TenantEntity> tenantsEntities = tenantsMapper.getTenantsList();
         return tenantsEntities;
     }
 
     @Override
-    public void save(TenantsEntity tenantsEntity) {
+    public void save(TenantEntity tenantsEntity) {
         tenantsMapper.insert(tenantsEntity);
     }
 

@@ -14,10 +14,15 @@
 package com.manager.pulsar.mapper;
 
 import com.github.pagehelper.Page;
-import com.manager.pulsar.entity.NamespacesEntity;
-import com.manager.pulsar.entity.TenantsEntity;
-import org.apache.ibatis.annotations.*;
+import com.manager.pulsar.entity.NamespaceEntity;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
+@Mapper
 public interface NamespacesMapper {
 
     @Insert("INSERT INTO namespaces(namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters," +
@@ -36,7 +41,7 @@ public interface NamespacesMapper {
             "#{antiAffinityGroup},#{encryptionRequired},#{subscriptionAuthMode},#{maxProducersPerTopic}," +
             "#{maxConsumersPerTopic},#{maxConsumersPerSubscription},#{compactionThreshold},#{offloadThreshold}," +
             "#{offloadDeletionLagMs},#{schemaValidationEnforced},#{schemaAutoApdateCompatibilityStrategy})")
-    void insert(NamespacesEntity namespacesEntity);
+    void insert(NamespaceEntity namespacesEntity);
 
     @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
@@ -46,7 +51,7 @@ public interface NamespacesMapper {
             "maxProducersPerTopic,maxConsumersPerTopic,maxConsumersPerSubscription,compactionThreshold," +
             "offloadThreshold,offloadDeletionLagMs,schemaValidationEnforced," +
             "schemaAutoApdateCompatibilityStrategy FROM namespaces WHERE namespaceId = #{namespaceId}")
-    NamespacesEntity findById(long namespaceId);
+    NamespaceEntity findById(long namespaceId);
 
     @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
@@ -56,7 +61,7 @@ public interface NamespacesMapper {
             "maxProducersPerTopic,maxConsumersPerTopic,maxConsumersPerSubscription,compactionThreshold," +
             "offloadThreshold,offloadDeletionLagMs,schemaValidationEnforced," +
             "schemaAutoApdateCompatibilityStrategy FROM namespaces WHERE tenant=#{tenant} and namespace=#{namespace}")
-    NamespacesEntity findByTenantNamespace(String tenant, String namespace);
+    NamespaceEntity findByTenantNamespace(String tenant, String namespace);
 
     @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
@@ -67,7 +72,7 @@ public interface NamespacesMapper {
             "offloadThreshold,offloadDeletionLagMs,schemaValidationEnforced," +
             "schemaAutoApdateCompatibilityStrategy FROM namespaces " +
             "WHERE tenant=#{tenantOrNamespace} or namespace=#{tenantOrNamespace}")
-    Page<NamespacesEntity> findByTenantOrNamespace(String tenantOrNamespace);
+    Page<NamespaceEntity> findByTenantOrNamespace(String tenantOrNamespace);
 
     @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
             "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
@@ -77,7 +82,17 @@ public interface NamespacesMapper {
             "maxProducersPerTopic,maxConsumersPerTopic,maxConsumersPerSubscription,compactionThreshold," +
             "offloadThreshold,offloadDeletionLagMs,schemaValidationEnforced," +
             "schemaAutoApdateCompatibilityStrategy FROM namespaces WHERE namespace=#{namespace}")
-    Page<NamespacesEntity> findByNamespace(String namespace);
+    Page<NamespaceEntity> findByNamespace(String namespace);
+
+    @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
+            "topicDispatchRate,subscriptionDispatchRate,replicatorDispatchRate,clusterSubscribeRate," +
+            "bookkeeperEnsemble,bookkeeperWriteQuorum,bookkeeperAckQuorum,managedLedgerMaxMarkDeleteRate," +
+            "deduplicationEnabled,latencyStatsSampleRate,messageTtlInSeconds,retentionTimeInMinutes," +
+            "retentionSizeInMB,deleted,antiAffinityGroup,encryptionRequired,subscriptionAuthMode," +
+            "maxProducersPerTopic,maxConsumersPerTopic,maxConsumersPerSubscription,compactionThreshold," +
+            "offloadThreshold,offloadDeletionLagMs,schemaValidationEnforced," +
+            "schemaAutoApdateCompatibilityStrategy FROM namespaces WHERE tenant=#{tenant}")
+    Page<NamespaceEntity> findByTenant(String tenant);
 
 
     @Select("SELECT namespaceId,tenant,namespace,authPolicies,backlogQuota,replicationClusters,numBundles,boundaries," +
@@ -88,7 +103,7 @@ public interface NamespacesMapper {
             "maxProducersPerTopic,maxConsumersPerTopic,maxConsumersPerSubscription,compactionThreshold," +
             "offloadThreshold,offloadDeletionLagMs,schemaValidationEnforced," +
             "schemaAutoApdateCompatibilityStrategy FROM namespaces")
-    Page<NamespacesEntity> getNamespacesList();
+    Page<NamespaceEntity> getNamespacesList();
 
     @Delete("DELETE FROM namespaces WHERE namespaceId = #{namespaceId}")
     void deleteByNamespaceId(long namespaceId);
@@ -110,7 +125,7 @@ public interface NamespacesMapper {
             "schemaValidationEnforced=#{schemaValidationEnforced}," +
             "schemaAutoApdateCompatibilityStrategy=#{schemaAutoApdateCompatibilityStrategy} " +
             "where tenant = #{tenant} and namespace = #{namespace})")
-    void updateByTenantNamespace(NamespacesEntity namespacesEntity);
+    void updateByTenantNamespace(NamespaceEntity namespacesEntity);
 
     @Delete("DELETE FROM namespaces WHERE tenant = #{tenant} and namespace = #{namespace}")
     void deleteByTenantNamespace(@Param("tenant") String tenant, @Param("namespace") String namespace);

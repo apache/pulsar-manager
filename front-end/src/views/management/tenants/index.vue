@@ -6,8 +6,8 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
     </div>
 
-    <el-row :gutter="8">
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
+    <el-row :gutter="24">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
         <el-table
           v-loading="listLoading"
           :key="tableKey"
@@ -23,9 +23,19 @@
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.config')" align="center" min-width="100px">
+          <el-table-column :label="$t('table.namespace')" align="center" min-width="100px">
             <template slot-scope="scope">
-              <span class="link-type" @click="handleGetConfig(scope.row)">config</span>
+              <span>{{ scope.row.namespace }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('table.allowedClusters')" align="center" min-width="100px">
+            <template slot-scope="scope">
+              <span>{{ scope.row.allowedClusters }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('table.adminRoles')" align="center" min-width="100px">
+            <template slot-scope="scope">
+              <span>{{ scope.row.adminRoles }}</span>
             </template>
           </el-table-column>
           <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
@@ -36,9 +46,6 @@
           </el-table-column>
         </el-table>
         <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getTenants" />
-      </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;">
-        <jsonEditor :value="jsonValue"/>
       </el-col>
     </el-row>
 
@@ -51,6 +58,9 @@
           <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
             <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
           </el-drag-select>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.role')" prop="roles">
+          <el-input v-model="temp.adminRoles"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('table.tenant')">
           <span>{{ temp.tenant }}</span>
@@ -156,10 +166,25 @@ export default {
       } else {
         this.listLoading = true
         fetchTenants().then(response => {
-          for (var i = 0; i < response.data.length; i++) {
-            this.localList.push({ 'tenant': response.data[i] })
+          for (var i = 0; i < response.data.total; i++) {
+            let allowedClusters = '-'
+            let adminRoles = '-'
+            if (response.data.data[i]['allowedClusters'].length > 0) {
+              allowedClusters = response.data.data[i]['allowedClusters']
+            }
+            if (response.data.data[i]['adminRoles'].length > 0) {
+              adminRoles = response.data.data[i]['adminRoles']
+            }
+            this.localList.push({
+              'tenant': response.data.data[i]['tenant'],
+              'namespace': response.data.data[i]['namespaces'],
+              'allowedClusters': allowedClusters,
+              'adminRoles': adminRoles
+            })
           }
-          this.total = this.localList.length
+          this.total = response.data.total
+          this.listQuery.page = response.data.pageNum
+          this.listQuery.limit = response.data.pageSize
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
           // this.localPaging()
           // Just to simulate the time of the request
@@ -185,7 +210,6 @@ export default {
         this.total = this.localList.length
         this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
       }
-      console.log(this.searchList)
       this.listLoading = false
     },
     handleGetConfig(row) {
@@ -226,7 +250,12 @@ export default {
     createData() {
       this.$refs['temp'].validate((valid) => {
         if (valid) {
-          const data = { allowedClusters: this.temp.clusters }
+          const data = {
+            allowedClusters: this.temp.clusters
+          }
+          if (this.temp.adminRoles.length > 0) {
+            data.adminRoles = this.temp.adminRoles.split(',')
+          }
           putTenant(this.temp.tenant, data).then((response) => {
             this.temp.adminRoles = 'empty'
             this.temp.allowedClusters = 'empty'
@@ -272,6 +301,8 @@ export default {
           if (this.temp.clusters.length > 0 || tempData.adminRoles.length > 0) {
             updateTenant(this.temp.tenant, data).then(() => {
               this.dialogFormVisible = false
+              this.localList = []
+              this.getTenants()
               this.$notify({
                 title: 'success',
                 message: 'update success',

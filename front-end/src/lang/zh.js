@@ -178,7 +178,9 @@ export default {
     builtin: '内建',
     sinks: 'Sink',
     quotas: '配额',
-    monitor: '监控'
+    monitor: '监控',
+    allowedClusters: 'Allowed Clusters',
+    adminRoles: 'Admin Roles'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

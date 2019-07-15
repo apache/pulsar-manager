@@ -14,9 +14,9 @@
 package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
-import com.manager.pulsar.entity.NamespacesEntity;
+import com.manager.pulsar.entity.NamespaceEntity;
 import com.manager.pulsar.entity.NamespacesRepository;
-import com.manager.pulsar.entity.TenantsEntity;
+import com.manager.pulsar.entity.TenantEntity;
 import com.manager.pulsar.entity.TenantsRepository;
 import org.junit.After;
 import org.junit.Assert;
@@ -37,7 +37,7 @@ public class NamespacesRepositoryImplTest {
     @Autowired
     private NamespacesRepository namespacesRepository;
 
-    public void initNamespaceEntity(NamespacesEntity namespacesEntity) {
+    public void initNamespaceEntity(NamespaceEntity namespacesEntity) {
         namespacesEntity.setNamespaceId(1);
         namespacesEntity.setTenant("test-namespace-public");
         namespacesEntity.setNamespace("test-namespace-default");
@@ -68,7 +68,7 @@ public class NamespacesRepositoryImplTest {
         namespacesEntity.setBookkeeperWriteQuorum(0);
     }
 
-    public void checkResult(Page<NamespacesEntity> namespacesEntityPage) {
+    public void checkResult(Page<NamespaceEntity> namespacesEntityPage) {
         long total = namespacesEntityPage.getTotal();
         Assert.assertEquals(total, 1);
         namespacesEntityPage.getResult().forEach((result) -> {
@@ -104,7 +104,7 @@ public class NamespacesRepositoryImplTest {
         });
     }
 
-    public void checkDeleteResult(Page<NamespacesEntity> namespacesEntityPage) {
+    public void checkDeleteResult(Page<NamespaceEntity> namespacesEntityPage) {
         long total = namespacesEntityPage.getTotal();
         Assert.assertEquals(total, 0);
     }
@@ -120,7 +120,7 @@ public class NamespacesRepositoryImplTest {
     }
 
     public void prepareTenant() {
-        TenantsEntity tenantsEntity = new TenantsEntity(
+        TenantEntity tenantsEntity = new TenantEntity(
                 1, "test-namespace-public",  "testrole", "testCluster");
         tenantsRepository.save(tenantsEntity);
     }
@@ -131,39 +131,39 @@ public class NamespacesRepositoryImplTest {
 
     @Test
     public void getNamespacesList() {
-        NamespacesEntity namespacesEntity = new NamespacesEntity();
+        NamespaceEntity namespacesEntity = new NamespaceEntity();
         initNamespaceEntity(namespacesEntity);
         namespacesRepository.save(namespacesEntity);
-        Page<NamespacesEntity> namespacesEntityPage = namespacesRepository.getNamespacesList(1, 2);
+        Page<NamespaceEntity> namespacesEntityPage = namespacesRepository.getNamespacesList(1, 2);
         namespacesEntityPage.count(true);
         checkResult(namespacesEntityPage);
         namespacesEntityPage.getResult().forEach((result) -> {
             namespacesRepository.remove(result.getTenant(), result.getNamespace());
         });
-        Page<NamespacesEntity> deleteNamespace = namespacesRepository.getNamespacesList(1, 2);
+        Page<NamespaceEntity> deleteNamespace = namespacesRepository.getNamespacesList(1, 2);
         deleteNamespace.count(true);
         checkDeleteResult(deleteNamespace);
     }
 
     @Test
     public void getNamespaceByTenantOrNamespace() {
-        NamespacesEntity namespacesEntity = new NamespacesEntity();
+        NamespaceEntity namespacesEntity = new NamespaceEntity();
         initNamespaceEntity(namespacesEntity);
         namespacesRepository.save(namespacesEntity);
         String tenant = "test-namespace-public";
-        Page<NamespacesEntity> namespacesEntityPageByTenant = namespacesRepository.
+        Page<NamespaceEntity> namespacesEntityPageByTenant = namespacesRepository.
                 findByTenantOrNamespace(1, 2, tenant);
         namespacesEntityPageByTenant.count(true);
         checkResult(namespacesEntityPageByTenant);
         String namespace = "test-namespace-default";
-        Page<NamespacesEntity> namespacesEntityPageByNamespace = namespacesRepository.
+        Page<NamespaceEntity> namespacesEntityPageByNamespace = namespacesRepository.
                 findByTenantOrNamespace(1, 2, namespace);
         namespacesEntityPageByNamespace.count(true);
         checkResult(namespacesEntityPageByNamespace);
         namespacesEntityPageByNamespace.getResult().forEach((result) -> {
             namespacesRepository.remove(result.getTenant(), result.getNamespace());
         });
-        Page<NamespacesEntity> deleteNamespace = namespacesRepository.getNamespacesList(1, 2);
+        Page<NamespaceEntity> deleteNamespace = namespacesRepository.getNamespacesList(1, 2);
         deleteNamespace.count(true);
         checkDeleteResult(deleteNamespace);
     }

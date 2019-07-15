@@ -27,7 +27,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TenantsEntity {
+public class TenantEntity {
   private long tenantId;
   private String tenant;
   private String adminRoles;

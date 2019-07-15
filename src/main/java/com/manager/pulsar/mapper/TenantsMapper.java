@@ -14,25 +14,28 @@
 package com.manager.pulsar.mapper;
 
 import com.github.pagehelper.Page;
-import com.manager.pulsar.entity.TenantsEntity;
-import org.apache.ibatis.annotations.*;
-
+import com.manager.pulsar.entity.TenantEntity;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface TenantsMapper {
 
   @Insert("INSERT INTO tenants(tenant,tenantId,adminRoles,allowedClusters) " +
           "VALUES(#{tenant},#{tenantId},#{adminRoles},#{allowedClusters})")
-  void insert(TenantsEntity tenantsEntity);
+  void insert(TenantEntity tenantsEntity);
 
   @Select("SELECT tenant,adminRoles,allowedClusters FROM tenants WHERE tenantId = #{tenantId}")
-  TenantsEntity findById(long tenantId);
+  TenantEntity findById(long tenantId);
 
   @Select("SELECT tenantId,tenant,adminRoles,allowedClusters FROM tenants WHERE tenant = #{tenant}")
-  TenantsEntity findByName(String tenant);
+  TenantEntity findByName(String tenant);
 
   @Select("SELECT tenantId,tenant,adminRoles,allowedClusters FROM tenants")
-  Page<TenantsEntity> getTenantsList();
+  Page<TenantEntity> getTenantsList();
 
   @Delete("DELETE FROM tenants WHERE tenantId = #{tenantId}")
   void delete(Long tenantId);

@@ -143,8 +143,8 @@ export default {
     name: 'Name',
     serviceUrl: 'ServiceUrl',
     brokerServiceUrl: 'BrokerServiceUrl',
-    tenant: 'Tenant',
-    namespace: 'Namespace',
+    tenant: 'Tenants',
+    namespace: 'Namespaces',
     role: 'Role',
     clusters: 'Clusters',
     addRole: 'AddRole',
@@ -178,7 +178,9 @@ export default {
     builtin: 'Builtin',
     sinks: 'Sink',
     quotas: 'Quotas',
-    monitor: 'Monitor'
+    monitor: 'Monitor',
+    allowedClusters: 'Allowed Clusters',
+    adminRoles: 'Admin Roles'
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

@@ -13,10 +13,7 @@
  */
 package com.manager.pulsar.controller;
 
-import com.github.pagehelper.Page;
-import com.google.common.collect.Maps;
-import com.manager.pulsar.entity.TenantsEntity;
-import com.manager.pulsar.entity.TenantsRepository;
+import com.manager.pulsar.service.TenantsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -44,7 +41,7 @@ import java.util.Map;
 public class TenantsController {
 
   @Autowired
-  private TenantsRepository tenantsRepository;
+  private TenantsService tenantsService;
 
   @ApiOperation(value = "Get the list of existing tenants, support paging, the default is 10 per page")
   @ApiResponses({
@@ -62,10 +59,7 @@ public class TenantsController {
           @RequestParam(name="page_size", defaultValue = "10")
           @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
           Integer pageSize) {
-    Map<String, Object> result = Maps.newHashMap();
-    Page<TenantsEntity> tenantsEntities = tenantsRepository.getTenantsList(pageNum, pageSize);
-    result.put("total", tenantsEntities.getTotal());
-    result.put("data", tenantsEntities);
+    Map<String, Object> result = tenantsService.getTenantsList(pageNum, pageSize);
     return ResponseEntity.ok(result);
   }
 }
