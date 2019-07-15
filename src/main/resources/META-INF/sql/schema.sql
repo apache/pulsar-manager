@@ -76,36 +76,6 @@ CREATE TABLE IF NOT EXISTS brokers (
   UNIQUE (brokerId)
 );
 
-CREATE TABLE IF NOT EXISTS brokerStats (
-  broker varchar(1024) NOT NULL PRIMARY KEY,
-  cpuUsage double,
-  cpuLimit double,
-  memoryUsage double,
-  memoryLimit double,
-  directMemoryUsage double,
-  directMemoryLimit double,
-  bandwidthInUsage double,
-  bandwidthInLimit double,
-  bandwidthOutUsage double,
-  bandwidthOutLimit double,
-  msgThroughputIn double,
-  msgThroughputOut double,
-  msgRateIn double,
-  msgRateOut double,
---   mysql use bigint
-  lastUpdate integer,
-  lastStats TEXT,
-  bundleStats TEXT,
-  numTopics integer,
-  numBundles integer,
-  numConsumers integer,
-  numProducers integer,
-  bundles TEXT,
-  lastBundleGains TEXT,
-  lastBundleLosses TEXT,
-  CONSTRAINT FK_broker FOREIGN KEY (broker) References brokers(broker)
-);
-
 CREATE TABLE IF NOT EXISTS bundles (
   broker varchar(1024) NOT NULL,
   tenant varchar(255) NOT NULL,
@@ -116,26 +86,3 @@ CREATE TABLE IF NOT EXISTS bundles (
   CONSTRAINT FK_namespace FOREIGN KEY (namespace) References namespaces(namespace),
   CONSTRAINT PK_bundle PRIMARY KEY (broker, tenant, namespace, bundle)
 );
-
-CREATE TABLE IF NOT EXISTS bundleStats (
-  broker varchar(1024) NOT NULL,
-  tenant varchar(255) NOT NULL,
-  namespace varchar(255) NOT NULL,
-  bundle varchar(1024) NOT NULL,
-  msgRateIn double,
-  msgThroughputIn double,
-  msgRateOut double,
-  msgThroughputOut double,
-  consumerCount integer,
-  producerCount integer,
-  --   mysql use bigint
-  topics integer,
-  --   mysql use bigint
-  cacheSize integer,
-  CONSTRAINT FK_broker FOREIGN KEY (broker) References brokers(broker),
-  CONSTRAINT FK_tenant FOREIGN KEY (tenant) References tenants(tenant),
-  CONSTRAINT FK_namespace FOREIGN KEY (namespace) References namespaces(namespace),
-  CONSTRAINT PK_bundle PRIMARY KEY (broker, tenant, namespace, bundle)
-);
-
-CREATE INDEX IF NOT EXISTS bundles_bundle_index ON bundles(bundle);
