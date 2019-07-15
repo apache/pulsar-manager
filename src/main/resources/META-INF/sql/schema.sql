@@ -61,6 +61,34 @@ CREATE TABLE IF NOT EXISTS namespaces (
 );
 CREATE INDEX IF NOT EXISTS namespaces_namespace_index ON namespaces(namespace);
 
+CREATE TABLE IF NOT EXISTS topics (
+  topicId INTEGER NOT NULL,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL,
+  topic varchar(255) NOT NULL,
+  persistent false,
+  partitions int,
+  CONSTRAINT FK_tenant FOREIGN KEY (tenant) References tenants(tenant),
+  CONSTRAINT FK_namespace FOREIGN KEY (namespace) References namespaces(namespace),
+  CONSTRAINT PK_topic PRIMARY KEY (tenant, namespace, topic)
+  UNIQUE (topicId)
+);
+CREATE INDEX IF NOT EXISTS topics_topic_index ON topics(topic);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+  subscriptionId INTEGER NOT NULL,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL,
+  topic varchar(255) NOT NULL,
+  subscription varchar(255) NOT NULL,
+  persistent false,
+  CONSTRAINT FK_tenant FOREIGN KEY (tenant) References tenants(tenant),
+  CONSTRAINT FK_namespace FOREIGN KEY (namespace) References namespaces(namespace),
+  CONSTRAINT FK_topic FOREIGN KEY (topic) References topics(topic),
+  CONSTRAINT PK_subscription PRIMARY KEY (tenant, namespace, topic, subscription)
+  UNIQUE(subscriptionId)
+);
+
 CREATE TABLE IF NOT EXISTS brokers (
   broker varchar(1024) NOT NULL PRIMARY KEY,
   brokerId INTEGER NOT NULl,
