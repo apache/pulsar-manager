@@ -40,12 +40,12 @@ public class TopicsRepositoryImpl implements TopicsRepository {
     }
 
     @Override
-    public Optional<TopicEntity> findByTenantNamespaceTopic(String tenant, String namespace, String topic) {
+    public Optional<TopicEntity> findByFullyQualifiedTopicName(String tenant, String namespace, String topic) {
         return Optional.ofNullable(topicsMapper.findByTenantNamespaceTopic(tenant, namespace, topic));
     }
 
     @Override
-    public Page<TopicEntity> findByTopic(String topic) {
+    public Page<TopicEntity> findByShortTopicName(String topic) {
         return topicsMapper.findByTopic(topic);
     }
 
@@ -69,8 +69,8 @@ public class TopicsRepositoryImpl implements TopicsRepository {
     }
 
     @Override
-    public void remove(String tenant, String namespace, String topic) {
-        topicsMapper.deleteByTenantNamespaceTopic(tenant, namespace, topic);
+    public void remove(String tenant, String namespace, String topic, boolean persistent) {
+        topicsMapper.deleteByTenantNamespaceTopic(tenant, namespace, topic, persistent);
     }
 
     @Override

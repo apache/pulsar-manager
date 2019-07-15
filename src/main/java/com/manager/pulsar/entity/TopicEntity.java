@@ -31,6 +31,7 @@ public class TopicEntity {
     private String tenant;
     private String namespace;
     private String topic;
+    private long namespaceId;
     private boolean persistent;
     private int partitions;
 }

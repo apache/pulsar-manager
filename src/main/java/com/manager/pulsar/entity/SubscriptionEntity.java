@@ -29,6 +29,7 @@ public class SubscriptionEntity {
     private long subscriptionId;
     private String tenant;
     private String namespace;
+    private long topicId;
     private String topic;
     private boolean persistent;
     private String subscription;

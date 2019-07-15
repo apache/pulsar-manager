@@ -35,7 +35,6 @@ public interface SubscriptionsRepository {
 
     Page<SubscriptionEntity> getSubscriptionsList(Integer pageNum, Integer pageSize);
 
-    void remove(String tenant, String namespace, String topic, String subscription);
+    void remove(String tenant, String namespace, String topic, String subscription, boolean persistent);
 
-    void update(SubscriptionEntity subscriptionsEntity);
 }

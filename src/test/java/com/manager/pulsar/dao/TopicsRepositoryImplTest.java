@@ -35,6 +35,7 @@ public class TopicsRepositoryImplTest {
 
     private void initTopicsEntity(TopicEntity topicsEntity) {
         topicsEntity.setTopicId(1);
+        topicsEntity.setNamespaceId(1);
         topicsEntity.setTenant("public");
         topicsEntity.setNamespace("default");
         topicsEntity.setTopic("test-topic");
@@ -47,6 +48,7 @@ public class TopicsRepositoryImplTest {
         Assert.assertEquals(total, 1);
         topicsEntityPage.getResult().forEach((result) -> {
             Assert.assertEquals(result.getTopicId(), 1);
+            Assert.assertEquals(result.getNamespaceId(), 1);
             Assert.assertEquals(result.getTenant(), "public");
             Assert.assertEquals(result.getNamespace(), "default");
             Assert.assertEquals(result.getTopic(), "test-topic");
@@ -69,7 +71,7 @@ public class TopicsRepositoryImplTest {
         topicsEntityPage.count(true);
         checkResult(topicsEntityPage);
         topicsEntityPage.getResult().forEach((result) -> {
-            topicsRepository.remove(result.getTenant(), result.getNamespace(), result.getTopic());
+            topicsRepository.remove(result.getTenant(), result.getNamespace(), result.getTopic(), result.isPersistent());
         });
         Page<TopicEntity> deleteTopics = topicsRepository.getTopicsList(1, 2);
         deleteTopics.count(true);
@@ -97,7 +99,7 @@ public class TopicsRepositoryImplTest {
         topicsEntityPageByTopic.count(true);
         checkResult(topicsEntityPageByTopic);
         topicsEntityPageByNamespace.getResult().forEach((result) -> {
-            topicsRepository.remove(result.getTenant(), result.getNamespace(), result.getTopic());
+            topicsRepository.remove(result.getTenant(), result.getNamespace(), result.getTopic(), result.isPersistent());
         });
         Page<TopicEntity> deleteNamespace = topicsRepository.getTopicsList(1, 2);
         deleteNamespace.count(true);

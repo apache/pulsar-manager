@@ -27,15 +27,15 @@ public interface TopicsRepository {
 
     Optional<TopicEntity> findById(Long topicId);
 
-    Optional<TopicEntity> findByTenantNamespaceTopic(String tenant, String namespace, String topic);
+    Optional<TopicEntity> findByFullyQualifiedTopicName(String tenant, String namespace, String topic);
 
     Page<TopicEntity> findByTenantOrNamespaceOrTopic(Integer pageNum, Integer pageSize, String tns);
 
-    Page<TopicEntity> findByTopic(String topic);
+    Page<TopicEntity> findByShortTopicName(String topic);
 
     Page<TopicEntity> getTopicsList(Integer pageNum, Integer pageSize);
 
-    void remove(String tenant, String namespace, String topic);
+    void remove(String tenant, String namespace, String topic, boolean persistent);
 
     void update(TopicEntity topicsEntity);
 }

@@ -35,6 +35,7 @@ public class SubscriptionsRepositoryImplTest {
 
     private void initSubscriptionsEntity(SubscriptionEntity subscriptionsEntity) {
         subscriptionsEntity.setSubscriptionId(1);
+        subscriptionsEntity.setTopicId(1);
         subscriptionsEntity.setTenant("public");
         subscriptionsEntity.setNamespace("default");
         subscriptionsEntity.setPersistent(true);
@@ -47,6 +48,7 @@ public class SubscriptionsRepositoryImplTest {
         Assert.assertEquals(total, 1);
         subscriptionsEntityPage.getResult().forEach((result) -> {
             Assert.assertEquals(result.getSubscriptionId(), 1);
+            Assert.assertEquals(result.getTopicId(), 1);
             Assert.assertEquals(result.getTenant(), "public");
             Assert.assertEquals(result.getNamespace(), "default");
             Assert.assertEquals(result.getTopic(), "test-topic");
@@ -71,7 +73,8 @@ public class SubscriptionsRepositoryImplTest {
         checkResut(subscriptionsEntityPage);
         subscriptionsEntityPage.getResult().forEach((result) -> {
             subscriptionsRepository.remove(
-                    result.getTenant(), result.getNamespace(), result.getTopic(), result.getSubscription());
+                    result.getTenant(), result.getNamespace(),
+                    result.getTopic(), result.getSubscription(), result.isPersistent());
         });
         Page<SubscriptionEntity> deleteSubscription = subscriptionsRepository.getSubscriptionsList(1, 2);
         deleteSubscription.count(true);
@@ -99,7 +102,8 @@ public class SubscriptionsRepositoryImplTest {
         subscriptionsEntityPageByTopic.count(true);
         checkResut(subscriptionsEntityPageByTopic);
         subscriptionsEntityPageByTopic.getResult().forEach((result) -> {
-            subscriptionsRepository.remove(result.getTenant(), result.getNamespace(), result.getTopic(), result.getSubscription());
+            subscriptionsRepository.remove(result.getTenant(), result.getNamespace(),
+                    result.getTopic(), result.getSubscription(), result.isPersistent());
         });
 
     }

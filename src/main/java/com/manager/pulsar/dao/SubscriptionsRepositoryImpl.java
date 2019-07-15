@@ -70,13 +70,8 @@ public class SubscriptionsRepositoryImpl implements SubscriptionsRepository {
     }
 
     @Override
-    public void remove(String tenant, String namespace, String topic, String subscription) {
-        subscriptionsMapper.deleteByTenantNamespaceTopic(tenant, namespace, topic, subscription);
-    }
-
-    @Override
-    public void update(SubscriptionEntity subscriptionsEntity) {
-        subscriptionsMapper.update(subscriptionsEntity);
+    public void remove(String tenant, String namespace, String topic, String subscription, boolean persistent) {
+        subscriptionsMapper.deleteByTenantNamespaceTopic(tenant, namespace, topic, subscription, persistent);
     }
 
     @Override
