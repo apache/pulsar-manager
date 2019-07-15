@@ -72,3 +72,29 @@ CREATE TABLE IF NOT EXISTS clusters (
   UNIQUE (clusterId)
 );
 CREATE INDEX IF NOT EXISTS clusters_cluster_index ON clusters(cluster);
+
+CREATE TABLE IF NOT EXISTS brokers (
+  broker varchar(1024) NOT NULL PRIMARY KEY,
+  brokerId INTEGER NOT NULl,
+  webServiceUrl varchar(1024),
+  webServiceUrlTls varchar(1024),
+  pulsarServiceUrl varchar(1024),
+  pulsarServiceUrlTls varchar(1024),
+  persistentTopicsEnabled true,
+  nonPersistentTopicsEnabled true,
+  brokerVersionString varchar(36),
+  loadReportType varchar(36),
+  maxResourceUsage double,
+  UNIQUE (brokerId)
+);
+
+CREATE TABLE IF NOT EXISTS bundles (
+  broker varchar(1024) NOT NULL,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL,
+  bundle varchar(1024) NOT NULL,
+  CONSTRAINT FK_broker FOREIGN KEY (broker) References brokers(broker),
+  CONSTRAINT FK_tenant FOREIGN KEY (tenant) References tenants(tenant),
+  CONSTRAINT FK_namespace FOREIGN KEY (namespace) References namespaces(namespace),
+  CONSTRAINT PK_bundle PRIMARY KEY (broker, tenant, namespace, bundle)
+);
