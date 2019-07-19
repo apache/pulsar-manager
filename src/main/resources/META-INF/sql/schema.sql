@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS tenants (
   UNIQUE (tenantId)
 );
 
+
 CREATE TABLE IF NOT EXISTS namespaces (
   namespaceId INTEGER NOT NULL,
   tenant varchar(255) NOT NULL,
@@ -88,6 +89,18 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   UNIQUE(subscriptionId)
 );
 CREATE INDEX IF NOT EXISTS subscriptions_subscription_index ON subscriptions(subscription);
+
+CREATE TABLE IF NOT EXISTS clusters (
+  cluster varchar(255) NOT NULL PRIMARY KEY,
+  clusterId INTEGER NOT NULL,
+  serviceUrl varchar(1024),
+  serviceUrlTls varchar(1024),
+  brokerServiceUrl varchar(1024),
+  brokerServiceUrlTls varchar(1024),
+  peerClusterNames varchar(1024),
+  UNIQUE (clusterId)
+);
+CREATE INDEX IF NOT EXISTS clusters_cluster_index ON clusters(cluster);
 
 CREATE TABLE IF NOT EXISTS brokers (
   broker varchar(1024) NOT NULL PRIMARY KEY,
