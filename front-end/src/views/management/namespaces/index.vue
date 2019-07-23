@@ -27,9 +27,7 @@
             style="width: 100%;">
             <el-table-column :label="$t('table.namespace')" min-width="50px" align="center">
               <template slot-scope="scope">
-                <router-link :to="'/management/tenantNamespace/' + scope.row.namespace" class="link-type">
-                  <span>{{ scope.row.namespace }}</span>
-                </router-link>
+                <span>{{ scope.row.namespace }}</span>
               </template>
             </el-table-column>
             <el-table-column label="topics" min-width="30px" align="center">
