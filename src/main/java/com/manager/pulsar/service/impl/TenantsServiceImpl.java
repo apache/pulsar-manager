@@ -86,22 +86,7 @@ public class TenantsServiceImpl implements TenantsService {
                 tenantsMap.put("pageSize", tenantsList.size());
             }
         } else {
-            Page<TenantEntity> tenantsEntities = tenantsRepository.getTenantsList(pageNum, pageSize);
-            Gson gson = new Gson();
-            tenantsEntities.getResult().forEach((result) -> {
-                Map<String, Object> tenantEntity = Maps.newHashMap();
-                tenantEntity.put("tenant", result.getTenant());
-                List<String> adminRolesList = gson.fromJson(result.getAdminRoles(), new TypeToken<List<String>>(){}.getType());
-                tenantEntity.put("adminRoles", String.join(",", adminRolesList));
-                List<String> allowedClusterList = gson.fromJson(result.getAllowedClusters(), new TypeToken<List<String>>(){}.getType());
-                tenantEntity.put("allowedClusters", String.join(",", allowedClusterList));
-                Page<NamespaceEntity> namespacesEntities = namespacesRepository.findByTenant(
-                        1, 1, result.getTenant());
-                tenantEntity.put("namespaces", namespacesEntities.getTotal());
-                tenantEntity.put("isPage", true);
-                tenantEntity.put("pageNum", pageNum);
-                tenantEntity.put("pageSize", pageSize);
-            });
+           // to do query from local database
         }
         return tenantsMap;
     }

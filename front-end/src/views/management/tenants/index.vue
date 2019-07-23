@@ -40,7 +40,9 @@
           </el-table-column>
           <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+              <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant">
+                <el-button type="primary" size="mini">{{ $t('table.edit') }}</el-button>
+              </router-link>
               <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
             </template>
           </el-table-column>
@@ -50,36 +52,38 @@
     </el-row>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" class="el-dialog-for-test">
-      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="150px" style="width: 400px; margin-left:50px;">
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.tenant')" prop="tenant">
           <el-input v-model="temp.tenant" placeholder="Please input tenant"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.clusters')" prop="clusters">
-          <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
+        <el-form-item v-if="dialogStatus==='create'" label="Allowed Clusters" prop="clusters">
+          <el-drag-select v-model="temp.clusters" style="width:250px;" multiple placeholder="Please select clusters">
             <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
           </el-drag-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.role')" prop="roles">
+        <el-form-item v-if="dialogStatus==='create'" label="Allowed Roles" prop="roles">
           <el-input v-model="temp.adminRoles"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('table.tenant')">
           <span>{{ temp.tenant }}</span>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.role')">
+        <el-form-item v-if="dialogStatus==='update'" label="Admin Roles">
           <el-input v-model="temp.adminRoles"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.clusters')">
-          <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
+        <el-form-item v-if="dialogStatus==='update'" label="Allowed Clusters">
+          <el-drag-select v-model="temp.clusters" style="width:250px;" multiple placeholder="Please select clusters">
             <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
           </el-drag-select>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='delete'">
+          <h4>Are you sure you want to delete this tenant?</h4>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" submit="Confirm" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
+        <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
@@ -97,11 +101,9 @@ import Pagination from '@/components/Pagination' // Secondary package based on e
 import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
 import ElDragSelect from '@/components/DragSelect' // base on element-ui
-
 const defaultForm = {
   cluster: ''
 }
-
 export default {
   name: 'Tenants',
   components: {
@@ -145,8 +147,9 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '',
+        create: 'New Tenant',
+        delete: 'Delete'
       },
       rules: {
         tenant: [{ required: true, message: 'Tenant is required', trigger: 'blur' }],
@@ -231,6 +234,23 @@ export default {
         allowedClusters: '',
         clusters: []
       }
+    },
+    handleOptions() {
+      this.$refs['temp'].validate((valid) => {
+        if (valid) {
+          switch (this.dialogStatus) {
+            case 'create':
+              this.createData()
+              break
+            case 'update':
+              this.updateData()
+              break
+            case 'delete':
+              this.deleteData()
+              break
+          }
+        }
+      })
     },
     handleCreate() {
       this.resetTemp()
@@ -322,13 +342,19 @@ export default {
       })
     },
     handleDelete(row) {
-      deleteTenant(row.tenant).then((response) => {
+      this.dialogStatus = 'delete'
+      this.dialogFormVisible = true
+      this.temp.tenant = row.tenant
+    },
+    deleteData() {
+      deleteTenant(this.temp.tenant).then((response) => {
         this.$notify({
           title: 'success',
           message: 'delete success',
           type: 'success',
           duration: 2000
         })
+        this.dialogFormVisible = false
         this.localList = []
         this.getTenants()
       })
