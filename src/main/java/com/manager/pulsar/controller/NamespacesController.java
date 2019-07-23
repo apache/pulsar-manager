@@ -17,6 +17,7 @@ import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.manager.pulsar.entity.NamespaceEntity;
 import com.manager.pulsar.entity.NamespacesRepository;
+import com.manager.pulsar.service.NamespacesService;
 import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class NamespacesController {
 
     @Autowired
     private NamespacesRepository namespacesRepository;
+
+    @Autowired
+    private NamespacesService namespacesService;
 
     @ApiOperation(value = "Get the list of existing namespaces, support paging, the default is 10 per page")
     @ApiResponses({
@@ -80,16 +84,12 @@ public class NamespacesController {
             @ApiParam(value = "page_num", defaultValue = "1", example = "1")
             @RequestParam(name = "page_num", defaultValue = "1")
             @Min(value = 1, message = "page_num is incorrect, should be greater than 0.")
-            Integer pageNum,
+                    Integer pageNum,
             @ApiParam(value = "page_size", defaultValue = "10", example = "10")
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
-            Integer pageSize) {
-        Page<NamespaceEntity> namespacesEntities = namespacesRepository
-                .findByTenantOrNamespace(pageNum, pageSize, tenantOrNamespace);
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("total", namespacesEntities.getTotal());
-        result.put("data", namespacesEntities);
+                    Integer pageSize) {
+        Map<String, Object> result = namespacesService.getNamespaceList(pageNum, pageSize, tenantOrNamespace);
         return ResponseEntity.ok(result);
     }
 

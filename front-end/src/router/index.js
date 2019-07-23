@@ -153,10 +153,10 @@ export const constantRouterMap = [
         hidden: true
       },
       {
-        path: 'namespaces/:tenant/:namespace/policies',
-        component: () => import('@/views/management/namespaces/policies'),
-        name: 'NamespacesPolicies',
-        meta: { title: 'NamespacesPolicies', noCache: true },
+        path: 'namespaces/:tenant/:namespace/namespace',
+        component: () => import('@/views/management/namespaces/namespace'),
+        name: 'NamespacesInfo',
+        meta: { title: 'NamespacesInfo', noCache: true },
         hidden: true
       },
       {
