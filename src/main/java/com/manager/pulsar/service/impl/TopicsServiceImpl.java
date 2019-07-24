@@ -50,6 +50,8 @@ public class TopicsServiceImpl implements TopicsService {
     public Map<String, Object> getTopicsList(Integer pageNum, Integer pageSize, String tenant, String namespace) {
         Map<String, Object> topicsMap = Maps.newHashMap();
         List<Map<String, String>> persistentTopic = this.getTopicListByHttp(tenant, namespace, "persistent");
+        List<Map<String, String>> nonPersistentTopic = this.getTopicListByHttp(tenant, namespace, "non-persistent");
+        persistentTopic.addAll(nonPersistentTopic);
         topicsMap.put("topics", persistentTopic);
         topicsMap.put("isPage", false);
         topicsMap.put("total", persistentTopic.size());
@@ -72,7 +74,9 @@ public class TopicsServiceImpl implements TopicsService {
             partitionedTopicsList = gson.fromJson(
                     partitonedTopic, new TypeToken<List<String>>(){}.getType());
             for (String p : partitionedTopicsList) {
-                partitionedMap.put(this.getTopicName(p), new ArrayList<>());
+                if (p.startsWith(persistent)) {
+                    partitionedMap.put(this.getTopicName(p), new ArrayList<>());
+                }
             }
         }
 
@@ -82,15 +86,18 @@ public class TopicsServiceImpl implements TopicsService {
             List<String> topicsList = gson.fromJson(
                     topics, new TypeToken<List<String>>(){}.getType());
             for (String topic: topicsList) {
-                String topicName = this.getTopicName(topic);
-                Map<String, String> topicEntity = Maps.newHashMap();
-                if (isPartitonedTopic(partitionedTopicsList, topic)) {
-                    String[] name = topicName.split(PARTITIONED_TOPIC_SUFFIX);
-                    partitionedMap.get(name[0]).add(topicName);
-                } else {
-                    topicEntity.put("topic", topicName);
-                    topicEntity.put("partitions", "0");
-                    topicsArray.add(topicEntity);
+                if (topic.startsWith(persistent)) {
+                    String topicName = this.getTopicName(topic);
+                    Map<String, String> topicEntity = Maps.newHashMap();
+                    if (isPartitonedTopic(partitionedTopicsList, topic)) {
+                        String[] name = topicName.split(PARTITIONED_TOPIC_SUFFIX);
+                        partitionedMap.get(name[0]).add(topicName);
+                    } else {
+                        topicEntity.put("topic", topicName);
+                        topicEntity.put("partitions", "0");
+                        topicEntity.put("persistent", persistent);
+                        topicsArray.add(topicEntity);
+                    }
                 }
             }
         }
@@ -102,6 +109,7 @@ public class TopicsServiceImpl implements TopicsService {
                 if (partitionedTopicList != null && partitionedTopicList.size() > 0) {
                     topicEntity.put("topic", topicName);
                     topicEntity.put("partitions", String.valueOf(partitionedTopicList.size()));
+                    topicEntity.put("persistent", persistent);
                 } else {
                     topicEntity.put("topic", topicName);
                     String metadataTopicUrl = directRequestHost + prefix + "/" + topicName + "/partitions";
@@ -109,6 +117,7 @@ public class TopicsServiceImpl implements TopicsService {
                     Map<String, Integer> metadata = gson.fromJson(
                             metadataTopic, new TypeToken<Map<String, Integer>>(){}.getType());
                     topicEntity.put("partitions", String.valueOf(metadata.get("partitions")));
+                    topicEntity.put("persistent", persistent);
                 }
                 topicsArray.add(topicEntity);
             }

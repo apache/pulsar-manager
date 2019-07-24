@@ -56,8 +56,11 @@
         <!-- <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"/> -->
       </el-tab-pane>
       <el-tab-pane label="TOPICS" name="topics">
+        <el-input v-model="searchTopic" placeholder="Query Topics" style="width: 200px;" @keyup.enter.native="handleFilterTopic"/>
+        <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterTopic">{{ $t('table.search') }}</el-button>
+        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateTopic">{{ $t('table.add') }}</el-button>
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px;padding-right:8px;margin-bottom:30px;">
             <el-table
               v-loading="topicsListLoading"
               :key="topicsTableKey"
@@ -68,12 +71,19 @@
               style="width: 100%;">
               <el-table-column label="Topic" min-width="50px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.topic }}</span>
+                  <router-link :to="scope.row.topicLink" class="link-type">
+                    <span>{{ scope.row.topic }}</span>
+                  </router-link>
                 </template>
               </el-table-column>
               <el-table-column label="Partitions" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.partitions }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="Persistent" min-width="30px" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.persistent }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="Producers" min-width="30px" align="center">
@@ -112,7 +122,6 @@
                 </template>
               </el-table-column>
             </el-table>
-            <pagination v-show="topicsTotal>0" :total="topicsTotal" :page.sync="topicsListQuery.page" :limit.sync="topicsListQuery.limit" @pagination="getTopics" />
           </el-col>
         </el-row>
       </el-tab-pane>
@@ -628,6 +637,30 @@
         <el-button type="danger" class="button" @click="deleteNamespace">Delete Namespace</el-button>
       </el-tab-pane>
     </el-tabs>
+    <el-dialog :visible.sync="dialogFormVisible">
+      <el-form ref="form" :model="form" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+        <div v-if="dialogStatus==='create'">
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <el-input v-model="form.topic"/>
+          </el-form-item>
+          <el-form-item label="Persistent">
+            <el-radio-group
+              v-model="form.isPersistent"
+              size="medium">
+              <el-radio label="Persistent"/>
+              <el-radio label="Non-persistent"/>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item :label="$t('table.partition')" prop="partition">
+            <el-input v-model="form.partitions"/>
+          </el-form-item>
+        </div>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button type="primary" @click="createTopic()">{{ $t('table.confirm') }}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -666,11 +699,14 @@ import {
   clearBacklog,
   deleteNamespace
 } from '@/api/namespaces'
+import { putTopic } from '@/api/topics'
 import { fetchBrokerStats } from '@/api/brokerStats'
 import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import MdInput from '@/components/MDinput'
+import { validateEmpty } from '@/utils/validate'
+
 const defaultForm = {
   tenant: '',
   namespace: ''
@@ -762,7 +798,10 @@ export default {
         dispatchRatePerSubPeriod: '',
         subscribeRatePerConsumerSub: '',
         subscribeRatePerConsumerPeriod: '',
-        maxConsumerPerSub: ''
+        maxConsumerPerSub: '',
+        topic: '',
+        isPersistent: 'Persistent',
+        partitions: 0
       },
       rules: {
         // ensembelSize: [{ required: true, message: 'EnsembelSize is greater more than 0', trigger: 'blur' }]
@@ -844,6 +883,7 @@ export default {
       brokerStats: null,
       topics: {},
       localList: [],
+      tempTopicsList: [],
       topicsList: [],
       topicsTotal: 0,
       // total: 0,
@@ -851,7 +891,15 @@ export default {
         page: 1,
         limit: 10
       },
-      firstInit: false
+      firstInit: false,
+      searchTopic: '',
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: 'Edit',
+        create: 'Create'
+      },
+      currentTabName: ''
     }
   },
   created() {
@@ -859,6 +907,9 @@ export default {
     this.postForm.namespace = this.$route.params && this.$route.params.namespace
     this.tenantNamespace = this.postForm.tenant + '/' + this.postForm.namespace
     this.firstInit = true
+    if (this.$route.query && this.$route.query.tab) {
+      this.activeName = this.$route.query.tab
+    }
     this.getRemoteTenantsList()
     this.getNamespacesList(this.postForm.tenant)
     this.getPolicies(this.tenantNamespace)
@@ -876,16 +927,25 @@ export default {
         if (!response.data) return
         for (var i in response.data.topics) {
           this.topics[response.data.topics[i]['topic']] = i
+          var topicLink = ''
+          if (response.data.topics[i]['partitions'] === '0') {
+            topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/topic'
+          } else {
+            topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/partitionedTopic'
+          }
           this.topicsList.push({
             'topic': response.data.topics[i]['topic'],
             'partitions': response.data.topics[i]['partitions'],
+            'persistent': response.data.topics[i]['persistent'],
             'producers': 0,
             'subscriptions': 0,
             'inMsg': 0,
             'outMsg': 0,
             'inBytes': 0,
             'outBytes': 0,
-            'storageSize': 0
+            'storageSize': 0,
+            'tenantNamespace': this.tenantNamespace,
+            'topicLink': topicLink
           })
         }
         fetchBrokerStats().then(res => {
@@ -915,7 +975,11 @@ export default {
                       this.topicsList[this.topics[topicName]]['outMsg'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateOut
                       this.topicsList[this.topics[topicName]]['inBytes'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputIn
                       this.topicsList[this.topics[topicName]]['outBytes'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputOut
-                      this.topicsList[this.topics[topicName]]['storageSize'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].storageSize
+                      if (p === 'non-persistent') {
+                        this.topicsList[this.topics[topicName]]['storageSize'] = 0
+                      } else {
+                        this.topicsList[this.topics[topicName]]['storageSize'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].storageSize
+                      }
                     } else {
                       this.topicsList[this.topics[topicName]]['producers'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].producerCount
                       for (var sub in this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions) {
@@ -925,7 +989,11 @@ export default {
                       this.topicsList[this.topics[topicName]]['outMsg'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateOut
                       this.topicsList[this.topics[topicName]]['inBytes'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputIn
                       this.topicsList[this.topics[topicName]]['outBytes'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputOut
-                      this.topicsList[this.topics[topicName]]['storageSize'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].storageSize
+                      if (p === 'non-persistent') {
+                        this.topicsList[this.topics[topicName]]['storageSize'] = 0
+                      } else {
+                        this.topicsList[this.topics[topicName]]['storageSize'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].storageSize
+                      }
                     }
                   }
                 }
@@ -935,6 +1003,25 @@ export default {
         })
         this.topicsListLoading = false
       })
+    },
+    handleFilterTopic() {
+      if (this.tempTopicsList.length <= 0) {
+        for (var t = 0; t < this.topicsList.length; t++) {
+          this.tempTopicsList.push(this.topicsList[t])
+        }
+      }
+      if (!validateEmpty(this.searchTopic)) {
+        this.searchList = []
+        for (var i = 0; i < this.topicsList.length; i++) {
+          if (this.topicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
+            this.searchList.push(this.topicsList[i])
+          }
+        }
+        this.topicsList = this.searchList
+      } else {
+        console.log(this.tempTopicsList)
+        this.topicsList = this.tempTopicsList
+      }
     },
     getPolicies(tenantNamespace) {
       fetchNamespacePolicies(tenantNamespace).then(response => {
@@ -1022,7 +1109,7 @@ export default {
       }
     },
     handleClick(tab, event) {
-      console.log(tab, event)
+      this.currentTabName = tab.name
     },
     getRemoteTenantsList() {
       fetchTenants().then(response => {
@@ -1048,7 +1135,7 @@ export default {
       })
     },
     getNamespaceInfo(tenant, namespace) {
-      this.$router.push({ path: '/management/namespaces/' + tenant + '/' + namespace + '/namespace' })
+      this.$router.push({ path: '/management/namespaces/' + tenant + '/' + namespace + '/namespace?tab=' + this.currentTabName })
     },
     handleFilterBundle() {
     },
@@ -1137,7 +1224,6 @@ export default {
         'managedLedgerMaxMarkDeleteRate': parseInt(this.form.markDeleteMaxRate)
       }
       setPersistence(this.tenantNamespace, data).then(response => {
-        this.dialogFormVisible = false
         this.$notify({
           title: 'success',
           message: 'Set persistence success for namespace',
@@ -1446,6 +1532,47 @@ export default {
         })
         this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant })
       })
+    },
+    handleCreateTopic() {
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.form.topic = ''
+      this.form.isPersistent = 'Persistent'
+      this.form.partitions = 0
+    },
+    generalCreateTopic(persistent) {
+      putTopic(
+        persistent,
+        this.postForm.tenant,
+        this.postForm.namespace,
+        this.form.topic, parseInt(this.form.partitions)).then(() => {
+        this.$notify({
+          title: 'success',
+          message: 'create topic success',
+          type: 'success',
+          duration: 2000
+        })
+        this.dialogFormVisible = false
+        this.topicsList = []
+        this.tempTopicsList = []
+        this.getTopics()
+      })
+    },
+    createTopic() {
+      if (this.form.topic === null || this.form.topic.length <= 0) {
+        this.$notify({
+          title: 'error',
+          message: 'Topic name is incorrect',
+          type: 'error',
+          duration: 3000
+        })
+        return
+      }
+      if (this.form.isPersistent === 'Persistent') {
+        this.generalCreateTopic('persistent')
+      } else if (this.form.isPersistent === 'Non-persistent') {
+        this.generalCreateTopic('non-persistent')
+      }
     }
   }
 }
