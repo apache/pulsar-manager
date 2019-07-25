@@ -196,6 +196,21 @@ export function peekMessages(persistent, tenantNamespaceTopic, subName, messageP
   })
 }
 
+export function resetCursorByTimestamp(persistent, tenantNamespaceTopic, subName, timestamp) {
+  return request({
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/resetcursor/${timestamp}`,
+    method: 'post'
+  })
+}
+
+export function resetCursorByPosition(persistent, tenantNamespaceTopic, subName, data) {
+  return request({
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/resetcursor`,
+    method: 'post',
+    data
+  })
+}
+
 export function resetPersistentCursor(tenantNamespaceTopic, subName, timestamp, data) {
   return request({
     url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/subscription/${subName}/resetcursor/${timestamp}`,

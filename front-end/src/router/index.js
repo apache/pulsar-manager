@@ -147,12 +147,6 @@ export const constantRouterMap = [
         meta: { title: 'ParititionTopicInfo', noCache: true },
         hidden: true
       },
-      // {
-      //   path: 'subscriptions',
-      //   component: () => import('@/views/management/subscriptions/index'),
-      //   name: 'Subscriptions',
-      //   meta: { title: 'Subscriptions', noCache: true }
-      // },
       {
         path: 'subscriptions/:persistent/:tenant/:namespace/:topic/:subscription/subscription',
         component: () => import('@/views/management/subscriptions/subscription'),
@@ -186,31 +180,35 @@ export const constantRouterMap = [
         component: () => import('@/views/management/brokers'),
         name: 'Brokers',
         meta: { title: 'Brokers', noCache: true }
+      },
+      {
+        path: 'functions',
+        component: () => import('@/views/management/functions'),
+        name: 'Functions',
+        meta: { title: 'Functions', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'sources',
+        component: () => import('@/views/management/sources'),
+        name: 'Sources',
+        meta: { title: 'Sources', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'sinks',
+        component: () => import('@/views/management/sinks'),
+        name: 'Sinks',
+        meta: { title: 'Sinks', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'bookies',
+        component: () => import('@/views/management/bookies'),
+        name: 'Bookies',
+        meta: { title: 'Bookies', noCache: true },
+        hidden: true
       }
-      // {
-      //   path: 'functions',
-      //   component: () => import('@/views/management/functions'),
-      //   name: 'Functions',
-      //   meta: { title: 'Functions', noCache: true }
-      // },
-      // {
-      //   path: 'sources',
-      //   component: () => import('@/views/management/sources'),
-      //   name: 'Sources',
-      //   meta: { title: 'Sources', noCache: true }
-      // },
-      // {
-      //   path: 'sinks',
-      //   component: () => import('@/views/management/sinks'),
-      //   name: 'Sinks',
-      //   meta: { title: 'Sinks', noCache: true }
-      // },
-      // {
-      //   path: 'bookies',
-      //   component: () => import('@/views/management/bookies'),
-      //   name: 'Bookies',
-      //   meta: { title: 'Bookies', noCache: true }
-      // }
     ]
   }
 ]

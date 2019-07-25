@@ -133,14 +133,21 @@
           </el-tab-pane>
           <el-tab-pane label="RESET">
             <el-form :inline="true" :model="form">
-              <el-button type="primary">Reset</el-button>
+              <el-button type="primary" @click="handleResetCursor">Reset</el-button>
               <span>The cursor to</span>
               <el-form-item>
                 <el-input v-model="form.minutes" placeholder="minutes"/>
               </el-form-item>
               <span>mins or to Message ID</span>
               <el-form-item>
-                <el-input v-model="form.messagesIds" placeholder="messages ids"/>
+                <el-select v-model="form.ledgerValue" style="width:150px" placeholder="LedgerId">
+                  <el-option
+                    v-for="item in ledgerOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"/>
+                </el-select>
+                <el-input v-model="form.messagesId" style="width: 150px" placeholder="Message id"/>
               </el-form-item>
             </el-form>
           </el-tab-pane>
@@ -159,9 +166,13 @@ import {
   // peekMessages,
   skip,
   expireMessage,
-  clearBacklog
+  clearBacklog,
+  fetchTopicStatsInternal,
+  resetCursorByTimestamp,
+  resetCursorByPosition
 } from '@/api/topics'
 import { fetchSubscriptions } from '@/api/subscriptions'
+
 const defaultForm = {
   persistent: '',
   tenant: '',
@@ -195,12 +206,14 @@ export default {
         peekNumMessages: 0,
         skipNumMessages: 0,
         expireNumMessages: 10,
-        minutes: 1,
-        messagesIds: ''
+        minutes: 0,
+        messagesId: '',
+        ledgerValue: ''
       },
       firstInitNamespace: false,
       firstInitTopic: false,
-      firstInitSubscription: false
+      firstInitSubscription: false,
+      ledgerOptions: []
     }
   },
   created() {
@@ -218,6 +231,7 @@ export default {
     this.getTopicsList()
     this.getSubscriptionsList()
     this.initTopicStats()
+    this.handleStatsInternal()
   },
   methods: {
     getRemoteTenantsList() {
@@ -276,6 +290,17 @@ export default {
       this.$router.push({ path: '/management/subscriptions/' + this.postForm.persistent +
         '/' + this.postForm.tenant + '/' + this.postForm.namespace + '/' +
         this.postForm.topic + '/' + this.postForm.subscription + '/subscription' })
+    },
+    handleStatsInternal() {
+      fetchTopicStatsInternal(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+        if (!response.data) return
+        for (var i in response.data.ledgers) {
+          this.ledgerOptions.push({
+            value: response.data.ledgers[i]['ledgerId'],
+            label: response.data.ledgers[i]['ledgerId']
+          })
+        }
+      })
     },
     initTopicStats() {
       fetchTopicStats(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
@@ -367,6 +392,34 @@ export default {
           duration: 3000
         })
       })
+    },
+    handleResetCursor() {
+      if (parseInt(this.form.minutes) > 0) {
+        var dateTime = new Date().getTime()
+        var timestamp = Math.floor(dateTime / 1000) - parseInt(this.form.minutes) * 60 * 1000
+        resetCursorByTimestamp(this.postForm.persistent, this.tenantNamespaceTopic, this.postForm.subscription, timestamp).then(response => {
+          this.$notify({
+            title: 'success',
+            message: 'Reset cursor success',
+            type: 'success',
+            duration: 3000
+          })
+        })
+      }
+      if (this.form.messagesId.length > 0 && this.form.ledgerValue != null) {
+        var data = {
+          'ledgerId': this.form.ledgerValue,
+          'entryId': parseInt(this.form.messagesId)
+        }
+        resetCursorByPosition(this.postForm.persistent, this.tenantNamespaceTopic, this.postForm.subscription, data).then(response => {
+          this.$notify({
+            title: 'success',
+            message: 'Reset cursor success',
+            type: 'success',
+            duration: 3000
+          })
+        })
+      }
     }
   }
 }
