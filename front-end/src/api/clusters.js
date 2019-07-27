@@ -15,9 +15,11 @@ import request from '@/utils/request'
 
 const BASE_URL_V2 = '/admin/v2'
 
+const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+
 export function fetchClusters(query) {
   return request({
-    url: BASE_URL_V2 + '/clusters',
+    url: SPRING_BASE_URL_V2 + '/clusters',
     method: 'get',
     params: { query }
   })

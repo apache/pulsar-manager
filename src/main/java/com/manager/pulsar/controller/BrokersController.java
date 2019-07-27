@@ -17,6 +17,7 @@ import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.manager.pulsar.entity.BrokerEntity;
 import com.manager.pulsar.entity.BrokersRepository;
+import com.manager.pulsar.service.BrokersService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -47,6 +48,9 @@ import java.util.Optional;
 public class BrokersController {
 
     @Autowired
+    private BrokersService brokersService;
+
+    @Autowired
     private BrokersRepository brokersRepository;
 
     @ApiOperation(value = "Get the list of existing brokers, support paging, the default is 10 per page")
@@ -54,35 +58,33 @@ public class BrokersController {
             @ApiResponse(code = 200, message = "ok"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    @RequestMapping(value = "/brokers", method =  RequestMethod.GET)
+    @RequestMapping(value = "/brokers/{cluster}", method =  RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getBrokers(
             @ApiParam(value = "page_num", defaultValue = "1", example = "1")
             @RequestParam(name = "page_num", defaultValue = "1")
             @Min(value = 1, message = "page_num is incorrect, should be greater than 0.")
-                    Integer pageNum,
+            Integer pageNum,
             @ApiParam(value = "page_size", defaultValue = "10", example = "10")
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
-                    Integer pageSize) {
-        Page<BrokerEntity> brokersEntityPage = brokersRepository.getBrokersList(pageNum, pageSize);
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("total", brokersEntityPage.getTotal());
-        result.put("data", brokersEntityPage);
+            Integer pageSize,
+            @PathVariable String cluster) {
+        Map<String, Object> result = brokersService.getBrokersList(pageNum, pageSize, cluster);
         return ResponseEntity.ok(result);
     }
-
-    @ApiOperation(value = "Query broker info")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/brokers/{broker}", method = RequestMethod.GET)
-    public ResponseEntity<Optional<BrokerEntity>> getBroker(
-            @ApiParam(value = "The name of broker")
-            @Size(min = 1, max = 255)
-            @PathVariable String broker) {
-        Optional<BrokerEntity> brokersEntity = brokersRepository.findByBroker(broker);
-        return ResponseEntity.ok(brokersEntity);
-    }
+//
+//    @ApiOperation(value = "Query broker info")
+//    @ApiResponses({
+//            @ApiResponse(code = 200, message = "ok"),
+//            @ApiResponse(code = 500, message = "Internal server error")
+//    })
+//    @RequestMapping(value = "/brokers/{broker}", method = RequestMethod.GET)
+//    public ResponseEntity<Optional<BrokerEntity>> getBroker(
+//            @ApiParam(value = "The name of broker")
+//            @Size(min = 1, max = 255)
+//            @PathVariable String broker) {
+//        Optional<BrokerEntity> brokersEntity = brokersRepository.findByBroker(broker);
+//        return ResponseEntity.ok(brokersEntity);
+//    }
 
 }

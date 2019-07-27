@@ -109,6 +109,41 @@ export const constantRouterMap = [
         meta: { title: 'Clusters', noCache: true }
       },
       {
+        path: 'clusters/:cluster/cluster',
+        component: () => import('@/views/management/clusters/cluster'),
+        name: 'ClusterInfo',
+        meta: { title: 'ClusterInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'clusters/:cluster/:failureDomainName/failureDomainName',
+        component: () => import('@/views/management/clusters/failureDomain'),
+        name: 'FailureDomainInfo',
+        meta: { title: 'FailureDomainInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'clusters/:cluster/:namespaceIsolation/namespaceIsolationPolicy',
+        component: () => import('@/views/management/namespaceIsolations/namespaceIsolationPolicy'),
+        name: 'NamespaceIsolationPolicy',
+        meta: { title: 'NamespaceIsolationPolicy', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'brokers',
+        component: () => import('@/views/management/brokers'),
+        name: 'Brokers',
+        meta: { title: 'Brokers', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'brokers/:cluster/:broker/broker',
+        component: () => import('@/views/management/brokers/broker'),
+        name: 'BrokerInfo',
+        meta: { title: 'BrokerInfo', noCache: true },
+        hidden: true
+      },
+      {
         path: 'tenants',
         component: () => import('@/views/management/tenants/index'),
         name: 'Tenants',
@@ -174,12 +209,6 @@ export const constantRouterMap = [
         name: 'NamespacesInfo',
         meta: { title: 'NamespacesInfo', noCache: true },
         hidden: true
-      },
-      {
-        path: 'brokers',
-        component: () => import('@/views/management/brokers'),
-        name: 'Brokers',
-        meta: { title: 'Brokers', noCache: true }
       },
       {
         path: 'functions',
