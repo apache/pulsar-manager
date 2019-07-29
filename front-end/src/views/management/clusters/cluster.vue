@@ -261,6 +261,9 @@ export default {
     this.getBrokerList()
     if (this.$route.query && this.$route.query.tab) {
       this.activeName = this.$route.query.tab
+      if (this.activeName === 'isolationPolicies') {
+        this.getNamespaceIsolationPolicy()
+      }
     }
     this.getFailureDomainsList()
   },
