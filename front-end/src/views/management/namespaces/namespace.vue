@@ -49,7 +49,7 @@
             <template slot-scope="scope">
               <el-button size="medium" type="danger" @click="handleSplitBundle(scope.row)">Split</el-button>
               <el-button size="medium" type="danger" @click="handleUnloadBundle(scope.row)">Unload</el-button>
-              <el-button size="medium" type="danger">Clear Backlog</el-button>
+              <el-button size="medium" type="danger" @click="handleClearBundleBacklog(scope.row)">Clear Backlog</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -697,7 +697,8 @@ import {
   unloadBundle,
   unload,
   clearBacklog,
-  deleteNamespace
+  deleteNamespace,
+  clearBundleBacklog
 } from '@/api/namespaces'
 import { putTopic } from '@/api/topics'
 import { fetchBrokerStats } from '@/api/brokerStats'
@@ -909,6 +910,7 @@ export default {
     this.firstInit = true
     if (this.$route.query && this.$route.query.tab) {
       this.activeName = this.$route.query.tab
+      this.currentTabName = this.$route.query.tab
     }
     this.getRemoteTenantsList()
     this.getNamespacesList(this.postForm.tenant)
@@ -1287,6 +1289,16 @@ export default {
         this.$notify({
           title: 'success',
           message: 'clearBacklog success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    handleClearBundleBacklog(row) {
+      clearBundleBacklog(this.tenantNamespace, row.bundle).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'clearBacklog success for bundle',
           type: 'success',
           duration: 3000
         })

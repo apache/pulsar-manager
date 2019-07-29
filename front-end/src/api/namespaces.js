@@ -232,6 +232,14 @@ export function clearBacklog(tenantNamespace) {
   })
 }
 
+export function clearBundleBacklog(tenantNamespace, bundle) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/clearBacklog`,
+    method: 'post'
+  })
+}
+
 export function clearBundleBacklogForSubscription(tenantNamespace, bundle, subscription) {
   return request({
     headers: { 'Content-Type': 'application/json' },
