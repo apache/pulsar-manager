@@ -77,6 +77,7 @@ export const constantRouterMap = [
       title: 'Dashboard',
       icon: 'dashboard'
     },
+    hidden: true,
     children: [
       {
         path: 'prometheus',
