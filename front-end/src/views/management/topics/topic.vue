@@ -434,11 +434,13 @@ export default {
     if (this.$route.query && this.$route.query.tab) {
       this.activeName = this.$route.query.tab
     }
-    if (this.postForm.persistennt === 'persistent') {
+    console.log(this.postForm.persistent)
+    if (this.postForm.persistent === 'persistent') {
       this.nonPersistent = false
-    } else {
+    } else if (this.postForm.persistent === 'non-persistent') {
       this.nonPersistent = true
     }
+    console.log(this.nonPersistent)
     this.topicName = this.postForm.persistent + '://' + this.tenantNamespaceTopic
     this.firstInit = true
     this.firstInitTopic = true
