@@ -70,6 +70,8 @@ public class TopicsServiceImpl implements TopicsService {
         String partitonedTopic = HttpUtil.doGet(partitonedUrl, header);
         List<String> partitionedTopicsList = Arrays.asList();
         Map<String, List<String>> partitionedMap = Maps.newHashMap();
+        System.out.println(partitonedUrl);
+        System.out.println(partitonedTopic);
         if (partitonedTopic != null) {
             partitionedTopicsList = gson.fromJson(
                     partitonedTopic, new TypeToken<List<String>>(){}.getType());
@@ -85,6 +87,8 @@ public class TopicsServiceImpl implements TopicsService {
         if (topics != null) {
             List<String> topicsList = gson.fromJson(
                     topics, new TypeToken<List<String>>(){}.getType());
+            System.out.println("===============topicsList===============");
+            System.out.println(topicsList);
             for (String topic: topicsList) {
                 if (topic.startsWith(persistent)) {
                     String topicName = this.getTopicName(topic);
@@ -106,6 +110,9 @@ public class TopicsServiceImpl implements TopicsService {
                 String topicName = this.getTopicName(s);
                 Map<String, String> topicEntity = Maps.newHashMap();
                 List<String> partitionedTopicList = partitionedMap.get(s);
+                System.out.println(partitionedMap);
+                System.out.println("================");
+                System.out.println(partitionedTopicList);
                 if (partitionedTopicList != null && partitionedTopicList.size() > 0) {
                     topicEntity.put("topic", topicName);
                     topicEntity.put("partitions", String.valueOf(partitionedTopicList.size()));

@@ -140,7 +140,7 @@
         </el-form>
         <h4>Danager Zone</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" >Delete Topic</el-button>
+        <el-button type="danger" class="button" @click="handleDeletePartitionTopic">Delete Topic</el-button>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -150,7 +150,8 @@
 import { fetchTenants } from '@/api/tenants'
 import { fetchNamespaces } from '@/api/namespaces'
 import {
-  fetchPartitionTopicStats
+  fetchPartitionTopicStats,
+  deletePartitionTopic
 } from '@/api/topics'
 import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -328,6 +329,17 @@ export default {
     },
     handleChangeOptions() {
       this.$forceUpdate()
+    },
+    handleDeletePartitionTopic() {
+      deletePartitionTopic(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Delete partitioned topic success',
+          type: 'success',
+          duration: 3000
+        })
+        this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant + '/' + this.postForm.namespace + '/namespace?tab=topics' })
+      })
     }
   }
 }

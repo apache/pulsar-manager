@@ -36,21 +36,21 @@
               <el-button class="filter-item" type="primary" style="margin-top:15px;" @click="handleUnload">Unload</el-button>
             </el-card>
           </el-col>
-          <el-col :span="4">
+          <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
               <h4>STATUS</h4>
               <el-button type="primary" circle class="circle"><span class="circle-font">{{ terminateStatus }}</span></el-button>
               <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleTerminate">terminate</el-button>
             </el-card>
           </el-col>
-          <el-col :span="4">
+          <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
               <h4>COMPACTION</h4>
               <el-button type="primary" circle class="circle"><span class="circle-font">{{ compaction }}</span></el-button>
               <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleCompaction">compaction</el-button>
             </el-card>
           </el-col>
-          <el-col :span="4">
+          <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
               <h4>OFFLOAD</h4>
               <el-button type="primary" circle class="circle"><span class="circle-font">{{ offload }}</span></el-button>
@@ -175,7 +175,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="STORAGE" name="storage">
+      <el-tab-pane v-if="nonPersistent===false" label="STORAGE" name="storage">
         <el-row :gutter="12">
           <el-col :span="8">
             <el-card>
@@ -329,7 +329,7 @@
         </el-form>
         <h4>Danager Zone</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" >Delete Topic</el-button>
+        <el-button type="danger" class="button" @click="handleDeleteTopic">Delete Topic</el-button>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -349,7 +349,8 @@ import {
   compact,
   compactionStatus,
   offload,
-  offloadStatus
+  offloadStatus,
+  deleteTopic
 } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 const defaultForm = {
@@ -420,7 +421,8 @@ export default {
       cursorTableKey: 0,
       cursorsList: [],
       cursorListLoading: false,
-      currentTabName: ''
+      currentTabName: '',
+      nonPersistent: false
     }
   },
   created() {
@@ -432,6 +434,11 @@ export default {
     if (this.$route.query && this.$route.query.tab) {
       this.activeName = this.$route.query.tab
     }
+    if (this.postForm.persistennt === 'persistent') {
+      this.nonPersistent = false
+    } else {
+      this.nonPersistent = true
+    }
     this.topicName = this.postForm.persistent + '://' + this.tenantNamespaceTopic
     this.firstInit = true
     this.firstInitTopic = true
@@ -440,10 +447,12 @@ export default {
     this.getTopicsList()
     this.initBundleRange()
     this.initTopicBroker()
-    this.initTerminateAndSegments()
     this.initTopicStats()
-    this.getCompactionStatus()
-    this.getOffloadStatus()
+    if (!this.nonPersistent) {
+      this.initTerminateAndSegments()
+      this.getCompactionStatus()
+      this.getOffloadStatus()
+    }
   },
   methods: {
     getRemoteTenantsList() {
@@ -689,6 +698,17 @@ export default {
         })
       })
       this.getOffloadStatus()
+    },
+    handleDeleteTopic() {
+      deleteTopic(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Delete topic success',
+          type: 'success',
+          duration: 3000
+        })
+        this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant + '/' + this.postForm.namespace + '/namespace?tab=topics' })
+      })
     }
   }
 }
