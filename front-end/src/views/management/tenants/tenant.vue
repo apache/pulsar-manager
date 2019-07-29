@@ -141,10 +141,10 @@ export default {
     },
     getClustersList() {
       fetchClusters().then(response => {
-        for (var i in response.data) {
+        for (var i in response.data.data) {
           this.clusterOptions.push({
-            value: response.data[i],
-            label: response.data[i]
+            value: response.data.data[i].cluster,
+            label: response.data.data[i].cluster
           })
         }
       })

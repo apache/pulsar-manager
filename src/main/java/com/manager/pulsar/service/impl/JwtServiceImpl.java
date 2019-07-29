@@ -21,14 +21,20 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Service
 public class JwtServiceImpl implements JwtService {
 
     private String secret;
     private int sessionTime;
+
+    private final Map<String, String> tokens = new ConcurrentHashMap<>();
 
     @Autowired
     public JwtServiceImpl(@Value("${jwt.secret}") String secret,
@@ -58,5 +64,24 @@ public class JwtServiceImpl implements JwtService {
 
     private Date expireTimeFromNow() {
         return new Date(System.currentTimeMillis() + sessionTime * 1000);
+    }
+
+    @Override
+    public void setToken(String key, String value) {
+        synchronized (this.tokens) {
+            this.tokens.put(key, value);
+        }
+    }
+
+    @Override
+    public String getToken(String key) {
+        return this.tokens.get(key);
+    }
+
+    @Override
+    public void removeToken(String key) {
+        synchronized (this.tokens) {
+            this.tokens.remove(key);
+        }
     }
 }

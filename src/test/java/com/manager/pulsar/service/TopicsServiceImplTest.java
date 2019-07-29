@@ -65,6 +65,6 @@ public class TopicsServiceImplTest {
         Assert.assertEquals(topicsMap.get("total"), 2);
         Assert.assertFalse((Boolean) topicsMap.get("isPage"));
         Assert.assertEquals(topicsMap.get("topics").toString(),
-                "[{partitions=0, topic=test789}, {partitions=3, topic=test900}]");
+                "[{partitions=0, topic=test789, persistent=persistent}, {partitions=3, topic=test900, persistent=persistent}]");
     }
 }
