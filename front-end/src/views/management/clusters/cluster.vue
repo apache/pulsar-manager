@@ -263,7 +263,6 @@ export default {
       this.activeName = this.$route.query.tab
     }
     this.getFailureDomainsList()
-    this.getNamespaceIsolationPolicy()
   },
   methods: {
     getClusterList() {
@@ -331,7 +330,9 @@ export default {
       this.$router.push({ path: '/management/clusters/' + this.postForm.cluster + '/cluster?tab=config' })
     },
     handleClick(tab, event) {
-      console.log(tab, event)
+      if (tab.name === 'isolationPolicies') {
+        this.getNamespaceIsolationPolicy()
+      }
     },
     handleServiceUrl() {
       var data = {
