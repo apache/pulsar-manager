@@ -13,7 +13,7 @@
           </el-select>
         </el-form-item>
         <el-button type="primary" @click="handleHeartBeat">Heartbeat</el-button>
-        <el-button type="primary">Runtime Config</el-button>
+        <el-button type="primary" @click="handleRuntimeConfig">Runtime Config</el-button>
       </el-form>
       <el-table
         :data="brokerStats"
@@ -76,6 +76,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-dialog :visible.sync="dialogFormVisible">
+        <jsonEditor :value="jsonValue"/>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -85,6 +88,9 @@ import { fetchClusters } from '@/api/clusters'
 import { fetchBrokerStatsMetrics, fetchBrokerStatsTopics } from '@/api/brokerStats'
 import { fetchBrokersHealth } from '@/api/brokers'
 import { fetchIsolationPolicies } from '@/api/isolationPolicies'
+import { unloadBundle } from '@/api/namespaces'
+import { fetchBrokersRuntimeConfiguration } from '@/api/brokers'
+import jsonEditor from '@/components/JsonEditor'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 const defaultForm = {
@@ -95,7 +101,8 @@ export default {
   name: 'BrokerInfo',
   components: {
     Pagination,
-    MdInput
+    MdInput,
+    jsonEditor
   },
   data() {
     return {
@@ -106,7 +113,9 @@ export default {
       bundleTableKey: 0,
       bundleList: [],
       isolationPolicyList: [],
-      isolationPolicyTableKey: 0
+      isolationPolicyTableKey: 0,
+      dialogFormVisible: false,
+      jsonValue: {}
     }
   },
   created() {
@@ -193,6 +202,14 @@ export default {
     getBrokersList(cluster) {
     },
     handleUnloadBundle(row) {
+      unloadBundle(row.tenant + '/' + row.namespace, row.bundle).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Unload bundle success',
+          type: 'success',
+          duration: 3000
+        })
+      })
     },
     handleHeartBeat() {
       fetchBrokersHealth().then(response => {
@@ -211,6 +228,12 @@ export default {
             duration: 3000
           })
         }
+      })
+    },
+    handleRuntimeConfig() {
+      fetchBrokersRuntimeConfiguration().then(response => {
+        this.dialogFormVisible = true
+        this.jsonValue = response.data
       })
     }
   }
