@@ -125,9 +125,16 @@ export function updateTopic(tenantNamespaceTopic, data) {
   })
 }
 
-export function deletePartitionTopic(tenantNamespaceTopic) {
+export function deleteTopic(persistent, tenantNamespaceTopic) {
   return request({
-    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/partitions`,
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}`,
+    method: 'delete'
+  })
+}
+
+export function deletePartitionTopic(persistent, tenantNamespaceTopic) {
+  return request({
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/partitions`,
     method: 'delete'
   })
 }
