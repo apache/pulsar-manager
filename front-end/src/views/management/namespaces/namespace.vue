@@ -49,7 +49,7 @@
             <template slot-scope="scope">
               <el-button size="medium" type="danger" @click="handleSplitBundle(scope.row)">Split</el-button>
               <el-button size="medium" type="danger" @click="handleUnloadBundle(scope.row)">Unload</el-button>
-              <el-button size="medium" type="danger">Clear Backlog</el-button>
+              <el-button size="medium" type="danger" @click="handleClearBundleBacklog(scope.row)">Clear Backlog</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -697,11 +697,11 @@ import {
   unloadBundle,
   unload,
   clearBacklog,
-  deleteNamespace
+  deleteNamespace,
+  clearBundleBacklog
 } from '@/api/namespaces'
-import { putTopic } from '@/api/topics'
 import { fetchBrokerStatsTopics } from '@/api/brokerStats'
-import { fetchTopicsByPulsarManager } from '@/api/topics'
+import { putTopic, fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import MdInput from '@/components/MDinput'
@@ -909,6 +909,7 @@ export default {
     this.firstInit = true
     if (this.$route.query && this.$route.query.tab) {
       this.activeName = this.$route.query.tab
+      this.currentTabName = this.$route.query.tab
     }
     this.getRemoteTenantsList()
     this.getNamespacesList(this.postForm.tenant)
@@ -1152,18 +1153,6 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    // removeDomain(item) {
-    //   var index = this.dynamicValidateForm.domains.indexOf(item)
-    //   if (index !== -1) {
-    //     this.dynamicValidateForm.domains.splice(index, 1)
-    //   }
-    // },
-    // addDomain() {
-    //   this.dynamicValidateForm.domains.push({
-    //     value: '',
-    //     key: Date.now()
-    //   })
-    // },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
       revokePermissions(this.tenantNamespace, tag).then(response => {
@@ -1287,6 +1276,16 @@ export default {
         this.$notify({
           title: 'success',
           message: 'clearBacklog success for namespace',
+          type: 'success',
+          duration: 3000
+        })
+      })
+    },
+    handleClearBundleBacklog(row) {
+      clearBundleBacklog(this.tenantNamespace, row.bundle).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'clearBacklog success for bundle',
           type: 'success',
           duration: 3000
         })
