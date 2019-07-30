@@ -21,19 +21,21 @@ import java.util.Optional;
 @Repository
 public interface NamespacesRepository {
 
-    void save(NamespacesEntity namespacesEntity);
+    void save(NamespaceEntity namespacesEntity);
 
-    Optional<NamespacesEntity> findById(long namespaceId);
+    Optional<NamespaceEntity> findById(long namespaceId);
 
-    Optional<NamespacesEntity> findByTenantNamespace(String tenant, String namespace);
+    Optional<NamespaceEntity> findByTenantNamespace(String tenant, String namespace);
 
-    Page<NamespacesEntity> findByTenantOrNamespace(Integer pageNum, Integer pageSize, String tenantOrNamespace);
+    Page<NamespaceEntity> findByTenantOrNamespace(Integer pageNum, Integer pageSize, String tenantOrNamespace);
 
-    Page<NamespacesEntity> findByNamespace(Integer pageNum, Integer pageSize, String namespace);
+    Page<NamespaceEntity> findByNamespace(Integer pageNum, Integer pageSize, String namespace);
 
-    Page<NamespacesEntity> getNamespacesList(Integer pageNum, Integer pageSize);
+    Page<NamespaceEntity> getNamespacesList(Integer pageNum, Integer pageSize);
+
+    Page<NamespaceEntity> findByTenant(Integer pageNum, Integer pageSize, String tenant);
 
     void remove(String tenant, String namespace);
 
-    void update(NamespacesEntity namespacesEntity);
+    void update(NamespaceEntity namespacesEntity);
 }

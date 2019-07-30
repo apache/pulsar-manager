@@ -14,7 +14,7 @@
 package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
-import com.manager.pulsar.entity.TenantsEntity;
+import com.manager.pulsar.entity.TenantEntity;
 import com.manager.pulsar.entity.TenantsRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,16 +35,16 @@ public class TenantsRepositoryImplTest {
     @Test
     public void getTenantsListTest() {
         for (int i = 0; i < 10; i++) {
-            TenantsEntity tenantsEntity = new TenantsEntity(i, "test" + i,  "testrole", "testCluster");
+            TenantEntity tenantsEntity = new TenantEntity(i, "test" + i,  "testrole", "testCluster");
             tenantsRepository.save(tenantsEntity);
         }
-        Page<TenantsEntity> tenantsEntities = tenantsRepository.getTenantsList(1, 10);
+        Page<TenantEntity> tenantsEntities = tenantsRepository.getTenantsList(1, 10);
         tenantsEntities.count(true);
         long total = tenantsEntities.getTotal();
         Assert.assertEquals(total, 10);
-        List<TenantsEntity> tenantsEntityList = tenantsEntities.getResult();
+        List<TenantEntity> tenantsEntityList = tenantsEntities.getResult();
         for (int i = 0; i < total; i ++) {
-            TenantsEntity tenantsEntity = tenantsEntityList.get(i);
+            TenantEntity tenantsEntity = tenantsEntityList.get(i);
             Assert.assertEquals(tenantsEntity.getTenantId(), i);
             Assert.assertEquals(tenantsEntity.getTenant(), "test" + i);
             Assert.assertEquals(tenantsEntity.getAdminRoles(), "testrole");

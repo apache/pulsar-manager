@@ -11,25 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.manager.pulsar.entity;
+package com.manager.pulsar.service;
 
+import org.springframework.stereotype.Service;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Map;
 
-/**
- * Tenants entity
- * tenant -> name of tenant
- */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class TenantsEntity {
-  private long tenantId;
-  private String tenant;
-  private String adminRoles;
-  private String allowedClusters;
+@Service
+public interface TenantsService {
+
+    Map<String, Object> getTenantsList(Integer pageNum, Integer pageSize);
 }

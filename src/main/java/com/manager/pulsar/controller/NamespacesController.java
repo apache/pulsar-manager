@@ -15,7 +15,7 @@ package com.manager.pulsar.controller;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
-import com.manager.pulsar.entity.NamespacesEntity;
+import com.manager.pulsar.entity.NamespaceEntity;
 import com.manager.pulsar.entity.NamespacesRepository;
 import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.Range;
@@ -60,7 +60,7 @@ public class NamespacesController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
             Integer pageSize) {
-        Page<NamespacesEntity> namespacesEntities = namespacesRepository.getNamespacesList(pageNum, pageSize);
+        Page<NamespaceEntity> namespacesEntities = namespacesRepository.getNamespacesList(pageNum, pageSize);
         Map<String, Object> result = Maps.newHashMap();
         result.put("total", namespacesEntities.getTotal());
         result.put("data", namespacesEntities);
@@ -85,7 +85,7 @@ public class NamespacesController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
             Integer pageSize) {
-        Page<NamespacesEntity> namespacesEntities = namespacesRepository
+        Page<NamespaceEntity> namespacesEntities = namespacesRepository
                 .findByTenantOrNamespace(pageNum, pageSize, tenantOrNamespace);
         Map<String, Object> result = Maps.newHashMap();
         result.put("total", namespacesEntities.getTotal());
@@ -99,14 +99,14 @@ public class NamespacesController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @RequestMapping(value = "/namespaces/{tenant}/{namespace}", method = RequestMethod.GET)
-    public ResponseEntity<Optional<NamespacesEntity>> getNamespacesByTenantNamespace(
+    public ResponseEntity<Optional<NamespaceEntity>> getNamespacesByTenantNamespace(
             @ApiParam(value = "The name of tenant")
             @Size(min = 1, max = 255)
             @PathVariable String tenant,
             @ApiParam(value = "The name of namespace")
             @Size(min = 1, max = 255)
             @PathVariable String namespace) {
-        Optional<NamespacesEntity> namespacesEntity = namespacesRepository.findByTenantNamespace(tenant, namespace);
+        Optional<NamespaceEntity> namespacesEntity = namespacesRepository.findByTenantNamespace(tenant, namespace);
         return ResponseEntity.ok(namespacesEntity);
     }
 

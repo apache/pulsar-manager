@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class NamespacesEntity {
+public class NamespaceEntity {
     private long namespaceId;
     private String tenant;
     private String namespace;

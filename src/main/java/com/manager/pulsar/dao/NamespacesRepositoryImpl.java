@@ -15,7 +15,7 @@ package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.manager.pulsar.entity.NamespacesEntity;
+import com.manager.pulsar.entity.NamespaceEntity;
 import com.manager.pulsar.entity.NamespacesRepository;
 import com.manager.pulsar.mapper.NamespacesMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,33 +34,40 @@ public class NamespacesRepositoryImpl implements NamespacesRepository {
     }
 
     @Override
-    public Optional<NamespacesEntity> findById(long namespaceId) {
+    public Optional<NamespaceEntity> findById(long namespaceId) {
         return Optional.ofNullable(namespacesMapper.findById(namespaceId));
     }
 
     @Override
-    public Optional<NamespacesEntity> findByTenantNamespace(String tenant, String namespace) {
+    public Optional<NamespaceEntity> findByTenantNamespace(String tenant, String namespace) {
         return Optional.ofNullable(namespacesMapper.findByTenantNamespace(tenant, namespace));
     }
 
     @Override
-    public Page<NamespacesEntity> findByTenantOrNamespace(Integer pageNum, Integer pageSize, String tenantOrNamespace) {
+    public Page<NamespaceEntity> findByTenantOrNamespace(Integer pageNum, Integer pageSize, String tenantOrNamespace) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<NamespacesEntity> namespacesEntities = namespacesMapper.findByTenantOrNamespace(tenantOrNamespace);
+        Page<NamespaceEntity> namespacesEntities = namespacesMapper.findByTenantOrNamespace(tenantOrNamespace);
         return namespacesEntities;
     }
 
     @Override
-    public Page<NamespacesEntity> findByNamespace(Integer pageNum, Integer pageSize, String namespace) {
+    public Page<NamespaceEntity> findByNamespace(Integer pageNum, Integer pageSize, String namespace) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<NamespacesEntity> namespacesEntities = namespacesMapper.findByNamespace(namespace);
+        Page<NamespaceEntity> namespacesEntities = namespacesMapper.findByNamespace(namespace);
         return namespacesEntities;
     }
 
     @Override
-    public Page<NamespacesEntity> getNamespacesList(Integer pageNum, Integer pageSize) {
+    public Page<NamespaceEntity> getNamespacesList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<NamespacesEntity> namespacesEntities = namespacesMapper.getNamespacesList();
+        Page<NamespaceEntity> namespacesEntities = namespacesMapper.getNamespacesList();
+        return namespacesEntities;
+    }
+
+    @Override
+    public Page<NamespaceEntity> findByTenant(Integer pageNum, Integer pageSize, String tenant) {
+        PageHelper.startPage(pageNum, pageSize);
+        Page<NamespaceEntity> namespacesEntities = namespacesMapper.findByTenant(tenant);
         return namespacesEntities;
     }
 
@@ -70,12 +77,12 @@ public class NamespacesRepositoryImpl implements NamespacesRepository {
     }
 
     @Override
-    public void update(NamespacesEntity namespacesEntity) {
+    public void update(NamespaceEntity namespacesEntity) {
         namespacesMapper.updateByTenantNamespace(namespacesEntity);
     }
 
     @Override
-    public void save(NamespacesEntity namespacesEntity) {
+    public void save(NamespaceEntity namespacesEntity) {
         namespacesMapper.insert(namespacesEntity);
     }
 }

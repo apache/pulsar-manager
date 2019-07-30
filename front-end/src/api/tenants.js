@@ -13,6 +13,8 @@
  */
 import request from '@/utils/request'
 
+const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+
 const BASE_URL_V2 = '/admin/v2'
 
 export function fetchTenantsAndNamespaces(query) {
@@ -25,7 +27,7 @@ export function fetchTenantsAndNamespaces(query) {
 
 export function fetchTenants() {
   return request({
-    url: BASE_URL_V2 + '/tenants',
+    url: SPRING_BASE_URL_V2 + '/tenants',
     method: 'get'
   })
 }

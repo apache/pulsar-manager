@@ -13,27 +13,23 @@
  */
 package com.manager.pulsar.entity;
 
-import java.util.Optional;
 
-import com.github.pagehelper.Page;
-import org.springframework.stereotype.Repository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Repository
-public interface TenantsRepository {
-
-  void save(TenantEntity tenantsEntity);
-
-  Optional<TenantEntity> findById(long tenantId);
-
-  Optional<TenantEntity> findByName(String tenant);
-
-  Page<TenantEntity> getTenantsList(Integer pageNum, Integer pageSize);
-
-  void remove(Long tenantId);
-
-  void removeByTenant(String tenant);
-
-  void updateByTenant(String tenant);
+/**
+ * Tenants entity
+ * tenant -> name of tenant
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class TenantEntity {
+  private long tenantId;
+  private String tenant;
+  private String adminRoles;
+  private String allowedClusters;
 }
-
-
