@@ -95,7 +95,8 @@ export const constantRouterMap = [
   {
     path: '/management',
     component: Layout,
-    redirect: 'management',
+    name: 'Management',
+    redirect: 'management/tenants',
     meta: {
       title: 'Management',
       icon: 'component'
@@ -127,16 +128,31 @@ export const constantRouterMap = [
         meta: { title: 'Namespaces', noCache: true }
       },
       {
-        path: 'topics',
+        path: 'namespaces/public/default/namespace?tab=topics',
         component: () => import('@/views/management/topics/index'),
         name: 'Topics',
         meta: { title: 'Topics', noCache: true }
       },
       {
-        path: 'subscriptions',
-        component: () => import('@/views/management/subscriptions/index'),
-        name: 'Subscriptions',
-        meta: { title: 'Subscriptions', noCache: true }
+        path: 'topics/:persistent/:tenant/:namespace/:topic/topic',
+        component: () => import('@/views/management/topics/topic'),
+        name: 'TopicInfo',
+        meta: { title: 'TopicInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'topics/:persistent/:tenant/:namespace/:topic/partitionedTopic',
+        component: () => import('@/views/management/topics/partitionedTopic'),
+        name: 'ParititionTopicInfo',
+        meta: { title: 'ParititionTopicInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'subscriptions/:persistent/:tenant/:namespace/:topic/:subscription/subscription',
+        component: () => import('@/views/management/subscriptions/subscription'),
+        name: 'SubscriptionInfo',
+        meta: { title: 'SubscriptionInfo', noCache: true },
+        hidden: true
       },
       {
         path: 'namespaces/:tenant',
@@ -169,25 +185,29 @@ export const constantRouterMap = [
         path: 'functions',
         component: () => import('@/views/management/functions'),
         name: 'Functions',
-        meta: { title: 'Functions', noCache: true }
+        meta: { title: 'Functions', noCache: true },
+        hidden: true
       },
       {
         path: 'sources',
         component: () => import('@/views/management/sources'),
         name: 'Sources',
-        meta: { title: 'Sources', noCache: true }
+        meta: { title: 'Sources', noCache: true },
+        hidden: true
       },
       {
         path: 'sinks',
         component: () => import('@/views/management/sinks'),
         name: 'Sinks',
-        meta: { title: 'Sinks', noCache: true }
+        meta: { title: 'Sinks', noCache: true },
+        hidden: true
       },
       {
         path: 'bookies',
         component: () => import('@/views/management/bookies'),
         name: 'Bookies',
-        meta: { title: 'Bookies', noCache: true }
+        meta: { title: 'Bookies', noCache: true },
+        hidden: true
       }
     ]
   }

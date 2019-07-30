@@ -23,6 +23,11 @@ module.exports = {
         // target: 'http://localhost:443/',
         target: 'http://localhost:8000/',
         changeOrigin: true
+      },
+      '/lookup/*': {
+        // target: 'http://localhost:443/',
+        target: 'http://localhost:8000/',
+        changeOrigin: true
       }
     },
 

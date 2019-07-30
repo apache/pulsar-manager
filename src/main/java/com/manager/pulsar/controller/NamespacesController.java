@@ -89,11 +89,7 @@ public class NamespacesController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
             Integer pageSize) {
-        Page<NamespaceEntity> namespacesEntities = namespacesRepository
-                .findByTenantOrNamespace(pageNum, pageSize, tenantOrNamespace);
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("total", namespacesEntities.getTotal());
-        result.put("data", namespacesEntities);
+        Map<String, Object> result = namespacesService.getNamespaceList(pageNum, pageSize, tenantOrNamespace);
         return ResponseEntity.ok(result);
     }
 
