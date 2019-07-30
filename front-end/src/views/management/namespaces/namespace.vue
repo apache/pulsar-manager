@@ -700,9 +700,8 @@ import {
   deleteNamespace,
   clearBundleBacklog
 } from '@/api/namespaces'
-import { putTopic } from '@/api/topics'
 import { fetchBrokerStatsTopics } from '@/api/brokerStats'
-import { fetchTopicsByPulsarManager } from '@/api/topics'
+import { putTopic, fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import MdInput from '@/components/MDinput'
@@ -1154,18 +1153,6 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    // removeDomain(item) {
-    //   var index = this.dynamicValidateForm.domains.indexOf(item)
-    //   if (index !== -1) {
-    //     this.dynamicValidateForm.domains.splice(index, 1)
-    //   }
-    // },
-    // addDomain() {
-    //   this.dynamicValidateForm.domains.push({
-    //     value: '',
-    //     key: Date.now()
-    //   })
-    // },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
       revokePermissions(this.tenantNamespace, tag).then(response => {

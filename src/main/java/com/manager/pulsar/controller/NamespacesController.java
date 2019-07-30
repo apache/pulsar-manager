@@ -88,7 +88,7 @@ public class NamespacesController {
             @ApiParam(value = "page_size", defaultValue = "10", example = "10")
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
-                    Integer pageSize) {
+            Integer pageSize) {
         Map<String, Object> result = namespacesService.getNamespaceList(pageNum, pageSize, tenantOrNamespace);
         return ResponseEntity.ok(result);
     }
