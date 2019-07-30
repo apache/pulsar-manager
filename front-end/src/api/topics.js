@@ -13,11 +13,21 @@
  */
 import request from '@/utils/request'
 
+const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+
 const BASE_URL_V2 = '/admin/v2'
 
 export function fetchTopics(tenant, namespace, query) {
   return request({
     url: BASE_URL_V2 + `/persistent/${tenant}/${namespace}`,
+    method: 'get',
+    params: { query }
+  })
+}
+
+export function fetchTopicsByPulsarManager(tenant, namespace, query) {
+  return request({
+    url: SPRING_BASE_URL_V2 + `/topics/${tenant}/${namespace}`,
     method: 'get',
     params: { query }
   })

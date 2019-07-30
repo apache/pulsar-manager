@@ -13,11 +13,13 @@
  */
 import request from '@/utils/request'
 
+const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+
 const BASE_URL_V2 = '/admin/v2'
 
 export function fetchNamespaces(tenant, query) {
   return request({
-    url: BASE_URL_V2 + `/namespaces/${tenant}`,
+    url: SPRING_BASE_URL_V2 + `/namespaces/${tenant}`,
     method: 'get',
     params: { query }
   })
@@ -101,6 +103,14 @@ export function removeBacklogQuota(tenantNamespace) {
   })
 }
 
+export function getPersistence(tenantNamespace) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/persistence`,
+    method: 'get'
+  })
+}
+
 export function setPersistence(tenantNamespace, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
@@ -145,6 +155,14 @@ export function setDeduplication(tenantNamespace, data) {
   })
 }
 
+export function getRetention(tenantNamespace) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/retention`,
+    method: 'get'
+  })
+}
+
 export function setRetention(tenantNamespace, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
@@ -183,6 +201,24 @@ export function setDispatchRate(tenantNamespace, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/dispatchRate`,
+    method: 'post',
+    data
+  })
+}
+
+export function setSubscribeRate(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/subscribeRate`,
+    method: 'post',
+    data
+  })
+}
+
+export function setSubscriptionDispatchRate(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/subscriptionDispatchRate`,
     method: 'post',
     data
   })
@@ -305,6 +341,15 @@ export function setSchemaAutoupdateStrategy(tenantNamespace, data) {
     headers: { 'Content-Type': 'application/json' },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/schemaAutoUpdateCompatibilityStrategy`,
     method: 'put',
+    data
+  })
+}
+
+export function setSchemaValidationEnforced(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/schemaValidationEnforced`,
+    method: 'post',
     data
   })
 }

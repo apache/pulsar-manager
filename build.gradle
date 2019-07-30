@@ -71,6 +71,7 @@ dependencies {
     compile group: 'com.github.pagehelper', name: 'pagehelper-spring-boot-starter', version: pageHelperVersion
     compile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
+    compile group: 'com.google.code.gson', name: 'gson', version: gsonVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-client', version: pulsarVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-common', version: pulsarVersion
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version

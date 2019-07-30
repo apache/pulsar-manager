@@ -13,17 +13,14 @@
  */
 package com.manager.pulsar.service.impl;
 
-import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
-import com.manager.pulsar.entity.NamespaceEntity;
+import com.google.gson.Gson;
 import com.manager.pulsar.entity.NamespacesRepository;
-import com.manager.pulsar.entity.TenantEntity;
 import com.manager.pulsar.entity.TenantsRepository;
 import com.manager.pulsar.service.TenantsService;
 import com.manager.pulsar.utils.HttpUtil;
 import org.apache.pulsar.common.policies.data.TenantInfo;
-import org.apache.pulsar.shade.com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

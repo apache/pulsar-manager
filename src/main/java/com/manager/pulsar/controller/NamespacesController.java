@@ -17,6 +17,7 @@ import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.manager.pulsar.entity.NamespaceEntity;
 import com.manager.pulsar.entity.NamespacesRepository;
+import com.manager.pulsar.service.NamespacesService;
 import io.swagger.annotations.*;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class NamespacesController {
 
     @Autowired
     private NamespacesRepository namespacesRepository;
+
+    @Autowired
+    private NamespacesService namespacesService;
 
     @ApiOperation(value = "Get the list of existing namespaces, support paging, the default is 10 per page")
     @ApiResponses({
