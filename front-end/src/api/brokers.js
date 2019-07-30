@@ -15,7 +15,16 @@ import request from '@/utils/request'
 
 const BASE_URL_V2 = '/admin/v2'
 
+const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+
 export function fetchBrokers(cluster) {
+  return request({
+    url: SPRING_BASE_URL_V2 + `/brokers/${cluster}`,
+    method: 'get'
+  })
+}
+
+export function fetchBrokersByDirectBroker(cluster) {
   return request({
     url: BASE_URL_V2 + `/brokers/${cluster}`,
     method: 'get'

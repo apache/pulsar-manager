@@ -700,9 +700,8 @@ import {
   deleteNamespace,
   clearBundleBacklog
 } from '@/api/namespaces'
-import { putTopic } from '@/api/topics'
-import { fetchBrokerStats } from '@/api/brokerStats'
-import { fetchTopicsByPulsarManager } from '@/api/topics'
+import { fetchBrokerStatsTopics } from '@/api/brokerStats'
+import { putTopic, fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import MdInput from '@/components/MDinput'
@@ -950,7 +949,7 @@ export default {
             'topicLink': topicLink
           })
         }
-        fetchBrokerStats().then(res => {
+        fetchBrokerStatsTopics('').then(res => {
           if (!res.data) return
           this.brokerStats = res.data
           if (this.brokerStats.hasOwnProperty(this.tenantNamespace)) {

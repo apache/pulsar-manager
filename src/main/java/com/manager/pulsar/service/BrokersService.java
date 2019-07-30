@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,20 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import request from '@/utils/request'
+package com.manager.pulsar.service;
 
-const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+import java.util.Map;
 
-export function fetchBrokerStatsTopics(broker) {
-  return request({
-    url: SPRING_BASE_URL_V2 + `/broker-stats/topics?broker=` + broker,
-    method: 'get'
-  })
-}
+public interface BrokersService {
 
-export function fetchBrokerStatsMetrics(broker) {
-  return request({
-    url: SPRING_BASE_URL_V2 + `/broker-stats/metrics?broker=` + broker,
-    method: 'get'
-  })
+    Map<String, Object> getBrokersList(Integer pageNum, Integer pageSize, String cluster);
 }

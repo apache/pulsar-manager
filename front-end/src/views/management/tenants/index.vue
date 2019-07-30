@@ -62,7 +62,22 @@
           </el-drag-select>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='create'" label="Allowed Roles" prop="roles">
-          <el-input v-model="temp.adminRoles"/>
+          <el-tag
+            v-for="tag in dynamicRoles"
+            :key="tag"
+            :disable-transitions="false"
+            closable
+            @close="handleClose(tag)">
+            {{ tag }}
+          </el-tag>
+          <el-input
+            v-if="inputVisible"
+            ref="saveTagInput"
+            v-model="inputValue"
+            size="small"
+            class="input-new-tag"
+            @keyup.enter.native="handleInputConfirm"/>
+          <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Role</el-button>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('table.tenant')">
           <span>{{ temp.tenant }}</span>
@@ -154,7 +169,10 @@ export default {
       rules: {
         tenant: [{ required: true, message: 'Tenant is required', trigger: 'blur' }],
         clusters: [{ required: true, message: 'Cluster is required', trigger: 'blur' }]
-      }
+      },
+      dynamicRoles: [],
+      inputVisible: false,
+      inputValue: ''
     }
   },
   created() {
@@ -259,8 +277,9 @@ export default {
       this.temp.clusters = []
       this.clusterListOptions = []
       fetchClusters(this.listQuery).then(response => {
-        for (var i = 0; i < response.data.length; i++) {
-          this.clusterListOptions.push({ 'value': response.data[i], 'label': response.data[i] })
+        console.log(response.data)
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.clusterListOptions.push({ 'value': response.data.data[i].cluster, 'label': response.data.data[i].cluster })
         }
       })
       this.$nextTick(() => {
@@ -271,10 +290,8 @@ export default {
       this.$refs['temp'].validate((valid) => {
         if (valid) {
           const data = {
-            allowedClusters: this.temp.clusters
-          }
-          if (this.temp.adminRoles.length > 0) {
-            data.adminRoles = this.temp.adminRoles.split(',')
+            allowedClusters: this.temp.clusters,
+            adminRoles: this.dynamicRoles
           }
           putTenant(this.temp.tenant, data).then((response) => {
             this.temp.adminRoles = 'empty'
@@ -358,6 +375,32 @@ export default {
         this.localList = []
         this.getTenants()
       })
+    },
+    handleClose(tag) {
+      this.dynamicRoles.splice(this.dynamicRoles.indexOf(tag), 1)
+    },
+    showInput() {
+      this.inputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    handleInputConfirm() {
+      const inputValue = this.inputValue
+      if (inputValue) {
+        if (this.dynamicRoles.indexOf(this.inputValue) >= 0) {
+          this.$notify({
+            title: 'error',
+            message: 'Role is exists',
+            type: 'error',
+            duration: 2000
+          })
+          return
+        }
+        this.dynamicRoles.push(inputValue)
+      }
+      this.inputVisible = false
+      this.inputValue = ''
     }
   }
 }

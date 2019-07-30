@@ -13,18 +13,28 @@
  */
 import request from '@/utils/request'
 
-const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+const BASE_URL_V2 = '/admin/v2'
 
-export function fetchBrokerStatsTopics(broker) {
+export function fetchIsolationPolicies(cluster) {
   return request({
-    url: SPRING_BASE_URL_V2 + `/broker-stats/topics?broker=` + broker,
+    url: BASE_URL_V2 + `/clusters/${cluster}/namespaceIsolationPolicies`,
     method: 'get'
   })
 }
 
-export function fetchBrokerStatsMetrics(broker) {
+export function updateIsolationPolicies(cluster, policyName, data) {
   return request({
-    url: SPRING_BASE_URL_V2 + `/broker-stats/metrics?broker=` + broker,
-    method: 'get'
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/clusters/${cluster}/namespaceIsolationPolicies/${policyName}`,
+    method: 'post',
+    data
+  })
+}
+
+export function deleteIsolationPolicies(cluster, policyName) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/clusters/${cluster}/namespaceIsolationPolicies/${policyName}`,
+    method: 'delete'
   })
 }
