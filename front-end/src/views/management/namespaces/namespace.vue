@@ -1154,18 +1154,6 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    // removeDomain(item) {
-    //   var index = this.dynamicValidateForm.domains.indexOf(item)
-    //   if (index !== -1) {
-    //     this.dynamicValidateForm.domains.splice(index, 1)
-    //   }
-    // },
-    // addDomain() {
-    //   this.dynamicValidateForm.domains.push({
-    //     value: '',
-    //     key: Date.now()
-    //   })
-    // },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
       revokePermissions(this.tenantNamespace, tag).then(response => {
