@@ -91,7 +91,6 @@ import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
-import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import MdInput from '@/components/MDinput'
 
 export default {
@@ -99,7 +98,6 @@ export default {
   components: {
     Pagination,
     jsonEditor,
-    ElDragSelect,
     MdInput
   },
   directives: { waves },

@@ -346,7 +346,7 @@ export default {
     },
     handleInputConfirmPrimary() {
       const inputValue = this.inputValuePrimary
-      if (this.primaryDynamicTags.indexOf(inputValue) > 0) {
+      if (this.primaryDynamicTags.indexOf(inputValue) >= 0) {
         this.$notify({
           title: 'error',
           message: 'This regex exist',
@@ -372,11 +372,11 @@ export default {
     },
     handleInputConfirmNamespace() {
       const inputValue = this.inputValueNamespace
-      if (this.namespaceDynamicTags.indexOf(inputValue) > 0) {
+      if (this.namespaceDynamicTags.indexOf(inputValue) >= 0) {
         this.$notify({
           title: 'error',
           message: 'This regex exist',
-          type: 'success',
+          type: 'error',
           duration: 3000
         })
         return
@@ -398,7 +398,7 @@ export default {
     },
     handleInputConfirmSecondary() {
       const inputValue = this.inputValueSecondary
-      if (this.secondaryDynamicTags.indexOf(inputValue) > 0) {
+      if (this.secondaryDynamicTags.indexOf(inputValue) >= 0) {
         this.$notify({
           title: 'error',
           message: 'This regex exist',

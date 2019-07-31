@@ -677,7 +677,6 @@ import {
 import { fetchBrokerStatsTopics } from '@/api/brokerStats'
 import { putTopic, fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import MdInput from '@/components/MDinput'
 import { validateEmpty } from '@/utils/validate'
 
@@ -688,7 +687,6 @@ const defaultForm = {
 export default {
   name: 'NamespaceInfo',
   components: {
-    ElDragSelect,
     MdInput,
     Pagination
   },
@@ -996,7 +994,6 @@ export default {
         }
         this.topicsList = this.searchList
       } else {
-        console.log(this.tempTopicsList)
         this.topicsList = this.tempTopicsList
       }
     },
@@ -1087,6 +1084,7 @@ export default {
     },
     handleClick(tab, event) {
       this.currentTabName = tab.name
+      this.$router.push({ query: { 'tab': tab.name }})
     },
     getRemoteTenantsList() {
       fetchTenants().then(response => {
@@ -1121,7 +1119,6 @@ export default {
         if (valid) {
           alert('submit!')
         } else {
-          console.log('error submit!!')
           return false
         }
       })
@@ -1176,7 +1173,6 @@ export default {
       this.inputValue = ''
     },
     handleChangeOptions() {
-      console.log(this.roleMap)
       this.$forceUpdate()
     },
     revokeAllRole() {
@@ -1320,7 +1316,6 @@ export default {
       })
     },
     handleSchemaAutoUpdateStrategy() {
-      console.log(this.form.autoUpdateStrategy)
       var strategy = 3
       if (this.form.autoUpdateStrategy === 'AutoUpdateDisabled') {
         strategy = 0
