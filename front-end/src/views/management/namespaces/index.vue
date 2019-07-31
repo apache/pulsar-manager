@@ -86,9 +86,8 @@ import { fetchTenants } from '@/api/tenants'
 import { fetchClusters } from '@/api/clusters'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-// import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
-import ElDragSelect from '@/components/DragSelect' // base on element-ui
+
 const defaultForm = {
   tenant: '',
   otherOptions: ''
@@ -96,8 +95,8 @@ const defaultForm = {
 export default {
   name: 'Namespaces',
   components: {
-    Pagination,
-    ElDragSelect
+    Pagination
+    // ElDragSelect
   },
   directives: { waves },
   data() {
