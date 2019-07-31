@@ -17,9 +17,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
 public interface JwtService {
+
     String toToken(String id);
 
     Optional<String> getSubFromToken(String token);
+
+    void setToken(String key, String value);
+
+    String getToken(String key);
+
+    void removeToken(String key);
 }
