@@ -703,7 +703,6 @@ import {
 import { fetchBrokerStatsTopics } from '@/api/brokerStats'
 import { putTopic, fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-import ElDragSelect from '@/components/DragSelect' // base on element-ui
 import MdInput from '@/components/MDinput'
 import { validateEmpty } from '@/utils/validate'
 
@@ -714,7 +713,6 @@ const defaultForm = {
 export default {
   name: 'NamespaceInfo',
   components: {
-    ElDragSelect,
     MdInput,
     Pagination
   },

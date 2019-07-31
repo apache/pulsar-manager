@@ -131,13 +131,6 @@ export const constantRouterMap = [
         hidden: true
       },
       {
-        path: 'brokers',
-        component: () => import('@/views/management/brokers'),
-        name: 'Brokers',
-        meta: { title: 'Brokers', noCache: true },
-        hidden: true
-      },
-      {
         path: 'brokers/:cluster/:broker/broker',
         component: () => import('@/views/management/brokers/broker'),
         name: 'BrokerInfo',
@@ -165,7 +158,6 @@ export const constantRouterMap = [
       },
       {
         path: 'namespaces/public/default/namespace?tab=topics',
-        component: () => import('@/views/management/topics/index'),
         name: 'Topics',
         meta: { title: 'Topics', noCache: true }
       },
@@ -195,13 +187,6 @@ export const constantRouterMap = [
         component: () => import('@/views/management/namespaces/index'),
         name: 'NamespacesTenant',
         meta: { title: 'Namespaces', noCache: true },
-        hidden: true
-      },
-      {
-        path: 'tenantNamespace/:tenant/:namespace',
-        component: () => import('@/views/management/topics/index'),
-        name: 'TenantNamespace',
-        meta: { title: 'Topics', noCache: true },
         hidden: true
       },
       {
