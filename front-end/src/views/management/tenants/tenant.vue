@@ -130,6 +130,7 @@ export default {
       this.inputValue = ''
       const data = {}
       data.adminRoles = this.dynamicRoles
+      data.allowedClusters = this.clusterValue
       updateTenant(this.tenant, data).then(() => {
         this.$notify({
           title: 'success',
@@ -158,6 +159,7 @@ export default {
     handleSelectClusters() {
       const data = {}
       data.allowedClusters = this.clusterValue
+      data.adminRoles = this.dynamicRoles
       updateTenant(this.tenant, data).then(() => {
         this.$notify({
           title: 'success',
