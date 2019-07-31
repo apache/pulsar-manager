@@ -72,7 +72,7 @@ export const constantRouterMap = [
   {
     path: '',
     component: Layout,
-    redirect: 'prometheus',
+    redirect: 'management/tenants',
     meta: {
       title: 'Dashboard',
       icon: 'dashboard'
