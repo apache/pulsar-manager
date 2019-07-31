@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="createPost-container">
-      <el-form :inline="true" :model="postForm" class="form-container">
+      <el-form :inline="true" :model="postForm" label-position="top" class="form-container">
         <el-form-item class="postInfo-container-item" label="Tenant">
           <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>

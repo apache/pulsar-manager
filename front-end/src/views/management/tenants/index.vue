@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input :placeholder="$t('table.tenant')" v-model="listQuery.tenant" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-input :placeholder="$t('tenant.searchTenant')" v-model="listQuery.tenant" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter"/>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('tenant.newTenant') }}</el-button>
     </div>
 
     <el-row :gutter="24">
@@ -52,7 +52,7 @@
     </el-row>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" class="el-dialog-for-test">
-      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="150px" style="width: 400px; margin-left:50px;">
+      <el-form ref="temp" :rules="rules" :model="temp" label-position="top" style="margin-left:30%; margin-right:10%">
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.tenant')" prop="tenant">
           <el-input v-model="temp.tenant" placeholder="Please input tenant"/>
         </el-form-item>
@@ -79,13 +79,13 @@
             @keyup.enter.native="handleInputConfirm"/>
           <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Role</el-button>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.tenant')">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('tenant.nameLabel')">
           <span>{{ temp.tenant }}</span>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Admin Roles">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('tenant.adminRolesLabel')">
           <el-input v-model="temp.adminRoles"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Allowed Clusters">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('tenant.allowedClustersLabel')">
           <el-drag-select v-model="temp.clusters" style="width:250px;" multiple placeholder="Please select clusters">
             <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
           </el-drag-select>
@@ -93,11 +93,11 @@
         <el-form-item v-if="dialogStatus==='delete'">
           <h4>Are you sure you want to delete this tenant?</h4>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
+          <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -162,9 +162,9 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: '',
+        update: 'Update Tenant Info',
         create: 'New Tenant',
-        delete: 'Delete'
+        delete: 'Delete Tenant'
       },
       rules: {
         tenant: [{ required: true, message: 'Tenant is required', trigger: 'blur' }],
@@ -405,3 +405,13 @@ export default {
   }
 }
 </script>
+
+<style>
+.el-dialog {
+  width: 30%;
+}
+.el-form {
+  margin-left: 0% !important;
+  margin-right: 0% !important;
+}
+</style>

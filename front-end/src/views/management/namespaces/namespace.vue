@@ -25,13 +25,18 @@
           <el-table-column prop="inBytes" label="In - bytes/s"/>
           <el-table-column prop="outBytes" label="Out - bytes/s"/>
         </el-table>
-        <h4>Bundles</h4>
+        <h4>
+          Bundles
+          <el-tooltip :content="bundleInfoContent" class="item" effect="dark" placement="top">
+            <i class="el-icon-info"/>
+          </el-tooltip>
+        </h4>
         <hr class="split-line">
         <div class="filter-container">
           <!-- <el-input placeholder="Search Bundles" prefix-icon="el-icon-search" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilterBundle"/> -->
           <!-- <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterBundle">{{ $t('table.search') }}</el-button> -->
-          <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete" @click="handleUnloadAll">Unload All</el-button>
-          <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-delete" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
+          <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadAll">Unload All</el-button>
+          <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
         </div>
         <el-table
           :key="tableKey"
@@ -47,18 +52,18 @@
           </el-table-column>
           <el-table-column label="Operations" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <el-button size="medium" type="danger" @click="handleSplitBundle(scope.row)">Split</el-button>
-              <el-button size="medium" type="danger" @click="handleUnloadBundle(scope.row)">Unload</el-button>
-              <el-button size="medium" type="danger" @click="handleClearBundleBacklog(scope.row)">Clear Backlog</el-button>
+              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-share" @click="handleSplitBundle(scope.row)">Split</el-button>
+              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">Unload</el-button>
+              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="handleClearBundleBacklog(scope.row)">Clear Backlog</el-button>
             </template>
           </el-table-column>
         </el-table>
         <!-- <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"/> -->
       </el-tab-pane>
       <el-tab-pane label="TOPICS" name="topics">
-        <el-input v-model="searchTopic" placeholder="Query Topics" style="width: 200px;" @keyup.enter.native="handleFilterTopic"/>
+        <el-input v-model="searchTopic" :placeholder="$t('namespace.searchTopics')" style="width: 200px;" @keyup.enter.native="handleFilterTopic"/>
         <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterTopic">{{ $t('table.search') }}</el-button>
-        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateTopic">{{ $t('table.add') }}</el-button>
+        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreateTopic">{{ $t('namespace.newTopic') }}</el-button>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px;padding-right:8px;margin-bottom:30px;">
             <el-table
@@ -126,9 +131,11 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="POLICIES" name="policies">
+        <!--
         <h4>Namespace Name</h4>
         <hr class="split-line">
         <span>{{ tenantNamespace }}</span>
+        -->
         <h4>Clusters</h4>
         <hr class="split-line">
         <div class="component-item">
@@ -223,78 +230,45 @@
         </div>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="ensembelSize">
+            <span>Ensemble Size</span>
             <md-input
               v-model="form.ensembleSize"
               class="md-input-style"
               name="ensembelSize"
               placeholder="Please input Ensemble"
-              @keyup.enter.native="handlePersistence">
-              Ensemble Size
-            </md-input>
+              @keyup.enter.native="handlePersistence"/>
           </el-form-item>
           <el-form-item prop="writeQuorumSize">
+            <span>Write Quorum Size</span>
             <md-input
               v-model="form.writeQuorumSize"
               class="md-input-style"
               name="writeQuorumSize"
               placeholder="Please input Write Quorum Size"
-              @keyup.enter.native="handlePersistence">
-              Write Quorum Size
-            </md-input>
+              @keyup.enter.native="handlePersistence"/>
           </el-form-item>
           <el-form-item prop="readQuorumSize">
+            <span>Read Quorum Size</span>
             <md-input
               v-model="form.readQuorumSize"
               class="md-input-style"
               name="readQuorumSize"
               placeholder="Please input Read Quorum Size"
-              @keyup.enter.native="handlePersistence">
-              Read Quorum Size
-            </md-input>
+              @keyup.enter.native="handlePersistence"/>
           </el-form-item>
+        </el-form>
+        <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="markDeleteMaxRate">
+            <span>Mark Delete Rate</span>
+            <el-tooltip :content="markDeleteRateContent" class="item" effect="dark" placement="top">
+              <i class="el-icon-info"/>
+            </el-tooltip>
             <md-input
               v-model="form.markDeleteMaxRate"
               class="md-input-style"
               name="markDeleteMaxRate"
               placeholder="Please input Delete Max Rate"
-              @keyup.enter.native="handlePersistence">
-              Mark Delete Max Rate
-            </md-input>
-          </el-form-item>
-        </el-form>
-        <el-form :inline="true" :model="form" :rules="rules">
-          <el-form-item prop="backlogQuotasLimit">
-            <span>Backlog Quotas Limit</span>
-            <el-tooltip :content="backlogQuotasLimitContent" class="item" effect="dark" placement="top">
-              <i class="el-icon-info"/>
-            </el-tooltip>
-            <md-input
-              v-model="form.backlogQuotasLimit"
-              class="md-input-style"
-              name="backlogQuotasLimit"
-              placeholder="Please input Backlog Quotas Limit"
-              @keyup.enter.native="handleBacklogQuota">
-              Backlog Quotas Limit
-            </md-input>
-          </el-form-item>
-          <el-form-item style="width:300px">
-            <span>Backlog Retention Policy</span>
-            <el-tooltip :content="backlogRententionPolicyContent" class="item" effect="dark" placement="top">
-              <i class="el-icon-info"/>
-            </el-tooltip>
-            <br>
-            <el-select
-              v-model="form.backlogRententionPolicy"
-              placeholder="Please select backlog rentention policy"
-              style="margin-top:36px;width:400px"
-              @change="handleBacklogQuota()">
-              <el-option
-                v-for="item in backlogRententionPolicyOption"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"/>
-            </el-select>
+              @keyup.enter.native="handlePersistence"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
@@ -307,7 +281,7 @@
             <el-radio-group
               v-model="form.encryptionRequireRadio"
               size="medium"
-              style="margin-top:30px;width:300px"
+              style="margin-top:8px;width:300px"
               @change="handleEncryption()">
               <el-radio label="Enabled"/>
               <el-radio label="Disabled"/>
@@ -322,11 +296,45 @@
             <el-radio-group
               v-model="form.deduplicationRadio"
               size="medium"
-              style="margin-top:30px;width:300px"
+              style="margin-top:8px;width:300px"
               @change="handleDeduplication()">
               <el-radio label="Enabled"/>
               <el-radio label="Disabled"/>
             </el-radio-group>
+          </el-form-item>
+        </el-form>
+        <h4>Backlog</h4>
+        <hr class="split-line">
+        <el-form :inline="true" :model="form" :rules="rules">
+          <el-form-item prop="backlogQuotasLimit">
+            <span>Backlog Quotas Limit</span>
+            <el-tooltip :content="backlogQuotasLimitContent" class="item" effect="dark" placement="top">
+              <i class="el-icon-info"/>
+            </el-tooltip>
+            <md-input
+              v-model="form.backlogQuotasLimit"
+              class="md-input-style"
+              name="backlogQuotasLimit"
+              placeholder="Please input Backlog Quotas Limit"
+              @keyup.enter.native="handleBacklogQuota"/>
+          </el-form-item>
+          <el-form-item style="width:300px">
+            <span>Backlog Retention Policy</span>
+            <el-tooltip :content="backlogRententionPolicyContent" class="item" effect="dark" placement="top">
+              <i class="el-icon-info"/>
+            </el-tooltip>
+            <br>
+            <el-select
+              v-model="form.backlogRententionPolicy"
+              placeholder="Please select backlog rentention policy"
+              style="margin-top:8px;width:400px"
+              @change="handleBacklogQuota()">
+              <el-option
+                v-for="item in backlogRententionPolicyOption"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"/>
+            </el-select>
           </el-form-item>
         </el-form>
         <h4>Schema</h4>
@@ -341,7 +349,7 @@
             <el-select
               v-model="form.autoUpdateStrategy"
               placeholder="Please select backlog autoUpdate strategy"
-              style="margin-top:30px;width:300px"
+              style="margin-top:8px;width:300px"
               @change="handleSchemaAutoUpdateStrategy()">
               <el-option
                 v-for="item in autoUpdateStrategyOption"
@@ -359,7 +367,7 @@
             <el-radio-group
               v-model="form.schemaValidationEnforcedRadio"
               size="medium"
-              style="margin-top:39px;width:300px"
+              style="margin-top:8px;width:300px"
               @change="handleSchemaValidationEnforced()">
               <el-radio label="Enabled"/>
               <el-radio label="Disabled"/>
@@ -379,9 +387,7 @@
               class="md-input-style"
               name="messageTTL"
               placeholder="Please input Backlog Quotas Limit"
-              @keyup.enter.native="handleMessageTTL">
-              Default 0
-            </md-input>
+              @keyup.enter.native="handleMessageTTL"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
@@ -395,9 +401,7 @@
               class="md-input-style"
               name="retentionSize"
               placeholder="Please input retention size"
-              @keyup.enter.native="handleRetention">
-              retention size default 0
-            </md-input>
+              @keyup.enter.native="handleRetention"/>
           </el-form-item>
           <el-form-item prop="retentionTime">
             <span>Retention Time(Unit Minutes)</span>
@@ -409,9 +413,7 @@
               class="md-input-style"
               name="retentionTime"
               placeholder="Please input Retention Time"
-              @keyup.enter.native="handleRetention">
-              Default 0
-            </md-input>
+              @keyup.enter.native="handleRetention"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
@@ -425,9 +427,7 @@
               class="md-input-style"
               name="compactionThreshold"
               placeholder="Please input retention size"
-              @keyup.enter.native="handleCompactionThreshold">
-              Default 0
-            </md-input>
+              @keyup.enter.native="handleCompactionThreshold"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
@@ -441,9 +441,7 @@
               class="md-input-style"
               name="offloadThreshold"
               placeholder="Please input Offload Threshold"
-              @keyup.enter.native="handleOffloadThreshold">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleOffloadThreshold"/>
           </el-form-item>
           <el-form-item prop="offloadDeletionLag">
             <span>Offload Deletion Lag</span>
@@ -455,9 +453,7 @@
               class="md-input-style"
               name="offloadDeletionLag"
               placeholder="Please input Retention Time"
-              @keyup.enter.native="handleOffloadDeletionLag">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleOffloadDeletionLag"/>
           </el-form-item>
         </el-form>
         <h4>Throttling</h4>
@@ -473,9 +469,7 @@
               class="md-input-style"
               name="maxProducersPerTopic"
               placeholder="Please input max Producers"
-              @keyup.enter.native="handleMaxProducersPerTopic">
-              Default 0
-            </md-input>
+              @keyup.enter.native="handleMaxProducersPerTopic"/>
           </el-form-item>
           <el-form-item prop="maxConsumersPerTopic">
             <span>Max Consumers Per Topic</span>
@@ -487,9 +481,7 @@
               class="md-input-style"
               name="maxConsumersPerTopic"
               placeholder="Please input max Consumers"
-              @keyup.enter.native="handleMaxConsumersPerTopic">
-              Default 0
-            </md-input>
+              @keyup.enter.native="handleMaxConsumersPerTopic"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
@@ -503,9 +495,7 @@
               class="md-input-style"
               name="maxConsumerPerSub"
               placeholder="Please input max Consumers"
-              @keyup.enter.native="handleMaxConsuemrsPerSubscription">
-              Default 0
-            </md-input>
+              @keyup.enter.native="handleMaxConsuemrsPerSubscription"/>
           </el-form-item>
         </el-form>
         <h4>Dispatch Rate</h4>
@@ -522,9 +512,7 @@
               class="md-input-style"
               name="dispatchRatePerTopicBytes"
               placeholder="Please input dispatch rate"
-              @keyup.enter.native="handleDispatchRatePerTopic">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerTopicMessage">
             <span>message/second</span>
@@ -533,9 +521,7 @@
               class="md-input-style"
               name="dispatchRatePerTopicMessage"
               placeholder="Please input dispatch rate"
-              @keyup.enter.native="handleDispatchRatePerTopic">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerTopicPeriod">
             <span>period(Unit second)</span>
@@ -544,9 +530,7 @@
               class="md-input-style"
               name="dispatchRatePerTopicPeriod"
               placeholder="Please input dispatch rate"
-              @keyup.enter.native="handleDispatchRatePerTopic">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
         </el-form>
         <span>Dispatch Rate Per Subscription</span>
@@ -561,9 +545,7 @@
               class="md-input-style"
               name="dispatchRatePerSubBytes"
               placeholder="Please input dispatch rate"
-              @keyup.enter.native="handleDispatchRatePerSub">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerSubMessage">
             <span>message/second</span>
@@ -572,9 +554,7 @@
               class="md-input-style"
               name="dispatchRatePerSubMessage"
               placeholder="Please input dispatch rate"
-              @keyup.enter.native="handleDispatchRatePerSub">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerSubPeriod">
             <span>period(Unit Second)</span>
@@ -583,9 +563,7 @@
               class="md-input-style"
               name="dispatchRatePerSubPeriod"
               placeholder="Please input dispatch rate"
-              @keyup.enter.native="handleDispatchRatePerSub">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
         </el-form>
         <span>Subscribe Rate Per Consumer</span>
@@ -600,9 +578,7 @@
               class="md-input-style"
               name="subscribeRatePerConsumerSub"
               placeholder="Please input subscribe rate"
-              @keyup.enter.native="handleSubscribeRate">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleSubscribeRate"/>
           </el-form-item>
           <el-form-item prop="subscribeRatePerConsumerPeriod">
             <span>period(Unit Second)</span>
@@ -611,9 +587,7 @@
               class="md-input-style"
               name="subscribeRatePerConsumerPeriod"
               placeholder="Please input subscribe rate"
-              @keyup.enter.native="handleSubscribeRate">
-              Default -1
-            </md-input>
+              @keyup.enter.native="handleSubscribeRate"/>
           </el-form-item>
         </el-form>
         <h4>Anti Affinity</h4>
@@ -632,24 +606,24 @@
               @keyup.enter.native="handleAntiAffinityGroup"/>
           </el-form-item>
         </el-form>
-        <h4>Danager Zone</h4>
+        <h4 style="color:#E57470">Danger Zone</h4>
         <hr class="danger-line">
         <el-button type="danger" class="button" @click="deleteNamespace">Delete Namespace</el-button>
       </el-tab-pane>
     </el-tabs>
     <el-dialog :visible.sync="dialogFormVisible">
-      <el-form ref="form" :model="form" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="form" :model="form" label-position="left" label-width="140px" style="width: 400px; margin-left:50px;">
         <div v-if="dialogStatus==='create'">
-          <el-form-item :label="$t('table.topic')" prop="topic">
-            <el-input v-model="form.topic"/>
-          </el-form-item>
-          <el-form-item label="Persistent">
+          <el-form-item label="Topic Domain">
             <el-radio-group
               v-model="form.isPersistent"
               size="medium">
               <el-radio label="Persistent"/>
               <el-radio label="Non-persistent"/>
             </el-radio-group>
+          </el-form-item>
+          <el-form-item :label="$t('table.topic')" prop="topic">
+            <el-input v-model="form.topic"/>
           </el-form-item>
           <el-form-item :label="$t('table.partition')" prop="partition">
             <el-input v-model="form.partitions"/>
@@ -806,6 +780,7 @@ export default {
       rules: {
         // ensembelSize: [{ required: true, message: 'EnsembelSize is greater more than 0', trigger: 'blur' }]
       },
+      markDeleteRateContent: 'This is markDeleteRateContent',
       backlogQuotasLimitContent: 'This is backlogQuotasLimitContent',
       backlogRententionPolicyContent: 'This is backlogRententionPolicyContent',
       backlogRententionPolicyRadio: 'consumer_backlog_eviction',
@@ -899,7 +874,8 @@ export default {
         update: 'Edit',
         create: 'Create'
       },
-      currentTabName: ''
+      currentTabName: '',
+      bundleInfoContent: 'This is bundleInfoContent'
     }
   },
   created() {
@@ -1596,6 +1572,6 @@ export default {
 }
 .md-input-style {
   width: 300px;
-  margin-top: 20px;
+  margin-top: 8px !important;
 }
 </style>

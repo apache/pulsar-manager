@@ -1,153 +1,164 @@
 <template>
   <div class="app-container">
+    <h2>{{ $t('ip.heading') }}</h2>
     <div class="createPost-container">
-      <el-form :inline="true" :model="postForm" class="form-container">
-        <el-form-item class="postInfo-container-item" label="Cluster">
-          <el-select v-model="postForm.cluster" placeholder="select cluster" @change="getClusterList(postForm.cluster)">
+      <el-form :inline="true" :model="postForm" label-position="top" class="form-container">
+        <el-form-item :label="$t('common.clusterLabel')" class="postInfo-container-item">
+          <el-select
+            v-model="postForm.cluster"
+            :placeholder="$t('cluster.selectCluster')"
+            @change="getClusterList(postForm.cluster)">
             <el-option v-for="(item,index) in clustersListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="created===false" class="postInfo-container-item" label="Policy">
-          <el-select v-model="postForm.policy" placeholder="select policy" @change="(postForm.cluster)">
+        <el-form-item v-if="created===false" :label="$t('ip.label')" class="postInfo-container-item">
+          <el-select
+            v-model="postForm.policy"
+            :placeholder="$t('ip.selectIp')"
+            @change="(postForm.cluster)">
             <el-option v-for="(item,index) in policiesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
+        <el-form-item v-if="created===true" :label="$t('ip.label')" class="postInfo-container-item">
+          <el-input
+            v-model="policyName"
+            :placeholder="$t('ip.newIpName')"
+            clearable
+            style="width:300px"/>
+        </el-form-item>
       </el-form>
     </div>
-    <h2>Namespace Isolation Policy</h2>
-    <hr class="split-line">
-    <div v-if="created===true">
-      <h3>Policy Name</h3>
+    <el-row>
+      <h3>{{ $t('common.namespacesLabel') }}</h3>
       <hr class="split-line">
+      <span>{{ $t('ip.selectNsLabel') }}
+        <el-tooltip :content="namespaceContent" class="item" effect="dark" placement="top">
+          <i class="el-icon-info"/>
+        </el-tooltip>
+      </span>
+      <br>
+      <el-tag
+        v-for="(ntag, index) in namespaceDynamicTags"
+        :key="'namespace-' + index"
+        :disable-transitions="false"
+        closable
+        @close="handleCloseNamespace(ntag)">
+        {{ ntag }}
+      </el-tag>
       <el-input
-        v-model="policyName"
-        placeholder="Please Input policy name"
-        clearable
-        style="width:300px"/>
-    </div>
-    <h3>Namespaces</h3>
-    <hr class="split-line">
-    <span>Selected Namespace (Regex)
-      <el-tooltip :content="namespaceContent" class="item" effect="dark" placement="top">
-        <i class="el-icon-info"/>
-      </el-tooltip>
-    </span>
-    <br>
-    <el-tag
-      v-for="(ntag, index) in namespaceDynamicTags"
-      :key="'namespace-' + index"
-      :disable-transitions="false"
-      closable
-      @close="handleCloseNamespace(ntag)">
-      {{ ntag }}
-    </el-tag>
-    <el-input
-      v-if="inputVisibleNamespace"
-      ref="saveTagInputNamespace"
-      v-model="inputValueNamespace"
-      class="input-new-tag"
-      size="small"
-      @keyup.enter.native="handleInputConfirmNamespace"/>
-    <el-button v-else class="button-new-tag" size="small" @click="showInputNamespace">+ Regex</el-button>
-    <h3>Primary Brokers</h3>
-    <hr class="split-line">
-    <span>Selected Brokers (Regex)
-      <el-tooltip :content="brokerContent" class="item" effect="dark" placement="top">
-        <i class="el-icon-info"/>
-      </el-tooltip>
-    </span>
-    <br>
-    <el-tag
-      v-for="(ptag, index) in primaryDynamicTags"
-      :key="'primary-' + index"
-      :disable-transitions="false"
-      closable
-      @close="handleClosePrimary(ptag)">
-      {{ ptag }}
-    </el-tag>
-    <el-input
-      v-if="inputVisiblePrimary"
-      ref="saveTagInputPrimary"
-      v-model="inputValuePrimary"
-      class="input-new-tag"
-      size="small"
-      @keyup.enter.native="handleInputConfirmPrimary"/>
-    <el-button v-else class="button-new-tag" size="small" @click="showInputPrimary">+ Regex</el-button>
-    <h3>Secondary Brokers</h3>
-    <hr class="split-line">
-    <span>Selected Brokers (Regex)
-      <el-tooltip :content="secondaryBrokersContent" class="item" effect="dark" placement="top">
-        <i class="el-icon-info"/>
-      </el-tooltip>
-    </span>
-    <br>
-    <el-tag
-      v-for="(stag, index) in secondaryDynamicTags"
-      :key="'secondary-' + index"
-      :disable-transitions="false"
-      closable
-      @close="handleCloseSecondary(stag)">
-      {{ stag }}
-    </el-tag>
-    <el-input
-      v-if="inputVisibleSecondary"
-      ref="saveTagInputSecondary"
-      v-model="inputValueSecondary"
-      class="input-new-tag"
-      size="small"
-      @keyup.enter.native="handleInputConfirmSecondary"/>
-    <el-button v-else class="button-new-tag" size="small" @click="showInputSecondary">+ Regex</el-button>
-    <h3>Auto Failover Policy</h3>
-    <hr class="split-line">
-    <span>Policy Type
-      <el-tooltip :content="policyTypeContent" class="item" effect="dark" placement="top">
-        <i class="el-icon-info"/>
-      </el-tooltip>
-    </span>
-    <br>
-    <el-select
-      v-model="autoFailoverPolicy"
-      placeholder="Please select Auto Failover Policy"
-      style="margin-top:20px;width:300px">
-      <el-option
-        v-for="item in autoFailoverPolicyOptions"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"/>
-    </el-select>
-    <el-form :inline="true" :model="form" :rules="rules">
-      <el-form-item prop="ensembelSize">
-        <span>Broker Usage Threshold (%)</span>
-        <el-tooltip :content="brokerUsageThresholdContent" class="item" effect="dark" placement="top">
-          <i class="el-icon-info"/>
-        </el-tooltip>
-        <md-input
-          v-model="form.brokerUsageThreshold"
-          class="md-input-style"
-          name="brokerUsageThreshold"
-          placeholder="Please input brokerUsageThreshold"
-          @keyup.enter.native="handleIsolationPolicy"/>
-      </el-form-item>
-      <el-form-item prop="writeQuorumSize">
-        <span>Minimal Available Brokers</span>
-        <el-tooltip :content="minimalAvailableBrokerContent" class="item" effect="dark" placement="top">
-          <i class="el-icon-info"/>
-        </el-tooltip>
-        <md-input
-          v-model="form.minimalAvailableBroker"
-          class="md-input-style"
-          name="minimalAvailableBroker"
-          placeholder="Please input minimalAvailableBroker"
-          @keyup.enter.native="handleIsolationPolicy"/>
-      </el-form-item>
-    </el-form>
-    <div v-if="created===true">
-      <h4>Create Zone</h4>
+        v-if="inputVisibleNamespace"
+        ref="saveTagInputNamespace"
+        v-model="inputValueNamespace"
+        class="input-new-tag"
+        size="small"
+        @keyup.enter.native="handleInputConfirmNamespace"/>
+      <el-button v-else class="button-new-tag" icon="el-icon-plus" size="small" @click="showInputNamespace">
+        {{ $t('common.regex') }}
+      </el-button>
+      <h3>{{ $t('ip.pbHeading') }}</h3>
       <hr class="split-line">
-      <el-button type="primary" class="button" @click="handleIsolationPolicy">Create Policy</el-button>
-    </div>
+      <span>{{ $t('ip.selectPbLabel') }}
+        <el-tooltip :content="brokerContent" class="item" effect="dark" placement="top">
+          <i class="el-icon-info"/>
+        </el-tooltip>
+      </span>
+      <br>
+      <el-tag
+        v-for="(ptag, index) in primaryDynamicTags"
+        :key="'primary-' + index"
+        :disable-transitions="false"
+        closable
+        @close="handleClosePrimary(ptag)">
+        {{ ptag }}
+      </el-tag>
+      <el-input
+        v-if="inputVisiblePrimary"
+        ref="saveTagInputPrimary"
+        v-model="inputValuePrimary"
+        class="input-new-tag"
+        size="small"
+        @keyup.enter.native="handleInputConfirmPrimary"/>
+      <el-button v-else class="button-new-tag" icon="el-icon-plus" size="small" @click="showInputPrimary">
+        {{ $t('common.regex') }}
+      </el-button>
+      <h3>{{ $t('ip.sbHeading') }}</h3>
+      <hr class="split-line">
+      <span>{{ $t('ip.selectSbLabel') }}
+        <el-tooltip :content="secondaryBrokersContent" class="item" effect="dark" placement="top">
+          <i class="el-icon-info"/>
+        </el-tooltip>
+      </span>
+      <br>
+      <el-tag
+        v-for="(stag, index) in secondaryDynamicTags"
+        :key="'secondary-' + index"
+        :disable-transitions="false"
+        closable
+        @close="handleCloseSecondary(stag)">
+        {{ stag }}
+      </el-tag>
+      <el-input
+        v-if="inputVisibleSecondary"
+        ref="saveTagInputSecondary"
+        v-model="inputValueSecondary"
+        class="input-new-tag"
+        size="small"
+        @keyup.enter.native="handleInputConfirmSecondary"/>
+      <el-button v-else class="button-new-tag" icon="el-icon-plus" size="small" @click="showInputSecondary">
+        {{ $t('common.regex') }}
+      </el-button>
+      <h3>{{ $t('ip.afpHeading') }}</h3>
+      <hr class="split-line">
+      <span>{{ $t('ip.ptHeading') }}
+        <el-tooltip :content="policyTypeContent" class="item" effect="dark" placement="top">
+          <i class="el-icon-info"/>
+        </el-tooltip>
+      </span>
+      <br>
+      <el-select
+        v-model="autoFailoverPolicy"
+        :placeholder="$t('ip.selectAfpPh')"
+        style="margin-top:20px;width:300px">
+        <el-option
+          v-for="item in autoFailoverPolicyOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"/>
+      </el-select>
+      <el-form :inline="true" :model="form" :rules="rules">
+        <el-form-item prop="ensembelSize">
+          <span>{{ $t('ip.brokerUsageThresholdLabel') }} (%)</span>
+          <el-tooltip :content="brokerUsageThresholdContent" class="item" effect="dark" placement="top">
+            <i class="el-icon-info"/>
+          </el-tooltip>
+          <md-input
+            v-model="form.brokerUsageThreshold"
+            :placeholder="$t('brokerUsageThresholdPh')"
+            class="md-input-style"
+            name="brokerUsageThreshold"/>
+        </el-form-item>
+        <el-form-item prop="writeQuorumSize">
+          <span>{{ $t('ip.minimalAvailableBrokerLabel') }}</span>
+          <el-tooltip :content="minimalAvailableBrokerContent" class="item" effect="dark" placement="top">
+            <i class="el-icon-info"/>
+          </el-tooltip>
+          <md-input
+            v-model="form.minimalAvailableBroker"
+            :placeholder="$t('ip.minimalAvailableBrokerPh')"
+            class="md-input-style"
+            name="minimalAvailableBroker" />
+        </el-form-item>
+      </el-form>
+      <div v-if="created===true">
+        <el-button type="primary" class="button" @click="handleIsolationPolicy">Create Policy</el-button>
+      </div>
+      <div v-if="created===false">
+        <el-button type="primary" class="button" @click="handleIsolationPolicy">Update Policy</el-button>
+      </div>
+    </el-row>
+
     <div v-if="created===false">
-      <h4>Danager Zone</h4>
+      <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
       <hr class="danger-line">
       <el-button type="danger" class="button" @click="handleDelete">Delete Policy</el-button>
     </div>
@@ -326,7 +337,6 @@ export default {
     },
     handleClosePrimary(tag) {
       this.primaryDynamicTags.splice(this.primaryDynamicTags.indexOf(tag), 1)
-      this.handleIsolationPolicy()
     },
     showInputPrimary() {
       this.inputVisiblePrimary = true
@@ -350,14 +360,9 @@ export default {
       }
       this.inputVisiblePrimary = false
       this.inputValuePrimary = ''
-      if (this.created) {
-        return
-      }
-      this.handleIsolationPolicy()
     },
     handleCloseNamespace(tag) {
       this.namespaceDynamicTags.splice(this.namespaceDynamicTags.indexOf(tag), 1)
-      this.handleIsolationPolicy()
     },
     showInputNamespace() {
       this.inputVisibleNamespace = true
@@ -381,14 +386,9 @@ export default {
       }
       this.inputVisibleNamespace = false
       this.inputValueNamespace = ''
-      if (this.created) {
-        return
-      }
-      this.handleIsolationPolicy()
     },
     handleCloseSecondary(tag) {
       this.secondaryDynamicTags.splice(this.secondaryDynamicTags.indexOf(tag), 1)
-      this.handleIsolationPolicy()
     },
     showInputSecondary() {
       this.inputVisibleSecondary = true
@@ -412,10 +412,6 @@ export default {
       }
       this.inputVisibleSecondary = false
       this.inputValueSecondary = ''
-      if (this.created) {
-        return
-      }
-      this.handleIsolationPolicy()
     },
     handleDelete() {
       deleteIsolationPolicies(this.postForm.cluster, this.postForm.policy).then(response => {

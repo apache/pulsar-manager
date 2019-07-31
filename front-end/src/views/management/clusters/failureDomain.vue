@@ -2,35 +2,35 @@
   <div class="app-container">
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
-        <el-form-item class="postInfo-container-item" label="Cluster">
+        <el-form-item :label="$t('cluster.label')" class="postInfo-container-item">
           <el-select v-model="postForm.cluster" placeholder="select cluster" @change="getFailureDomainsList()">
             <el-option v-for="(item,index) in clustersListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item class="postInfo-container-item" label="Failure Domain">
+        <el-form-item :label="$t('fd.label')" class="postInfo-container-item">
           <el-select v-model="postForm.failureDomainName" placeholder="select domain" @change="getFailureDomainInfo()">
             <el-option v-for="(item,index) in failureDomainListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
       </el-form>
     </div>
-    <h3>FailureDomain</h3>
-    <h4>Brokers
+    <h3>{{ $t('fd.label') }}</h3>
+    <h4>{{ $t('fd.brokerList') }}
       <el-tooltip :content="brokersContent" class="item" effect="dark" placement="top">
         <i class="el-icon-info"/>
       </el-tooltip>
     </h4>
     <el-select
       v-model="brokerValue"
+      :placeholder="$t('fd.selectBrokers')"
       style="width:500px;margin-top:20px"
-      multiple
-      placeholder="Please Select Brokers"
-      @change="handleSelectBrokers()">
+      multiple>
       <el-option v-for="item in brokerOptions" :key="item.value" :label="item.label" :value="item.value" />
     </el-select>
-    <h4>Danager Zone</h4>
+    <el-button type="primary" class="button" @click="handleSelectBrokers()">{{ $t('fd.updateFd') }}</el-button>
+    <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
     <hr class="danger-line">
-    <el-button type="danger" class="button" @click="handleDelete">Delete Failure Domain</el-button>
+    <el-button type="danger" class="button" @click="handleDelete">{{ $t('fd.deleteFd') }}</el-button>
   </div>
 </template>
 

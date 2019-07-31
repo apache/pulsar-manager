@@ -206,5 +206,78 @@ export default {
     close: 'Close',
     closeOthers: 'Close Others',
     closeAll: 'Close All'
+  },
+  tabs: {
+    config: 'CONFIG',
+    failuredomains: 'FAILURE DOMAINS',
+    isolationpolicies: 'ISOLATION POLICIES'
+  },
+  common: {
+    dangerZone: 'Danger Zone',
+    actions: 'Actions',
+    clusterLabel: 'Cluster',
+    namespacesLabel: 'Namespaces',
+    regex: 'Regex'
+  },
+  tenant: {
+    searchTenant: 'Search Tenants',
+    newTenant: 'New Tenant',
+    nameLabel: 'Tenant Name',
+    adminRolesLabel: 'Admin Roles',
+    allowedClustersLabel: 'Allowed Clusters'
+  },
+  namespace: {
+    newTopic: 'New Topic',
+    searchTopics: 'Search Topics'
+  },
+  cluster: {
+    label: 'Cluster',
+    name: 'Cluster Name',
+    addCluster: 'Add Cluster',
+    updateCluster: 'Update Cluster',
+    deleteCluster: 'Delete Cluster',
+    searchClusters: 'Search Clusters',
+    selectCluster: 'Select Cluster',
+    webServiceUrlPrefix: 'Http Service Url',
+    webServiceUrlTlsPrefix: 'Https Service Url',
+    brokerServiceUrlPrefix: 'Broker Service Url',
+    brokerServiceUrlTlsPrefix: 'Broker Service Url (TLS)'
+  },
+  // failure domain
+  fd: {
+    label: 'Failure Domain',
+    createFdTitle: 'Add a New Failure Domain',
+    name: 'Domain Name',
+    brokerList: 'Broker List',
+    selectBrokers: 'Please select brokers',
+    searchFds: 'Search Failure Domains',
+    newFd: 'New FailureDomain',
+    updateFd: 'Update Failure Domain',
+    deleteFd: 'Delete Failure Domain'
+  },
+  // isolation policies
+  ip: {
+    label: 'Policy',
+    heading: 'Namespace Isolation Policy',
+    name: 'Policy Name',
+    searchIps: 'Search Isolation Policies',
+    selectIp: 'Select Isolation Policy',
+    newIp: 'New Isolation Policy',
+    nameLabel: 'Isolation Policy',
+    numPBLabel: 'Number of Primary Brokers',
+    numSBLabel: 'Number of Secondary Brokers',
+    newIpName: 'Please input policy name',
+    selectNsLabel: 'Select Namespaces',
+    selectPbLabel: 'Select Brokers',
+    selectSbLabel: 'Select Brokers',
+    selectAfpPh: 'Please select auto failover policy',
+    pbHeading: 'Primary Brokers',
+    sbHeading: 'Secondary Brokers',
+    afpHeading: 'Auto Failover Policy',
+    ptHeading: 'Policy Type',
+    brokerUsageThresholdLabel: 'Broker Usage Threshold',
+    brokerUsageThresholdPh: 'Please input broker usage threshold',
+    minimalAvailableBrokerLabel: 'Minimal Available Brokers',
+    minimalAvailableBrokerPh: 'Please input minimalAvailableBroker'
   }
 }
