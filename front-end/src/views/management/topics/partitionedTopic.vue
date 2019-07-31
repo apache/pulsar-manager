@@ -290,6 +290,7 @@ export default {
     },
     handleClick(tab, event) {
       this.currentTabName = tab.name
+      this.$router.push({ query: { 'tab': tab.name }})
     },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)

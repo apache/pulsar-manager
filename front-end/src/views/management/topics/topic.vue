@@ -612,6 +612,7 @@ export default {
     },
     handleClick(tab, event) {
       this.currentTabName = tab.name
+      this.$router.push({ query: { 'tab': tab.name }})
     },
     handleUnload() {
       unload(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {

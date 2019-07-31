@@ -336,6 +336,7 @@ export default {
       if (tab.name === 'isolationPolicies') {
         this.getNamespaceIsolationPolicy()
       }
+      this.$router.push({ query: { 'tab': tab.name }})
     },
     handleServiceUrl() {
       var data = {

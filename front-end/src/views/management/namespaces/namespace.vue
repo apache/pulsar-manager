@@ -1020,7 +1020,6 @@ export default {
         }
         this.topicsList = this.searchList
       } else {
-        console.log(this.tempTopicsList)
         this.topicsList = this.tempTopicsList
       }
     },
@@ -1111,6 +1110,7 @@ export default {
     },
     handleClick(tab, event) {
       this.currentTabName = tab.name
+      this.$router.push({ query: { 'tab': tab.name }})
     },
     getRemoteTenantsList() {
       fetchTenants().then(response => {
@@ -1145,7 +1145,6 @@ export default {
         if (valid) {
           alert('submit!')
         } else {
-          console.log('error submit!!')
           return false
         }
       })
@@ -1200,7 +1199,6 @@ export default {
       this.inputValue = ''
     },
     handleChangeOptions() {
-      console.log(this.roleMap)
       this.$forceUpdate()
     },
     revokeAllRole() {
@@ -1344,7 +1342,6 @@ export default {
       })
     },
     handleSchemaAutoUpdateStrategy() {
-      console.log(this.form.autoUpdateStrategy)
       var strategy = 3
       if (this.form.autoUpdateStrategy === 'AutoUpdateDisabled') {
         strategy = 0
