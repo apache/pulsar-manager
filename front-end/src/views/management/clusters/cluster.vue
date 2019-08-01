@@ -51,10 +51,14 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="ISOLATION-POLICIES" name="isolationPolicies">
-        <el-input v-model="isolationPolicyKey" placeholder="policy" style="width: 200px;" @keyup.enter.native="handlePolicyFilter"/>
-        <el-button type="primary" icon="el-icon-search" @click="handleFilter">Search</el-button>
-        <el-button type="primary" icon="el-icon-edit" @click="handleCreatePolicy">New Policy</el-button>
+      <el-tab-pane :label="$t('tabs.isolationpolicies')" name="isolationPolicies">
+        <el-input
+          v-model="isolationPolicyKey"
+          :placeholder="$t('ip.searchIps')"
+          style="width: 200px;"
+          @keyup.enter.native="handlePolicyFilter"/>
+        <el-button type="primary" icon="el-icon-search" @click="handleFilter"/>
+        <el-button type="primary" icon="el-icon-plus" @click="handleCreatePolicy">{{ $t('ip.newIp') }}</el-button>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-top:15px;">
             <el-table
@@ -64,24 +68,24 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Isolation Policy" min-width="50px" align="center">
+              <el-table-column :label="$t('ip.nameLabel')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <router-link :to="'/management/clusters/' + scope.row.cluster + '/' + scope.row.isolationPolicy + '/namespaceIsolationPolicy'" class="link-type">
                     <span>{{ scope.row.isolationPolicy }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column label="Number of Primary Brokers" align="center" min-width="100px">
+              <el-table-column :label="$t('ip.numPBLabel')" align="center" min-width="100px">
                 <template slot-scope="scope">
                   <span>{{ scope.row.numberOfPrimaryBrokers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Number of Secondary Brokers" align="center" min-width="100px">
+              <el-table-column :label="$t('ip.numSBLabel')" align="center" min-width="100px">
                 <template slot-scope="scope">
                   <span>{{ scope.row.numberOfSecondaryBrokers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Delete Policy" align="center" class-name="small-padding fixed-width">
+              <el-table-column :label="$t('common.actions')" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                   <el-button class="el-button el-button--primary el-button--medium" type="danger" @click="handleDeletePolicy(scope.row)">Delete
                   </el-button>
@@ -91,10 +95,14 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="FAILURE-DOMAINS" name="failureDomains">
-        <el-input v-model="failureDomainsKey" placeholder="Failure Domains" style="width: 200px;" @keyup.enter.native="handleFailureDomainFilter"/>
-        <el-button type="primary" icon="el-icon-search" @click="handleFailureDomainFilter">Search</el-button>
-        <el-button type="primary" icon="el-icon-edit" @click="newFailureDomain">New FailureDomain</el-button>
+      <el-tab-pane :label="$t('tabs.failuredomains')" name="failureDomains">
+        <el-input
+          v-model="failureDomainsKey"
+          :placeholder="$t('fd.searchFds')"
+          style="width: 200px;"
+          @keyup.enter.native="handleFailureDomainFilter"/>
+        <el-button type="primary" icon="el-icon-search" @click="handleFailureDomainFilter"/>
+        <el-button type="primary" icon="el-icon-plus" @click="newFailureDomain">{{ $t('fd.newFd') }}</el-button>
         <el-table
           :data="faileDomainList"
           border
@@ -118,81 +126,54 @@
           </el-table-column> -->
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="CONFIG" name="config">
-        <el-form :inline="true" :model="form" :rules="rules">
-          <el-form-item prop="httpServiceUrl">
-            <span>Http Service Url</span>
-            <md-input
-              v-model="form.httpServiceUrl"
-              class="md-input-style"
-              name="serviceUrl"
-              placeholder="Please input httpServiceUrl"
-              @keyup.enter.native="handleServiceUrl">
-              http://
-            </md-input>
-          </el-form-item>
-          <el-form-item prop="httpsServiceUrl">
-            <span>Https Service Url</span>
-            <md-input
-              v-model="form.httpsServiceUrl"
-              class="md-input-style"
-              name="httpsServiceUrl"
-              placeholder="Please input httpsServiceUrl"
-              @keyup.enter.native="handleServiceUrl">
-              https://
-            </md-input>
-          </el-form-item>
-          <el-form-item prop="brokerServiceUrl">
-            <span>Broker Service Url</span>
-            <md-input
-              v-model="form.brokerServiceUrl"
-              class="md-input-style"
-              name="brokerServiceUrl"
-              placeholder="Please input brokerServiceUrl"
-              @keyup.enter.native="handleServiceUrl">
-              pulsar://
-            </md-input>
-          </el-form-item>
-          <el-form-item prop="brokersServiceUrl">
-            <span>Http Secure Service Url</span>
-            <md-input
-              v-model="form.brokersServiceUrl"
-              class="md-input-style"
-              name="brokersServiceUrl"
-              placeholder="Please input brokersServiceUrl"
-              @keyup.enter.native="handleServiceUrl">
-              pulsar+ssl://
-            </md-input>
-          </el-form-item>
-        </el-form>
-        <h4>Danager Zone</h4>
+      <el-tab-pane :label="$t('tabs.config')" name="config">
+        <el-row>
+          <el-col :span="6">
+            <el-form :inline="false" :model="form" :rules="rules" label-position="top">
+              <el-form-item :label="$t('cluster.webServiceUrlPrefix')" prop="httpServiceUrl">
+                <el-input v-model="form.httpServiceUrl" placeholder="http://"/>
+              </el-form-item>
+              <el-form-item :label="$t('cluster.webServiceUrlTlsPrefix')" prop="httpsServiceUrlTls">
+                <el-input v-model="form.httpsServiceUrl" placeholder="https://"/>
+              </el-form-item>
+              <el-form-item :label="$t('cluster.brokerServiceUrlPrefix')" prop="brokerServiceUrl">
+                <el-input v-model="form.brokerServiceUrl" placeholder="pulsar://"/>
+              </el-form-item>
+              <el-form-item :label="$t('cluster.brokerServiceUrlTlsPrefix')" prop="brokersServiceUrl">
+                <el-input v-model="form.brokersServiceUrl" placeholder="pulsar+ssl://"/>
+              </el-form-item>
+              <el-button type="primary" class="button" @click="handleServiceUrl">{{ $t('cluster.updateCluster') }}</el-button>
+            </el-form>
+          </el-col>
+        </el-row>
+        <h4 style="color:#E57470">{{ $t('Danger Zone') }}</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" @click="handleDelete">Delete Cluster</el-button>
+        <el-button type="danger" class="button" @click="handleDelete">{{ $t('cluster.deleteCluster') }}</el-button>
       </el-tab-pane>
     </el-tabs>
-    <el-dialog :visible.sync="dialogFormVisible" title="Create Failure Domain Name">
-      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="150px" style="width: 400px; margin-left:50px;">
+    <el-dialog :visible.sync="dialogFormVisible" :title="$t('fd.createFdTitle')">
+      <el-form ref="temp" :rules="rules" :model="temp" label-position="top" style="margin-left: 30%; margin-right: 10%">
         <div v-if="dialogStatus==='create'">
           <div v-if="dialogStatus==='create'">
-            <el-form-item label="domainName" prop="domainName">
+            <el-form-item :label="$t('fd.name')" prop="domainName">
               <el-input v-model="temp.domainName"/>
             </el-form-item>
-            <el-form-item label="brokerList" prop="brokerList">
+            <el-form-item :label="$t('fd.brokerList')" prop="brokerList">
               <el-select
                 v-model="temp.brokerValue"
                 style="width:254px;"
                 multiple
-                placeholder="Please Select Brokers">
+                placeholder="Please select brokers">
                 <el-option v-for="item in brokerOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="handleCreateFailureDomain()">{{ $t('table.confirm') }}</el-button>
+              <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
             </el-form-item>
           </div>
         </div>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="handleCreateFailureDomain()">{{ $t('table.confirm') }}</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>

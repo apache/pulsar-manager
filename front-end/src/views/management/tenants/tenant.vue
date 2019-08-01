@@ -4,14 +4,14 @@
       <el-col :span="24">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <h1>Tenant Info</h1>
+            <h2>Tenant Info</h2>
           </div>
           <h4>Tenant Name</h4>
           <hr class="split-line">
           <div style="height:20px;">
             <el-form>
               <el-form-item prop="title">
-                {{ tenant }}
+                <span>{{ tenant }}</span>
               </el-form-item>
             </el-form>
           </div>

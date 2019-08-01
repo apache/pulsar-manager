@@ -49,7 +49,7 @@
         </el-table-column>
         <el-table-column label="Operations" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-button size="medium" type="danger" @click="handleUnloadBundle(scope.row)">Unload</el-button>
+            <el-button size="medium" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">Unload</el-button>
           </template>
         </el-table-column>
       </el-table>
