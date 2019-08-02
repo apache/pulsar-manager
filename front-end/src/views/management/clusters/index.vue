@@ -1,9 +1,9 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input :placeholder="$t('table.cluster')" v-model="listQuery.cluster" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-input :placeholder="$t('cluster.searchClusters')" v-model="listQuery.cluster" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter"/>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('cluster.addCluster') }}</el-button>
     </div>
 
     <el-row :gutter="24">
@@ -41,31 +41,42 @@
       </el-col>
     </el-row>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="150px" style="width: 400px; margin-left:50px;">
+      <el-form
+        ref="temp"
+        :rules="rules"
+        :model="temp"
+        label-position="top"
+        style="margin-left:30%; margin-right:10%">
         <div v-if="dialogStatus==='create'||dialogStatus==='update'">
           <div v-if="dialogStatus==='create'">
-            <el-form-item :label="$t('table.cluster')" prop="cluster">
+            <el-form-item :label="$t('cluster.name')" prop="cluster">
               <el-input v-model="temp.cluster"/>
             </el-form-item>
-            <el-form-item :label="$t('table.serviceUrl')" prop="serviceUrl">
-              <el-input v-model="temp.serviceUrl"/>
+            <el-form-item :label="$t('cluster.webServiceUrlPrefix')" prop="serviceUrl">
+              <el-input v-model="temp.serviceUrl" placeholder="http://"/>
             </el-form-item>
-            <el-form-item label="serviceUrlTls" prop="serviceUrlTls">
-              <el-input v-model="temp.serviceUrlTls"/>
+            <el-form-item :label="$t('cluster.webServiceUrlTlsPrefix')" prop="serviceUrlTls">
+              <el-input v-model="temp.serviceUrlTls" placeholder="https://"/>
             </el-form-item>
-            <el-form-item :label="$t('table.brokerServiceUrl')" prop="brokerServiceUrl">
-              <el-input v-model="temp.brokerServiceUrl"/>
+            <el-form-item :label="$t('cluster.brokerServiceUrlPrefix')" prop="brokerServiceUrl">
+              <el-input v-model="temp.brokerServiceUrl" placeholder="pulsar://"/>
             </el-form-item>
-            <el-form-item label="brokerServiceUrlTls" prop="brokerServiceUrlTls">
-              <el-input v-model="temp.brokerServiceUrlTls"/>
+            <el-form-item :label="$t('cluster.brokerServiceUrlTlsPrefix')" prop="brokerServiceUrlTls">
+              <el-input v-model="temp.brokerServiceUrlTls" placeholder="pulsar+ssl://"/>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
+              <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
             </el-form-item>
           </div>
         </div>
       </el-form>
+      <!--
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
         <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
       </div>
+      -->
     </el-dialog>
   </div>
 </template>
@@ -80,12 +91,14 @@ import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
+import MdInput from '@/components/MDinput'
 
 export default {
   name: 'Clusters',
   components: {
     Pagination,
-    jsonEditor
+    jsonEditor,
+    MdInput
   },
   directives: { waves },
   filters: {
@@ -130,8 +143,8 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: 'Edit an existing cluster',
+        create: 'Add a new cluster'
       },
       dialogPvVisible: false,
       rules: {
@@ -264,3 +277,13 @@ export default {
   }
 }
 </script>
+
+<style>
+.el-dialog {
+  width: 35%;
+}
+.el-form {
+  margin-left: 0% !important;
+  margin-right: 0% !important;
+}
+</style>
