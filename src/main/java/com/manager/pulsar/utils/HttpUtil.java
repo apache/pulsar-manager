@@ -17,6 +17,9 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -24,6 +27,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
@@ -52,10 +56,19 @@ public class HttpUtil {
 
     public static String doGet(String url, Map<String, String> header){
         HttpGet request = new HttpGet(url);
+        return httpRequest(request, header);
+    }
+
+    public static String doPut(String url, Map<String, String> header, String body) throws UnsupportedEncodingException {
+        HttpPut request = new HttpPut(url);
+        request.setEntity(new StringEntity(body));
+        return httpRequest(request, header);
+    }
+
+    public static String httpRequest(HttpUriRequest request, Map<String, String> header) {
         CloseableHttpResponse response = null;
         try {
-
-            for (Map.Entry<String, String> entry : header.entrySet()) {
+            for (Map.Entry<String, String> entry: header.entrySet()) {
                 request.setHeader(entry.getKey(), entry.getValue());
             }
             response = httpClient.execute(request);
