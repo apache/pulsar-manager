@@ -33,7 +33,7 @@
         <h4>Partitions</h4>
         <hr class="split-line">
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
               :key="partitionTableKey"
               :data="partitionsList"
@@ -138,11 +138,22 @@
             <!-- <el-button @click="revokeAllRole()">Revoke All</el-button> -->
           </el-form-item>
         </el-form>
-        <h4>Danager Zone</h4>
+        <h4 style="color:#E57470">Danager Zone</h4>
         <hr class="danger-line">
         <el-button type="danger" class="button" @click="handleDeletePartitionTopic">Delete Topic</el-button>
       </el-tab-pane>
     </el-tabs>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
+      <el-form label-position="top">
+        <el-form-item v-if="dialogStatus==='delete'">
+          <h4>Are you sure you want to delete this topic?</h4>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="deleteParititionTopic">{{ $t('table.confirm') }}</el-button>
+          <el-button @click="dialogFormVisible=false">{{ $t('table.cancel') }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -197,7 +208,12 @@ export default {
       partitionedTopicName: '',
       firstInit: false,
       firstInitTopic: false,
-      currentTabName: ''
+      currentTabName: '',
+      textMap: {
+        delete: 'Delete Topic'
+      },
+      dialogFormVisible: false,
+      dialogStatus: ''
     }
   },
   created() {
@@ -332,6 +348,10 @@ export default {
       this.$forceUpdate()
     },
     handleDeletePartitionTopic() {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'delete'
+    },
+    deleteParititionTopic() {
       deletePartitionTopic(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
         this.$notify({
           title: 'success',

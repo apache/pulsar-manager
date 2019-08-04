@@ -31,6 +31,19 @@
     <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
     <hr class="danger-line">
     <el-button type="danger" class="button" @click="handleDelete">{{ $t('fd.deleteFd') }}</el-button>
+    <el-dialog :visible.sync="dialogFormVisible" :title="textMap[dialogStatus]" width="30%">
+      <el-form label-position="top">
+        <div v-if="dialogStatus==='delete'">
+          <el-form-item>
+            <h4>Are you sure you want to delete this domain?</h4>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="deleteDomain()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
+        </div>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -62,7 +75,12 @@ export default {
       brokerValue: [],
       brokerOptions: [],
       failureDomainListOptions: [],
-      firstInit: false
+      firstInit: false,
+      textMap: {
+        delete: 'Delete Failure Domain'
+      },
+      dialogStatus: '',
+      dialogFormVisible: false
     }
   },
   created() {
@@ -130,6 +148,10 @@ export default {
       this.$router.push({ path: '/management/clusters/' + this.postForm.cluster + '/' + this.postForm.failureDomainName + '/failureDomainName' })
     },
     handleDelete() {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'delete'
+    },
+    deleteDomain() {
       deleteClusterDomainName(this.postForm.cluster, this.postForm.failureDomainName).then(response => {
         this.$notify({
           title: 'success',
@@ -137,6 +159,7 @@ export default {
           type: 'success',
           duration: 3000
         })
+        this.dialogFormVisible = false
         this.$router.push({ path: '/management/clusters/' + this.postForm.cluster + '/cluster?tab=failureDomains' })
       })
     }

@@ -25,7 +25,9 @@
           </el-table-column>
           <el-table-column label="Brokers" min-width="150px" align="center">
             <template slot-scope="scope">
-              <span>{{ scope.row.brokers }}</span>
+              <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=brokers'" class="link-type">
+                <span>{{ scope.row.brokers }}</span>
+              </router-link>
             </template>
           </el-table-column>
           <el-table-column label="Service Urls" min-width="150px" align="center">
@@ -35,6 +37,14 @@
                 <br>
                 admin: {{ scope.row.serviceUrl }}
               </span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
+            <template slot-scope="scope">
+              <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'">
+                <el-button type="primary" size="mini">{{ $t('table.edit') }}</el-button>
+              </router-link>
+              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -47,36 +57,37 @@
         :model="temp"
         label-position="top"
         style="margin-left:30%; margin-right:10%">
-        <div v-if="dialogStatus==='create'||dialogStatus==='update'">
-          <div v-if="dialogStatus==='create'">
-            <el-form-item :label="$t('cluster.name')" prop="cluster">
-              <el-input v-model="temp.cluster"/>
-            </el-form-item>
-            <el-form-item :label="$t('cluster.webServiceUrlPrefix')" prop="serviceUrl">
-              <el-input v-model="temp.serviceUrl" placeholder="http://"/>
-            </el-form-item>
-            <el-form-item :label="$t('cluster.webServiceUrlTlsPrefix')" prop="serviceUrlTls">
-              <el-input v-model="temp.serviceUrlTls" placeholder="https://"/>
-            </el-form-item>
-            <el-form-item :label="$t('cluster.brokerServiceUrlPrefix')" prop="brokerServiceUrl">
-              <el-input v-model="temp.brokerServiceUrl" placeholder="pulsar://"/>
-            </el-form-item>
-            <el-form-item :label="$t('cluster.brokerServiceUrlTlsPrefix')" prop="brokerServiceUrlTls">
-              <el-input v-model="temp.brokerServiceUrlTls" placeholder="pulsar+ssl://"/>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
-              <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-            </el-form-item>
-          </div>
+        <div v-if="dialogStatus==='create'">
+          <el-form-item :label="$t('cluster.name')" prop="cluster">
+            <el-input v-model="temp.cluster"/>
+          </el-form-item>
+          <el-form-item :label="$t('cluster.webServiceUrlPrefix')" prop="serviceUrl">
+            <el-input v-model="temp.serviceUrl" placeholder="http://"/>
+          </el-form-item>
+          <el-form-item :label="$t('cluster.webServiceUrlTlsPrefix')" prop="serviceUrlTls">
+            <el-input v-model="temp.serviceUrlTls" placeholder="https://"/>
+          </el-form-item>
+          <el-form-item :label="$t('cluster.brokerServiceUrlPrefix')" prop="brokerServiceUrl">
+            <el-input v-model="temp.brokerServiceUrl" placeholder="pulsar://"/>
+          </el-form-item>
+          <el-form-item :label="$t('cluster.brokerServiceUrlTlsPrefix')" prop="brokerServiceUrlTls">
+            <el-input v-model="temp.brokerServiceUrlTls" placeholder="pulsar+ssl://"/>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
+        </div>
+        <div v-if="dialogStatus==='delete'">
+          <el-form-item>
+            <h4>Are you sure you want to delete this cluster?</h4>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="deleteCluster()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
         </div>
       </el-form>
-      <!--
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
-      </div>
-      -->
     </el-dialog>
   </div>
 </template>
@@ -85,7 +96,8 @@
 import {
   fetchClusters,
   putCluster,
-  fetchClusterConfig
+  fetchClusterConfig,
+  deleteCluster
 } from '@/api/clusters'
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -143,7 +155,7 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit an existing cluster',
+        delete: 'Delete Cluster',
         create: 'Add a new cluster'
       },
       dialogPvVisible: false,
@@ -273,6 +285,24 @@ export default {
           this.handleDomainNameCreate()
           break
       }
+    },
+    handleDelete(row) {
+      this.dialogStatus = 'delete'
+      this.dialogFormVisible = true
+      this.temp.cluster = row.cluster
+    },
+    deleteCluster() {
+      deleteCluster(this.temp.cluster).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Delete success',
+          type: 'success',
+          duration: 2000
+        })
+        this.dialogFormVisible = false
+        this.localList = []
+        this.getClusters()
+      })
     }
   }
 }

@@ -2,19 +2,24 @@
   <div class="app-container">
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
-        <el-form-item class="postInfo-container-item" label="Tenant">
+        <el-form-item label="Tenant">
           <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item class="postInfo-container-item" label="Namespace">
+        <el-form-item label="Namespace">
           <el-select v-model="postForm.namespace" placeholder="select namespace" @change="getTopicsList()">
             <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item class="postInfo-container-item" label="Topic">
-          <el-select v-model="postForm.topic" placeholder="select topic" @change="getTopicInfo()">
+        <el-form-item label="Topic">
+          <el-select v-model="postForm.topic" placeholder="select topic" @change="generatePartitions()">
             <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Partition">
+          <el-select v-model="postForm.partition" :disabled="partitionDisabled" placeholder="select partition" @change="getTopicInfo()">
+            <el-option v-for="(item,index) in partitionsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
       </el-form>
@@ -69,7 +74,7 @@
         </el-table>
         <h4>Producers</h4>
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
               v-loading="producersListLoading"
               :key="producerTableKey"
@@ -114,12 +119,11 @@
                 </template>
               </el-table-column>
             </el-table>
-            <pagination v-show="producersTotal>0" :total="producersTotal" :page.sync="producersListQuery.page" :limit.sync="producersListQuery.limit" @pagination="getProducers" />
           </el-col>
         </el-row>
         <h4>Subscriptions</h4>
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
               v-loading="subscriptionsListLoading"
               :key="subscriptionTableKey"
@@ -161,17 +165,23 @@
                   <el-dropdown>
                     <span class="el-dropdown-link"><i class="el-icon-more"/></span>
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item>INSPECT</el-dropdown-item>
-                      <el-dropdown-item>SKIP</el-dropdown-item>
-                      <el-dropdown-item>EXPIRE</el-dropdown-item>
-                      <el-dropdown-item>CLEAR</el-dropdown-item>
-                      <el-dropdown-item>RESET</el-dropdown-item>
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=skip'" class="link-type">
+                        <el-dropdown-item command="skip">SKIP</el-dropdown-item>
+                      </router-link>
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=expire'" class="link-type">
+                        <el-dropdown-item command="expire">EXPIRE</el-dropdown-item>
+                      </router-link>
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=clear'" class="link-type">
+                        <el-dropdown-item command="clear">CLEAR</el-dropdown-item>
+                      </router-link>
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=reset'" class="link-type">
+                        <el-dropdown-item command="reset">RESET</el-dropdown-item>
+                      </router-link>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </template>
               </el-table-column>
             </el-table>
-            <pagination v-show="subscriptionsTotal>0" :total="subscriptionsTotal" :page.sync="subscriptionsListQuery.page" :limit.sync="subscriptionsListQuery.limit" @pagination="getSubscriptions" />
           </el-col>
         </el-row>
       </el-tab-pane>
@@ -195,7 +205,7 @@
         </el-row>
         <h4>Segments</h4>
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
               v-loading="segmentsListLoading"
               :key="segmentTableKey"
@@ -232,8 +242,9 @@
             </el-table>
           </el-col>
         </el-row>
+        <h4>Cursors</h4>
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
               v-loading="cursorListLoading"
               :key="cursorTableKey"
@@ -277,8 +288,6 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="POLICIES" name="policies">
-        <h4>Topic Name</h4>
-        <hr class="split-line">
         <span>{{ topicName }}</span>
         <h4>Authorization
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
@@ -327,11 +336,22 @@
             <!-- <el-button @click="revokeAllRole()">Revoke All</el-button> -->
           </el-form-item>
         </el-form>
-        <h4>Danager Zone</h4>
+        <h4 style="color:#E57470">Danager Zone</h4>
         <hr class="danger-line">
         <el-button type="danger" class="button" @click="handleDeleteTopic">Delete Topic</el-button>
       </el-tab-pane>
     </el-tabs>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
+      <el-form label-position="top">
+        <el-form-item v-if="dialogStatus==='delete'">
+          <h4>Are you sure you want to delete this topic?</h4>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="deleteTopic">{{ $t('table.confirm') }}</el-button>
+          <el-button @click="dialogFormVisible=false">{{ $t('table.cancel') }}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -357,7 +377,8 @@ const defaultForm = {
   persistent: '',
   tenant: '',
   namespace: '',
-  topic: ''
+  topic: '',
+  partition: ''
 }
 export default {
   name: 'TopicInfo',
@@ -422,7 +443,15 @@ export default {
       cursorsList: [],
       cursorListLoading: false,
       currentTabName: '',
-      nonPersistent: false
+      nonPersistent: false,
+      textMap: {
+        delete: 'Delete Topic'
+      },
+      dialogFormVisible: false,
+      dialogStatus: '',
+      topicPartitions: {},
+      partitionDisabled: false,
+      partitionsListOptions: []
     }
   },
   created() {
@@ -431,6 +460,14 @@ export default {
     this.postForm.namespace = this.$route.params && this.$route.params.namespace
     this.postForm.topic = this.$route.params && this.$route.params.topic
     this.tenantNamespaceTopic = this.postForm.tenant + '/' + this.postForm.namespace + '/' + this.postForm.topic
+    if (this.postForm.topic.indexOf('-partition-') > 0) {
+      var splitTopic = this.postForm.topic.split('-partition-')
+      this.postForm.partition = splitTopic[1]
+      this.postForm.topic = splitTopic[0]
+    } else {
+      this.postForm.partition = '-1'
+      this.partitionDisabled = true
+    }
     if (this.$route.query && this.$route.query.tab) {
       this.activeName = this.$route.query.tab
     }
@@ -455,6 +492,26 @@ export default {
     }
   },
   methods: {
+    generatePartitions() {
+      var partitions = parseInt(this.topicPartitions[this.postForm.topic])
+      this.partitionsListOptions = []
+      if (partitions > 0) {
+        this.partitionDisabled = false
+        if (this.postForm.partition === '-1') {
+          this.postForm.partition = ''
+        }
+        for (var i = 0; i < partitions; i++) {
+          this.partitionsListOptions.push(i)
+        }
+      } else {
+        this.partitionDisabled = true
+        if (this.postForm.partition !== '-1') {
+          this.getTopicInfo()
+        }
+        this.postForm.partition = '-1'
+        this.partitionsListOptions.push('-1')
+      }
+    },
     getRemoteTenantsList() {
       fetchTenants().then(response => {
         if (!response.data) return
@@ -464,19 +521,19 @@ export default {
       })
     },
     getOffloadStatus() {
-      offloadStatus(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      offloadStatus(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.offload = response.data.status
       })
     },
     getCompactionStatus() {
-      compactionStatus(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      compactionStatus(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.compaction = response.data.status
       })
     },
     initTopicStats() {
-      fetchTopicStats(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      fetchTopicStats(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.topicStats.push({
           inMsg: response.data.msgRateIn,
@@ -508,14 +565,14 @@ export default {
             'backlog': response.data.subscriptions[s].msgBacklog,
             'type': type,
             // subscriptions/:persistent/:tenant/:namespace/:topic/:subscription/subscription
-            'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + this.tenantNamespaceTopic + '/' + s + '/subscription'
+            'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + this.getFullTopic() + '/' + s + '/subscription'
           })
         }
         this.storageSize = response.data.storageSize
       })
     },
     initBundleRange() {
-      getBundleRange(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      getBundleRange(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.infoData.push({
           infoColumn: 'bundle',
@@ -524,7 +581,7 @@ export default {
       })
     },
     initTopicBroker() {
-      getTopicBroker(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      getTopicBroker(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.infoData.push({
           infoColumn: 'broker',
@@ -537,7 +594,7 @@ export default {
       })
     },
     initTerminateAndSegments() {
-      fetchTopicStatsInternal(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      fetchTopicStatsInternal(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.terminateStatus = response.data.state
         this.segments = response.data.ledgers.length
@@ -600,22 +657,24 @@ export default {
           this.postForm.topic = ''
         }
         for (var i in response.data.topics) {
-          if (response.data.topics[i]['partitions'] === '0') {
-            this.topicsListOptions.push(response.data.topics[i]['topic'])
+          this.topicsListOptions.push(response.data.topics[i]['topic'])
+          this.topicPartitions[response.data.topics[i]['topic']] = response.data.topics[i]['partitions']
+          if (response.data.topics[i]['topic'] === this.postForm.topic) {
+            this.generatePartitions()
           }
         }
       })
     },
     getTopicInfo() {
       this.$router.push({ path: '/management/topics/' + this.postForm.persistent +
-        '/' + this.postForm.tenant + '/' + this.postForm.namespace + '/' + this.postForm.topic + '/topic?tab=' + this.currentTabName })
+        '/' + this.getFullTopic() + '/topic?tab=' + this.currentTabName })
     },
     handleClick(tab, event) {
       this.currentTabName = tab.name
       this.$router.push({ query: { 'tab': tab.name }})
     },
     handleUnload() {
-      unload(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      unload(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: 'Unload topic success',
@@ -625,7 +684,7 @@ export default {
       })
     },
     handleTerminate() {
-      terminate(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      terminate(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: 'Terminate topic success',
@@ -634,10 +693,6 @@ export default {
         })
         this.initTerminateAndSegments()
       })
-    },
-    getProducers() {
-    },
-    getSubscriptions() {
     },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
@@ -678,8 +733,15 @@ export default {
     handleChangeOptions() {
       this.$forceUpdate()
     },
+    getFullTopic() {
+      var fullTopic = this.postForm.tenant + '/' + this.postForm.namespace + '/' + this.postForm.topic
+      if (parseInt(this.postForm.partition) >= 0) {
+        fullTopic += '-partition-' + this.postForm.partition
+      }
+      return fullTopic
+    },
     handleCompaction() {
-      compact(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      compact(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: 'Start topic compaction requested',
@@ -690,7 +752,7 @@ export default {
       })
     },
     handleOffload() {
-      offload(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      offload(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: 'Start topic offload requested',
@@ -701,7 +763,11 @@ export default {
       this.getOffloadStatus()
     },
     handleDeleteTopic() {
-      deleteTopic(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      this.dialogStatus = 'delete'
+      this.dialogFormVisible = true
+    },
+    deleteTopic() {
+      deleteTopic(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: 'Delete topic success',

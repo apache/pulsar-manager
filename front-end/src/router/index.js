@@ -151,8 +151,7 @@ export const constantRouterMap = [
         hidden: true
       },
       {
-        path: 'namespaces',
-        component: () => import('@/views/management/namespaces/index'),
+        path: 'tenants/tenantInfo/public?tab=namespaces',
         name: 'Namespaces',
         meta: { title: 'Namespaces', noCache: true }
       },
@@ -184,7 +183,6 @@ export const constantRouterMap = [
       },
       {
         path: 'namespaces/:tenant',
-        component: () => import('@/views/management/namespaces/index'),
         name: 'NamespacesTenant',
         meta: { title: 'Namespaces', noCache: true },
         hidden: true
