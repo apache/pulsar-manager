@@ -33,8 +33,6 @@
         </h4>
         <hr class="split-line">
         <div class="filter-container">
-          <!-- <el-input placeholder="Search Bundles" prefix-icon="el-icon-search" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilterBundle"/> -->
-          <!-- <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterBundle">{{ $t('table.search') }}</el-button> -->
           <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadAll">Unload All</el-button>
           <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
         </div>
@@ -62,10 +60,10 @@
       </el-tab-pane>
       <el-tab-pane label="TOPICS" name="topics">
         <el-input v-model="searchTopic" :placeholder="$t('namespace.searchTopics')" style="width: 200px;" @keyup.enter.native="handleFilterTopic"/>
-        <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterTopic">{{ $t('table.search') }}</el-button>
-        <el-button style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreateTopic">{{ $t('namespace.newTopic') }}</el-button>
+        <el-button type="primary" icon="el-icon-search" @click="handleFilterTopic"/>
+        <el-button type="primary" icon="el-icon-plus" @click="handleCreateTopic">{{ $t('namespace.newTopic') }}</el-button>
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px;padding-right:8px;margin-bottom:30px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px">
             <el-table
               v-loading="topicsListLoading"
               :key="topicsTableKey"
@@ -131,11 +129,6 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="POLICIES" name="policies">
-        <!--
-        <h4>Namespace Name</h4>
-        <hr class="split-line">
-        <span>{{ tenantNamespace }}</span>
-        -->
         <h4>Clusters</h4>
         <hr class="split-line">
         <div class="component-item">
@@ -608,11 +601,11 @@
         </el-form>
         <h4 style="color:#E57470">Danger Zone</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" @click="deleteNamespace">Delete Namespace</el-button>
+        <el-button type="danger" class="button" @click="handleDeleteNamespace">Delete Namespace</el-button>
       </el-tab-pane>
     </el-tabs>
-    <el-dialog :visible.sync="dialogFormVisible">
-      <el-form ref="form" :model="form" label-position="left" label-width="140px" style="width: 400px; margin-left:50px;">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
+      <el-form ref="form" :rules="rules" :model="form" label-position="top">
         <div v-if="dialogStatus==='create'">
           <el-form-item label="Topic Domain">
             <el-radio-group
@@ -628,12 +621,19 @@
           <el-form-item :label="$t('table.partition')" prop="partition">
             <el-input v-model="form.partitions"/>
           </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="createTopic()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
         </div>
+        <el-form-item v-if="dialogStatus==='delete'">
+          <h4>Are you sure you want to delete this namespace?</h4>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='delete'">
+          <el-button type="primary" @click="deleteNamespace()">{{ $t('table.confirm') }}</el-button>
+          <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="createTopic()">{{ $t('table.confirm') }}</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -691,13 +691,6 @@ export default {
     Pagination
   },
   data() {
-    // const validate = (rule, value, callback) => {
-    //   if (value.length !== 6) {
-    //     callback(new Error('请输入六个字符'))
-    //   } else {
-    //     callback()
-    //   }
-    // }
     return {
       postForm: Object.assign({}, defaultForm),
       tenantNamespace: '',
@@ -776,6 +769,7 @@ export default {
         partitions: 0
       },
       rules: {
+        topic: [{ required: true, message: 'topic is required', trigger: 'blur' }]
         // ensembelSize: [{ required: true, message: 'EnsembelSize is greater more than 0', trigger: 'blur' }]
       },
       markDeleteRateContent: 'This is markDeleteRateContent',
@@ -869,8 +863,7 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        create: 'Create Topic'
       },
       currentTabName: '',
       bundleInfoContent: 'This is bundleInfoContent'
@@ -908,7 +901,7 @@ export default {
           } else {
             topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/partitionedTopic'
           }
-          this.topicsList.push({
+          var topicInfo = {
             'topic': response.data.topics[i]['topic'],
             'partitions': response.data.topics[i]['partitions'],
             'persistent': response.data.topics[i]['persistent'],
@@ -921,7 +914,9 @@ export default {
             'storageSize': 0,
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink
-          })
+          }
+          this.topicsList.push(topicInfo)
+          this.tempTopicsList.push(topicInfo)
         }
         fetchBrokerStatsTopics('').then(res => {
           if (!res.data) return
@@ -980,16 +975,11 @@ export default {
       })
     },
     handleFilterTopic() {
-      if (this.tempTopicsList.length <= 0) {
-        for (var t = 0; t < this.topicsList.length; t++) {
-          this.tempTopicsList.push(this.topicsList[t])
-        }
-      }
       if (!validateEmpty(this.searchTopic)) {
         this.searchList = []
-        for (var i = 0; i < this.topicsList.length; i++) {
-          if (this.topicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
-            this.searchList.push(this.topicsList[i])
+        for (var i = 0; i < this.tempTopicsList.length; i++) {
+          if (this.tempTopicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
+            this.searchList.push(this.tempTopicsList[i])
           }
         }
         this.topicsList = this.searchList
@@ -1492,6 +1482,10 @@ export default {
         })
       })
     },
+    handleDeleteNamespace() {
+      this.dialogStatus = 'delete'
+      this.dialogFormVisible = true
+    },
     deleteNamespace() {
       deleteNamespace(this.tenantNamespace).then((response) => {
         this.$notify({
@@ -1529,20 +1523,24 @@ export default {
       })
     },
     createTopic() {
-      if (this.form.topic === null || this.form.topic.length <= 0) {
-        this.$notify({
-          title: 'error',
-          message: 'Topic name is incorrect',
-          type: 'error',
-          duration: 3000
-        })
-        return
-      }
-      if (this.form.isPersistent === 'Persistent') {
-        this.generalCreateTopic('persistent')
-      } else if (this.form.isPersistent === 'Non-persistent') {
-        this.generalCreateTopic('non-persistent')
-      }
+      // if (this.form.topic === null || this.form.topic.length <= 0) {
+      //   this.$notify({
+      //     title: 'error',
+      //     message: 'Topic name is incorrect',
+      //     type: 'error',
+      //     duration: 3000
+      //   })
+      //   return
+      // }
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          if (this.form.isPersistent === 'Persistent') {
+            this.generalCreateTopic('persistent')
+          } else if (this.form.isPersistent === 'Non-persistent') {
+            this.generalCreateTopic('non-persistent')
+          }
+        }
+      })
     }
   }
 }
