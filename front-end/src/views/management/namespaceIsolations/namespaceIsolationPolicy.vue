@@ -133,7 +133,7 @@
           </el-tooltip>
           <md-input
             v-model="form.brokerUsageThreshold"
-            :placeholder="$t('brokerUsageThresholdPh')"
+            :placeholder="$t('ip.brokerUsageThresholdPh')"
             class="md-input-style"
             name="brokerUsageThreshold"/>
         </el-form-item>
@@ -162,6 +162,19 @@
       <hr class="danger-line">
       <el-button type="danger" class="button" @click="handleDelete">Delete Policy</el-button>
     </div>
+    <el-dialog :visible.sync="dialogFormVisible" :title="textMap[dialogStatus]" width="30%">
+      <el-form label-position="top">
+        <div v-if="dialogStatus==='delete'">
+          <el-form-item>
+            <h4>Are you sure you want to delete policy?</h4>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="deletePolicy()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
+        </div>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -211,7 +224,12 @@ export default {
       inputVisibleSecondary: false,
       inputValueSecondary: '',
       created: false,
-      policyName: ''
+      policyName: '',
+      textMap: {
+        delete: 'Delete Policy'
+      },
+      dialogStatus: '',
+      dialogFormVisible: false
     }
   },
   created() {
@@ -414,6 +432,10 @@ export default {
       this.inputValueSecondary = ''
     },
     handleDelete() {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'delete'
+    },
+    deletePolicy() {
       deleteIsolationPolicies(this.postForm.cluster, this.postForm.policy).then(response => {
         this.$notify({
           title: 'success',

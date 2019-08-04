@@ -12,7 +12,7 @@
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="BROKERS" name="brokers">
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
               :key="brokerTableKey"
               :data="brokersList"
@@ -57,10 +57,10 @@
           :placeholder="$t('ip.searchIps')"
           style="width: 200px;"
           @keyup.enter.native="handlePolicyFilter"/>
-        <el-button type="primary" icon="el-icon-search" @click="handleFilter"/>
+        <el-button type="primary" icon="el-icon-search" @click="handlePolicyFilter"/>
         <el-button type="primary" icon="el-icon-plus" @click="handleCreatePolicy">{{ $t('ip.newIp') }}</el-button>
         <el-row :gutter="24">
-          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-top:15px;">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
               :key="isolationTableKey"
               :data="isolationPoliciesList"
@@ -85,10 +85,12 @@
                   <span>{{ scope.row.numberOfSecondaryBrokers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.actions')" align="center" class-name="small-padding fixed-width">
+              <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                  <el-button class="el-button el-button--primary el-button--medium" type="danger" @click="handleDeletePolicy(scope.row)">Delete
-                  </el-button>
+                  <router-link :to="'/management/clusters/' + scope.row.cluster + '/' + scope.row.isolationPolicy + '/namespaceIsolationPolicy'">
+                    <el-button type="primary" size="mini">{{ $t('table.edit') }}</el-button>
+                  </router-link>
+                  <el-button class="el-button el-button--primary el-button--medium" type="danger" size="mini" @click="handleDeletePolicy(scope.row)">Delete</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -104,7 +106,7 @@
         <el-button type="primary" icon="el-icon-search" @click="handleFailureDomainFilter"/>
         <el-button type="primary" icon="el-icon-plus" @click="newFailureDomain">{{ $t('fd.newFd') }}</el-button>
         <el-table
-          :data="faileDomainList"
+          :data="failureDomainList"
           border
           style="width: 100%;margin-top:15px">
           <el-table-column prop="domain" label="Domain">
@@ -119,11 +121,14 @@
               <span>{{ scope.row.brokers }}</span>
             </template>
           </el-table-column>
-          <!-- <el-table-column label="Delete FailureDomain" align="center" class-name="small-padding fixed-width">
+          <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <el-button class="el-button el-button--primary el-button--medium" type="danger" @click="handleDeleteFailureDomain(scope.row)">Delete</el-button>
+              <router-link :to="'/management/clusters/' + scope.row.cluster + '/' + scope.row.domain + '/failureDomainName'">
+                <el-button type="primary" size="mini">{{ $t('table.edit') }}</el-button>
+              </router-link>
+              <el-button class="el-button el-button--primary el-button--medium" type="danger" size="mini" @click="handleDeleteFailureDomain(scope.row)">Delete</el-button>
             </template>
-          </el-table-column> -->
+          </el-table-column>
         </el-table>
       </el-tab-pane>
       <el-tab-pane :label="$t('tabs.config')" name="config">
@@ -146,32 +151,57 @@
             </el-form>
           </el-col>
         </el-row>
-        <h4 style="color:#E57470">{{ $t('Danger Zone') }}</h4>
+        <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
         <hr class="danger-line">
         <el-button type="danger" class="button" @click="handleDelete">{{ $t('cluster.deleteCluster') }}</el-button>
       </el-tab-pane>
     </el-tabs>
-    <el-dialog :visible.sync="dialogFormVisible" :title="$t('fd.createFdTitle')">
-      <el-form ref="temp" :rules="rules" :model="temp" label-position="top" style="margin-left: 30%; margin-right: 10%">
-        <div v-if="dialogStatus==='create'">
-          <div v-if="dialogStatus==='create'">
-            <el-form-item :label="$t('fd.name')" prop="domainName">
-              <el-input v-model="temp.domainName"/>
-            </el-form-item>
-            <el-form-item :label="$t('fd.brokerList')" prop="brokerList">
-              <el-select
-                v-model="temp.brokerValue"
-                style="width:254px;"
-                multiple
-                placeholder="Please select brokers">
-                <el-option v-for="item in brokerOptions" :key="item.value" :label="item.label" :value="item.value" />
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="handleCreateFailureDomain()">{{ $t('table.confirm') }}</el-button>
-              <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-            </el-form-item>
-          </div>
+    <el-dialog :visible.sync="dialogFormVisible" :title="textMap[dialogStatus]" width="30%">
+      <el-form ref="temp" :rules="rules" :model="temp" label-position="top">
+        <div v-if="dialogStatus==='createFailureDomain'">
+          <el-form-item :label="$t('fd.name')" prop="domainName">
+            <el-input v-model="temp.domainName"/>
+          </el-form-item>
+          <el-form-item :label="$t('fd.brokerList')" prop="brokerList">
+            <el-select
+              v-model="temp.brokerValue"
+              style="width:254px;"
+              multiple
+              placeholder="Please select brokers">
+              <el-option v-for="item in brokerOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleCreateFailureDomain()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
+        </div>
+        <div v-if="dialogStatus==='deleteCluster'">
+          <el-form-item>
+            <h4>Are you sure you want to delete this cluster?</h4>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="deleteCluster()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
+        </div>
+        <div v-if="dialogStatus==='deleteDomain'">
+          <el-form-item>
+            <h4>Are you sure you want to delete this domain?</h4>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="deleteDomain()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
+        </div>
+        <div v-if="dialogStatus==='deletePolicy'">
+          <el-form-item>
+            <h4>Are you sure you want to delete this policy?</h4>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="deletePolicy()">{{ $t('table.confirm') }}</el-button>
+            <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          </el-form-item>
         </div>
       </el-form>
     </el-dialog>
@@ -184,13 +214,16 @@ import {
   updateCluster,
   listClusterDomainName,
   deleteCluster,
-  createClusterDomainName
+  createClusterDomainName,
+  deleteClusterDomainName
 } from '@/api/clusters'
 import { fetchBrokerStatsMetrics } from '@/api/brokerStats'
 import { fetchBrokers, fetchBrokersByDirectBroker } from '@/api/brokers'
-import { fetchIsolationPolicies } from '@/api/isolationPolicies'
+import { fetchIsolationPolicies, deleteIsolationPolicies } from '@/api/isolationPolicies'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
+import { validateEmpty } from '@/utils/validate'
+
 const defaultForm = {
   cluster: ''
 }
@@ -220,12 +253,13 @@ export default {
       brokerOptions: [],
       temp: {
         domainName: '',
+        policyName: '',
         brokerValue: []
       },
       rules: {
         domainName: [{ required: true, message: 'Please input Domain Name', trigger: 'change' }]
       },
-      faileDomainList: [],
+      failureDomainList: [],
       brokersList: [],
       brokerTableKey: 0,
       isolationTableKey: 0,
@@ -233,7 +267,15 @@ export default {
       isolationPolicyKey: '',
       failureDomainsKey: '',
       dialogFormVisible: false,
-      dialogStatus: ''
+      dialogStatus: '',
+      textMap: {
+        createFailureDomain: this.$i18n.t('fd.createFdTitle'),
+        deleteCluster: 'Delete Cluster',
+        deleteDomain: 'Delete Domain',
+        deletePolicy: 'Delete Policy'
+      },
+      tempIsolationPolicyList: [],
+      tempFailureDomainList: []
     }
   },
   created() {
@@ -265,8 +307,8 @@ export default {
     getBrokerList() {
       fetchBrokers(this.postForm.cluster).then(response => {
         if (!response.data) return
-        var brokerInfo = {}
         for (var i = 0; i < response.data.data.length; i++) {
+          var brokerInfo = {}
           var throughputIn = 0
           var throughputOut = 0
           var bandwidthIn = 0
@@ -292,21 +334,25 @@ export default {
             brokerInfo['throughputOut'] = throughputOut
             brokerInfo['bandwidthOut'] = bandwidthOut
             brokerInfo['bandwidthIn'] = bandwidthIn
-            this.brokersList.push(brokerInfo)
           })
+          this.brokersList.push(brokerInfo)
         }
       })
     },
     getNamespaceIsolationPolicy() {
       fetchIsolationPolicies(this.postForm.cluster).then(response => {
         if (!response.data) return
+        this.isolationPoliciesList = []
+        this.tempIsolationPolicyList = []
         for (var key in response.data) {
-          this.isolationPoliciesList.push({
+          var policy = {
             'cluster': this.postForm.cluster,
             'isolationPolicy': key,
             'numberOfPrimaryBrokers': response.data[key].primary.length,
             'numberOfSecondaryBrokers': response.data[key].secondary.length
-          })
+          }
+          this.isolationPoliciesList.push(policy)
+          this.tempIsolationPolicyList.push(policy)
         }
       })
     },
@@ -338,12 +384,16 @@ export default {
     getFailureDomainsList() {
       listClusterDomainName(this.postForm.cluster).then(response => {
         if (!response.data) return
+        this.failureDomainList = []
+        this.tempFailureDomainList = []
         for (var key in response.data) {
-          this.faileDomainList.push({
+          var domain = {
             'cluster': this.postForm.cluster,
             'domain': key,
             'brokers': response.data[key].brokers.length
-          })
+          }
+          this.failureDomainList.push(domain)
+          this.tempFailureDomainList.push(domain)
         }
       })
     },
@@ -363,7 +413,7 @@ export default {
       this.brokerOptions = []
       this.getSelectBrokers()
       this.dialogFormVisible = true
-      this.dialogStatus = 'create'
+      this.dialogStatus = 'createFailureDomain'
       this.$nextTick(() => {
         this.$refs['temp'].clearValidate()
       })
@@ -381,8 +431,8 @@ export default {
               type: 'success',
               duration: 3000
             })
-            this.getFailureDomainsList()
             this.dialogFormVisible = false
+            this.getFailureDomainsList()
           })
         }
       })
@@ -393,6 +443,10 @@ export default {
     handleFilter() {
     },
     handleDelete() {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'deleteCluster'
+    },
+    deleteCluster() {
       deleteCluster(this.postForm.cluster).then(response => {
         this.$notify({
           title: 'success',
@@ -400,22 +454,70 @@ export default {
           type: 'success',
           duration: 2000
         })
+        this.dialogFormVisible = false
         this.$router.push({ path: '/management/clusters' })
       })
     },
     handleFailureDomainFilter() {
+      if (!validateEmpty(this.failureDomainsKey)) {
+        var searchFailureDomainList = []
+        for (var i = 0; i < this.tempFailureDomainList.length; i++) {
+          if (this.tempFailureDomainList[i]['domain'].indexOf(this.failureDomainsKey) !== -1) {
+            searchFailureDomainList.push(this.tempFailureDomainList[i])
+          }
+        }
+        this.failureDomainList = searchFailureDomainList
+      } else {
+        this.failureDomainList = this.tempFailureDomainList
+      }
+    },
+    handleDeleteFailureDomain(row) {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'deleteDomain'
+      this.temp.domainName = row.domain
+    },
+    deleteDomain() {
+      deleteClusterDomainName(this.postForm.cluster, this.temp.domainName).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Delete falure domain success',
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+        this.getFailureDomainsList()
+      })
+    },
+    handleDeletePolicy(row) {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'deletePolicy'
+      this.temp.policyName = row.isolationPolicy
+    },
+    deletePolicy() {
+      deleteIsolationPolicies(this.postForm.cluster, this.temp.policyName).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Delete policy success',
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+        this.getNamespaceIsolationPolicy()
+      })
+    },
+    handlePolicyFilter() {
+      if (!validateEmpty(this.isolationPolicyKey)) {
+        var searchIsolationPolicyList = []
+        for (var i = 0; i < this.tempIsolationPolicyList.length; i++) {
+          if (this.tempIsolationPolicyList[i]['isolationPolicy'].indexOf(this.isolationPolicyKey) !== -1) {
+            searchIsolationPolicyList.push(this.tempIsolationPolicyList[i])
+          }
+        }
+        this.isolationPoliciesList = searchIsolationPolicyList
+      } else {
+        this.isolationPoliciesList = this.tempIsolationPolicyList
+      }
     }
-    // handleDeletePolicy(row) {
-    //   deleteIsolationPolicies(this.postForm.cluster, row.isolationPolicy).then(response => {
-    //     this.$notify({
-    //       title: 'success',
-    //       message: 'Delete policy success',
-    //       type: 'success',
-    //       duration: 3000
-    //     })
-    //     this.$router.push({ path: '/management/clusters/' + this.postForm.cluster + '/cluster?tab=isolationPolicies' })
-    //   })
-    // }
   }
 }
 </script>

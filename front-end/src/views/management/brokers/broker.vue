@@ -3,12 +3,12 @@
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
         <el-form-item class="postInfo-container-item" label="Cluster">
-          <el-select v-model="postForm.cluster" placeholder="select cluster" @change="getClusterList(postForm.cluster)">
+          <el-select v-model="postForm.cluster" placeholder="select cluster" @change="getBrokersList()">
             <el-option v-for="(item,index) in clustersListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
         <el-form-item class="postInfo-container-item" label="Broker">
-          <el-select v-model="postForm.broker" placeholder="select broker" @change="getBrokersList(postForm.broker)">
+          <el-select v-model="postForm.broker" placeholder="select broker" @change="changeBrokerInfo()">
             <el-option v-for="(item,index) in brokersListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
@@ -86,7 +86,7 @@
 <script>
 import { fetchClusters } from '@/api/clusters'
 import { fetchBrokerStatsMetrics, fetchBrokerStatsTopics } from '@/api/brokerStats'
-import { fetchBrokersHealth } from '@/api/brokers'
+import { fetchBrokersHealth, fetchBrokers } from '@/api/brokers'
 import { fetchIsolationPolicies } from '@/api/isolationPolicies'
 import { unloadBundle } from '@/api/namespaces'
 import { fetchBrokersRuntimeConfiguration } from '@/api/brokers'
@@ -124,6 +124,8 @@ export default {
     this.getBrokerInfo()
     this.getBrokerStats()
     this.getIsolationPolicy()
+    this.getClusterList()
+    this.getBrokersList()
   },
   methods: {
     getBrokerInfo() {
@@ -141,6 +143,9 @@ export default {
           }
         }
       })
+    },
+    changeBrokerInfo() {
+      this.$router.push({ path: '/management/brokers/' + this.postForm.cluster + '/' + this.postForm.broker + '/broker' })
     },
     getBrokerStats() {
       var throughputIn = 0
@@ -167,7 +172,12 @@ export default {
       })
     },
     getClusterList() {
-      fetchClusters(this.listQuery).then(response => {})
+      fetchClusters(this.listQuery).then(response => {
+        if (!response.data) return
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.clustersListOptions.push(response.data.data[i].cluster)
+        }
+      })
     },
     getIsolationPolicy() {
       fetchIsolationPolicies(this.postForm.cluster).then(res => {
@@ -199,7 +209,14 @@ export default {
         }
       })
     },
-    getBrokersList(cluster) {
+    getBrokersList() {
+      fetchBrokers(this.postForm.cluster).then(response => {
+        if (!response.data) return
+        this.brokersListOptions = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.brokersListOptions.push(response.data.data[i].broker)
+        }
+      })
     },
     handleUnloadBundle(row) {
       unloadBundle(row.tenant + '/' + row.namespace, row.bundle).then(response => {
@@ -239,6 +256,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>

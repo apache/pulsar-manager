@@ -59,8 +59,12 @@ service.interceptors.response.use(
   error => {
     console.log('err' + error) // for debug
     let message = ''
-    if (error.response.status === 404 && error.response.data.length <= 0) {
-      message = 'not found'
+    if (error.response.status === 404) {
+      if (error.response.data.length <= 0) {
+        message = 'not found'
+      } else if (error.response.data.data.reason.length > 0 && error.response.data.data.reason.indexOf('NamespaceIsolationPolicies for cluster')) {
+        return
+      }
     } else if (error.response.status === 401) {
       if (error.response.data.hasOwnProperty('message') && error.response.data.message.indexOf('login') > 0) {
         store.dispatch('FedLogOut').then(() => {
