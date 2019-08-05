@@ -51,6 +51,35 @@
           </el-col>
         </el-row>
       </el-tab-pane>
+      <el-tab-pane label="BOOKIES" name="bookies">
+        <el-row :gutter="24">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
+            <el-table
+              :key="bookieTableKey"
+              :data="bookiesList"
+              border
+              fit
+              highlight-current-row
+              style="width: 100%;">
+              <el-table-column label="Bookies" min-width="50px" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.bookie }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="State" align="center" min-width="100px">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.status }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="Storage" align="center" min-width="100px">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.storage }}%</span>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
+      </el-tab-pane>
       <el-tab-pane :label="$t('tabs.isolationpolicies')" name="isolationPolicies">
         <el-input
           v-model="isolationPolicyKey"
@@ -220,6 +249,7 @@ import {
 import { fetchBrokerStatsMetrics } from '@/api/brokerStats'
 import { fetchBrokers, fetchBrokersByDirectBroker } from '@/api/brokers'
 import { fetchIsolationPolicies, deleteIsolationPolicies } from '@/api/isolationPolicies'
+import { getBookiesList } from '@/api/bookies'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 import { validateEmpty } from '@/utils/validate'
@@ -268,6 +298,8 @@ export default {
       failureDomainsKey: '',
       dialogFormVisible: false,
       dialogStatus: '',
+      bookieTableKey: 0,
+      bookiesList: [],
       textMap: {
         createFailureDomain: this.$i18n.t('fd.createFdTitle'),
         deleteCluster: 'Delete Cluster',
@@ -289,8 +321,28 @@ export default {
       }
     }
     this.getFailureDomainsList()
+    this.getBookiesList()
   },
   methods: {
+    getBookiesList() {
+      getBookiesList(this.postForm.cluster).then(response => {
+        if (response.data.enableBookieHttp) {
+          for (var i = 0; i < response.data.data.length; i++) {
+            var bookieInfo = {}
+            if (response.data.data[i].status === 'rw') {
+              bookieInfo['status'] = 'Writable'
+            } else if (response.data.data[i].status === 'ro') {
+              bookieInfo['status'] = 'Readonly'
+            }
+            var storage = (parseInt(response.data.data[i].storage[1]) - parseInt(response.data.data[i].storage[0])) / parseInt(response.data.data[i].storage[1])
+            bookieInfo['storage'] = storage.toFixed(2) * 100
+            bookieInfo['bookie'] = response.data.data[i].bookie
+            bookieInfo['cluster'] = this.postForm.cluster
+            this.bookiesList.push(bookieInfo)
+          }
+        }
+      })
+    },
     getClusterList() {
       fetchClusters(this.listQuery).then(response => {
         for (var i = 0; i < response.data.data.length; i++) {

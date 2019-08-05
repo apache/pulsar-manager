@@ -16,17 +16,17 @@ module.exports = {
       },
       '/admin/*': {
         // target: 'http://localhost:443/',
-        target: 'http://localhost:8000/',
+        target: 'http://localhost:7750/',
         changeOrigin: true
       },
       '/pulsar-manager/*': {
         // target: 'http://localhost:443/',
-        target: 'http://localhost:8000/',
+        target: 'http://localhost:7750/',
         changeOrigin: true
       },
       '/lookup/*': {
         // target: 'http://localhost:443/',
-        target: 'http://localhost:8000/',
+        target: 'http://localhost:7750/',
         changeOrigin: true
       }
     },
