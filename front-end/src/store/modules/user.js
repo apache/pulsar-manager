@@ -13,6 +13,7 @@
  */
 import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { removeEnvironment } from '@/utils/environment'
 
 const user = {
   state: {
@@ -96,6 +97,7 @@ const user = {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           removeToken()
+          removeEnvironment()
           resolve()
         }).catch(error => {
           reject(error)
@@ -108,7 +110,14 @@ const user = {
       return new Promise(resolve => {
         commit('SET_TOKEN', '')
         removeToken()
+        removeEnvironment()
         resolve()
+      })
+    },
+
+    SetEnvironment({ commit }, environment) {
+      return new Promise(resolve => {
+        commit('ENVIRONMENT', environment)
       })
     },
 

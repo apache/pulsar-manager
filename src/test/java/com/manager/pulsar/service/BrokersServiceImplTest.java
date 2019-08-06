@@ -15,6 +15,9 @@ package com.manager.pulsar.service;
 
 
 import com.google.common.collect.Maps;
+import com.manager.pulsar.entity.EnvironmentEntity;
+import com.manager.pulsar.entity.EnvironmentsRepository;
+import com.manager.pulsar.utils.EnvironmentTools;
 import com.manager.pulsar.utils.HttpUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,8 +30,12 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringRunner.class)
@@ -41,16 +48,20 @@ public class BrokersServiceImplTest {
     private BrokersService brokersService;
 
     @Test
-    public void brokersServiceTest() {
+    public void brokersServiceTest() throws Exception{
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
                 .thenReturn("{\"test\":{\"brokers\":[\"tengdeMBP:8080\"]}}");
 
+        EnvironmentEntity environmentEntity = new EnvironmentEntity();
+        environmentEntity.setName("test-environment");
+        environmentEntity.setBroker("http://localhost:8080");
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
                 .thenReturn("[\"tengdeMBP:8080\"]");
-        Map<String, Object> result = brokersService.getBrokersList(1, 1, "standalone");
+        Map<String, Object> result = brokersService.getBrokersList(
+                1, 1, "standalone", "http://localhost:8080");
         Assert.assertEquals(result.get("total"), 1);
         Assert.assertEquals(result.get("data").toString(), "[{failureDomain=[test], broker=tengdeMBP:8080}]");
         Assert.assertEquals(result.get("pageSize"), 1);

@@ -15,6 +15,8 @@ package com.manager.pulsar.interceptor;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.manager.pulsar.entity.EnvironmentEntity;
+import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -25,12 +27,16 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private EnvironmentsRepository environmentsRepository;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -41,6 +47,16 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
             map.put("message", "Please login.");
             Gson gson = new Gson();
             response.setStatus(401);
+            response.getWriter().append(gson.toJson(map));
+            return false;
+        }
+        String environment = request.getHeader("environment");
+        Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
+        if (!request.getRequestURI().startsWith("/pulsar-manager/environments") && !environmentEntityOptional.isPresent()) {
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("message", "Currently there is no active environment, please set one");
+            Gson gson = new Gson();
+            response.setStatus(400);
             response.getWriter().append(gson.toJson(map));
             return false;
         }

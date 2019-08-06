@@ -16,6 +16,8 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import { getEnvironment } from '@/utils/environment'
+import router from '../router'
 
 // create an axios instance
 const service = axios.create({
@@ -30,6 +32,7 @@ service.interceptors.request.use(
     if (store.getters.token) {
       config.headers['token'] = getToken()
     }
+    config.headers['environment'] = getEnvironment()
     return config
   },
   error => {
@@ -70,6 +73,11 @@ service.interceptors.response.use(
         store.dispatch('FedLogOut').then(() => {
           location.reload()
         })
+      }
+    } else if (error.response.status === 400) {
+      if (error.response.data.hasOwnProperty('message') && error.response.data.message.indexOf('no active environment') > 0) {
+        router.replace({ path: '/environments' })
+        return
       }
     } else {
       message = error.response.data.reason

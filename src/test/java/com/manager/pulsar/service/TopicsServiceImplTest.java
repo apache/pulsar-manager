@@ -61,7 +61,7 @@ public class TopicsServiceImplTest {
                 "http://localhost:8080/admin/v2/persistent/public/default/test900/partitions", header))
                 .thenReturn("{\"partitions\":3}");
         Map<String, Object> topicsMap = topicsService.getTopicsList(
-                1, 1, "public", "default");
+                1, 1, "public", "default", "http://localhost:8080");
         Assert.assertEquals(topicsMap.get("total"), 2);
         Assert.assertFalse((Boolean) topicsMap.get("isPage"));
         Assert.assertEquals(topicsMap.get("topics").toString(),

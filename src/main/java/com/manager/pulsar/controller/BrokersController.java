@@ -13,11 +13,10 @@
  */
 package com.manager.pulsar.controller;
 
-import com.github.pagehelper.Page;
-import com.google.common.collect.Maps;
-import com.manager.pulsar.entity.BrokerEntity;
 import com.manager.pulsar.entity.BrokersRepository;
+import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.service.BrokersService;
+import com.manager.pulsar.utils.EnvironmentTools;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -33,10 +32,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Brokers rest api.
@@ -52,6 +50,12 @@ public class BrokersController {
 
     @Autowired
     private BrokersRepository brokersRepository;
+
+    @Autowired
+    private EnvironmentsRepository environmentsRepository;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @ApiOperation(value = "Get the list of existing brokers, support paging, the default is 10 per page")
     @ApiResponses({
@@ -69,7 +73,8 @@ public class BrokersController {
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
             Integer pageSize,
             @PathVariable String cluster) {
-        Map<String, Object> result = brokersService.getBrokersList(pageNum, pageSize, cluster);
+        String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
+        Map<String, Object> result = brokersService.getBrokersList(pageNum, pageSize, cluster, requestHost);
         return ResponseEntity.ok(result);
     }
 //

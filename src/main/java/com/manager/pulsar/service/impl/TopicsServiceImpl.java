@@ -32,10 +32,8 @@ public class TopicsServiceImpl implements TopicsService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
-    @Value("${backend.directRequestHost}")
-    private String directRequestHost;
-
     public static final String PARTITIONED_TOPIC_SUFFIX = "-partition-";
+
 
     private boolean isPartitonedTopic(List<String> topics, String topic) {
         if (topic.contains(PARTITIONED_TOPIC_SUFFIX)) {
@@ -47,10 +45,13 @@ public class TopicsServiceImpl implements TopicsService {
         return false;
     }
 
-    public Map<String, Object> getTopicsList(Integer pageNum, Integer pageSize, String tenant, String namespace) {
+    public Map<String, Object> getTopicsList(
+            Integer pageNum, Integer pageSize, String tenant, String namespace, String requestHost) {
         Map<String, Object> topicsMap = Maps.newHashMap();
-        List<Map<String, String>> persistentTopic = this.getTopicListByHttp(tenant, namespace, "persistent");
-        List<Map<String, String>> nonPersistentTopic = this.getTopicListByHttp(tenant, namespace, "non-persistent");
+        List<Map<String, String>> persistentTopic = this.getTopicListByHttp(
+                tenant, namespace, "persistent", requestHost);
+        List<Map<String, String>> nonPersistentTopic = this.getTopicListByHttp(
+                tenant, namespace, "non-persistent", requestHost);
         persistentTopic.addAll(nonPersistentTopic);
         topicsMap.put("topics", persistentTopic);
         topicsMap.put("isPage", false);
@@ -60,13 +61,14 @@ public class TopicsServiceImpl implements TopicsService {
         return topicsMap;
     }
 
-    private List<Map<String, String>> getTopicListByHttp(String tenant, String namespace, String persistent) {
+    private List<Map<String, String>> getTopicListByHttp(
+            String tenant, String namespace, String persistent, String requestHost) {
         List<Map<String, String>> topicsArray = new ArrayList<>();
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
         String prefix = "/admin/v2/" + persistent + "/" + tenant + "/" + namespace;
         Gson gson = new Gson();
-        String partitonedUrl = directRequestHost + prefix + "/partitioned";
+        String partitonedUrl = requestHost + prefix + "/partitioned";
         String partitonedTopic = HttpUtil.doGet(partitonedUrl, header);
         List<String> partitionedTopicsList = Arrays.asList();
         Map<String, List<String>> partitionedMap = Maps.newHashMap();
@@ -80,7 +82,7 @@ public class TopicsServiceImpl implements TopicsService {
             }
         }
 
-        String topicUrl = directRequestHost + prefix;
+        String topicUrl = requestHost + prefix;
         String topics = HttpUtil.doGet(topicUrl, header);
         if (topics != null) {
             List<String> topicsList = gson.fromJson(
@@ -112,7 +114,7 @@ public class TopicsServiceImpl implements TopicsService {
                     topicEntity.put("persistent", persistent);
                 } else {
                     topicEntity.put("topic", topicName);
-                    String metadataTopicUrl = directRequestHost + prefix + "/" + topicName + "/partitions";
+                    String metadataTopicUrl = requestHost + prefix + "/" + topicName + "/partitions";
                     String metadataTopic = HttpUtil.doGet(metadataTopicUrl, header);
                     Map<String, Integer> metadata = gson.fromJson(
                             metadataTopic, new TypeToken<Map<String, Integer>>(){}.getType());

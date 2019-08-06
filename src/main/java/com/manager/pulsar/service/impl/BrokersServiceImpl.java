@@ -31,10 +31,8 @@ public class BrokersServiceImpl implements BrokersService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
-    @Value("${backend.directRequestHost}")
-    private String directRequestHost;
 
-    public Map<String, Object> getBrokersList(Integer pageNum, Integer pageSize, String cluster) {
+    public Map<String, Object> getBrokersList(Integer pageNum, Integer pageSize, String cluster, String requestHost) {
         Map<String, Object> brokersMap = Maps.newHashMap();
         List<Map<String, Object>> brokersArray = new ArrayList<>();
         if (directRequestBroker) {
@@ -42,10 +40,10 @@ public class BrokersServiceImpl implements BrokersService {
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
             String failureDomainsResult = HttpUtil.doGet(
-                    directRequestHost + "/admin/v2/clusters/" + cluster + "/failureDomains", header);
+                    requestHost + "/admin/v2/clusters/" + cluster + "/failureDomains", header);
             Map<String, Map<String, List<String>>> failureDomains = gson.fromJson(
                     failureDomainsResult, new TypeToken<Map<String, Map<String, List<String>>>>() {}.getType());
-            String result = HttpUtil.doGet(directRequestHost + "/admin/v2/brokers/" + cluster, header);
+            String result = HttpUtil.doGet(requestHost + "/admin/v2/brokers/" + cluster, header);
             List<String> brokersList = gson.fromJson(result, new TypeToken<List<String>>() {}.getType());
             for (String broker: brokersList) {
                 Map<String, Object> brokerEntity = Maps.newHashMap();

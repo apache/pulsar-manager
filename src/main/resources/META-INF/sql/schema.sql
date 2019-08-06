@@ -99,3 +99,10 @@ CREATE TABLE IF NOT EXISTS bundles (
   CONSTRAINT FK_namespace FOREIGN KEY (namespace) References namespaces(namespace),
   CONSTRAINT PK_bundle PRIMARY KEY (broker, tenant, namespace, bundle)
 );
+
+CREATE TABLE IF NOT EXISTS environments (
+  name varchar(256) NOT NULL,
+  broker varchar(1024) NOT NULL,
+  CONSTRAINT PK_name PRIMARY KEY (name),
+  UNIQUE (broker)
+)

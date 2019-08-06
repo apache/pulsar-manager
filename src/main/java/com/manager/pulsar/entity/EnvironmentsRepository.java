@@ -11,13 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.manager.pulsar.service;
+package com.manager.pulsar.entity;
 
-import java.util.Map;
+import com.github.pagehelper.Page;
+import org.springframework.stereotype.Repository;
 
-public interface NamespacesService {
+import java.util.Optional;
 
-    Map<String, Object> getNamespaceList(
-            Integer pageNum, Integer pageSize, String tenant, String requestHost);
+@Repository
+public interface EnvironmentsRepository {
+
+    void save(EnvironmentEntity environmentEntity);
+
+    Optional<EnvironmentEntity> findByBroker(String broker);
+
+    Optional<EnvironmentEntity> findByName(String name);
+
+    Page<EnvironmentEntity> getEnvironmentsList(Integer pageNum, Integer pageSize);
+
+    void remove(String name);
+
+    void update(EnvironmentEntity environmentEntity);
 
 }

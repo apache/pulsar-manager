@@ -11,13 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.manager.pulsar.service;
+package com.manager.pulsar.entity;
 
-import java.util.Map;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public interface NamespacesService {
-
-    Map<String, Object> getNamespaceList(
-            Integer pageNum, Integer pageSize, String tenant, String requestHost);
-
+/**
+ * Environment entity.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+public class EnvironmentEntity {
+    private String name;
+    private String broker;
 }

@@ -57,7 +57,7 @@ public class ClustersServiceImplTest {
 
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
                 .thenReturn("[\"tengdeMBP:8080\"]");
-        Map<String, Object> result = clustersService.getClustersList(1, 1);
+        Map<String, Object> result = clustersService.getClustersList(1, 1, "http://localhost:8080");
         Assert.assertEquals(result.get("data").toString(),
                 "[{cluster=standalone, serviceUrlTls=null, brokers=1, serviceUrl=http://tengdeMBP:8080, " +
                         "brokerServiceUrlTls=null, brokerServiceUrl=pulsar://tengdeMBP:6650}]");

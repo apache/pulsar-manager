@@ -20,5 +20,6 @@ import java.util.Map;
 @Service
 public interface TenantsService {
 
-    Map<String, Object> getTenantsList(Integer pageNum, Integer pageSize);
+    Map<String, Object> getTenantsList(
+            Integer pageNum, Integer pageSize, String requestHost);
 }

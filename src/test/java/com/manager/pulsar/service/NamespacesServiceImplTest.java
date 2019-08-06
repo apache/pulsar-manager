@@ -52,7 +52,7 @@ public class NamespacesServiceImplTest {
         PowerMockito.when(HttpUtil.doGet(
                 "http://localhost:8080/admin/v2/persistent/public/default/partitioned", header))
                 .thenReturn("[]");
-        Map<String, Object> result = namespacesService.getNamespaceList(1, 1, "public");
+        Map<String, Object> result = namespacesService.getNamespaceList(1, 1, "public", "http://localhost:8080");
         Assert.assertEquals(result.get("total"), 1);
         Assert.assertFalse((Boolean) result.get("isPage"));
         Assert.assertEquals(result.get("data").toString(), "[{topics=1, namespace=default}]");
