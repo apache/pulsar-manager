@@ -5,6 +5,17 @@
     <breadcrumb class="breadcrumb-container"/>
 
     <div class="right-menu">
+      <el-dropdown @command="handleCommand">
+        <span class="el-dropdown-link">
+          Environment<i class="el-icon-arrow-down el-icon--right"/>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item v-for="(item,index) in environmentsListOptions" :command="item" :key="index" :label="item.label" :value="item.value">
+            {{ item.value }}
+          </el-dropdown-item>
+          <el-dropdown-item command="newEnvironment" divided>New Environment</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
       <template v-if="device!=='mobile'">
         <error-log class="errLog-container right-menu-item"/>
 
@@ -17,19 +28,10 @@
       </template>
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
-        <!-- <div class="avatar-wrapper">
-          <img src="@/asserts/avatar/avatar.png" class="user-avatar">
-          <i class="el-icon-caret-bottom"/>
-        </div> -->
         <span class="avatar-wrapper">
           Admin<i class="el-icon-arrow-down el-icon--right"/>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <!-- <router-link to="/">
-            <el-dropdown-item>
-              {{ $t('navbar.dashboard') }}
-            </el-dropdown-item>
-          </router-link> -->
           <a target="_blank" href="https://github.com/apache/pulsar">
             <el-dropdown-item>
               {{ $t('navbar.github') }}
@@ -51,6 +53,8 @@ import Hamburger from '@/components/Hamburger'
 import ErrorLog from '@/components/ErrorLog'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
+import { fetchEnvironments } from '@/api/environments'
+import { setEnvironment } from '@/utils/environment'
 
 export default {
   components: {
@@ -60,6 +64,14 @@ export default {
     SizeSelect,
     LangSelect
   },
+  data() {
+    return {
+      environmentsListOptions: [{
+        'label': 'localhost:8080',
+        'value': 'localhost:8080'
+      }]
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
@@ -67,6 +79,9 @@ export default {
       'avatar',
       'device'
     ])
+  },
+  created() {
+    this.getEnvironmentsList()
   },
   methods: {
     toggleSideBar() {
@@ -76,12 +91,36 @@ export default {
       this.$store.dispatch('LogOut').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
+    },
+    handleCommand(command) {
+      if (command === 'newEnvironment') {
+        this.$router.push({ path: '/environments' })
+        return
+      }
+      setEnvironment(command.value)
+      window.location.reload()
+    },
+    getEnvironmentsList() {
+      fetchEnvironments().then(response => {
+        if (!response.data) return
+        this.environmentsListOptions = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.environmentsListOptions.push({
+            'value': response.data.data[i].name,
+            'label': response.data.data[i].broker,
+            'status': response.data.data[i].status
+          })
+        }
+      })
     }
   }
 }
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+.el-icon-arrow-down {
+  font-size: 12px;
+}
 .navbar {
   height: 50px;
   line-height: 50px;

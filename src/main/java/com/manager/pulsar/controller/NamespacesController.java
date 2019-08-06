@@ -15,10 +15,16 @@ package com.manager.pulsar.controller;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
+import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.entity.NamespaceEntity;
 import com.manager.pulsar.entity.NamespacesRepository;
 import com.manager.pulsar.service.NamespacesService;
-import io.swagger.annotations.*;
+import com.manager.pulsar.utils.EnvironmentTools;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.Map;
@@ -48,6 +55,12 @@ public class NamespacesController {
 
     @Autowired
     private NamespacesService namespacesService;
+
+    @Autowired
+    private EnvironmentsRepository environmentsRepository;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @ApiOperation(value = "Get the list of existing namespaces, support paging, the default is 10 per page")
     @ApiResponses({
@@ -89,7 +102,8 @@ public class NamespacesController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
             Integer pageSize) {
-        Map<String, Object> result = namespacesService.getNamespaceList(pageNum, pageSize, tenantOrNamespace);
+        String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
+        Map<String, Object> result = namespacesService.getNamespaceList(pageNum, pageSize, tenantOrNamespace, requestHost);
         return ResponseEntity.ok(result);
     }
 

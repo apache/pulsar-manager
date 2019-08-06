@@ -31,21 +31,21 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         put("Content-Type","application/json");
     }};
 
-    public String forwarBrokerStatsMetrics(String broker) {
+    public String forwarBrokerStatsMetrics(String broker, String requestHost) {
 
-        broker = checkBroker(broker);
+        broker = checkBroker(broker, requestHost);
         return HttpUtil.doGet(broker + "/admin/v2/broker-stats/metrics", header);
     }
 
-    public String forwardBrokerStatsTopics(String broker) {
+    public String forwardBrokerStatsTopics(String broker, String requestHost) {
 
-        broker = checkBroker(broker);
+        broker = checkBroker(broker, requestHost);
         return HttpUtil.doGet(broker + "/admin/v2/broker-stats/topics", header);
     }
 
-    private String checkBroker(String broker) {
+    private String checkBroker(String broker, String requestHost) {
         if (broker == null || broker.length() <= 0) {
-            broker = directRequestHost;
+            broker = requestHost;
         }
 
         if (!broker.startsWith("http")) {

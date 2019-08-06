@@ -17,5 +17,5 @@ import java.util.Map;
 
 public interface BrokersService {
 
-    Map<String, Object> getBrokersList(Integer pageNum, Integer pageSize, String cluster);
+    Map<String, Object> getBrokersList(Integer pageNum, Integer pageSize, String cluster, String requestHost);
 }

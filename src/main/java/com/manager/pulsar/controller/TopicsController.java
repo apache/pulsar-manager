@@ -13,7 +13,9 @@
  */
 package com.manager.pulsar.controller;
 
+import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.service.TopicsService;
+import com.manager.pulsar.utils.EnvironmentTools;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.Map;
@@ -43,6 +46,12 @@ public class TopicsController {
 
     @Autowired
     private TopicsService topicsService;
+
+    @Autowired
+    private EnvironmentsRepository environmentsRepository;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @ApiOperation(value = "Query topic info by tenant and namespace and topic")
     @ApiResponses({
@@ -65,7 +74,8 @@ public class TopicsController {
             @ApiParam(value = "The name of namespace")
             @Size(min = 1, max = 255)
             @PathVariable String namespace) {
-        Map<String, Object> result = topicsService.getTopicsList(pageNum, pageSize, tenant, namespace);
+        String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
+        Map<String, Object> result = topicsService.getTopicsList(pageNum, pageSize, tenant, namespace, requestHost);
         return result;
     }
 }

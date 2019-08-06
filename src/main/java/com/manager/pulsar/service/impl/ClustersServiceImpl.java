@@ -16,6 +16,7 @@ package com.manager.pulsar.service.impl;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.service.BrokersService;
 import com.manager.pulsar.service.ClustersService;
 import com.manager.pulsar.utils.HttpUtil;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,27 +36,25 @@ public class ClustersServiceImpl implements ClustersService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
-    @Value("${backend.directRequestHost}")
-    private String directRequestHost;
-
     @Autowired
     private BrokersService brokersService;
 
-    public Map<String, Object> getClustersList(Integer pageNum, Integer pageSize) {
+
+    public Map<String, Object> getClustersList(Integer pageNum, Integer pageSize, String requestHost) {
         Map<String, Object> clustersMap = Maps.newHashMap();
         List<Map<String, Object>> clustersArray = new ArrayList<>();
         if (directRequestBroker) {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
-            String result = HttpUtil.doGet(directRequestHost + "/admin/v2/clusters", header);
+            String result = HttpUtil.doGet(requestHost + "/admin/v2/clusters", header);
             List<String> clustersList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
             for (String cluster: clustersList) {
                 Map<String, Object> clusterEntity = Maps.newHashMap();
-                Map<String, Object> brokers = brokersService.getBrokersList(1, 1, cluster);
+                Map<String, Object> brokers = brokersService.getBrokersList(1, 1, cluster, requestHost);
                 clusterEntity.put("brokers", brokers.get("total"));
                 clusterEntity.put("cluster", cluster);
-                String clusterInfo = HttpUtil.doGet(directRequestHost + "/admin/v2/clusters/" + cluster, header);
+                String clusterInfo = HttpUtil.doGet(requestHost + "/admin/v2/clusters/" + cluster, header);
                 ClusterData clusterData = gson.fromJson(clusterInfo, ClusterData.class);
                 clusterEntity.put("serviceUrl", clusterData.getServiceUrl());
                 clusterEntity.put("serviceUrlTls", clusterData.getServiceUrlTls());

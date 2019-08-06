@@ -17,5 +17,6 @@ import java.util.Map;
 
 public interface TopicsService {
 
-    Map<String, Object> getTopicsList(Integer pageNum, Integer pageSize, String namespace, String tenant);
+    Map<String, Object> getTopicsList(
+            Integer pageNum, Integer pageSize, String namespace, String tenant, String requestHost);
 }

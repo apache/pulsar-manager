@@ -33,27 +33,24 @@ public class NamespacesServiceImpl implements NamespacesService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
-    @Value("${backend.directRequestHost}")
-    private String directRequestHost;
-
     @Autowired
     private TopicsService topicsService;
 
-    public Map<String, Object> getNamespaceList(Integer pageNum, Integer pageSize, String tenant) {
+    public Map<String, Object> getNamespaceList(Integer pageNum, Integer pageSize, String tenant, String requestHost) {
         Map<String, Object> namespacesMap = Maps.newHashMap();
         List<Map<String, Object>> namespacesArray = new ArrayList<>();
         if (directRequestBroker) {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
-            String result = HttpUtil.doGet(directRequestHost + "/admin/v2/namespaces/" + tenant, header);
+            String result = HttpUtil.doGet(requestHost + "/admin/v2/namespaces/" + tenant, header);
             if (result != null) {
                 List<String> namespacesList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
                 for (String tenantNamespace : namespacesList) {
                     String namespace = tenantNamespace.split("/")[1];
                     Map<String, Object> topicsEntity = Maps.newHashMap();
                     Map<String, Object> topics = topicsService.getTopicsList(
-                            0, 0, tenant, namespace);
+                            0, 0, tenant, namespace, requestHost);
                     topicsEntity.put("topics", topics.get("total"));
                     topicsEntity.put("namespace", namespace);
                     namespacesArray.add(topicsEntity);
@@ -67,4 +64,5 @@ public class NamespacesServiceImpl implements NamespacesService {
         }
         return namespacesMap;
     }
+
 }

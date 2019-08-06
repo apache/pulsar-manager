@@ -70,6 +70,11 @@ export const constantRouterMap = [
     hidden: true
   },
   {
+    path: '/environments',
+    component: () => import('@/views/management/environments/index'),
+    hidden: true
+  },
+  {
     path: '',
     component: Layout,
     redirect: 'management/tenants',

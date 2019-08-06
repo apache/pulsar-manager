@@ -52,7 +52,7 @@ public class TenantsServiceImplTest {
                 .thenReturn("{\"adminRoles\": [\"admin\"], \"allowedClusters\": [\"standalone\"]}");
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/namespaces/public", header))
                 .thenReturn("[\"public/default\"]");
-        Map<String, Object> objectMap = tenantsService.getTenantsList(1, 2);
+        Map<String, Object> objectMap = tenantsService.getTenantsList(1, 2, "http://localhost:8080");
         Assert.assertEquals(objectMap.get("total"), 1);
         Assert.assertEquals(objectMap.get("pageSize"), 1);
         Assert.assertEquals(objectMap.get("pageNum"), 1);
