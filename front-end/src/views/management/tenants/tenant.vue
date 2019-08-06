@@ -116,7 +116,7 @@
       </el-tab-pane>
     </el-tabs>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
-      <el-form :model="temp" label-position="top">
+      <el-form ref="temp" :model="temp" :rules="rules" label-position="top">
         <el-form-item v-if="dialogStatus==='createNamespace'" :label="$t('table.namespace')" prop="namespace">
           <el-input v-model="temp.namespace" placeholder="Please input namespace"/>
         </el-form-item>

@@ -14,7 +14,7 @@
           style="width: 100%;">
           <el-table-column label="Environments" min-width="50px" align="center">
             <template slot-scope="scope">
-              <router-link :to="'/management/tenants'" class="link-type" @click.native="handleSetEnvironment(scope.row.environment)">
+              <router-link :to="'#'" class="link-type" @click.native="handleSetEnvironment(scope.row.environment)">
                 <span>{{ scope.row.environment }}</span>
               </router-link>
             </template>
@@ -223,6 +223,7 @@ export default {
     },
     handleSetEnvironment(environment) {
       setEnvironment(environment)
+      this.$router.push({ path: '/management/tenants' })
     }
   }
 }

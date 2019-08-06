@@ -44,7 +44,6 @@ public class BrokersServiceImpl implements BrokersService {
             Map<String, Map<String, List<String>>> failureDomains = gson.fromJson(
                     failureDomainsResult, new TypeToken<Map<String, Map<String, List<String>>>>() {}.getType());
             String result = HttpUtil.doGet(requestHost + "/admin/v2/brokers/" + cluster, header);
-            System.out.println(requestHost);
             List<String> brokersList = gson.fromJson(result, new TypeToken<List<String>>() {}.getType());
             for (String broker: brokersList) {
                 Map<String, Object> brokerEntity = Maps.newHashMap();
