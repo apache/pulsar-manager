@@ -15,6 +15,16 @@ import request from '@/utils/request'
 
 const BASE_URL_V2 = '/admin/v2'
 
+const SPRING_BASE_URL_V1 = '/pulsar-manager/api/v1'
+
+export function getBookiesList(cluster, query) {
+  return request({
+    url: SPRING_BASE_URL_V1 + `/bookies/${cluster}`,
+    method: 'get',
+    params: { query }
+  })
+}
+
 export function racksInfo() {
   return request({
     url: BASE_URL_V2 + `/bookies/racks-info`,
@@ -43,3 +53,11 @@ export function deleteRacksByBookie(bookie) {
     method: 'delete'
   })
 }
+
+export function heartbeat(bookie) {
+  return request({
+    url: SPRING_BASE_URL_V1 + `/bookies/heartbeat/${bookie}`,
+    method: 'get'
+  })
+}
+
