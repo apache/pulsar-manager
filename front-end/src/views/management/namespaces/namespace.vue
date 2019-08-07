@@ -2,28 +2,28 @@
   <div class="app-container">
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
-        <el-form-item class="postInfo-container-item" label="Tenant">
-          <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
+        <el-form-item :label="$t('tenant.label')" class="postInfo-container-item">
+          <el-select v-model="postForm.tenant" :placeholder="$t('tenant.name')" @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item class="postInfo-container-item" label="Namespace">
-          <el-select v-model="postForm.namespace" placeholder="select namespace" @change="getNamespaceInfo(postForm.tenant, postForm.namespace)">
+        <el-form-item :label="$t('namespace.label')" class="postInfo-container-item">
+          <el-select v-model="postForm.namespace" :placeholder="$t('namespace.name')" @change="getNamespaceInfo(postForm.tenant, postForm.namespace)">
             <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
       </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="OVERVIEW" name="overview">
+      <el-tab-pane :label="$t('tabs.overview')" name="overview">
         <el-table
           :data="namespaceStats"
           border
           style="width: 100%">
-          <el-table-column prop="inMsg" label="In - msg/s"/>
-          <el-table-column prop="outMsg" label="Out - msg/s"/>
-          <el-table-column prop="inBytes" label="In - bytes/s"/>
-          <el-table-column prop="outBytes" label="Out - bytes/s"/>
+          <el-table-column :label="$t('common.inMsg')" prop="inMsg"/>
+          <el-table-column :label="$t('common.outMsg')" prop="outMsg"/>
+          <el-table-column :label="$t('common.inBytes')" prop="inBytes"/>
+          <el-table-column :label="$t('common.outBytes')" prop="outBytes"/>
         </el-table>
         <h4>
           Bundles
@@ -43,22 +43,22 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column label="Bundle" align="center" min-width="100px">
+          <el-table-column :label="$t('namespace.bundle.label')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.bundle }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="Operations" align="center" class-name="small-padding fixed-width">
+          <el-table-column :label="$t('namespace.bundle.operation')" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-share" @click="handleSplitBundle(scope.row)">Split</el-button>
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">Unload</el-button>
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="handleClearBundleBacklog(scope.row)">Clear Backlog</el-button>
+              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-share" @click="handleSplitBundle(scope.row)">{{ $t('namespace.bundle.split') }}</el-button>
+              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">{{ $t('namespace.bundle.unload') }}</el-button>
+              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="handleClearBundleBacklog(scope.row)">{{ $t('namespace.clearBacklog') }}</el-button>
             </template>
           </el-table-column>
         </el-table>
         <!-- <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"/> -->
       </el-tab-pane>
-      <el-tab-pane label="TOPICS" name="topics">
+      <el-tab-pane :label="$t('tabs.topic')" name="topics">
         <el-input v-model="searchTopic" :placeholder="$t('namespace.searchTopics')" style="width: 200px;" @keyup.enter.native="handleFilterTopic"/>
         <el-button type="primary" icon="el-icon-search" @click="handleFilterTopic"/>
         <el-button type="primary" icon="el-icon-plus" @click="handleCreateTopic">{{ $t('namespace.newTopic') }}</el-button>
@@ -72,54 +72,54 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Topic" min-width="50px" align="center">
+              <el-table-column :label="$t('topic.label')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.topicLink" class="link-type">
                     <span>{{ scope.row.topic }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column label="Partitions" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.partitionNumber')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.partitions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Persistent" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.persistent')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.persistent }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Producers" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Subscriptions" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.subscriptions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="In - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="In - bytes/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - bytes/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Storage Size" min-width="30px" align="center">
+              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.storageSize }}</span>
                 </template>
@@ -128,26 +128,26 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="POLICIES" name="policies">
-        <h4>Clusters</h4>
+      <el-tab-pane :label="$t('tabs.policies')" name="policies">
+        <h4>{{ $t('namespace.policy.cluster') }}</h4>
         <hr class="split-line">
         <div class="component-item">
           <div class="section-title">
-            <span>Replicated Clusters</span>
+            <span>{{ $t('namespace.policy.replicatedCluster') }}</span>
             <el-tooltip :content="replicatedClustersContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
           </div>
           <el-select
             v-model="replicationClustersValue"
+            :placeholder="$t('cluster.selectClusterMessage')"
             style="width:500px;margin-top:20px"
             multiple
-            placeholder="Please Select Cluster"
             @change="handleReplicationsClusters()">
             <el-option v-for="item in replicationClustersOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </div>
-        <h4>Authorization
+        <h4>{{ $t('namespace.policy.authorization') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
           </el-tooltip>
@@ -166,8 +166,8 @@
             </div>
             <el-select
               v-model="roleMap[tag]"
+              :placeholder="$t('namespace.policy.selectRole')"
               multiple
-              placeholder="Please Select Options"
               style="width:300px;"
               @change="handleChangeOptions()">
               <el-option
@@ -177,7 +177,7 @@
                 :value="item.value"
                 style="width:300px"/>
             </el-select>
-            <el-button @click.prevent="handleClose(tag)">删除</el-button>
+            <el-button @click.prevent="handleClose(tag)">{{ $t('namespace.policy.deleteRole') }}</el-button>
           </el-tag>
           <el-form-item style="margin-top:30px">
             <el-input
@@ -190,14 +190,14 @@
               @keyup.enter.native="handleInputConfirm"
               @blur="handleInputConfirm"
             />
-            <el-button @click="showInput()">Add Role</el-button>
+            <el-button @click="showInput()">{{ $t('namespace.policy.addRole') }}</el-button>
             <!-- <el-button @click="revokeAllRole()">Revoke All</el-button> -->
           </el-form-item>
         </el-form>
-        <h4>Subscription Authentication</h4>
+        <h4>{{ $t('namespace.policy.subscriptionAuthentication') }}</h4>
         <hr class="split-line">
         <div class="section-title">
-          <span>Subscription Authentication Mode</span>
+          <span>{{ $t('namespace.policy.subscriptionAuthenticationMode') }}</span>
           <el-tooltip :content="subscriptionAuthenticationModeContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
           </el-tooltip>
@@ -213,60 +213,60 @@
             :label="item.label"
             :value="item.value"/>
         </el-select>
-        <h4>Storage</h4>
+        <h4>{{ $t('namespace.policy.storage') }}</h4>
         <hr class="split-line">
         <div class="section-title">
-          <span>Replication Factor</span>
+          <span>{{ $t('namespace.policy.replicationFactor') }}</span>
           <el-tooltip :content="replicationFactorContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
           </el-tooltip>
         </div>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="ensembelSize">
-            <span>Ensemble Size</span>
+            <span>{{ $t('namespace.policy.ensembelSize') }}</span>
             <md-input
               v-model="form.ensembleSize"
+              :placeholder="$t('namespace.policy.inputEnsemble')"
               class="md-input-style"
               name="ensembelSize"
-              placeholder="Please input Ensemble"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
           <el-form-item prop="writeQuorumSize">
-            <span>Write Quorum Size</span>
+            <span>{{ $t('namespace.policy.writeQuorumSize') }}</span>
             <md-input
               v-model="form.writeQuorumSize"
+              :placeholder="$t('namespace.policy.inputWriteQuorumSize')"
               class="md-input-style"
               name="writeQuorumSize"
-              placeholder="Please input Write Quorum Size"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
           <el-form-item prop="readQuorumSize">
-            <span>Read Quorum Size</span>
+            <span>{{ $t('namespace.policy.readQuorumSize') }}</span>
             <md-input
               v-model="form.readQuorumSize"
+              :placeholder="$t('namespace.policy.inputReadQuorumSize')"
               class="md-input-style"
               name="readQuorumSize"
-              placeholder="Please input Read Quorum Size"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="markDeleteMaxRate">
-            <span>Mark Delete Rate</span>
+            <span>{{ $t('namespace.policy.markDeleteRate') }}</span>
             <el-tooltip :content="markDeleteRateContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.markDeleteMaxRate"
+              :placeholder="$t('namespace.policy.inputDeleteMaxRate')"
               class="md-input-style"
               name="markDeleteMaxRate"
-              placeholder="Please input Delete Max Rate"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="encryptionRequire">
-            <span>Encryption Require</span>
+            <span>{{ $t('namespace.policy.encryptionRequire') }}</span>
             <el-tooltip :content="encryptionRequireContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
@@ -276,12 +276,12 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleEncryption()">
-              <el-radio label="Enabled"/>
-              <el-radio label="Disabled"/>
+              <el-radio :label="$t('common.enabled')"/>
+              <el-radio :label="$t('common.disabled')"/>
             </el-radio-group>
           </el-form-item>
           <el-form-item prop="deduplication">
-            <span>Deduplication</span>
+            <span>{{ $t('namespace.policy.deduplication') }}</span>
             <el-tooltip :content="deduplicationContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
@@ -291,35 +291,35 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleDeduplication()">
-              <el-radio label="Enabled"/>
-              <el-radio label="Disabled"/>
+              <el-radio :label="$t('common.enabled')"/>
+              <el-radio :label="$t('common.disabled')"/>
             </el-radio-group>
           </el-form-item>
         </el-form>
-        <h4>Backlog</h4>
+        <h4>{{ $t('namespace.policy.backlog') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="backlogQuotasLimit">
-            <span>Backlog Quotas Limit</span>
+            <span>{{ $t('namespace.policy.backlogQuotasLimit') }}</span>
             <el-tooltip :content="backlogQuotasLimitContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.backlogQuotasLimit"
+              :placeholder="$t('namespace.policy.inputBacklogQuotasLimit')"
               class="md-input-style"
               name="backlogQuotasLimit"
-              placeholder="Please input Backlog Quotas Limit"
               @keyup.enter.native="handleBacklogQuota"/>
           </el-form-item>
           <el-form-item style="width:300px">
-            <span>Backlog Retention Policy</span>
+            <span>{{ $t('namespace.policy.backlogRententionPolicy') }}</span>
             <el-tooltip :content="backlogRententionPolicyContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <br>
             <el-select
               v-model="form.backlogRententionPolicy"
-              placeholder="Please select backlog rentention policy"
+              :placeholder="$t('namespace.policy.inputBacklogRententionPolicyContent')"
               style="margin-top:8px;width:400px"
               @change="handleBacklogQuota()">
               <el-option
@@ -330,18 +330,18 @@
             </el-select>
           </el-form-item>
         </el-form>
-        <h4>Schema</h4>
+        <h4>{{ $t('namespace.policy.schema') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="autoUpdateStrategy">
-            <span>AutoUpdate Strategy</span>
+            <span>{{ $t('namespace.policy.autoUpdateStrategy') }}</span>
             <el-tooltip :content="autoUpdateStrategyContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <br>
             <el-select
               v-model="form.autoUpdateStrategy"
-              placeholder="Please select backlog autoUpdate strategy"
+              :placeholder="$t('namespace.policy.inputAutoUpdateStrategy')"
               style="margin-top:8px;width:300px"
               @change="handleSchemaAutoUpdateStrategy()">
               <el-option
@@ -352,7 +352,7 @@
             </el-select>
           </el-form-item>
           <el-form-item prop="schemaValidationEnforced">
-            <span>Schema Validation Enforced</span>
+            <span>{{ $t('namespace.policy.schemaValidationEnforced') }}</span>
             <el-tooltip :content="schemaValidationEnforcedContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
@@ -362,263 +362,263 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleSchemaValidationEnforced()">
-              <el-radio label="Enabled"/>
-              <el-radio label="Disabled"/>
+              <el-radio :label="$t('common.enabled')"/>
+              <el-radio :label="$t('common.disabled')"/>
             </el-radio-group>
           </el-form-item>
         </el-form>
-        <h4>Cleanup Policy</h4>
+        <h4>{{ $t('namespace.policy.cleanupPolicy') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="messageTTL">
-            <span>Message TTL(Unit Second)</span>
+            <span>{{ $t('namespace.policy.messageTTL') }}</span>
             <el-tooltip :content="messageTTLContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.messageTTL"
+              :placeholder="$t('namespace.policy.inputMessageTTL')"
               class="md-input-style"
               name="messageTTL"
-              placeholder="Please input Backlog Quotas Limit"
               @keyup.enter.native="handleMessageTTL"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="retentionSize">
-            <span>Retention Size</span>
+            <span>{{ $t('namespace.policy.retentionSize') }}</span>
             <el-tooltip :content="retentionSizeContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.retentionSize"
+              :placeholder="$t('namespace.policy.inputRententionSize')"
               class="md-input-style"
               name="retentionSize"
-              placeholder="Please input retention size"
               @keyup.enter.native="handleRetention"/>
           </el-form-item>
           <el-form-item prop="retentionTime">
-            <span>Retention Time(Unit Minutes)</span>
+            <span>{{ $t('namespace.policy.retentionTime') }}</span>
             <el-tooltip :content="retentionTimeContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.retentionTime"
+              :placeholder="$t('namespace.policy.inputRetentionTime')"
               class="md-input-style"
               name="retentionTime"
-              placeholder="Please input Retention Time"
               @keyup.enter.native="handleRetention"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="compactionThreshold">
-            <span>Compaction Threshold</span>
+            <span>{{ $t('namespace.policy.compactionThreshold') }}</span>
             <el-tooltip :content="compactionThresholdContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.compactionThreshold"
+              :placeholder="$t('namespace.policy.inputCompactionThreshold')"
               class="md-input-style"
               name="compactionThreshold"
-              placeholder="Please input retention size"
               @keyup.enter.native="handleCompactionThreshold"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="offloadThreshold">
-            <span>Offload Threshold</span>
+            <span>{{ $t('namespace.policy.offloadThreshold') }}</span>
             <el-tooltip :content="offloadThresholdContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.offloadThreshold"
+              :placeholder="$t('namespace.policy.inputOffloadThreshold')"
               class="md-input-style"
               name="offloadThreshold"
-              placeholder="Please input Offload Threshold"
               @keyup.enter.native="handleOffloadThreshold"/>
           </el-form-item>
           <el-form-item prop="offloadDeletionLag">
-            <span>Offload Deletion Lag</span>
+            <span>{{ $t('namespace.policy.offloadDeletionLag') }}</span>
             <el-tooltip :content="offloadDeletionLagContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.offloadDeletionLag"
+              :placeholder="$t('namespace.policy.inputOffloadDeleteLag')"
               class="md-input-style"
               name="offloadDeletionLag"
-              placeholder="Please input Retention Time"
               @keyup.enter.native="handleOffloadDeletionLag"/>
           </el-form-item>
         </el-form>
-        <h4>Throttling</h4>
+        <h4>{{ $t('namespace.policy.throttling') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="maxProducersPerTopic">
-            <span>Max Producers Per Topic</span>
+            <span>{{ $t('namespace.policy.maxProducersPerTopic') }}</span>
             <el-tooltip :content="maxProducersPerTopicContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.maxProducersPerTopic"
+              :placeholder="$t('namespace.policy.inputMaxProducersPerTopic')"
               class="md-input-style"
               name="maxProducersPerTopic"
-              placeholder="Please input max Producers"
               @keyup.enter.native="handleMaxProducersPerTopic"/>
           </el-form-item>
           <el-form-item prop="maxConsumersPerTopic">
-            <span>Max Consumers Per Topic</span>
+            <span>{{ $t('namespace.policy.maxConsumersPerTopic') }}</span>
             <el-tooltip :content="maxConsumersPerTopicContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.maxConsumersPerTopic"
+              :placeholder="$t('namespace.policy.inputMaxConsumersForTopic')"
               class="md-input-style"
               name="maxConsumersPerTopic"
-              placeholder="Please input max Consumers"
               @keyup.enter.native="handleMaxConsumersPerTopic"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="maxConsumerPerSub">
-            <span>Max Consumers Per Subscription</span>
+            <span>{{ $t('namespace.policy.maxConsumerPerSubscription') }}</span>
             <el-tooltip :content="maxConsumerPerSubContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.maxConsumerPerSub"
+              :placeholder="$t('namespace.policy.inputMaxConsumersForSub')"
               class="md-input-style"
               name="maxConsumerPerSub"
-              placeholder="Please input max Consumers"
               @keyup.enter.native="handleMaxConsuemrsPerSubscription"/>
           </el-form-item>
         </el-form>
-        <h4>Dispatch Rate</h4>
+        <h4>{{ $t('namespace.policy.dispatchRate') }}</h4>
         <hr class="split-line">
-        <span>Dispatch Rate Per Topic</span>
+        <span>{{ $t('namespace.policy.dispatchRatePerTopic') }}</span>
         <el-tooltip :content="dispatchRatePerTopicContent" class="item" effect="dark" placement="top">
           <i class="el-icon-info"/>
         </el-tooltip>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="dispatchRatePerTopicBytes">
-            <span>bytes/second</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerTopicBytes') }}</span>
             <md-input
               v-model="form.dispatchRatePerTopicBytes"
+              :placeholder="$t('namespace.policy.inputDispatchRateBytes')"
               class="md-input-style"
               name="dispatchRatePerTopicBytes"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerTopicMessage">
-            <span>message/second</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerTopicMessage') }}</span>
             <md-input
               v-model="form.dispatchRatePerTopicMessage"
+              :placeholder="$t('namespace.policy.inputDispatchRatePerTopicMessage')"
               class="md-input-style"
               name="dispatchRatePerTopicMessage"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerTopicPeriod">
-            <span>period(Unit second)</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerTopicPeriod') }}</span>
             <md-input
               v-model="form.dispatchRatePerTopicPeriod"
+              :placeholder="$t('namespace.policy.inputDispatchPerTopicPerPeriod')"
               class="md-input-style"
               name="dispatchRatePerTopicPeriod"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
         </el-form>
-        <span>Dispatch Rate Per Subscription</span>
+        <span>{{ $t('namespace.policy.dispatchRateForSub') }}</span>
         <el-tooltip :content="dispatchRatePerSubContent" class="item" effect="dark" placement="top">
           <i class="el-icon-info"/>
         </el-tooltip>
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="dispatchRatePerSubBytes">
-            <span>bytes/second</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerSubBytes') }}</span>
             <md-input
               v-model="form.dispatchRatePerSubBytes"
+              :placeholder="$t('namespace.policy.inputDispatchRatePerSubBytes')"
               class="md-input-style"
               name="dispatchRatePerSubBytes"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerSubMessage">
-            <span>message/second</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerSubMessage') }}</span>
             <md-input
               v-model="form.dispatchRatePerSubMessage"
+              :placeholder="$t('namespace.policy.inputDispatchRatePerSubMessage')"
               class="md-input-style"
               name="dispatchRatePerSubMessage"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerSubPeriod">
-            <span>period(Unit Second)</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerSubPeriod') }}</span>
             <md-input
               v-model="form.dispatchRatePerSubPeriod"
+              :placeholder="$t('namespace.policy.inputDispatchRatePerSubPeriod')"
               class="md-input-style"
               name="dispatchRatePerSubPeriod"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
         </el-form>
-        <span>Subscribe Rate Per Consumer</span>
+        <span>{{ $t('namespace.policy.subscribeRatePerConsumer') }}</span>
         <el-tooltip :content="subscribeRatePerConsumerContent" class="item" effect="dark" placement="top">
           <i class="el-icon-info"/>
         </el-tooltip>
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="subscribeRatePerConsumerSub">
-            <span>message/second</span>
+            <span>{{ $t('namespace.policy.subscribeRatePerConsumerSub') }}</span>
             <md-input
               v-model="form.subscribeRatePerConsumerSub"
+              :placeholder="$t('namespace.policy.inputSubscribeRate')"
               class="md-input-style"
               name="subscribeRatePerConsumerSub"
-              placeholder="Please input subscribe rate"
               @keyup.enter.native="handleSubscribeRate"/>
           </el-form-item>
           <el-form-item prop="subscribeRatePerConsumerPeriod">
-            <span>period(Unit Second)</span>
+            <span>{{ $t('namespace.policy.subscribeRatePerConsumerPeriod') }}</span>
             <md-input
               v-model="form.subscribeRatePerConsumerPeriod"
+              :placeholder="$t('namespace.policy.inputSubscribeRate')"
               class="md-input-style"
               name="subscribeRatePerConsumerPeriod"
-              placeholder="Please input subscribe rate"
               @keyup.enter.native="handleSubscribeRate"/>
           </el-form-item>
         </el-form>
-        <h4>Anti Affinity</h4>
+        <h4>{{ $t('namespace.policy.antiAffinity') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="antiAffinityGroup">
-            <span>Anti Affinity Group</span>
+            <span>{{ $t('namespace.policy.antiAffinityGroup') }}</span>
             <el-tooltip :content="antiAffinityGroupContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.antiAffinityGroup"
+              :placeholder="$t('namespace.policy.inputAntiAffinityGroup')"
               class="md-input-style"
               name="antiAffinityGroup"
-              placeholder="Please input Anti Affinity Group"
               @keyup.enter.native="handleAntiAffinityGroup"/>
           </el-form-item>
         </el-form>
-        <h4 style="color:#E57470">Danger Zone</h4>
+        <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" @click="handleDeleteNamespace">Delete Namespace</el-button>
+        <el-button type="danger" class="button" @click="handleDeleteNamespace">{{ $t('namespace.deleteNamespace') }}</el-button>
       </el-tab-pane>
     </el-tabs>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="form" :rules="rules" :model="form" label-position="top">
         <div v-if="dialogStatus==='create'">
-          <el-form-item label="Topic Domain">
+          <el-form-item :label="$t('topic.topicDomain')">
             <el-radio-group
               v-model="form.isPersistent"
               size="medium">
-              <el-radio label="Persistent"/>
-              <el-radio label="Non-persistent"/>
+              <el-radio :label="$t('topic.persistent')"/>
+              <el-radio :label="$t('topic.nonPersistent')"/>
             </el-radio-group>
           </el-form-item>
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('topic.name')" prop="topic">
             <el-input v-model="form.topic"/>
           </el-form-item>
-          <el-form-item :label="$t('table.partition')" prop="partition">
+          <el-form-item :label="$t('topic.partition')" prop="partition">
             <el-input v-model="form.partitions"/>
           </el-form-item>
           <el-form-item>
@@ -627,7 +627,7 @@
           </el-form-item>
         </div>
         <el-form-item v-if="dialogStatus==='delete'">
-          <h4>Are you sure you want to delete this namespace?</h4>
+          <h4>{{ $t('namespace.deleteNamespaceMessage') }}</h4>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='delete'">
           <el-button type="primary" @click="deleteNamespace()">{{ $t('table.confirm') }}</el-button>

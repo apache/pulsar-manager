@@ -3,14 +3,14 @@
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
         <el-form-item class="postInfo-container-item" label="Cluster">
-          <el-select v-model="postForm.cluster" placeholder="select cluster" @change="getClusterInfo()">
+          <el-select v-model="postForm.cluster" :placeholder="$t('cluster.selectCluster')" @change="getClusterInfo()">
             <el-option v-for="(item,index) in clustersListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
       </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="BROKERS" name="brokers">
+      <el-tab-pane :label="$t('tabs.broker')" name="brokers">
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
@@ -20,29 +20,29 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Brokers" min-width="50px" align="center">
+              <el-table-column :label="$t('broker.name')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <router-link :to="'/management/brokers/' + scope.row.cluster + '/' + scope.row.broker + '/broker'" class="link-type">
                     <span>{{ scope.row.broker }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column label="Failure Domains" align="center" min-width="100px">
+              <el-table-column :label="$t('fd.failureDomainNumber')" align="center" min-width="100px">
                 <template slot-scope="scope">
                   <span>{{ scope.row.failureDomain }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Owned Namespaces" align="center" min-width="100px">
+              <el-table-column :label="$t('broker.ownedNamespaceNumber')" align="center" min-width="100px">
                 <template slot-scope="scope">
                   <span>{{ scope.row.ownedNamespaces }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Throughput" align="center" min-width="100px">
+              <el-table-column :label="$t('broker.throughput')" align="center" min-width="100px">
                 <template slot-scope="scope">
                   <span>In:{{ scope.row.throughputIn }}<br>Out:{{ scope.row.throughputOut }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Bandwidth" align="center" min-width="100px">
+              <el-table-column :label="$t('broker.bandwidth')" align="center" min-width="100px">
                 <template slot-scope="scope">
                   <span>In: {{ scope.row.bandwidthIn }}<br>Out: {{ scope.row.bandwidthOut }}</span>
                 </template>
@@ -51,7 +51,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="BOOKIES" name="bookies">
+      <el-tab-pane :label="$t('tabs.bookie')" name="bookies">
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
             <el-table
@@ -61,17 +61,17 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Bookies" min-width="50px" align="center">
+              <el-table-column :label="$t('bookie.name')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.bookie }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="State" align="center" min-width="100px">
+              <el-table-column :label="$t('bookie.state')" align="center" min-width="100px">
                 <template slot-scope="scope">
                   <span>{{ scope.row.status }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Storage" align="center" min-width="100px">
+              <el-table-column :label="$t('bookie.storage')" align="center" min-width="100px">
                 <template slot-scope="scope">
                   <span>{{ scope.row.storage }}%</span>
                 </template>
@@ -194,9 +194,9 @@
           <el-form-item :label="$t('fd.brokerList')" prop="brokerList">
             <el-select
               v-model="temp.brokerValue"
+              :placeholder="$t('broker.placeholderSelectBroker')"
               style="width:254px;"
-              multiple
-              placeholder="Please select brokers">
+              multiple>
               <el-option v-for="item in brokerOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
@@ -207,7 +207,7 @@
         </div>
         <div v-if="dialogStatus==='deleteCluster'">
           <el-form-item>
-            <h4>Are you sure you want to delete this cluster?</h4>
+            <h4>{{ deleteClusterMessage }}</h4>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="deleteCluster()">{{ $t('table.confirm') }}</el-button>
@@ -216,7 +216,7 @@
         </div>
         <div v-if="dialogStatus==='deleteDomain'">
           <el-form-item>
-            <h4>Are you sure you want to delete this domain?</h4>
+            <h4>{{ deleteFdMessage }}</h4>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="deleteDomain()">{{ $t('table.confirm') }}</el-button>
@@ -225,7 +225,7 @@
         </div>
         <div v-if="dialogStatus==='deletePolicy'">
           <el-form-item>
-            <h4>Are you sure you want to delete this policy?</h4>
+            <h4>{{ deletePolicyMessage }}</h4>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="deletePolicy()">{{ $t('table.confirm') }}</el-button>
@@ -307,7 +307,10 @@ export default {
         deletePolicy: 'Delete Policy'
       },
       tempIsolationPolicyList: [],
-      tempFailureDomainList: []
+      tempFailureDomainList: [],
+      deleteClusterMessage: this.$i18n.t('cluster.deleteClusterMessage'),
+      deleteFdMessage: this.$i18n.t('fd.deleteFdMessage'),
+      deletePolicyMessage: this.$i18n.t('ip.deletePolicyMessage')
     }
   },
   created() {

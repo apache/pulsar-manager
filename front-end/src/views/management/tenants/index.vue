@@ -16,26 +16,26 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column :label="$t('table.tenant')" min-width="50px" align="center">
+          <el-table-column :label="$t('tenant.name')" min-width="50px" align="center">
             <template slot-scope="scope">
               <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant + '?tab=namespaces'" class="link-type">
                 <span>{{ scope.row.tenant }}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.namespace')" align="center" min-width="100px">
+          <el-table-column :label="$t('namespace.namespaceNumber')" align="center" min-width="100px">
             <template slot-scope="scope">
               <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant + '?tab=namespaces'" class="link-type">
                 <span>{{ scope.row.namespace }}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.allowedClusters')" align="center" min-width="100px">
+          <el-table-column :label="$t('tenant.allowedClustersLabel')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.allowedClusters }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.adminRoles')" align="center" min-width="100px">
+          <el-table-column :label="$t('tenant.adminRolesLabel')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.adminRoles }}</span>
             </template>
@@ -55,14 +55,14 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="form" :rules="rules" :model="form" label-position="top">
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.tenant')" prop="tenant">
-          <el-input v-model="form.tenant" placeholder="Please input tenant"/>
+          <el-input v-model="form.tenant" :placeholder="$t('tenant.selectTenantMessage')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="Allowed Clusters" prop="clusters">
-          <el-select v-model="form.clusters" multiple placeholder="Please select clusters" style="width:100%">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('tenant.allowedClustersLabel')" prop="clusters">
+          <el-select v-model="form.clusters" :placeholder="$t('cluster.selectClusterMessage')" multiple style="width:100%">
             <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="Allowed Roles" prop="roles">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('tenant.adminRolesLabel')" prop="roles">
           <el-tag
             v-for="tag in form.dynamicRoles"
             :key="tag"
@@ -81,7 +81,7 @@
           <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Role</el-button>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='delete'">
-          <h4>Are you sure you want to delete this tenant?</h4>
+          <h4>{{ deleteTenantMessage }}</h4>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
@@ -128,15 +128,16 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        create: 'New Tenant',
-        delete: 'Delete Tenant'
+        create: this.$i18n.t('tenant.newTenant'),
+        delete: this.$i18n.t('tenant.deleteTenant')
       },
       rules: {
         tenant: [{ required: true, message: 'Tenant is required', trigger: 'blur' }],
         clusters: [{ required: true, message: 'Cluster is required', trigger: 'blur' }]
       },
       inputVisible: false,
-      inputValue: ''
+      inputValue: '',
+      deleteTenantMessage: this.$i18n.t('tenant.deleteTenantMessage')
     }
   },
   created() {
