@@ -43,7 +43,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
 RUN apt-get install -y nodejs
 
-COPY build/libs/pulsar-manager.jar pulsar-manager.jar
+COPY build/libs/*.jar pulsar-manager.jar
 
 COPY docker/supervisord.conf /etc/
 
