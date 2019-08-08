@@ -2,22 +2,22 @@
   <div class="app-container">
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
-        <el-form-item label="Tenant">
+        <el-form-item :label="$t('tenant.label')">
           <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="Namespace">
+        <el-form-item :label="$t('namespace.label')">
           <el-select v-model="postForm.namespace" placeholder="select namespace" @change="getTopicsList()">
             <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="Topic">
+        <el-form-item :label="$t('topic.label')">
           <el-select v-model="postForm.topic" placeholder="select topic" @change="generatePartitions()">
             <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="Partition">
+        <el-form-item :label="$t('topic.partition')">
           <el-select v-model="postForm.partition" :disabled="partitionDisabled" placeholder="select partition" @change="getTopicInfo()">
             <el-option v-for="(item,index) in partitionsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
@@ -25,41 +25,41 @@
       </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="OVERVIEW" name="overview">
+      <el-tab-pane :label="$t('tabs.overview')" name="overview">
         <el-row :gutter="12">
           <el-col :span="12">
             <el-card style="height: 305px">
-              <h4>INFO</h4>
+              <h4>{{ $t('topic.info') }}</h4>
               <el-table
                 :data="infoData"
                 :show-header="false"
                 border
                 style="width: 100%">
-                <el-table-column prop="infoColumn" label="column"/>
-                <el-table-column prop="data" label="data"/>
+                <el-table-column :label="$t('topic.column')" prop="infoColumn"/>
+                <el-table-column :label="$t('topic.data')" prop="data"/>
               </el-table>
               <el-button class="filter-item" type="primary" style="margin-top:15px;" @click="handleUnload">Unload</el-button>
             </el-card>
           </el-col>
           <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
-              <h4>STATUS</h4>
+              <h4>{{ $t('topic.status') }}</h4>
               <el-button type="primary" circle class="circle"><span class="circle-font">{{ terminateStatus }}</span></el-button>
-              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleTerminate">terminate</el-button>
+              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleTerminate">{{ $t('topic.terminate') }}</el-button>
             </el-card>
           </el-col>
           <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
-              <h4>COMPACTION</h4>
+              <h4>{{ $t('topic.compactionName') }}</h4>
               <el-button type="primary" circle class="circle"><span class="circle-font">{{ compaction }}</span></el-button>
-              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleCompaction">compaction</el-button>
+              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleCompaction">{{ $t('topic.compaction') }}</el-button>
             </el-card>
           </el-col>
           <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
-              <h4>OFFLOAD</h4>
+              <h4>{{ $t('topic.offloadName') }}</h4>
               <el-button type="primary" circle class="circle"><span class="circle-font">{{ offload }}</span></el-button>
-              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleOffload">offload</el-button>
+              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleOffload">{{ $t('topic.offload') }}</el-button>
             </el-card>
           </el-col>
         </el-row>

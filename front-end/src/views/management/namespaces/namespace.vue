@@ -703,7 +703,7 @@ export default {
         inBytes: 0,
         outBytes: 0
       }],
-      replicatedClustersContent: 'This is Allowed Clusters',
+      replicatedClustersContent: this.$i18n.t('namespace.replicatedClustersContent'),
       replicationClustersValue: [],
       replicationClustersOptions: [],
       dynamicValidateForm: {
@@ -728,9 +728,9 @@ export default {
         value: 'functions',
         label: 'functions'
       }],
-      authorizationContent: 'This is AuthorizationContent',
+      authorizationContent: this.$i18n.t('namespace.policy.authorizationContent'),
       subscriptionAuthenticationMode: '',
-      subscriptionAuthenticationModeContent: 'This is subscriptionAuthenticationMode',
+      subscriptionAuthenticationModeContent: this.$i18n.t('namespace.policy.subscriptionAuthenticationModeContent'),
       subscriptionAuthenticationModeOptions: [{
         value: 'None',
         label: 'None'
@@ -738,7 +738,7 @@ export default {
         value: 'Prefix',
         label: 'Prefix'
       }],
-      replicationFactorContent: 'This is replicationFactorContent',
+      replicationFactorContent: this.$i18n.t('namespace.policy.replicationFactorContent'),
       form: {
         ensembelSize: '',
         writeQuorumSize: '',
@@ -772,9 +772,9 @@ export default {
         topic: [{ required: true, message: 'topic is required', trigger: 'blur' }]
         // ensembelSize: [{ required: true, message: 'EnsembelSize is greater more than 0', trigger: 'blur' }]
       },
-      markDeleteRateContent: 'This is markDeleteRateContent',
-      backlogQuotasLimitContent: 'This is backlogQuotasLimitContent',
-      backlogRententionPolicyContent: 'This is backlogRententionPolicyContent',
+      markDeleteRateContent: this.$i18n.t('namespace.policy.markDeleteRateContent'),
+      backlogQuotasLimitContent: this.$i18n.t('namespace.policy.backlogQuotasLimitContent'),
+      backlogRententionPolicyContent: this.$i18n.t('namespace.policy.backlogRententionPolicyContent'),
       backlogRententionPolicyRadio: 'consumer_backlog_eviction',
       backlogRententionPolicyOption: [{
         value: 'consumer_backlog_eviction',
@@ -786,7 +786,7 @@ export default {
         value: 'producer_request_hold',
         lable: 'producer_request_hold'
       }],
-      encryptionRequireContent: 'This is encryptionRequireContent',
+      encryptionRequireContent: this.$i18n.t('namespace.policy.encryptionRequireContent'),
       encryptionRequireOption: [{
         value: 'Enabled',
         label: 'Enabled'
@@ -794,7 +794,7 @@ export default {
         value: 'Disabled',
         label: 'Disabled'
       }],
-      deduplicationContent: 'This is deduplicationContent',
+      deduplicationContent: this.$i18n.t('namespace.policy.deduplicationContent'),
       deduplication: '',
       deduplicationOption: [{
         value: 'Enabled',
@@ -803,7 +803,7 @@ export default {
         value: 'Disabled',
         label: 'Disabled'
       }],
-      autoUpdateStrategyContent: 'This is schemaValidationEnforced',
+      autoUpdateStrategyContent: this.$i18n.t('namespace.policy.autoUpdateStrategyContent'),
       autoUpdateStrategyOption: [{
         value: 'Full',
         label: 'Full'
@@ -829,21 +829,21 @@ export default {
         value: 'FullTransitive',
         label: 'FullTransitive'
       }],
-      schemaValidationEnforcedContent: 'This is schemaValidationEnforcedContent',
+      schemaValidationEnforcedContent: this.$i18n.t('namespace.policy.schemaValidationEnforcedContent'),
       schemaValidationEnforced: '',
-      messageTTLContent: 'This is messageTTLContent',
-      retentionSizeContent: 'This is retentionSizeContent',
-      retentionTimeContent: 'This is retentionTimeContent',
-      compactionThresholdContent: 'This is compactionThresholdContent',
-      offloadThresholdContent: 'This is offloadThresholdContent',
-      offloadDeletionLagContent: 'This is offloadDeletionLagContent',
-      maxProducersPerTopicContent: 'This is maxProducersPerTopicContent',
-      maxConsumersPerTopicContent: 'This is maxConsumersPerTopicContent',
-      maxConsumerPerSubContent: 'This is maxConsumerPerSubContent',
-      dispatchRatePerTopicContent: 'This is dispatchRatePerTopicContent',
-      dispatchRatePerSubContent: 'This is dispatchRatePerSubContent',
-      subscribeRatePerConsumerContent: 'This is subscribeRatePerConsumerContent',
-      antiAffinityGroupContent: 'This is antiAffinityGroupContent',
+      messageTTLContent: this.$i18n.t('namespace.policy.messageTTLContent'),
+      retentionSizeContent: this.$i18n.t('namespace.policy.retentionSizeContent'),
+      retentionTimeContent: this.$i18n.t('namespace.policy.retentionTimeContent'),
+      compactionThresholdContent: this.$i18n.t('namespace.policy.compactionThresholdContent'),
+      offloadThresholdContent: this.$i18n.t('namespace.policy.offloadThresholdContent'),
+      offloadDeletionLagContent: this.$i18n.t('namespace.policy.offloadDeletionLagContent'),
+      maxProducersPerTopicContent: this.$i18n.t('namespace.policy.maxProducersPerTopicContent'),
+      maxConsumersPerTopicContent: this.$i18n.t('namespace.policy.maxConsumersPerTopicContent'),
+      maxConsumerPerSubContent: this.$i18n.t('namespace.policy.maxConsumerPerSubContent'),
+      dispatchRatePerTopicContent: this.$i18n.t('namespace.policy.dispatchRatePerTopicContent'),
+      dispatchRatePerSubContent: this.$i18n.t('namespace.policy.dispatchRatePerSubContent'),
+      subscribeRatePerConsumerContent: this.$i18n.t('namespace.policy.subscribeRatePerConsumerContent'),
+      antiAffinityGroupContent: this.$i18n.t('namespace.policy.antiAffinityGroupContent'),
       tableKey: 0,
       topicsListLoading: true,
       topicsTableKey: 0,

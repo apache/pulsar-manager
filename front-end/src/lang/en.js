@@ -389,7 +389,16 @@ export default {
       label: 'Subscription',
       name: 'Subscription Name',
       subscriptionNumber: 'Subscription Number'
-    }
+    },
+    info: 'INFO',
+    column: 'column',
+    data: 'data',
+    terminate: 'terminate',
+    compactionName: 'COMPACTION',
+    compaction: 'compaction',
+    offloadName: 'OFFLOAD',
+    offload: 'offload',
+    status: 'STATUS'
   },
   cluster: {
     label: 'Cluster',
