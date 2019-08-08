@@ -375,20 +375,82 @@ export default {
     topicNumber: 'Topic Number',
     newTopic: 'New Topic',
     deleteTopic: 'Delete Topic',
+    delete: 'Delete',
     persistent: 'Persistent',
     nonPersistent: 'Non-persistent',
     partition: 'Partition',
+    partitions: 'Partitions',
     partitionNumber: 'Partition Number',
     topicDomain: 'Topic Domain',
+    addRole: 'Add Role',
     producer: {
       label: 'Producer',
       name: 'Producer Name',
-      producerNumber: 'Producer Number'
+      producers: 'Producers',
+      producerId: 'Producer Id',
+      producerName: 'Producer Name',
+      producerNumber: 'Producer Number',
+      avgMsgSize: 'Avg Msg Size',
+      address: 'Address',
+      since: 'Since'
     },
     subscription: {
       label: 'Subscription',
       name: 'Subscription Name',
-      subscriptionNumber: 'Subscription Number'
+      subscriptions: 'Subscriptions',
+      type: 'Type',
+      subscriptionNumber: 'Subscription Number',
+      msgExpired: 'Msg Expired',
+      backlog: 'Backlog',
+      skip: 'SKIP',
+      skipMessage: 'Messages',
+      expire: 'EXPIRE',
+      expireMessage: 'messages older than timestamp (in seconds)',
+      clear: 'CLEAR',
+      clearMessage: 'Clear Message',
+      reset: 'RESET',
+      resetByTimeMessage: 'Reset By Time',
+      resetById: 'Reset By Message Id',
+      messageId: 'Message ID',
+      mins: 'Mins',
+      storage: 'STORAGE',
+      storageSize: 'Storage Size',
+      entries: 'Entries',
+      segments: 'Segments'
+    },
+    segment: {
+      label: 'Segment',
+      name: 'Segment Name',
+      ledgerId: 'Ledger Id',
+      entries: 'Entries',
+      size: 'Size',
+      status: 'Status',
+      offload: 'Offload'
+    },
+    cursor: {
+      label: 'Cursor',
+      name: 'Cursor Name',
+      cursors: 'Cursors',
+      markDeletePosition: 'Mark Delete Position',
+      readPosition: 'Read Position',
+      waitingReadOp: 'Waiting Read Op',
+      pendingReadOp: 'Pending Read Op',
+      numberOfEntriesSinceFirstNotAckedMessage: 'Entries Since First Not AckedMessage'
+    },
+    policy: {
+      label: 'policy',
+      name: 'Policy Name',
+      policies: 'Policies',
+      authentication: 'Authorization',
+      authorizationContent: 'This is authorizationContent'
+    },
+    consumer: {
+      label: 'Consumer',
+      name: 'Consumer Name',
+      consumers: 'Consumers',
+      avgMsgSize: 'Avg Msg Size',
+      address: 'Address',
+      since: 'Since'
     },
     info: 'INFO',
     column: 'column',
@@ -398,7 +460,12 @@ export default {
     compaction: 'compaction',
     offloadName: 'OFFLOAD',
     offload: 'offload',
-    status: 'STATUS'
+    status: 'STATUS',
+    unload: 'Unload',
+    deleteTopicMessage: 'Are you sure you want to delete this topic?',
+    partitionedTopicName: 'Partitioned Topic Name',
+    selectRoleMessage: 'Please Select Role',
+    backlogOpeartion: 'Backlog Operation'
   },
   cluster: {
     label: 'Cluster',

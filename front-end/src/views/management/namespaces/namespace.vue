@@ -863,10 +863,10 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        create: 'Create Topic'
+        create: this.$i18n.t('topic.newTopic')
       },
       currentTabName: '',
-      bundleInfoContent: 'This is bundleInfoContent'
+      bundleInfoContent: this.$i18n.t('bundleInfoContent')
     }
   },
   created() {

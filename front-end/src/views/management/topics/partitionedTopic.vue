@@ -2,17 +2,17 @@
   <div class="app-container">
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" label-position="top" class="form-container">
-        <el-form-item class="postInfo-container-item" label="Tenant">
+        <el-form-item :label="$t('tenant.label')">
           <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item class="postInfo-container-item" label="Namespace">
+        <el-form-item :label="$t('namespace.label')">
           <el-select v-model="postForm.namespace" placeholder="select namespace" @change="getTopicsList()">
             <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item class="postInfo-container-item" label="Topic">
+        <el-form-item :label="$t('topic.label')">
           <el-select v-model="postForm.topic" placeholder="select topic" @change="getPartitionTopicInfo()">
             <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
@@ -20,17 +20,17 @@
       </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="OVERVIEW" name="overview">
+      <el-tab-pane :label="$t('tabs.overview')" name="overview">
         <el-table
           :data="partitionTopicStats"
           border
           style="width: 100%">
-          <el-table-column prop="inMsg" label="In - msg/s"/>
-          <el-table-column prop="outMsg" label="Out - msg/s"/>
-          <el-table-column prop="inBytes" label="In - bytes/s"/>
-          <el-table-column prop="outBytes" label="Out - bytes/s"/>
+          <el-table-column :label="$t('common.inMsg')" prop="inMsg"/>
+          <el-table-column :label="$t('common.outMsg')" prop="outMsg"/>
+          <el-table-column :label="$t('common.inBytes')" prop="inBytes"/>
+          <el-table-column :label="$t('common.outBytes')" prop="outBytes"/>
         </el-table>
-        <h4>Partitions</h4>
+        <h4>{{ $t('topic.partitions') }}</h4>
         <hr class="split-line">
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
@@ -41,44 +41,44 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Partition" min-width="50px" align="center">
+              <el-table-column :label="$t('topic.partition')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.partitionTopicLink" class="link-type">
                     <span>{{ scope.row.partition }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column label="Producers" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Subscriptions" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.subscriptions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="In - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="In - bytes/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - bytes/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Storage Size" min-width="30px" align="center">
+              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.storageSize }}</span>
                 </template>
@@ -88,10 +88,10 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="POLICIES" name="policies">
-        <h4>Partitioned Topic Name</h4>
+        <h4>{{ $t('topic.partitionedTopicName') }}</h4>
         <hr class="split-line">
         <span>{{ partitionedTopicName }}</span>
-        <h4>Authorization
+        <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
           </el-tooltip>
@@ -110,8 +110,8 @@
             </div>
             <el-select
               v-model="roleMap[tag]"
+              :placeholder="$t('topic.selectRoleMessage')"
               multiple
-              placeholder="Please Select Options"
               style="width:300px;"
               @change="handleChangeOptions()">
               <el-option
@@ -121,7 +121,7 @@
                 :value="item.value"
                 style="width:300px"/>
             </el-select>
-            <el-button @click.prevent="handleClose(tag)">删除</el-button>
+            <el-button @click.prevent="handleClose(tag)">{{ $t('topic.delete') }}</el-button>
           </el-tag>
           <el-form-item style="margin-top:30px">
             <el-input
@@ -134,11 +134,11 @@
               @keyup.enter.native="handleInputConfirm"
               @blur="handleInputConfirm"
             />
-            <el-button @click="showInput()">Add Role</el-button>
+            <el-button @click="showInput()">{{ $t('topic.addRole') }}</el-button>
             <!-- <el-button @click="revokeAllRole()">Revoke All</el-button> -->
           </el-form-item>
         </el-form>
-        <h4 style="color:#E57470">Danager Zone</h4>
+        <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
         <hr class="danger-line">
         <el-button type="danger" class="button" @click="handleDeletePartitionTopic">Delete Topic</el-button>
       </el-tab-pane>
@@ -146,7 +146,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-position="top">
         <el-form-item v-if="dialogStatus==='delete'">
-          <h4>Are you sure you want to delete this topic?</h4>
+          <h4>{{ $t('topic.deleteTopicMessage') }}</h4>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="deleteParititionTopic">{{ $t('table.confirm') }}</el-button>
@@ -204,13 +204,13 @@ export default {
         value: 'functions',
         label: 'functions'
       }],
-      authorizationContent: 'This is authorizationContent',
+      authorizationContent: this.$i18n.t('topic.policy.authorizationContent'),
       partitionedTopicName: '',
       firstInit: false,
       firstInitTopic: false,
       currentTabName: '',
       textMap: {
-        delete: 'Delete Topic'
+        delete: this.$i18n.t('topic.deleteTopic')
       },
       dialogFormVisible: false,
       dialogStatus: ''

@@ -38,7 +38,7 @@
                 <el-table-column :label="$t('topic.column')" prop="infoColumn"/>
                 <el-table-column :label="$t('topic.data')" prop="data"/>
               </el-table>
-              <el-button class="filter-item" type="primary" style="margin-top:15px;" @click="handleUnload">Unload</el-button>
+              <el-button class="filter-item" type="primary" style="margin-top:15px;" @click="handleUnload">{{ $t('topic.unload') }}</el-button>
             </el-card>
           </el-col>
           <el-col v-if="nonPersistent===false" :span="4">
@@ -67,12 +67,12 @@
           :data="topicStats"
           border
           style="width: 100%">
-          <el-table-column prop="inMsg" label="In - msg/s"/>
-          <el-table-column prop="outMsg" label="Out - msg/s"/>
-          <el-table-column prop="inBytes" label="In - bytes/s"/>
-          <el-table-column prop="outBytes" label="Out - bytes/s"/>
+          <el-table-column :label="$t('common.inMsg')" prop="inMsg"/>
+          <el-table-column :label="$t('common.outMsg')" prop="outMsg"/>
+          <el-table-column :label="$t('common.inBytes')" prop="inBytes"/>
+          <el-table-column :label="$t('common.outBytes')" prop="outBytes"/>
         </el-table>
-        <h4>Producers</h4>
+        <h4>{{ $t('topic.producer.producers') }}</h4>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
@@ -83,37 +83,37 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Producer Id" min-width="50px" align="center">
+              <el-table-column :label="$t('topic.producer.producerId')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producerId }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Producer Name" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.producerName')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producerName }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="In - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="In - bytes/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Avg Msg Size" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.avgMsgSize')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.avgMsgSize }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Address" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.address')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.address }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Since" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.since')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.since }}</span>
                 </template>
@@ -121,7 +121,7 @@
             </el-table>
           </el-col>
         </el-row>
-        <h4>Subscriptions</h4>
+        <h4>{{ $t('topic.subscription.subscriptions') }}</h4>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
@@ -132,50 +132,50 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Subscription" min-width="50px" align="center">
+              <el-table-column :label="$t('topic.subscription.name')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.subscriptionLink" class="link-type">
                     <span>{{ scope.row.subscription }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column label="type" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.subscription.type')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.type }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="outBytes" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Msg Expired" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.subscription.msgExpired')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.msgExpired }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Backlog" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.subscription.backlog')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.backlog }}</span>
                   <el-dropdown>
                     <span class="el-dropdown-link"><i class="el-icon-more"/></span>
                     <el-dropdown-menu slot="dropdown">
                       <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=skip'" class="link-type">
-                        <el-dropdown-item command="skip">SKIP</el-dropdown-item>
+                        <el-dropdown-item command="skip">{{ $t('topic.subscription.skip') }}</el-dropdown-item>
                       </router-link>
                       <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=expire'" class="link-type">
-                        <el-dropdown-item command="expire">EXPIRE</el-dropdown-item>
+                        <el-dropdown-item command="expire">{{ $t('topic.subscription.expire') }}</el-dropdown-item>
                       </router-link>
                       <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=clear'" class="link-type">
-                        <el-dropdown-item command="clear">CLEAR</el-dropdown-item>
+                        <el-dropdown-item command="clear">{{ $t('topic.subscription.clear') }}</el-dropdown-item>
                       </router-link>
                       <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=reset'" class="link-type">
-                        <el-dropdown-item command="reset">RESET</el-dropdown-item>
+                        <el-dropdown-item command="reset">{{ $t('topic.subscription.reset') }}</el-dropdown-item>
                       </router-link>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -185,25 +185,25 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane v-if="nonPersistent===false" label="STORAGE" name="storage">
+      <el-tab-pane v-if="nonPersistent===false" :label="$t('topic.subscription.storage')" name="storage">
         <el-row :gutter="12">
           <el-col :span="8">
             <el-card>
-              <el-button type="primary" class="circle"><span>Storage Size <br>{{ storageSize }}</span></el-button>
+              <el-button type="primary" class="circle"><span>{{ $t('topic.subscription.storageSize') }} <br>{{ storageSize }}</span></el-button>
             </el-card>
           </el-col>
           <el-col :span="8">
             <el-card>
-              <el-button type="primary" class="circle"><span>Entries <br>{{ entries }}</span></el-button>
+              <el-button type="primary" class="circle"><span>{{ $t('topic.subscription.entries') }} <br>{{ entries }}</span></el-button>
             </el-card>
           </el-col>
           <el-col :span="8">
             <el-card>
-              <el-button type="primary" class="circle"><span>Segments<br>{{ segments }}</span></el-button>
+              <el-button type="primary" class="circle"><span>{{ $t('topic.subscription.segments') }}<br>{{ segments }}</span></el-button>
             </el-card>
           </el-col>
         </el-row>
-        <h4>Segments</h4>
+        <h4>{{ $t('topic.segment.label') }}</h4>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
@@ -214,27 +214,27 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Ledger Id" min-width="50px" align="center">
+              <el-table-column :label="$t('topic.segment.ledgerId')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.ledgerId }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Entries" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.segment.entries')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.entries }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Size" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.segment.size')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.size }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Status" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.segment.status')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.status }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Offload" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.segment.offload')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.offload }}</span>
                 </template>
@@ -242,7 +242,7 @@
             </el-table>
           </el-col>
         </el-row>
-        <h4>Cursors</h4>
+        <h4>{{ $t('topic.cursor.cursors') }}</h4>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
@@ -253,32 +253,32 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Name" min-width="50px" align="center">
+              <el-table-column :label="$t('topic.cursor.label')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.name }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Mark Delete Position" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.cursor.markDeletePosition')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.markDeletePosition }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Read Position" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.cursor.readPosition')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.readPosition }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Waiting Read Op" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.cursor.waitingReadOp')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.waitingReadOp }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Pending Read Ops" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.cursor.pendingReadOp')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.pendingReadOps }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Entries Since First Not AckedMessage" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.cursor.numberOfEntriesSinceFirstNotAckedMessage')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.numberOfEntriesSinceFirstNotAckedMessage }}</span>
                 </template>
@@ -287,9 +287,9 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="POLICIES" name="policies">
+      <el-tab-pane :label="$t('topic.policy.policies')" name="policies">
         <span>{{ topicName }}</span>
-        <h4>Authorization
+        <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
           </el-tooltip>
@@ -319,7 +319,7 @@
                 :value="item.value"
                 style="width:300px"/>
             </el-select>
-            <el-button @click.prevent="handleClose(tag)">删除</el-button>
+            <el-button @click.prevent="handleClose(tag)">{{ $t('topic.delete') }}</el-button>
           </el-tag>
           <el-form-item style="margin-top:30px">
             <el-input
@@ -332,19 +332,19 @@
               @keyup.enter.native="handleInputConfirm"
               @blur="handleInputConfirm"
             />
-            <el-button @click="showInput()">Add Role</el-button>
+            <el-button @click="showInput()">{{ $t('topic.addRole') }}</el-button>
             <!-- <el-button @click="revokeAllRole()">Revoke All</el-button> -->
           </el-form-item>
         </el-form>
-        <h4 style="color:#E57470">Danager Zone</h4>
+        <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" @click="handleDeleteTopic">Delete Topic</el-button>
+        <el-button type="danger" class="button" @click="handleDeleteTopic">{{ $t('topic.deleteTopic') }}</el-button>
       </el-tab-pane>
     </el-tabs>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-position="top">
         <el-form-item v-if="dialogStatus==='delete'">
-          <h4>Are you sure you want to delete this topic?</h4>
+          <h4>{{ $t(topic.deleteTopicMessage) }}</h4>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="deleteTopic">{{ $t('table.confirm') }}</el-button>
@@ -435,7 +435,7 @@ export default {
         value: 'functions',
         label: 'functions'
       }],
-      authorizationContent: 'This is authorizationContent',
+      authorizationContent: this.$i18n.t('topic.policy.authorizationContent'),
       topicName: '',
       firstInit: false,
       firstInitTopic: false,
@@ -445,7 +445,7 @@ export default {
       currentTabName: '',
       nonPersistent: false,
       textMap: {
-        delete: 'Delete Topic'
+        delete: this.$i18n.t('topic.deleteTopic')
       },
       dialogFormVisible: false,
       dialogStatus: '',
