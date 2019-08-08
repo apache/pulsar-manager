@@ -3,14 +3,14 @@
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
         <el-form-item class="postInfo-container-item" label="Tenant">
-          <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
+          <el-select v-model="postForm.tenant" :placeholder="$t('tenant.selectTenantMessage')" @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
       </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="Namespaces" name="namespaces">
+      <el-tab-pane :label="$t('tabs.namespace')" name="namespaces">
         <div class="filter-container">
           <el-input
             :placeholder="$t('table.namespace')"
@@ -18,7 +18,7 @@
             style="width: 200px;"
             @keyup.enter.native="handleFilterNamespace"/>
           <el-button type="primary" icon="el-icon-search" @click="handleFilterNamespace"/>
-          <el-button type="primary" icon="el-icon-plus" @click="handleCreateNamespace">New Namespace</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="handleCreateNamespace">{{ $t('namespace.newNamespace') }}</el-button>
         </div>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
@@ -30,14 +30,14 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column :label="$t('table.namespace')" align="center">
+              <el-table-column :label="$t('namespace.name')" align="center">
                 <template slot-scope="scope">
                   <router-link :to="'/management/namespaces/' + scope.row.tenant +'/' + scope.row.namespace + '/namespace?tab=overview'" class="link-type">
                     <span>{{ scope.row.namespace }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column label="topics" align="center">
+              <el-table-column :label="$t('topic.topicNumber')" align="center">
                 <template slot-scope="scope">
                   <router-link :to="'/management/namespaces/' + scope.row.tenant + '/' + scope.row.namespace + '/namespace?tab=topics'" class="link-type">
                     <span>{{ scope.row.topics }}</span>
@@ -56,35 +56,35 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="Configuration" name="configuration">
+      <el-tab-pane :label="$t('tabs.configuration')" name="configuration">
         <el-row :gutter="24">
           <el-col :span="24">
             <div slot="header" class="clearfix">
-              <h2>Tenant Info</h2>
+              <h2>{{ $t('tenant.tenantInfo') }}</h2>
             </div>
             <h4>Clusters</h4>
             <hr class="split-line">
             <div class="component-item">
               <div class="section-title">
-                <span>Allowed Clusters</span>
+                <span>{{ $t('tenant.allowedClustersLabel') }}</span>
                 <el-tooltip :content="allowedClustersContent" class="item" effect="dark" placement="top">
                   <i class="el-icon-info"/>
                 </el-tooltip>
               </div>
               <el-select
                 v-model="clusterValue"
+                :placeholder="$t('cluster.selectCluster')"
                 style="width:500px;margin-top:20px"
                 multiple
-                placeholder="Please Select Cluster"
                 @change="handleSelectClusters()">
                 <el-option v-for="item in clusterOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </div>
-            <h4>Permissions</h4>
+            <h4>{{ $t('tenant.permissions') }}</h4>
             <hr class="split-line">
             <div class="component-item">
               <div class="section-title">
-                <span>Admin Roles</span>
+                <span>{{ $t('tenant.adminRolesLabel') }}</span>
                 <el-tooltip :content="adminRolesContent" class="item" effect="dark" placement="top">
                   <i class="el-icon-info"/>
                 </el-tooltip>
@@ -105,12 +105,12 @@
                   size="small"
                   class="input-new-tag"
                   @keyup.enter.native="handleInputConfirm"/>
-                <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Role</el-button>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput">{{ $t('tenant.newRole') }}</el-button>
               </div>
             </div>
-            <h4 style="color:#E57470">Danger Zone</h4>
+            <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
             <hr class="danger-line">
-            <el-button type="danger" class="button" @click="handleDeleteTenant">Delete Tenant</el-button>
+            <el-button type="danger" class="button" @click="handleDeleteTenant">{{ $t('tenant.deleteTenant') }}</el-button>
           </el-col>
         </el-row>
       </el-tab-pane>
@@ -118,13 +118,13 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="temp" :model="temp" :rules="rules" label-position="top">
         <el-form-item v-if="dialogStatus==='createNamespace'" :label="$t('table.namespace')" prop="namespace">
-          <el-input v-model="temp.namespace" placeholder="Please input namespace"/>
+          <el-input v-model="temp.namespace" :placeholder="$t('namespace.inputNamespaceMessage')"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='deleteNamespace'">
-          <h4>Are you sure you want to delete this namespace {{ temp.tenant }}/{{ temp.namespace }}?</h4>
+          <h4>{{ $t('namespace.deleteNamespaceMessage') }}</h4>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='deleteTenant'">
-          <h4>Are you sure you want to delete this tenant?</h4>
+          <h4>{{ $t('tenant.deleteTenantMessage') }}</h4>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
@@ -158,8 +158,8 @@ export default {
       inputVisible: false,
       inputValue: '',
       adminRoles: '',
-      allowedClustersContent: 'This is Allowed Clusters',
-      adminRolesContent: 'This is Admin Roles',
+      allowedClustersContent: this.$i18n.t('tenant.allowedClustersContent'),
+      adminRolesContent: this.$i18n.t('tenant.adminRolesContent'),
       clusterValue: [],
       clusterOptions: [],
       activeName: 'configuration',
@@ -187,9 +187,9 @@ export default {
       },
       currentTabName: '',
       textMap: {
-        createNamespace: 'New Namespace',
-        deleteNamespace: 'Delete Namespace',
-        deleteTenant: 'Delete Tenant'
+        createNamespace: this.$i18n.t('namespace.newNamespace'),
+        deleteNamespace: this.$i18n.t('namespace.deleteNamespace'),
+        deleteTenant: this.$i18n.t('tenant.deleteTenant')
       },
       tempNamespacesList: [],
       searchNamespace: '',

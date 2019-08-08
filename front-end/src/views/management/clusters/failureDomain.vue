@@ -35,7 +35,7 @@
       <el-form label-position="top">
         <div v-if="dialogStatus==='delete'">
           <el-form-item>
-            <h4>Are you sure you want to delete this domain?</h4>
+            <h4>{{ deleteFdMessage }}</h4>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="deleteDomain()">{{ $t('table.confirm') }}</el-button>
@@ -71,16 +71,17 @@ export default {
     return {
       postForm: Object.assign({}, defaultForm),
       clustersListOptions: [],
-      brokersContent: 'This is BrokersContent',
+      brokersContent: this.$i18n.t('broker.brokerContent'),
       brokerValue: [],
       brokerOptions: [],
       failureDomainListOptions: [],
       firstInit: false,
       textMap: {
-        delete: 'Delete Failure Domain'
+        delete: this.$i18n.t('fd.deleteFd')
       },
       dialogStatus: '',
-      dialogFormVisible: false
+      dialogFormVisible: false,
+      deleteFdMessage: this.$i18n.t('fd.deleteFdMessage')
     }
   },
   created() {

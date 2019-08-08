@@ -16,21 +16,21 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column :label="$t('table.cluster')" min-width="150px" align="center">
+          <el-table-column :label="$t('cluster.name')" min-width="150px" align="center">
             <template slot-scope="scope">
               <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'" class="link-type">
                 <span>{{ scope.row.cluster }}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column label="Brokers" min-width="150px" align="center">
+          <el-table-column :label="$t('broker.brokerNumber')" min-width="150px" align="center">
             <template slot-scope="scope">
               <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=brokers'" class="link-type">
                 <span>{{ scope.row.brokers }}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column label="Service Urls" min-width="150px" align="center">
+          <el-table-column :label="$t('cluster.serviceUrl')" min-width="150px" align="center">
             <template slot-scope="scope">
               <span>
                 data: {{ scope.row.brokerServiceUrl }}
@@ -80,7 +80,7 @@
         </div>
         <div v-if="dialogStatus==='delete'">
           <el-form-item>
-            <h4>Are you sure you want to delete this cluster?</h4>
+            <h4>{{ deleteClusterMessage }}</h4>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="deleteCluster()">{{ $t('table.confirm') }}</el-button>
@@ -155,8 +155,8 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        delete: 'Delete Cluster',
-        create: 'Add a new cluster'
+        delete: this.$i18n.t('cluster.deleteCluster'),
+        create: this.$i18n.t('cluster.addCluster')
       },
       dialogPvVisible: false,
       rules: {
@@ -164,7 +164,8 @@ export default {
         serviceUrl: [{ required: true, message: 'serviceUrl is required', trigger: 'change' }],
         domainName: [{ required: true, message: 'domainName is required', trigger: 'change' }],
         domainNames: [{ required: true, message: 'domainNames is required', trigger: 'change' }]
-      }
+      },
+      deleteClusterMessage: this.$i18n.t('cluster.deleteClusterMessage')
     }
   },
   created() {
