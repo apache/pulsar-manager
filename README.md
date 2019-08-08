@@ -18,6 +18,7 @@ Back end is based on [spring boot](https://github.com/spring-projects/spring-boo
 * Node 10.15.3 or later
 * Npm 6.4.1 or later
 * Pulsar 2.4.0 or later
+* Docker
 
 ### Preparations
 
@@ -27,6 +28,8 @@ Back end is based on [spring boot](https://github.com/spring-projects/spring-boo
 docker pull apachepulsar/pulsar:2.4.0
 docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pulsar-manager-standalone apachepulsar/pulsar:2.4.0 bin/pulsar standalone
 ```
+
+### Build Environment with Docker
 
 #### Download source code
 
@@ -49,7 +52,16 @@ npm install --save
 npm run dev
 ```
 
-#### Open your browser and use the account and the password to access the following address.
+### Build Environment with local
+
+```
+docker pull streamnative/pulsar-manager
+docker run -it  -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port streamnative/pulsar-manager
+```
+* REDIRECT_HOST: This parameter represents the ip address of the front-end server.
+* REDIRECT_PORT: This parameter represents the ip port of the front-end server.
+
+### Open your browser and use the account and the password to access the following address.
 username: pulsar
 password: pulsar
 http://localhost:9527/
