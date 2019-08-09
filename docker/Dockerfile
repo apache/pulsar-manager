@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-FROM openjdk:8
+FROM openjdk:8-jre-alpine
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -31,17 +31,17 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.version=$VERSION \
       org.label-schema.schema-version="1.0"
 
-RUN apt update
+RUN apk update
 
-RUN apt install -y nginx python-pip
+RUN apk add nginx \
+  && apk add supervisor \
+  && apk add sqlite \
+  && rm  -rf /tmp/* \
+  && rm /var/cache/apk/*
 
-RUN pip install supervisor
+RUN mkdir -p /run/nginx
 
 WORKDIR /pulsar-manager
-
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-
-RUN apt-get install -y nodejs
 
 COPY build/libs/*.jar pulsar-manager.jar
 

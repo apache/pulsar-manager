@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo 'Starting Pulsar Manager Front end'
 nginx
