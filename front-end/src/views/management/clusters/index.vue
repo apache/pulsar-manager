@@ -160,8 +160,8 @@ export default {
       },
       dialogPvVisible: false,
       rules: {
-        cluster: [{ required: true, message: 'cluster name is required', trigger: 'change' }],
-        serviceUrl: [{ required: true, message: 'serviceUrl is required', trigger: 'change' }],
+        cluster: [{ required: true, message: this.$i18n.t('cluster.clusterNameIsRequired'), trigger: 'change' }],
+        serviceUrl: [{ required: true, message: this.$i18n.t('cluster.serviceUrlIsRequired'), trigger: 'change' }],
         domainName: [{ required: true, message: 'domainName is required', trigger: 'change' }],
         domainNames: [{ required: true, message: 'domainNames is required', trigger: 'change' }]
       },
@@ -219,7 +219,7 @@ export default {
       fetchClusterConfig(this.temp.cluster).then(response => {
         this.jsonValue = {
           'serviceUrl': response.data.serviceUrl,
-          'serviceUrlTls': response.data.serverUrlTls,
+          'serviceUrlTls': response.data.serviceUrlTls,
           'brokerServiceUrl': response.data.brokerServiceUrl,
           'brokerServiceUrlTsl': response.data.brokerServiceUrlTls
         }
@@ -253,7 +253,7 @@ export default {
         this.getClusters()
         this.$notify({
           title: 'success',
-          message: 'create success',
+          message: this.$i18n.t('cluster.addClusterSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -296,7 +296,7 @@ export default {
       deleteCluster(this.temp.cluster).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete success',
+          message: this.$i18n.t('cluster.deleteClusterSuccessNotification'),
           type: 'success',
           duration: 2000
         })

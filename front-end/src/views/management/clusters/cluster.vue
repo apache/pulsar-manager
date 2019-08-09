@@ -287,7 +287,7 @@ export default {
         brokerValue: []
       },
       rules: {
-        domainName: [{ required: true, message: 'Please input Domain Name', trigger: 'change' }]
+        domainName: [{ required: true, message: this.$i18n.t('fd.domainNameIsRequired'), trigger: 'change' }]
       },
       failureDomainList: [],
       brokersList: [],
@@ -302,9 +302,9 @@ export default {
       bookiesList: [],
       textMap: {
         createFailureDomain: this.$i18n.t('fd.createFdTitle'),
-        deleteCluster: 'Delete Cluster',
-        deleteDomain: 'Delete Domain',
-        deletePolicy: 'Delete Policy'
+        deleteCluster: this.$i18n.t('cluster.deleteClusterDialogCaption'),
+        deleteDomain: this.$i18n.t('fd.deleteDomainDialogCaption'),
+        deletePolicy: this.$i18n.t('ip.deletePolicyDialogCaption')
       },
       tempIsolationPolicyList: [],
       tempFailureDomainList: [],
@@ -430,7 +430,7 @@ export default {
       updateCluster(this.postForm.cluster, data).then(() => {
         this.$notify({
           title: 'success',
-          message: 'Update cluster success',
+          message: this.$i18n.t('cluster.updateClusterSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -482,7 +482,7 @@ export default {
           createClusterDomainName(this.postForm.cluster, this.temp.domainName, data).then(response => {
             this.$notify({
               title: 'success',
-              message: 'Set Domain Name success',
+              message: this.$i18n.t('fd.createFdSuccessNotification'),
               type: 'success',
               duration: 3000
             })
@@ -505,7 +505,7 @@ export default {
       deleteCluster(this.postForm.cluster).then(response => {
         this.$notify({
           title: 'success',
-          message: 'delete success',
+          message: this.$i18n.t('cluster.deleteClusterSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -535,7 +535,7 @@ export default {
       deleteClusterDomainName(this.postForm.cluster, this.temp.domainName).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete falure domain success',
+          message: this.$i18n.t('fd.deleteFdSuccessNotification'),
           type: 'success',
           duration: 3000
         })
@@ -552,7 +552,7 @@ export default {
       deleteIsolationPolicies(this.postForm.cluster, this.temp.policyName).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete policy success',
+          message: this.$i18n.t('ip.deletePolicySuccessNotification'),
           type: 'success',
           duration: 3000
         })
