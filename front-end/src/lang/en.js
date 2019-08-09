@@ -481,13 +481,19 @@ export default {
     webServiceUrlTlsPrefix: 'Https Service Url',
     brokerServiceUrlPrefix: 'Broker Service Url',
     brokerServiceUrlTlsPrefix: 'Broker Service Url (TLS)',
-    deleteClusterMessage: 'Are you sure you want to delete this policy?',
-    replicatedCluster: 'Replicated Clusters'
+    deleteClusterMessage: 'Are you sure you want to delete this cluster?',
+    replicatedCluster: 'Replicated Clusters',
+    addClusterSuccessNotification: 'Successfully add a cluster',
+    deleteClusterSuccessNotification: 'Successfully delete a cluster',
+    clusterNameIsRequired: 'Cluster name is required',
+    serviceUrlIsRequired: 'Service URL is required',
+    deleteClusterDialogCaption: 'Delete Cluster',
+    updateClusterSuccessNotification: 'Successfully update a cluster'
   },
   broker: {
     label: 'Broker',
     name: 'Broker Name',
-    brokerNumber: 'Broker Number',
+    brokerNumber: 'Brokers',
     ownedNamespaceNumber: 'Owned Namespace Number',
     throughput: 'Throughput',
     bandwidth: 'Bandwidth',
@@ -512,7 +518,12 @@ export default {
     newFd: 'New FailureDomain',
     updateFd: 'Update Failure Domain',
     deleteFd: 'Delete Failure Domain',
-    deleteFdMessage: 'Are you sure you want to delete this domain?'
+    deleteFdMessage: 'Are you sure you want to delete this failure domain?',
+    domainNameIsRequired: 'Domain Name is required',
+    deleteDomainDialogCaption: 'Delete Failure Domain',
+    createFdSuccessNotification: 'Successfully create a failure domain',
+    deleteFdSuccessNotification: 'Successfully delete a failure domain',
+    updateFdSuccessNotification: 'Successfully update a failure domain'
   },
   // isolation policies
   ip: {
@@ -538,6 +549,40 @@ export default {
     brokerUsageThresholdPh: 'Please input broker usage threshold',
     minimalAvailableBrokerLabel: 'Minimal Available Brokers',
     minimalAvailableBrokerPh: 'Please input minimalAvailableBroker',
-    deletePolicyMessage: 'Are you sure you want to delete this policy?'
+    deletePolicyMessage: 'Are you sure you want to delete this policy?',
+    deletePolicyDialogCaption: 'Delete Isolation Policy',
+    deletePolicySuccessNotification: 'Successfully delete an isolation policy',
+    policyNameCannotBeEmpty: 'Policy name cannot be empty',
+    regexCannotBeEmpty: 'Namespace regex cannot be empty',
+    nsRegexAlreadyExists: 'Namespace regex already exists',
+    primaryBrokerRegexCannotBeEmpty: 'Primary broker regex cannot be empty',
+    primaryBrokerRegexAlreadyExists: 'Primary broker regex already exists',
+    secondaryBrokerRegexCannotBeEmpty: 'Secondary broker regex cannot be empty',
+    secondaryBrokerRegexAlreadyExists: 'Secondary broker regex already exists',
+    numLimitShouldGreaterThan0: 'Minimal available brokers should be greater than 0',
+    usageThresholdShouldGreaterThan0: 'Broker usage threshold should be greater than 0',
+    updatePolicySuccessNotification: 'Successfully update an ioslation policy'
+  },
+  // environment
+  env: {
+    buttonNewEnv: 'New Environment',
+    colHeadingEnv: 'Environment Name',
+    colHeadingServiceUrl: 'Service URL',
+    newEnvDialogCaption: 'New Environment',
+    newEnvNamePlaceHolder: 'Please input environment name',
+    newEnvNameLabel: 'Environment Name',
+    newEnvServiceUrlPlaceHolder: 'Please input environment service url',
+    newEnvServiceUrlLabel: 'Service URL',
+    updateEnvDialogCaption: 'Update Environment',
+    updateEnvNameLabel: 'Environment Name',
+    updateEnvServiceUrlPlaceHolder: 'Please input environment service url',
+    updateEnvServiceUrlLabel: 'Service URL',
+    deleteEnvDialogCaption: 'Delete Environment',
+    deleteEnvDialogText: 'Are you sure you want to delete this environment?',
+    envNameIsRequired: 'Environment Name is required',
+    serviceUrlIsRequired: 'Service URL is required',
+    addEnvSuccessNotification: 'Successfully add an environment',
+    deleteEnvSuccessNotification: 'Successfully delete an environment',
+    updateEnvSuccessNotification: 'Successfully update an environment'
   }
 }

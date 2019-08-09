@@ -139,7 +139,7 @@ export default {
       updateClusterDomainName(this.postForm.cluster, this.postForm.failureDomainName, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Update brokers success',
+          message: this.$i18n.t('fd.updateFdSuccessNotification'),
           type: 'success',
           duration: 3000
         })
@@ -156,7 +156,7 @@ export default {
       deleteClusterDomainName(this.postForm.cluster, this.postForm.failureDomainName).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete Domain success',
+          message: this.$i18n.t('fd.deleteFdSuccessNotification'),
           type: 'success',
           duration: 3000
         })

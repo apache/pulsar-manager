@@ -166,7 +166,7 @@
       <el-form label-position="top">
         <div v-if="dialogStatus==='delete'">
           <el-form-item>
-            <h4>Are you sure you want to delete policy?</h4>
+            <h4>{{ $t('ip.deletePolicyMessage') }}</h4>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="deletePolicy()">{{ $t('table.confirm') }}</el-button>
@@ -226,7 +226,7 @@ export default {
       created: false,
       policyName: '',
       textMap: {
-        delete: 'Delete Policy'
+        delete: this.$i18n.t('ip.deletePolicyDialogCaption')
       },
       dialogStatus: '',
       dialogFormVisible: false
@@ -276,7 +276,7 @@ export default {
         if (this.policyName.length <= 0) {
           this.$notify({
             title: 'error',
-            message: 'Policy Name cannot be empty',
+            message: this.$i18n.t('ip.policyNameCannotBeEmpty'),
             type: 'error',
             duration: 3000
           })
@@ -285,7 +285,7 @@ export default {
         if (this.namespaceDynamicTags.length <= 0) {
           this.$notify({
             title: 'error',
-            message: 'Namespace Regex cannot be empty',
+            message: this.$i18n.t('ip.regexCannotBeEmpty'),
             type: 'error',
             duration: 3000
           })
@@ -294,7 +294,7 @@ export default {
         if (this.primaryDynamicTags.length <= 0) {
           this.$notify({
             title: 'error',
-            message: 'Primary Broker Regex cannot be empty',
+            message: this.$i18n.t('ip.primaryBrokerRegexCannotBeEmpty'),
             type: 'error',
             duration: 3000
           })
@@ -303,7 +303,7 @@ export default {
         if (this.secondaryDynamicTags.length <= 0) {
           this.$notify({
             title: 'error',
-            message: 'Secondary Broker Regex cannot be empty',
+            message: this.$i18n.t('ip.secondaryBrokerRegexCannotBeEmpty'),
             type: 'error',
             duration: 3000
           })
@@ -312,7 +312,7 @@ export default {
         if (this.form.minimalAvailableBroker <= 0) {
           this.$notify({
             title: 'error',
-            message: 'min_limit should greater than 0',
+            message: this.$i18n.t('ip.numLimitShouldGreaterThan0'),
             type: 'error',
             duration: 3000
           })
@@ -321,7 +321,7 @@ export default {
         if (this.form.brokerUsageThreshold <= 0) {
           this.$notify({
             title: 'error',
-            message: 'usage_threshold should greater than 0',
+            message: this.$i18n.t('ip.usageThresholdShouldGreaterThan0'),
             type: 'error',
             duration: 3000
           })
@@ -344,7 +344,7 @@ export default {
       updateIsolationPolicies(this.postForm.cluster, policyName, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set policy success',
+          message: this.$i18n.t('ip.updatePolicySuccessNotification'),
           type: 'success',
           duration: 3000
         })
@@ -367,7 +367,7 @@ export default {
       if (this.primaryDynamicTags.indexOf(inputValue) >= 0) {
         this.$notify({
           title: 'error',
-          message: 'This regex exist',
+          message: this.$i18n.t('ip.primaryBrokerRegexAlreadyExists'),
           type: 'error',
           duration: 3000
         })
@@ -393,7 +393,7 @@ export default {
       if (this.namespaceDynamicTags.indexOf(inputValue) >= 0) {
         this.$notify({
           title: 'error',
-          message: 'This regex exist',
+          message: this.$i18n.t('ip.nsRegexAlreadyExists'),
           type: 'error',
           duration: 3000
         })
@@ -419,7 +419,7 @@ export default {
       if (this.secondaryDynamicTags.indexOf(inputValue) >= 0) {
         this.$notify({
           title: 'error',
-          message: 'This regex exist',
+          message: this.$i18n.t('ip.secondaryBrokerRegexAlreadyExists'),
           type: 'error',
           duration: 3000
         })
@@ -439,7 +439,7 @@ export default {
       deleteIsolationPolicies(this.postForm.cluster, this.postForm.policy).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete policy success',
+          message: this.$i18n.t('ip.deletePolicySuccessNotification'),
           type: 'success',
           duration: 3000
         })

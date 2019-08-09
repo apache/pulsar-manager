@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-button type="primary" icon="el-icon-plus" @click="handleCreateEnvironment">New Environment</el-button>
+    <el-button type="primary" icon="el-icon-plus" @click="handleCreateEnvironment">{{ $t('env.buttonNewEnv') }}</el-button>
 
     <el-row :gutter="24">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px">
@@ -12,14 +12,14 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column label="Environments" min-width="50px" align="center">
+          <el-table-column :label="$t('env.colHeadingEnv')" min-width="50px" align="center">
             <template slot-scope="scope">
               <router-link :to="'#'" class="link-type" @click.native="handleSetEnvironment(scope.row.environment)">
                 <span>{{ scope.row.environment }}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column label="broker" align="center" min-width="100px">
+          <el-table-column :label="$t('env.colHeadingServiceUrl')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.broker }}</span>
             </template>
@@ -36,20 +36,20 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="form" :rules="rules" :model="form" label-position="top">
-        <el-form-item v-if="dialogStatus==='create'" label="New Environment" prop="environment">
-          <el-input v-model="form.environment" placeholder="Please input name"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('env.newEnvNameLabel')" prop="environment">
+          <el-input v-model="form.environment" :placeholder="$t('env.newEnvNamePlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="New Broker" prop="broker">
-          <el-input v-model="form.broker" placeholder="Please input broker"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('env.newEnvServiceUrlLabel')" prop="broker">
+          <el-input v-model="form.broker" :placeholder="$t('env.newEnvServiceUrlPlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Environment">
-          <span>{{ form.environment }}</span>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('env.updateEnvNameLabel')">
+          <el-tag type="primary" size="medium">{{ form.environment }}</el-tag>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Broker" prop="broker">
-          <el-input v-model="form.broker" placeholder="Please input broker"/>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('env.updateEnvServiceUrlLabel')" prop="broker">
+          <el-input v-model="form.broker" :placeholder="$t('env.updateEnvServiceUrlPlaceHolder')"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='delete'">
-          <h4>Are you sure you want to delete this environment?</h4>
+          <h4>{{ $t('env.deleteEnvDialogText') }}</h4>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
@@ -72,9 +72,9 @@ export default {
       environmentTableKey: 0,
       environmentListLoading: false,
       textMap: {
-        create: 'New Environment',
-        delete: 'Delete Environment',
-        update: 'Update Environemnt'
+        create: this.$i18n.t('env.newEnvDialogCaption'),
+        delete: this.$i18n.t('env.deleteEnvDialogCaption'),
+        update: this.$i18n.t('env.updateEnvDialogCaption')
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -87,8 +87,8 @@ export default {
         'broker': ''
       },
       rules: {
-        environment: [{ required: true, message: 'Environment Name is required', trigger: 'blur' }],
-        broker: [{ required: true, message: 'Broker is required', trigger: 'blur' }]
+        environment: [{ required: true, message: this.$i18n.t('env.envNameIsRequired'), trigger: 'blur' }],
+        broker: [{ required: true, message: this.$i18n.t('env.serviceUrlIsRequired'), trigger: 'blur' }]
       }
     }
   },
@@ -161,7 +161,7 @@ export default {
         }
         this.$notify({
           title: 'success',
-          message: 'Add environment success',
+          message: this.$i18n.t('env.addEnvSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -187,7 +187,7 @@ export default {
         }
         this.$notify({
           title: 'success',
-          message: 'Delete environment success',
+          message: this.$i18n.t('env.deleteEnvSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -213,7 +213,7 @@ export default {
         }
         this.$notify({
           title: 'success',
-          message: 'Update environment success',
+          message: this.$i18n.t('env.updateEnvSuccessNotification'),
           type: 'success',
           duration: 2000
         })
