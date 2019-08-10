@@ -185,7 +185,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane v-if="nonPersistent===false" :label="$t('topic.subscription.storage')" name="storage">
+      <el-tab-pane v-if="nonPersistent===false" :label="$t('tabs.storage')" name="storage">
         <el-row :gutter="12">
           <el-col :span="8">
             <el-card>
@@ -287,8 +287,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane :label="$t('topic.policy.policies')" name="policies">
-        <span>{{ topicName }}</span>
+      <el-tab-pane :label="$t('tabs.policies')" name="policies">
         <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
@@ -427,13 +426,13 @@ export default {
       roleMapOptions: {},
       roleOptions: [{
         value: 'consume',
-        label: 'consume'
+        label: this.$i18n.t('role_actions.consume')
       }, {
         value: 'produce',
-        label: 'produce'
+        label: this.$i18n.t('role_actions.produce')
       }, {
         value: 'functions',
-        label: 'functions'
+        label: this.$i18n.t('role_actions.functions')
       }],
       authorizationContent: this.$i18n.t('topic.policy.authorizationContent'),
       topicName: '',
@@ -677,7 +676,7 @@ export default {
       unload(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Unload topic success',
+          message: this.$i18n.t('topic.notification.unloadTopicSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -687,7 +686,7 @@ export default {
       terminate(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Terminate topic success',
+          message: this.$i18n.t('topic.notification.terminateTopicSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -708,7 +707,7 @@ export default {
       if (inputValue) {
         if (this.roleMap.hasOwnProperty(inputValue)) {
           this.$message({
-            message: 'This role is exist',
+            message: this.$i18n.t('role.roleAlreadyExists'),
             type: 'error'
           })
           this.inputVisible = false
@@ -744,7 +743,7 @@ export default {
       compact(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Start topic compaction requested',
+          message: this.$i18n.t('topic.notification.startCompactionSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -755,7 +754,7 @@ export default {
       offload(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Start topic offload requested',
+          message: this.$i18n.t('topic.notification.startOffloadSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -770,7 +769,7 @@ export default {
       deleteTopic(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete topic success',
+          message: this.$i18n.t('topic.notification.deleteTopicSuccess'),
           type: 'success',
           duration: 3000
         })

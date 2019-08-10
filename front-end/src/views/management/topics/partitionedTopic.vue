@@ -88,9 +88,6 @@
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="POLICIES" name="policies">
-        <h4>{{ $t('topic.partitionedTopicName') }}</h4>
-        <hr class="split-line">
-        <span>{{ partitionedTopicName }}</span>
         <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
@@ -322,7 +319,7 @@ export default {
       if (inputValue) {
         if (this.roleMap.hasOwnProperty(inputValue)) {
           this.$message({
-            message: 'This role is exist',
+            message: this.$i18n.t('role.roleAlreadyExists'),
             type: 'error'
           })
           this.inputVisible = false
@@ -355,7 +352,7 @@ export default {
       deletePartitionTopic(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete partitioned topic success',
+          message: this.$i18n.t('topic.notification.deletePartitionedTopicSuccess'),
           type: 'success',
           duration: 3000
         })

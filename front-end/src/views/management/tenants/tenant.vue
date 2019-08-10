@@ -13,7 +13,7 @@
       <el-tab-pane :label="$t('tabs.namespace')" name="namespaces">
         <div class="filter-container">
           <el-input
-            :placeholder="$t('table.namespace')"
+            :placeholder="$t('namespace.searchNamespaces')"
             v-model="searchNamespace"
             style="width: 200px;"
             @keyup.enter.native="handleFilterNamespace"/>
@@ -183,7 +183,7 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       rules: {
-        namespace: [{ required: true, message: 'namespace is required', trigger: 'blur' }]
+        namespace: [{ required: true, message: this.$i18n.t('namespace.namespaceNameIsRequired'), trigger: 'blur' }]
       },
       currentTabName: '',
       textMap: {
@@ -215,7 +215,7 @@ export default {
       updateTenant(this.postForm.tenant, data).then(() => {
         this.$notify({
           title: 'success',
-          message: 'Update role success',
+          message: this.$i18n.t('tenant.updateRolesSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -241,7 +241,7 @@ export default {
         if (this.dynamicRoles.indexOf(this.inputValue) >= 0) {
           this.$notify({
             title: 'error',
-            message: 'Role is exists',
+            message: this.$i18n.t('tenant.roleAlreadyExists'),
             type: 'error',
             duration: 2000
           })
@@ -257,7 +257,7 @@ export default {
       updateTenant(this.postForm.tenant, data).then(() => {
         this.$notify({
           title: 'success',
-          message: 'Update role success',
+          message: this.$i18n.t('tenant.updateRolesSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -286,7 +286,7 @@ export default {
       updateTenant(this.postForm.tenant, data).then(() => {
         this.$notify({
           title: 'success',
-          message: 'Update cluster success',
+          message: this.$i18n.t('tenant.updateClustersSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -300,7 +300,7 @@ export default {
       deleteTenant(this.postForm.tenant).then((response) => {
         this.$notify({
           title: 'success',
-          message: 'delete success',
+          message: this.$i18n.t('tenant.deleteTenantSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -358,7 +358,7 @@ export default {
         this.dialogFormVisible = false
         this.$notify({
           title: 'success',
-          message: 'create success',
+          message: this.$i18n.t('namespace.createNsSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -392,7 +392,7 @@ export default {
       deleteNamespace(tenantNamespace).then((response) => {
         this.$notify({
           title: 'success',
-          message: 'delete success',
+          message: this.$i18n.t('namespace.deleteNsSuccessNotification'),
           type: 'success',
           duration: 2000
         })
