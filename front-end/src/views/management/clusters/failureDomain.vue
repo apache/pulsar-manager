@@ -20,14 +20,18 @@
         <i class="el-icon-info"/>
       </el-tooltip>
     </h4>
-    <el-select
-      v-model="brokerValue"
-      :placeholder="$t('fd.selectBrokers')"
-      style="width:500px;margin-top:20px"
-      multiple>
-      <el-option v-for="item in brokerOptions" :key="item.value" :label="item.label" :value="item.value" />
-    </el-select>
-    <el-button type="primary" class="button" @click="handleSelectBrokers()">{{ $t('fd.updateFd') }}</el-button>
+    <el-form>
+      <el-form-item>
+        <el-select
+          v-model="brokerValue"
+          :placeholder="$t('fd.selectBrokers')"
+          style="width:500px;margin-top:20px"
+          multiple>
+          <el-option v-for="item in brokerOptions" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
+      <el-button type="primary" class="button" @click="handleSelectBrokers()">{{ $t('fd.updateFd') }}</el-button>
+    </el-form>
     <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
     <hr class="danger-line">
     <el-button type="danger" class="button" @click="handleDelete">{{ $t('fd.deleteFd') }}</el-button>

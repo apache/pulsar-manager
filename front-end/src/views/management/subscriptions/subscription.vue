@@ -22,7 +22,7 @@
             <el-option v-for="(item,index) in partitionsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('topic.subscription.Subscription')">
+        <el-form-item :label="$t('topic.subscription.label')">
           <el-select v-model="postForm.subscription" placeholder="select subscription" style="width: 150px;" @change="getSubscriptionsInfo()">
             <el-option v-for="(item,index) in subscriptionsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
