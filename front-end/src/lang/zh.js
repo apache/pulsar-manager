@@ -94,6 +94,13 @@ export default {
     thirdparty: '第三方登录',
     thirdpartyTips: '本地不能模拟，请结合自己业务进行模拟！！！'
   },
+  sidebar: {
+    clusters: 'Clusters',
+    clusterInfo: 'Cluster Details',
+    tenants: 'Tenants',
+    namespaces: 'Namespaces',
+    topics: 'Topics'
+  },
   documentation: {
     documentation: '文档',
     github: 'Github 地址'
@@ -207,17 +214,64 @@ export default {
     closeOthers: '关闭其它',
     closeAll: '关闭所有'
   },
+  breadcrumb: {
+    management: 'Management',
+    clusters: 'Clusters',
+    clusterInfo: 'Cluster Details',
+    brokers: 'Brokers',
+    brokerInfo: 'Broker Details',
+    isolationPolicies: 'Isolation Policies',
+    isolationPolicyInfo: 'Isolation Policy Details',
+    failureDomains: 'Failure Domains',
+    failureDomainInfo: 'Faillure Domain Details',
+    tenants: 'Tenants',
+    tenantInfo: 'Tenant Details',
+    namespaces: 'Namespaces',
+    namespaceInfo: 'Namespace Details',
+    topics: 'Topics',
+    topicInfo: 'Topic Details',
+    subscriptions: 'Subscriptions',
+    subscriptionInfo: 'Subscription Details'
+  },
   tabs: {
     config: 'CONFIG',
     broker: 'BROKER',
     bookie: 'BOOKIE',
     namespace: 'NAMESPACE',
     overview: 'OVERVIEW',
-    topic: 'TOPIC',
+    topic: 'TOPICS',
     policies: 'POLICIES',
     configuration: 'CONFIGURATION',
     failuredomains: 'FAILURE DOMAINS',
-    isolationpolicies: 'ISOLATION POLICIES'
+    isolationpolicies: 'ISOLATION POLICIES',
+    storage: 'STORAGE'
+  },
+  role: {
+    roleAlreadyExists: 'Role already exists'
+  },
+  role_actions: {
+    consume: 'consume',
+    produce: 'produce',
+    functions: 'functions'
+  },
+  subscription_auth_mode: {
+    none: 'None',
+    prefix: 'Prefix'
+  },
+  backlog_policy: {
+    consumer_backlog_eviction: 'consumer_backlog_eviction',
+    producer_exception: 'producer_exception',
+    producer_request_hold: 'producer_request_hold'
+  },
+  schema_bc: {
+    full: 'Full',
+    forward: 'Forward',
+    backward: 'Backward',
+    always: 'Always Compatible',
+    auto_update_disabled: 'AutoUpdate Disabled',
+    backward_transitive: 'Backward Transitive',
+    forward_transitive: 'Forward Transitive',
+    full_transitive: 'Full Transitive'
   },
   common: {
     dangerZone: 'Danger Zone',
@@ -248,7 +302,14 @@ export default {
     allowedClustersContent: 'This is Allowed Clusters Content',
     adminRolesContent: 'This is Admin Roles Content',
     permissions: 'Permissions',
-    newRole: '+ New Role'
+    newRole: '+ New Role',
+    tenantIsRequired: 'Tenant Name is required',
+    clusterIsRequired: 'Please select allowed clusters for a tenant',
+    createTenantSuccessNotification: 'Successfully create a tenant',
+    deleteTenantSuccessNotification: 'Successfully delete a tenant',
+    roleAlreadyExists: 'Role already exists',
+    updateRolesSuccessNotification: 'Successfully update roles for this tenant',
+    updateClustersSuccessNotification: 'Successfully update allowed clusters for this tenant'
   },
   namespace: {
     label: 'Namespace',
@@ -260,6 +321,10 @@ export default {
     newTopic: 'New Topic',
     searchTopics: 'Search Topics',
     deleteNamespaceMessage: 'Are you sure you want to delete this namespace?',
+    namespaceNameIsRequired: 'Namespace name is required',
+    createNsSuccessNotification: 'Successfully create a namespace',
+    deleteNsSuccessNotification: 'Successfully delete the namespace',
+    searchNamespaces: 'Search namespaces',
     policy: {
       label: 'Policy',
       name: 'Policy Name',
@@ -357,7 +422,8 @@ export default {
       antiAffinity: 'Anti Affinity',
       antiAffinityGroup: 'Anti Affinity Group',
       antiAffinityGroupContent: 'This is antiAffinityGroupContent',
-      inputAntiAffinityGroup: 'Please input Anti Affinity Group'
+      inputAntiAffinityGroup: 'Please input Anti Affinity Group',
+      roleAlreadyExists: 'This role already exists'
     },
     clearBacklog: 'Clear Backlog',
     bundle: {
@@ -367,12 +433,45 @@ export default {
       split: 'Split',
       unload: 'Unload',
       bundleInfoContent: 'This is Bundle Info'
+    },
+    notification: {
+      updatePersistenceSuccess: 'Successfully update persistence settings for this namespace!',
+      updateBacklogQuotaSuccess: 'Successfully update backlog quota settings for this namespace!',
+      splitBundleSuccess: 'Successfully split a namespace bundle for this namespace!',
+      unloadAllBundlesSuccess: 'Successfully unload all the namespace bundles for this namespace!',
+      unloadBundleSuccess: 'Successfully unload a namespace bundle for this namespace!',
+      clearBacklogSuccess: 'Successfully clear backlog for this namespace!',
+      clearBundleBacklogSuccess: 'Successfully clear backlog of a namespace bundle for this namespace!',
+      updateReplicatedClustersSuccess: 'Successfully update replicated clusters for this namespace!',
+      updateSubscriptionAuthModeSuccess: 'Successfully update subscription authentication mode for this namespace!',
+      addRoleSuccess: 'Successfully add a role for this namespace!',
+      removeRoleSuccess: 'Successfully remove a role from this namespace!',
+      updateSchemaAutoUpdateStrategySuccess: 'Successfully change schema auto-update strategy for this namespace!',
+      enableSchemaValidationEnforcedSuccess: 'Successfully enable schema validation for this namespace!',
+      disableSchemaValidationEnforcedSuccess: 'Successfully disable schema validation for this namespace!',
+      updateMessageTTLSuccess: 'Successfully set message TTL for this namespace!',
+      updateRetentionSuccess: 'Successfully set message retention policy for this namespace!',
+      updateCompactionThresholdSuccess: 'Successfully set compaction threshold for this namespace!',
+      updateOffloadThresholdSuccess: 'Successfully set offload threshold for this namespace!',
+      updateOffloadDeletionLagSuccess: 'Successfully update offload deletion lag for this namespace!',
+      setMaxProducersSuccess: 'Successfully set max producers per topic for this namespace!',
+      setMaxConsumersSuccess: 'Successfully set max consumers per topic for this namespace!',
+      setMaxConsumersPerSubscriptionSuccess: 'Successfully set max consumers per subscription for this namespace!',
+      setDispatchRateSuccess: 'Successfully set max dispatch rate per topic for this namespace!',
+      setDispatchRatePerSubscriptionSuccess: 'Successfully set max dispatch rate per subscription for this namespace!',
+      setSubscribeRateSuccess: 'Successfully set max subscribe rate per topic for this namespace!',
+      setAntiAffinityGroupSuccess: 'Successfully set anti-affinity group for this namespace!',
+      enableEncryptionSuccess: 'Successfully enable message encryption for this namespace!',
+      disableEncryptionSuccess: 'Successfully disable message encryption for this namespace!',
+      enableDeduplicationSuccess: 'Successfully enable message de-duplication for this namespace!',
+      disableDeduplicationSuccess: 'Successfully disable message de-duplication for this namespace!'
     }
   },
   topic: {
     label: 'Topic',
     name: 'Topic Name',
-    topicNumber: 'Topic Number',
+    topicName: 'Topic Name',
+    topicNumber: 'Topics',
     newTopic: 'New Topic',
     deleteTopic: 'Delete Topic',
     delete: 'Delete',
@@ -452,6 +551,15 @@ export default {
       address: 'Address',
       since: 'Since'
     },
+    notification: {
+      createTopicSuccess: 'Successfully create a topic!',
+      deleteTopicSuccess: 'Successfully delete the topic!',
+      deletePartitionedTopicSuccess: 'Successfully delete the partitioned topic!',
+      unloadTopicSuccess: 'Successfully unload the topic!',
+      terminateTopicSuccess: 'Successfully terminate the topic!',
+      startCompactionSuccess: 'Successfully start compacting the topic!',
+      startOffloadSuccess: 'Successfully start offloading the topic!'
+    },
     info: 'INFO',
     column: 'column',
     data: 'data',
@@ -482,7 +590,13 @@ export default {
     brokerServiceUrlPrefix: 'Broker Service Url',
     brokerServiceUrlTlsPrefix: 'Broker Service Url (TLS)',
     deleteClusterMessage: 'Are you sure you want to delete this policy?',
-    replicatedCluster: 'Replicated Clusters'
+    replicatedCluster: 'Replicated Clusters',
+    addClusterSuccessNotification: 'Successfully add a cluster',
+    deleteClusterSuccessNotification: 'Successfully delete a cluster',
+    clusterNameIsRequired: 'Cluster name is required',
+    serviceUrlIsRequired: 'Service URL is required',
+    deleteClusterDialogCaption: 'Delete Cluster',
+    updateClusterSuccessNotification: 'Successfully update a cluster'
   },
   broker: {
     label: 'Broker',
@@ -512,7 +626,12 @@ export default {
     newFd: 'New FailureDomain',
     updateFd: 'Update Failure Domain',
     deleteFd: 'Delete Failure Domain',
-    deleteFdMessage: 'Are you sure you want to delete this domain?'
+    deleteFdMessage: 'Are you sure you want to delete this domain?',
+    domainNameIsRequired: 'Domain Name is required',
+    deleteDomainDialogCaption: 'Delete Failure Domain',
+    createFdSuccessNotification: 'Successfully create a failure domain',
+    deleteFdSuccessNotification: 'Successfully delete a failure domain',
+    updateFdSuccessNotification: 'Successfully update a failure domain'
   },
   // isolation policies
   ip: {
@@ -538,6 +657,40 @@ export default {
     brokerUsageThresholdPh: 'Please input broker usage threshold',
     minimalAvailableBrokerLabel: 'Minimal Available Brokers',
     minimalAvailableBrokerPh: 'Please input minimalAvailableBroker',
-    deletePolicyMessage: 'Are you sure you want to delete this policy?'
+    deletePolicyMessage: 'Are you sure you want to delete this policy?',
+    deletePolicyDialogCaption: 'Delete Isolation Policy',
+    deletePolicySuccessNotification: 'Successfully delete an isolation policy',
+    policyNameCannotBeEmpty: 'Policy name cannot be empty',
+    regexCannotBeEmpty: 'Namespace regex cannot be empty',
+    nsRegexAlreadyExists: 'Namespace regex already exists',
+    primaryBrokerRegexCannotBeEmpty: 'Primary broker regex cannot be empty',
+    primaryBrokerRegexAlreadyExists: 'Primary broker regex already exists',
+    secondaryBrokerRegexCannotBeEmpty: 'Secondary broker regex cannot be empty',
+    secondaryBrokerRegexAlreadyExists: 'Secondary broker regex already exists',
+    numLimitShouldGreaterThan0: 'Minimal available brokers should be greater than 0',
+    usageThresholdShouldGreaterThan0: 'Broker usage threshold should be greater than 0',
+    updatePolicySuccessNotification: 'Successfully update an ioslation policy'
+  },
+  // environment
+  env: {
+    buttonNewEnv: 'New Environment',
+    colHeadingEnv: 'Environment Name',
+    colHeadingServiceUrl: 'Service URL',
+    newEnvDialogCaption: 'New Environment',
+    newEnvNamePlaceHolder: 'Please input environment name',
+    newEnvNameLabel: 'Environment Name',
+    newEnvServiceUrlPlaceHolder: 'Please input environment service url',
+    newEnvServiceUrlLabel: 'Service URL',
+    updateEnvDialogCaption: 'Update Environment',
+    updateEnvNameLabel: 'Environment Name',
+    updateEnvServiceUrlPlaceHolder: 'Please input environment service url',
+    updateEnvServiceUrlLabel: 'Service URL',
+    deleteEnvDialogCaption: 'Delete Environment',
+    deleteEnvDialogText: 'Are you sure you want to delete this environment?',
+    envNameIsRequired: 'Environment Name is required',
+    serviceUrlIsRequired: 'Service URL is required',
+    addEnvSuccessNotification: 'Successfully add an environment',
+    deleteEnvSuccessNotification: 'Successfully delete an environment',
+    updateEnvSuccessNotification: 'Successfully update an environment'
   }
 }
