@@ -13,13 +13,20 @@
  */
 package com.manager.pulsar.service;
 
+import java.util.function.Function;
+
 public interface BrokerStatsService {
 
     String forwarBrokerStatsMetrics(String broker, String requestHost);
 
     String forwardBrokerStatsTopics(String broker, String requestHost);
 
-    void convertStatsToDb(Integer pageNum, Integer pageSize, String requestHost);
+    default void convertStatsToDb(Integer pageNum, Integer pageSize, String requestHost) {
+        convertStatsToDb(pageNum, pageSize, requestHost, c -> requestHost);
+    }
+
+    void convertStatsToDb(Integer pageNum, Integer pageSize, String requestHost,
+                          Function<String, String> serviceUrlProvider);
 
     void clearStats(long nowTime, long timeInterval);
 }

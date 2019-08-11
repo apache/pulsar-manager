@@ -19,7 +19,9 @@ import com.manager.pulsar.entity.*;
 import com.manager.pulsar.service.BrokerStatsService;
 import com.manager.pulsar.service.BrokersService;
 import com.manager.pulsar.service.ClustersService;
+import com.manager.pulsar.service.EnvironmentCacheService;
 import com.manager.pulsar.utils.HttpUtil;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     @Autowired
     private ConsumersStatsRepository consumersStatsRepository;
 
+    @Autowired
+    private EnvironmentCacheService environmentCache;
+
     private static final Map<String, String> header = new HashMap<String, String>(){{
         put("Content-Type","application/json");
     }};
@@ -98,7 +103,8 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         Set<String> collectStatsBroker = new HashSet<>();
         for (String b : brokerList) {
             String broker = checkBroker(null, b);
-            Map<String, Object> clusterObject = clustersService.getClustersList(0, 0, broker);
+            Map<String, Object> clusterObject =
+                clustersService.getClustersList(0, 0, broker, (c) -> broker);
             List<HashMap<String, Object>> clusterLists = (List<HashMap<String, Object>>) clusterObject.get("data");
             clusterLists.forEach((clusterMap) -> {
                 String cluster = (String) clusterMap.get("cluster");
@@ -109,7 +115,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         }
         collectStatsBroker.forEach((broker) -> {
             log.info("Start collecting stats from broker: {}", broker);
-            convertStatsToDb(0, 0, checkBroker(null, broker));
+            convertStatsToDb(0, 0, checkBroker(null, broker), (c) -> broker);
         });
 
         log.info("Start clearing stats from broker");
@@ -117,8 +123,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         clearStats(unixTime, clearStatsInterval);
     }
 
-    public void convertStatsToDb(Integer pageNum, Integer pageSize, String requestHost) {
-        Map<String, Object> clusterObject = clustersService.getClustersList(pageNum, pageSize, requestHost);
+    @Override
+    public void convertStatsToDb(Integer pageNum, Integer pageSize, String requestHost, Function<String, String> serviceUrlProvider) {
+        Map<String, Object> clusterObject = clustersService.getClustersList(pageNum, pageSize, requestHost, serviceUrlProvider);
         List<HashMap<String, Object>> clusterLists = (List<HashMap<String, Object>>) clusterObject.get("data");
         clusterLists.forEach((clusterMap) -> {
             String cluster = (String) clusterMap.get("cluster");
