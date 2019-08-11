@@ -679,8 +679,7 @@ import {
   deleteNamespace,
   clearBundleBacklogOnCluster
 } from '@/api/namespaces'
-import { fetchBrokerStatsTopics } from '@/api/brokerStats'
-import { putTopic, fetchTopicsByPulsarManager } from '@/api/topics'
+import { putTopic, fetchTopicsStatsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 import { validateEmpty } from '@/utils/validate'
@@ -893,19 +892,26 @@ export default {
     this.initPersistence(this.tenantNamespace)
     this.initRetention(this.tenantNamespace)
     this.getStats()
+    this.getTopicsStats()
     this.activeBundleCluster = this.replicationClustersValue.length > 0 ? this.replicationClustersValue[0] : ''
   },
   methods: {
     getStats() {
       this.getTopics()
     },
-    getTopics() {
-      fetchTopicsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
+    getTopicsStats() {
+      fetchTopicsStatsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
+        console.log(response)
+      })
+    },
+    getTopics() {
+      fetchTopicsStatsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
+        if (!response.data) return
+        console.log(response)
         for (var i in response.data.topics) {
-          this.topics[response.data.topics[i]['topic']] = i
           var topicLink = ''
-          if (response.data.topics[i]['partitions'] === '0') {
+          if (response.data.topics[i]['partitions'] === 0) {
             topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/topic'
           } else {
             topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/partitionedTopic'
@@ -914,73 +920,19 @@ export default {
             'topic': response.data.topics[i]['topic'],
             'partitions': response.data.topics[i]['partitions'],
             'persistent': response.data.topics[i]['persistent'],
-            'producers': 0,
-            'subscriptions': 0,
-            'inMsg': 0,
-            'outMsg': 0,
-            'inBytes': 0,
-            'outBytes': 0,
-            'storageSize': 0,
+            'producers': response.data.topics[i]['producers'],
+            'subscriptions': response.data.topics[i]['subscriptions'],
+            'inMsg': response.data.topics[i]['inMsg'],
+            'outMsg': response.data.topics[i]['outMsg'],
+            'inBytes': response.data.topics[i]['inBytes'],
+            'outBytes': response.data.topics[i]['outBytes'],
+            'storageSize': response.data.topics[i]['storageSize'],
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink
           }
+          this.topicsListLoading = false
           this.topicsList.push(topicInfo)
-          this.tempTopicsList.push(topicInfo)
         }
-        fetchBrokerStatsTopics('').then(res => {
-          if (!res.data) return
-          this.brokerStats = res.data
-          if (this.brokerStats.hasOwnProperty(this.tenantNamespace)) {
-            for (var bundle in this.brokerStats[this.tenantNamespace]) {
-              for (var p in this.brokerStats[this.tenantNamespace][bundle]) {
-                for (var topic in this.brokerStats[this.tenantNamespace][bundle][p]) {
-                  this.namespaceStats[0].inMsg += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateIn
-                  this.namespaceStats[0].outMsg += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateOut
-                  this.namespaceStats[0].inBytes += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputIn
-                  this.namespaceStats[0].outBytes += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputOut
-                  var topicName = topic.split('://')[1].split('/')[2]
-                  var isPartition = false
-                  if (topicName.indexOf('-partition-') > 0) {
-                    topicName = topicName.split('-partition-')[0]
-                    isPartition = true
-                  }
-                  if (this.topics.hasOwnProperty(topicName)) {
-                    if (isPartition) {
-                      this.topicsList[this.topics[topicName]]['producers'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].producerCount
-                      for (var psub in this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions) {
-                        this.topicsList[this.topics[topicName]]['subscriptions'] += Object.keys(this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions[psub].consumers).length
-                      }
-                      this.topicsList[this.topics[topicName]]['inMsg'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateIn
-                      this.topicsList[this.topics[topicName]]['outMsg'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateOut
-                      this.topicsList[this.topics[topicName]]['inBytes'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputIn
-                      this.topicsList[this.topics[topicName]]['outBytes'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputOut
-                      if (p === 'non-persistent') {
-                        this.topicsList[this.topics[topicName]]['storageSize'] = 0
-                      } else {
-                        this.topicsList[this.topics[topicName]]['storageSize'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].storageSize
-                      }
-                    } else {
-                      this.topicsList[this.topics[topicName]]['producers'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].producerCount
-                      for (var sub in this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions) {
-                        this.topicsList[this.topics[topicName]]['subscriptions'] = Object.keys(this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions[sub].consumers).length
-                      }
-                      this.topicsList[this.topics[topicName]]['inMsg'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateIn
-                      this.topicsList[this.topics[topicName]]['outMsg'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateOut
-                      this.topicsList[this.topics[topicName]]['inBytes'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputIn
-                      this.topicsList[this.topics[topicName]]['outBytes'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputOut
-                      if (p === 'non-persistent') {
-                        this.topicsList[this.topics[topicName]]['storageSize'] = 0
-                      } else {
-                        this.topicsList[this.topics[topicName]]['storageSize'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].storageSize
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        })
-        this.topicsListLoading = false
       })
     },
     handleFilterTopic() {

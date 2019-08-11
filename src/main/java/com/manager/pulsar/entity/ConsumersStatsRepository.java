@@ -16,24 +16,19 @@ package com.manager.pulsar.entity;
 import com.github.pagehelper.Page;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
 @Repository
-public interface EnvironmentsRepository {
+public interface ConsumersStatsRepository {
 
-    void save(EnvironmentEntity environmentEntity);
+    long save(ConsumerStatsEntity consumerStatsEntity);
 
-    Optional<EnvironmentEntity> findByBroker(String broker);
+    Page<ConsumerStatsEntity> findByTopicStatsId(Integer pageNum, Integer pageSize,
+                                                 long topicStatsId, long timestamp);
 
-    Optional<EnvironmentEntity> findByName(String name);
+    Page<ConsumerStatsEntity> findBySubscriptionStatsId(Integer pageNum, Integer pageSize,
+                                                        long subscriptionStatsId, long timestamp);
 
-    Page<EnvironmentEntity> getEnvironmentsList(Integer pageNum, Integer pageSize);
+    Page<ConsumerStatsEntity> findByReplicationStatsId(Integer pageNum, Integer pageSize,
+                                                       long replicationStatsId, long timestamp);
 
-    List<EnvironmentEntity> getAllEnvironments();
-
-    void remove(String name);
-
-    void update(EnvironmentEntity environmentEntity);
-
+    void remove(long timestamp, long timeInterval);
 }

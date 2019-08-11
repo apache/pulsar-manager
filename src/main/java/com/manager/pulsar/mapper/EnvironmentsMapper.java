@@ -17,6 +17,7 @@ import com.github.pagehelper.Page;
 import com.manager.pulsar.entity.EnvironmentEntity;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -33,6 +34,9 @@ public interface EnvironmentsMapper {
 
     @Select("SELECT name,broker FROM environments")
     Page<EnvironmentEntity> findEnvironmentsList();
+
+    @Select("SELECT name,broker FROM environments")
+    List<EnvironmentEntity> getAllEnvironments();
 
     @Update("UPDATE environments set broker=#{broker} where name=#{name}")
     void update(EnvironmentEntity environmentEntity);

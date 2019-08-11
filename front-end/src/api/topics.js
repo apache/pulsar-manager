@@ -35,6 +35,14 @@ export function fetchTopicsByPulsarManager(tenant, namespace, query) {
   })
 }
 
+export function fetchTopicsStatsByPulsarManager(tenant, namespace, query) {
+  return request({
+    url: SPRING_BASE_URL_V2 + `/topics/${tenant}/${namespace}/stats`,
+    method: 'get',
+    params: { query }
+  })
+}
+
 export function fetchPersistentPartitonsTopics(tenant, namespace) {
   return request({
     url: BASE_URL_V2 + `/persistent/${tenant}/${namespace}/partitioned`,

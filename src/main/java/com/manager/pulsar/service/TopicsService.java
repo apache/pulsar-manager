@@ -13,10 +13,17 @@
  */
 package com.manager.pulsar.service;
 
+import java.util.List;
 import java.util.Map;
 
 public interface TopicsService {
 
     Map<String, Object> getTopicsList(
-            Integer pageNum, Integer pageSize, String namespace, String tenant, String requestHost);
+            Integer pageNum, Integer pageSize, String tenant, String namespace, String requestHost);
+
+    Map<String, Object> getTopicStats(
+            Integer pageNum, Integer pageSize, String tenant, String namespace, String requestHost);
+
+    List<Map<String, Object>> getTopicsStatsList(String broker, String tenant, String namespace,
+                                                 String persistent, List<Map<String, String>> topics);
 }

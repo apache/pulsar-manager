@@ -13,27 +13,27 @@
  */
 package com.manager.pulsar.entity;
 
-import com.github.pagehelper.Page;
-import org.springframework.stereotype.Repository;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-import java.util.Optional;
-
-@Repository
-public interface EnvironmentsRepository {
-
-    void save(EnvironmentEntity environmentEntity);
-
-    Optional<EnvironmentEntity> findByBroker(String broker);
-
-    Optional<EnvironmentEntity> findByName(String name);
-
-    Page<EnvironmentEntity> getEnvironmentsList(Integer pageNum, Integer pageSize);
-
-    List<EnvironmentEntity> getAllEnvironments();
-
-    void remove(String name);
-
-    void update(EnvironmentEntity environmentEntity);
-
+/**
+ * Publisher Stats entity.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+public class PublisherStatsEntity {
+    private long publisherStatsId;
+    private long producerId;
+    private long topicStatsId;
+    private String producerName;
+    private double msgRateIn;
+    private double msgThroughputIn;
+    private double averageMsgSize;
+    private String address;
+    private String connectedSince;
+    private String clientVersion;
+    private String metadata;
+    private long timestamp;
 }
