@@ -32,7 +32,6 @@ public class ConsumerStatsEntity {
     private double msgRateOut;
     private double msgThroughputOut;
     private double msgRateRedeliver;
-    private String consumerName;
     private int availablePermits;
     private int unackedMessages;
     private String address;

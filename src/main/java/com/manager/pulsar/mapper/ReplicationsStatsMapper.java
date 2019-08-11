@@ -20,23 +20,23 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface ReplicationsStatsMapper {
 
-    @Insert("INSERT INTO replicationStats(topicStatsId,cluster,connected,msgRateIn,msgRateOut,msgThroughputIn," +
+    @Insert("INSERT INTO replicationsStats(topicStatsId,cluster,connected,msgRateIn,msgRateOut,msgThroughputIn," +
             "msgThroughputOut,replicationBacklog,replicationDelayInSeconds,inboundConnection," +
-            "inboundConnectedSince,outboundConnection,outboundConnectedSince,timestamp) " +
+            "inboundConnectedSince,outboundConnection,outboundConnectedSince,timestamp,msgRateExpired) " +
             "VALUES(#{topicStatsId},#{cluster},#{connected},#{msgRateIn},#{msgRateOut},#{msgThroughputIn}," +
             "#{msgThroughputOut},#{replicationBacklog},#{replicationDelayInSeconds}," +
             "#{inboundConnection},#{inboundConnectedSince},#{outboundConnection},#{outboundConnectedSince}," +
-            "#{timestamp})")
+            "#{timestamp},#{msgRateExpired})")
     @Options(useGeneratedKeys=true, keyProperty="replicationStatsId", keyColumn="replicationStatsId")
     void save(ReplicationStatsEntity replicationStatsEntity);
 
     @Select("SELECT replicationStatsId,topicStatsId,cluster,connected,msgRateIn,msgRateOut,msgThroughputIn,msgThroughputOut," +
             "replicationBacklog,replicationDelayInSeconds,inboundConnection,inboundConnectedSince," +
-            "outboundConnection,outboundConnectedSince,timestamp FROM replicationStats " +
+            "outboundConnection,outboundConnectedSince,timestamp,msgRateExpired FROM replicationsStats " +
             "where topicStatsId=#{topicStatsId} and timestamp=#{timestamp}")
     Page<ReplicationStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                     @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM replicationStats WHERE #{nowTime} - #{timeInterval} > timestamp")
+    @Delete("DELETE FROM replicationsStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
     void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
 }

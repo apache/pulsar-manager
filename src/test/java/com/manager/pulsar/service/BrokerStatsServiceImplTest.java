@@ -15,7 +15,9 @@ package com.manager.pulsar.service;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
+import com.manager.pulsar.PulsarManagerApplication;
 import com.manager.pulsar.entity.*;
+import com.manager.pulsar.profiles.SqliteDBTestProfile;
 import com.manager.pulsar.utils.HttpUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,6 +29,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
@@ -36,7 +39,13 @@ import java.util.Optional;
 @PowerMockRunnerDelegate(SpringRunner.class)
 @PowerMockIgnore( {"javax.management.*", "javax.net.ssl.*"})
 @PrepareForTest(HttpUtil.class)
-@SpringBootTest
+@SpringBootTest(
+        classes = {
+                PulsarManagerApplication.class,
+                SqliteDBTestProfile.class
+        }
+)
+@ActiveProfiles("test")
 public class BrokerStatsServiceImplTest {
 
     @Autowired
@@ -184,7 +193,6 @@ public class BrokerStatsServiceImplTest {
 
     private void checkConsumerStatsResult(ConsumerStatsEntity consumerStatsEntity) {
         Assert.assertEquals(consumerStatsEntity.getConsumer(), "543bd");
-        Assert.assertEquals(consumerStatsEntity.getConsumerName(), "543bd");
         Assert.assertEquals(consumerStatsEntity.getAddress(), "/127.0.0.1:59668");
         Assert.assertEquals(consumerStatsEntity.getConnectedSince(), "2019-08-10T11:37:24.306+08:00");
         Assert.assertEquals(consumerStatsEntity.getAvailablePermits(), 1000, 0);
@@ -223,8 +231,11 @@ public class BrokerStatsServiceImplTest {
         topicStatsEntityPage.getResult().forEach((t) -> {
             checkTopicStatsResult(t);
         });
+        System.out.println(topicStatsEntity1.getTopicStatsId());
+        System.out.println(topicStatsEntity1.getTimestamp());
         Page<SubscriptionStatsEntity> subscriptionStatsEntities = subscriptionsStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
+        System.out.println(subscriptionStatsEntities);
         subscriptionStatsEntities.getResult().forEach((subscription) -> {
             checkSubscriptionStatsResult(subscription);
             Page<ConsumerStatsEntity> consumerStatsEntities = consumersStatsRepository.findBySubscriptionStatsId(
@@ -253,7 +264,13 @@ public class BrokerStatsServiceImplTest {
         }
 
         Optional<TopicStatsEntity> deleteTopicStatsEntity = topicsStatsRepository.findMaxTime();
+        System.out.println(deleteTopicStatsEntity);
         Assert.assertFalse(deleteTopicStatsEntity.isPresent());
+        if (deleteTopicStatsEntity.isPresent()) {
+            TopicStatsEntity topicStatsEntity2 = deleteTopicStatsEntity.get();
+            System.out.println(topicStatsEntity2.getTenant());
+            System.out.println(topicStatsEntity2.getTimestamp());
+        }
         Page<SubscriptionStatsEntity> deleteSubscriptionStatsEntities = subscriptionsStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
         Assert.assertEquals(deleteSubscriptionStatsEntities.getTotal(), 0);

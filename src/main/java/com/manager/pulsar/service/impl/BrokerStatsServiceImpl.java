@@ -136,6 +136,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                         bundleStats.forEach((persistent, persistentStats) -> {
                             persistentStats.forEach((topic, topicStats) -> {
                                 long unixTime = System.currentTimeMillis() / 1000L;
+                                System.out.println("---------------------");
+                                System.out.println(topicStats.getReplication());
+                                System.out.println(topicStats.getPublishers());
                                 TopicStatsEntity topicStatsEntity = new TopicStatsEntity();
                                 String[] topicPath = this.parseTopic(topic);
                                 topicStatsEntity.setCluster(cluster);
@@ -163,6 +166,10 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                         subscriptionStatsEntity.setMsgRateOut(subscriptionStats.getMsgRateOut());
                                         subscriptionStatsEntity.setMsgThroughputOut(subscriptionStats.getMsgThroughputOut());
                                         subscriptionStatsEntity.setMsgRateRedeliver(subscriptionStats.getMsgRateRedeliver());
+                                        subscriptionStatsEntity.setNumberOfEntriesSinceFirstNotAckedMessage(
+                                                subscriptionStats.getNumberOfEntriesSinceFirstNotAckedMessage());
+                                        subscriptionStatsEntity.setTotalNonContiguousDeletedMessagesRange(
+                                                subscriptionStats.getTotalNonContiguousDeletedMessagesRange());
                                         subscriptionStatsEntity.setMsgBacklog(subscriptionStats.getMsgBacklog());
                                         subscriptionStatsEntity.setSubscriptionType(String.valueOf(subscriptionStats.getType()));
                                         subscriptionStatsEntity.setMsgRateExpired(subscriptionStats.getMsgRateExpired());
@@ -183,7 +190,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                                 consumerStatsEntity.setAddress(consumerStats.getAddress());
                                                 consumerStatsEntity.setConnectedSince(consumerStats.getConnectedSince());
                                                 consumerStatsEntity.setClientVersion(consumerStats.getClientVersion());
-                                                consumerStatsEntity.setMetadata(gson.toJson(consumerStats.getAddress()));
+                                                consumerStatsEntity.setMetadata(gson.toJson(consumerStats.getMetadata()));
                                                 consumerStatsEntity.setTimestamp(unixTime);
                                                 consumersStatsRepository.save(consumerStatsEntity);
                                             });
@@ -207,7 +214,10 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                         publishersStatsRepository.save(publisherStatsEntity);
                                     });
                                 }
+                                System.out.println("=====================");
                                 if (topicStats.getReplication() != null) {
+                                    System.out.println("=====================");
+                                    System.out.println(topicStats.getReplication());
                                     topicStats.getReplication().forEach((replication, replicatorStats) -> {
                                         ReplicationStatsEntity replicationStatsEntity = new ReplicationStatsEntity();
                                         replicationStatsEntity.setCluster(replication);

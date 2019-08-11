@@ -143,13 +143,14 @@ CREATE TABLE IF NOT EXISTS publishersStats (
   CONSTRAINT FK_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
 );
 
-CREATE TABLE IF NOT EXISTS replicationStats (
+CREATE TABLE IF NOT EXISTS replicationsStats (
   replicationStatsId INTEGER PRIMARY KEY AUTOINCREMENT,
   topicStatsId INTEGER NOT NULL,
   cluster varchar(255) NOT NULL,
   connected false,
   msgRateIn double,
   msgRateOut double,
+  msgRateExpired double,
   msgThroughputIn double,
   msgThroughputOut double,
   msgRateRedeliver double,

@@ -31,18 +31,18 @@ public interface TopicsStatsMapper {
     @Options(useGeneratedKeys=true, keyProperty="topicStatsId", keyColumn="topicStatsId")
     void insert(TopicStatsEntity topicStatsEntity);
 
-    @Select("SELECT cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
+    @Select("SELECT topicStatsId,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
             "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
-            "ORDER BY timestamp limit 1 ")
+            "ORDER BY timestamp DESC limit 1 ")
     TopicStatsEntity findMaxTime();
 
-    @Select("SELECT cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
+    @Select("SELECT topicStatsId,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
             "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
             "WHERE cluster=#{cluster} and broker=#{broker} and timestamp=#{timestamp}")
     Page<TopicStatsEntity> findByClusterBroker(
             @Param("cluster") String cluster, @Param("broker") String broker, @Param("timestamp") long timestamp);
 
-    @Select("SELECT cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
+    @Select("SELECT topicStatsId,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
             "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
             "WHERE cluster=#{cluster} and broker=#{broker} and tenant=#{tenant} and namespace=#{namespace} " +
             "and timestamp=#{timestamp}")
@@ -51,7 +51,7 @@ public interface TopicsStatsMapper {
                                            @Param("timestamp") long timestamp);
 
     @Select({"<script>",
-            "SELECT cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
+            "SELECT topicStatsId,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
             "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats",
             "WHERE broker=#{broker} and tenant=#{tenant} and namespace=#{namespace} and timestamp=#{timestamp} and " +
                     "topic IN <foreach collection='topicList' item='topic' open='(' separator=',' close=')'> #{topic} </foreach>" +
@@ -60,6 +60,6 @@ public interface TopicsStatsMapper {
                                             @Param("namespace") String namespace, @Param("persistent") String persistent,
                                             @Param("topicList") List<String> topicList, @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM topicsStats WHERE #{nowTime} - #{timeInterval} > timestamp")
+    @Delete("DELETE FROM topicsStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
     void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
 }
