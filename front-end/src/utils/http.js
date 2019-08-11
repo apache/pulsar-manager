@@ -11,27 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import request from '@/utils/request'
 
-const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
-
-export function fetchBrokerStatsTopics(broker) {
-  return request({
-    headers: {
-      'Content-Type': 'application/json',
-      'x-pulsar-broker': broker
-    },
-    url: `/admin/v2/broker-stats/topics`,
-    method: 'get'
-  })
-}
-
-export function fetchBrokerStatsMetrics(broker) {
-  return request({
-    headers: {
-      'x-pulsar-broker': broker
-    },
-    url: SPRING_BASE_URL_V2 + `/broker-stats/metrics?broker=` + broker,
-    method: 'get'
-  })
+export function isValidResponse(response) {
+  return response.status === 200 || response.status === 204
 }
