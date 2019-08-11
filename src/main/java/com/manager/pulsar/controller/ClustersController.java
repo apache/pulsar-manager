@@ -75,7 +75,15 @@ public class ClustersController {
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
                     Integer pageSize) {
         String requestHost = environmentCacheService.getServiceUrl(request);
-        Map<String, Object> result = clusterService.getClustersList(pageNum, pageSize, requestHost);
+        Map<String, Object> result = clusterService.getClustersList(
+            pageNum, pageSize, requestHost, cluster -> {
+                String environment = request.getHeader("environment");
+                if (null == environment) {
+                    return requestHost;
+                } else {
+                    return environmentCacheService.getServiceUrl(environment, cluster);
+                }
+            });
 
         return ResponseEntity.ok(result);
     }

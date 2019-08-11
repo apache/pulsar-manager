@@ -33,9 +33,9 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  * Handle http redirect and forward.
  */
 @Component
-public class EnvirmentForward extends ZuulFilter {
+public class EnvironmentForward extends ZuulFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(EnvirmentForward.class);
+    private static final Logger log = LoggerFactory.getLogger(EnvironmentForward.class);
 
     @Autowired
     private EnvironmentCacheService environmentCacheService;
@@ -67,22 +67,30 @@ public class EnvirmentForward extends ZuulFilter {
             String redirectHost = request.getParameter("redirect.host");
             String redirectPort = request.getParameter("redirect.port");
             String url = redirectScheme + "://" + redirectHost + ":" + redirectPort;
-            ctx.put(REQUEST_URI_KEY, request.getRequestURI());
-            try {
-                ctx.setRouteHost(new URL(url));
-            } catch(MalformedURLException mue) {
-                log.error("Route redirect to {} path {} error: {}", url, request.getRequestURI(), mue.getMessage());
-            }
-            return null;
+            return forwardRequest(ctx, request, url);
         }
+
+        String broker = request.getHeader("x-pulsar-broker");
+        if (null != broker) { // the request should be forward to a pulsar broker
+            // TODO: support https://
+            String serviceUrl = "http://" + broker;
+            return forwardRequest(ctx, request, serviceUrl);
+        }
+
         String environment = request.getHeader("environment");
         if (null == environment) {
             return null;
         }
         String serviceUrl = environmentCacheService.getServiceUrl(request);
+        return forwardRequest(ctx, request, serviceUrl);
+    }
+
+    private Object forwardRequest(RequestContext ctx, HttpServletRequest request, String serviceUrl) {
         ctx.put(REQUEST_URI_KEY, request.getRequestURI());
         try {
             ctx.setRouteHost(new URL(serviceUrl));
+            log.info("Forward request to {} @ path {}",
+                serviceUrl, request.getRequestURI());
         } catch (MalformedURLException e) {
             log.error("Route forward to {} path {} error: {}",
                 serviceUrl, request.getRequestURI(), e.getMessage());

@@ -53,7 +53,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
     @Override
     public String getServiceUrl(HttpServletRequest request) {
-        String cluster = request.getParameter("cluster");
+        String cluster = request.getHeader("x-pulsar-cluster");
         return getServiceUrl(request, cluster);
     }
 
@@ -76,10 +76,8 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     }
 
     private String getServiceUrl(String environment, String cluster, int numReloads) {
-        log.info("Get service url from {} @ {} : numReloads = {}", environment, cluster, numReloads);
         // if there is a cluster specified, lookup the cluster.
         Map<String, ClusterData> clusters = environments.get(environment);
-        log.info("cluster : {}", clusters);
         ClusterData clusterData;
         if (null == clusters) {
             clusterData = reloadCluster(environment, cluster);
