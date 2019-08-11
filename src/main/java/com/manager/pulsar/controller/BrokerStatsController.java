@@ -13,9 +13,8 @@
  */
 package com.manager.pulsar.controller;
 
-import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.service.BrokerStatsService;
-import com.manager.pulsar.utils.EnvironmentTools;
+import com.manager.pulsar.service.EnvironmentCacheService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -43,7 +42,7 @@ public class BrokerStatsController {
     private BrokerStatsService brokerStatsService;
 
     @Autowired
-    private EnvironmentsRepository environmentsRepository;
+    private EnvironmentCacheService environmentCacheService;
 
     @Autowired
     private HttpServletRequest request;
@@ -56,7 +55,7 @@ public class BrokerStatsController {
     @RequestMapping(value = "/broker-stats/metrics", method =  RequestMethod.GET)
     public ResponseEntity<String> getBrokerStatsMetrics(
             @RequestParam() String broker) {
-        String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
+        String requestHost = environmentCacheService.getServiceUrl(request);
         String result = brokerStatsService.forwarBrokerStatsMetrics(broker, requestHost);
         return ResponseEntity.ok(result);
     }
@@ -69,7 +68,7 @@ public class BrokerStatsController {
     @RequestMapping(value = "/broker-stats/topics", method =  RequestMethod.GET)
     public ResponseEntity<String> getBrokerStatsTopics(
             @RequestParam() String broker) {
-        String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
+        String requestHost = environmentCacheService.getServiceUrl(request);
         String result = brokerStatsService.forwardBrokerStatsTopics(broker, requestHost);
         return ResponseEntity.ok(result);
     }

@@ -32,12 +32,25 @@
           </el-table-column>
           <el-table-column :label="$t('tenant.allowedClustersLabel')" align="center" min-width="100px">
             <template slot-scope="scope">
-              <span>{{ scope.row.allowedClusters }}</span>
+              <span
+                v-for="tag in scope.row.allowedClusters"
+                :key="tag"
+                class="list-el-tag">
+                <router-link :to="'/management/clusters/' + tag + '/cluster?tab=brokers'" class="link-type">
+                  {{ tag }}
+                </router-link>
+              </span>
             </template>
           </el-table-column>
           <el-table-column :label="$t('tenant.adminRolesLabel')" align="center" min-width="100px">
             <template slot-scope="scope">
-              <span>{{ scope.row.adminRoles }}</span>
+              <el-tag
+                v-for="tag in scope.row.adminRoles"
+                :key="tag"
+                effect="dark"
+                class="list-el-tag">
+                {{ tag }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
@@ -132,8 +145,8 @@ export default {
         delete: this.$i18n.t('tenant.deleteTenant')
       },
       rules: {
-        tenant: [{ required: true, message: 'Tenant is required', trigger: 'blur' }],
-        clusters: [{ required: true, message: 'Cluster is required', trigger: 'blur' }]
+        tenant: [{ required: true, message: this.$i18n.t('tenant.tenantIsRequired'), trigger: 'blur' }],
+        clusters: [{ required: true, message: this.$i18n.t('tenant.clusterIsRequired'), trigger: 'blur' }]
       },
       inputVisible: false,
       inputValue: '',
@@ -153,19 +166,27 @@ export default {
         this.listLoading = true
         fetchTenants().then(response => {
           for (var i = 0; i < response.data.total; i++) {
-            let allowedClusters = '-'
-            let adminRoles = '-'
+            let allowedClusters = ''
+            let adminRoles = ''
             if (response.data.data[i]['allowedClusters'].length > 0) {
               allowedClusters = response.data.data[i]['allowedClusters']
             }
             if (response.data.data[i]['adminRoles'].length > 0) {
               adminRoles = response.data.data[i]['adminRoles']
             }
+            let adminRolesArray = []
+            if (adminRoles !== '') {
+              adminRolesArray = adminRoles.split(',')
+            }
+            let allowedClustersArray = []
+            if (allowedClusters !== '') {
+              allowedClustersArray = allowedClusters.split(',')
+            }
             this.localList.push({
               'tenant': response.data.data[i]['tenant'],
               'namespace': response.data.data[i]['namespaces'],
-              'allowedClusters': allowedClusters,
-              'adminRoles': adminRoles
+              'allowedClusters': allowedClustersArray,
+              'adminRoles': adminRolesArray
             })
           }
           this.total = response.data.total
@@ -253,7 +274,7 @@ export default {
             this.dialogFormVisible = false
             this.$notify({
               title: 'success',
-              message: 'create success',
+              message: this.$i18n.t('tenant.createTenantSuccessNotification'),
               type: 'success',
               duration: 2000
             })
@@ -270,7 +291,7 @@ export default {
       deleteTenant(this.form.tenant).then((response) => {
         this.$notify({
           title: 'success',
-          message: 'delete success',
+          message: this.$i18n.t('tenant.deleteTenantSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -294,7 +315,7 @@ export default {
         if (this.form.dynamicRoles.indexOf(this.inputValue) >= 0) {
           this.$notify({
             title: 'error',
-            message: 'Role is exists',
+            message: this.$i18n.t('tenant.roleAlreadyExists'),
             type: 'error',
             duration: 2000
           })
@@ -310,6 +331,10 @@ export default {
 </script>
 
 <style>
+.list-el-tag {
+  margin-left: 2px;
+  margin-right: 2px;
+}
 .el-form {
   margin-left: 0% !important;
   margin-right: 0% !important;

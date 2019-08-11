@@ -15,9 +15,8 @@ package com.manager.pulsar.controller;
 
 import com.manager.pulsar.entity.ClusterEntity;
 import com.manager.pulsar.entity.ClustersRepository;
-import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.service.ClustersService;
-import com.manager.pulsar.utils.EnvironmentTools;
+import com.manager.pulsar.service.EnvironmentCacheService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -55,7 +54,7 @@ public class ClustersController {
     private ClustersService clusterService;
 
     @Autowired
-    private EnvironmentsRepository environmentsRepository;
+    private EnvironmentCacheService environmentCacheService;
 
     @Autowired
     private HttpServletRequest request;
@@ -75,7 +74,7 @@ public class ClustersController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
                     Integer pageSize) {
-        String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
+        String requestHost = environmentCacheService.getServiceUrl(request);
         Map<String, Object> result = clusterService.getClustersList(pageNum, pageSize, requestHost);
 
         return ResponseEntity.ok(result);

@@ -14,27 +14,34 @@
 package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
+import com.manager.pulsar.PulsarManagerApplication;
 import com.manager.pulsar.entity.BrokerEntity;
 import com.manager.pulsar.entity.BrokersRepository;
+import com.manager.pulsar.profiles.SqliteDBTestProfile;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Optional;
 
 /**
  * Brokers crud test.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(
+    classes = {
+        PulsarManagerApplication.class,
+        SqliteDBTestProfile.class
+    }
+)
+@ActiveProfiles("test")
 public class BrokersRepositoryImplTest {
 
     @Autowired
     private BrokersRepository brokersRepository;
-
 
     private void initBrokerEntity(BrokerEntity brokersEntity) {
         brokersEntity.setBrokerId(1);

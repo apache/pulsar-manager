@@ -14,10 +14,12 @@
 package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
+import com.manager.pulsar.PulsarManagerApplication;
 import com.manager.pulsar.entity.NamespaceEntity;
 import com.manager.pulsar.entity.NamespacesRepository;
 import com.manager.pulsar.entity.TenantEntity;
 import com.manager.pulsar.entity.TenantsRepository;
+import com.manager.pulsar.profiles.SqliteDBTestProfile;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,10 +27,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(
+    classes = {
+        PulsarManagerApplication.class,
+        SqliteDBTestProfile.class
+    }
+)
+@ActiveProfiles("test")
 public class NamespacesRepositoryImplTest {
 
     @Autowired

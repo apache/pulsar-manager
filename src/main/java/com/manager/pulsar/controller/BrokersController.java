@@ -13,10 +13,8 @@
  */
 package com.manager.pulsar.controller;
 
-import com.manager.pulsar.entity.BrokersRepository;
-import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.service.BrokersService;
-import com.manager.pulsar.utils.EnvironmentTools;
+import com.manager.pulsar.service.EnvironmentCacheService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -49,13 +47,10 @@ public class BrokersController {
     private BrokersService brokersService;
 
     @Autowired
-    private BrokersRepository brokersRepository;
-
-    @Autowired
-    private EnvironmentsRepository environmentsRepository;
-
-    @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private EnvironmentCacheService environmentCacheService;
 
     @ApiOperation(value = "Get the list of existing brokers, support paging, the default is 10 per page")
     @ApiResponses({
@@ -73,8 +68,8 @@ public class BrokersController {
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
             Integer pageSize,
             @PathVariable String cluster) {
-        String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
-        Map<String, Object> result = brokersService.getBrokersList(pageNum, pageSize, cluster, requestHost);
+        String requestServiceUrl = environmentCacheService.getServiceUrl(request, cluster);
+        Map<String, Object> result = brokersService.getBrokersList(pageNum, pageSize, cluster, requestServiceUrl);
         return ResponseEntity.ok(result);
     }
 //

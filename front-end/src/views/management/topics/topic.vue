@@ -38,28 +38,137 @@
                 <el-table-column :label="$t('topic.column')" prop="infoColumn"/>
                 <el-table-column :label="$t('topic.data')" prop="data"/>
               </el-table>
-              <el-button class="filter-item" type="primary" style="margin-top:15px;" @click="handleUnload">{{ $t('topic.unload') }}</el-button>
+              <el-button
+                class="filter-item"
+                type="danger"
+                style="margin-top:15px;"
+                icon="el-icon-download"
+                @click="handleUnload">
+                {{ $t('topic.unload') }}
+              </el-button>
             </el-card>
           </el-col>
           <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
               <h4>{{ $t('topic.status') }}</h4>
-              <el-button type="primary" circle class="circle"><span class="circle-font">{{ terminateStatus }}</span></el-button>
-              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleTerminate">{{ $t('topic.terminate') }}</el-button>
+              <el-button
+                v-if="terminateStatus !== 'Terminated'"
+                type="primary"
+                circle
+                class="circle">
+                <span class="circle-font">{{ terminateStatus }}</span>
+              </el-button>
+              <el-button
+                v-if="terminateStatus === 'Terminated'"
+                type="info"
+                circle
+                class="circle"
+                disabled>
+                <span class="circle-font">{{ terminateStatus }}</span>
+              </el-button>
+              <el-button
+                v-if="terminateStatus !== 'Terminated'"
+                type="primary"
+                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
+                icon="el-icon-close"
+                @click="handleTerminate">
+                {{ $t('topic.terminate') }}
+              </el-button>
+              <el-button
+                v-if="terminateStatus === 'Terminated'"
+                type="info"
+                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
+                icon="el-icon-close"
+                disabled
+                @click="handleTerminate">
+                {{ $t('topic.terminate') }}
+              </el-button>
             </el-card>
           </el-col>
           <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
               <h4>{{ $t('topic.compactionName') }}</h4>
-              <el-button type="primary" circle class="circle"><span class="circle-font">{{ compaction }}</span></el-button>
-              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleCompaction">{{ $t('topic.compaction') }}</el-button>
+              <el-button
+                v-if="compaction === 'NOT_RUN' || compaction === 'SUCCESS'"
+                type="primary"
+                circle
+                class="circle">
+                <span class="circle-font">{{ compaction }}</span>
+              </el-button>
+              <el-button
+                v-if="compaction === 'RUNNING'"
+                type="success"
+                circle
+                class="circle">
+                <span class="circle-font">{{ compaction }}</span>
+              </el-button>
+              <el-button
+                v-if="compaction === 'ERROR'"
+                type="danger"
+                circle
+                class="circle">
+                <span class="circle-font">{{ compaction }}</span>
+              </el-button>
+              <el-button
+                v-if="compaction !== 'RUNNING'"
+                type="primary"
+                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
+                icon="el-icon-minus"
+                @click="handleCompaction">
+                {{ $t('topic.compaction') }}
+              </el-button>
+              <el-button
+                v-if="compaction === 'RUNNING'"
+                type="success"
+                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
+                icon="el-icon-minus"
+                disabled
+                @click="handleCompaction">
+                {{ $t('topic.compaction') }}
+              </el-button>
             </el-card>
           </el-col>
           <el-col v-if="nonPersistent===false" :span="4">
             <el-card>
               <h4>{{ $t('topic.offloadName') }}</h4>
-              <el-button type="primary" circle class="circle"><span class="circle-font">{{ offload }}</span></el-button>
-              <el-button type="primary" style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;" @click="handleOffload">{{ $t('topic.offload') }}</el-button>
+              <el-button
+                v-if="offload === 'NOT_RUN' || offload === 'SUCCESS'"
+                type="primary"
+                circle
+                class="circle">
+                <span class="circle-font">{{ offload }}</span>
+              </el-button>
+              <el-button
+                v-if="offload === 'RUNNING'"
+                type="success"
+                circle
+                class="circle">
+                <span class="circle-font">{{ offload }}</span>
+              </el-button>
+              <el-button
+                v-if="offload === 'ERROR'"
+                type="danger"
+                circle
+                class="circle">
+                <span class="circle-font">{{ offload }}</span>
+              </el-button>
+              <el-button
+                v-if="offload !== 'RUNNING'"
+                type="primary"
+                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
+                icon="el-icon-refresh"
+                @click="handleOffload">
+                {{ $t('topic.offload') }}
+              </el-button>
+              <el-button
+                v-if="offload === 'RUNNING'"
+                type="success"
+                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
+                icon="el-icon-refresh"
+                disabled
+                @click="handleOffload">
+                {{ $t('topic.offload') }}
+              </el-button>
             </el-card>
           </el-col>
         </el-row>
@@ -185,21 +294,36 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane v-if="nonPersistent===false" :label="$t('topic.subscription.storage')" name="storage">
+      <el-tab-pane v-if="nonPersistent===false" :label="$t('tabs.storage')" name="storage">
         <el-row :gutter="12">
           <el-col :span="8">
-            <el-card>
-              <el-button type="primary" class="circle"><span>{{ $t('topic.subscription.storageSize') }} <br>{{ storageSize }}</span></el-button>
+            <el-card class="box-card" shadow="always">
+              <div slot="header" class="clearfix">
+                <span>{{ $t('topic.subscription.storageSize') }}</span>
+              </div>
+              <el-button type="primary" class="circle">
+                <span style="font-size: 200%;">{{ storageSize }}</span>
+              </el-button>
             </el-card>
           </el-col>
           <el-col :span="8">
-            <el-card>
-              <el-button type="primary" class="circle"><span>{{ $t('topic.subscription.entries') }} <br>{{ entries }}</span></el-button>
+            <el-card class="box-card" shadow="always">
+              <div slot="header" class="clearfix">
+                <span>{{ $t('topic.subscription.entries') }}</span>
+              </div>
+              <el-button type="primary" class="circle">
+                <span style="font-size: 200%;">{{ entries }}</span>
+              </el-button>
             </el-card>
           </el-col>
           <el-col :span="8">
-            <el-card>
-              <el-button type="primary" class="circle"><span>{{ $t('topic.subscription.segments') }}<br>{{ segments }}</span></el-button>
+            <el-card class="box-card" shadow="always">
+              <div slot="header" class="clearfix">
+                <span>{{ $t('topic.subscription.segments') }}</span>
+              </div>
+              <el-button type="primary" class="circle">
+                <span style="font-size: 200%;">{{ segments }}</span>
+              </el-button>
             </el-card>
           </el-col>
         </el-row>
@@ -287,8 +411,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane :label="$t('topic.policy.policies')" name="policies">
-        <span>{{ topicName }}</span>
+      <el-tab-pane :label="$t('tabs.policies')" name="policies">
         <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
@@ -427,13 +550,13 @@ export default {
       roleMapOptions: {},
       roleOptions: [{
         value: 'consume',
-        label: 'consume'
+        label: this.$i18n.t('role_actions.consume')
       }, {
         value: 'produce',
-        label: 'produce'
+        label: this.$i18n.t('role_actions.produce')
       }, {
         value: 'functions',
-        label: 'functions'
+        label: this.$i18n.t('role_actions.functions')
       }],
       authorizationContent: this.$i18n.t('topic.policy.authorizationContent'),
       topicName: '',
@@ -677,7 +800,7 @@ export default {
       unload(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Unload topic success',
+          message: this.$i18n.t('topic.notification.unloadTopicSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -687,7 +810,7 @@ export default {
       terminate(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Terminate topic success',
+          message: this.$i18n.t('topic.notification.terminateTopicSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -708,7 +831,7 @@ export default {
       if (inputValue) {
         if (this.roleMap.hasOwnProperty(inputValue)) {
           this.$message({
-            message: 'This role is exist',
+            message: this.$i18n.t('role.roleAlreadyExists'),
             type: 'error'
           })
           this.inputVisible = false
@@ -744,7 +867,7 @@ export default {
       compact(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Start topic compaction requested',
+          message: this.$i18n.t('topic.notification.startCompactionSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -755,7 +878,7 @@ export default {
       offload(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Start topic offload requested',
+          message: this.$i18n.t('topic.notification.startOffloadSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -770,7 +893,7 @@ export default {
       deleteTopic(this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete topic success',
+          message: this.$i18n.t('topic.notification.deleteTopicSuccess'),
           type: 'success',
           duration: 3000
         })

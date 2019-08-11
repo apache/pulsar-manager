@@ -13,9 +13,8 @@
  */
 package com.manager.pulsar.controller;
 
-import com.manager.pulsar.entity.EnvironmentsRepository;
+import com.manager.pulsar.service.EnvironmentCacheService;
 import com.manager.pulsar.service.TopicsService;
-import com.manager.pulsar.utils.EnvironmentTools;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -48,7 +47,7 @@ public class TopicsController {
     private TopicsService topicsService;
 
     @Autowired
-    private EnvironmentsRepository environmentsRepository;
+    private EnvironmentCacheService environmentCacheService;
 
     @Autowired
     private HttpServletRequest request;
@@ -74,7 +73,7 @@ public class TopicsController {
             @ApiParam(value = "The name of namespace")
             @Size(min = 1, max = 255)
             @PathVariable String namespace) {
-        String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
+        String requestHost = environmentCacheService.getServiceUrl(request);
         Map<String, Object> result = topicsService.getTopicsList(pageNum, pageSize, tenant, namespace, requestHost);
         return result;
     }

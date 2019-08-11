@@ -27,7 +27,7 @@
         </el-table>
         <h4>
           Bundles
-          <el-tooltip :content="bundleInfoContent" class="item" effect="dark" placement="top">
+          <el-tooltip :content="$t('namespace.bundle.bundleInfoContent')" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
           </el-tooltip>
         </h4>
@@ -84,7 +84,7 @@
                   <span>{{ scope.row.partitions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.persistent')" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.topicDomain')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.persistent }}</span>
                 </template>
@@ -101,22 +101,22 @@
               </el-table-column>
               <el-table-column :label="$t('common.inMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.inMsg }}</span>
+                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ scope.row.inMsg }}</span>
                 </template>
               </el-table-column>
               <el-table-column :label="$t('common.outMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.outMsg }}</span>
+                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
               <el-table-column :label="$t('common.inBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.inBytes }}</span>
+                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ scope.row.inBytes }}</span>
                 </template>
               </el-table-column>
               <el-table-column :label="$t('common.outBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.outBytes }}</span>
+                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
               <el-table-column :label="$t('common.storageSize')" min-width="30px" align="center">
@@ -134,7 +134,7 @@
         <div class="component-item">
           <div class="section-title">
             <span>{{ $t('namespace.policy.replicatedCluster') }}</span>
-            <el-tooltip :content="replicatedClustersContent" class="item" effect="dark" placement="top">
+            <el-tooltip :content="$t('namespace.policy.replicatedClustersContent')" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
           </div>
@@ -615,10 +615,10 @@
               <el-radio :label="$t('topic.nonPersistent')"/>
             </el-radio-group>
           </el-form-item>
-          <el-form-item :label="$t('topic.name')" prop="topic">
+          <el-form-item :label="$t('topic.topicName')" prop="topic">
             <el-input v-model="form.topic"/>
           </el-form-item>
-          <el-form-item :label="$t('topic.partition')" prop="partition">
+          <el-form-item :label="$t('topic.partitions')" prop="partition">
             <el-input v-model="form.partitions"/>
           </el-form-item>
           <el-form-item>
@@ -702,7 +702,7 @@ export default {
         inBytes: 0,
         outBytes: 0
       }],
-      replicatedClustersContent: this.$i18n.t('namespace.replicatedClustersContent'),
+      replicatedClustersContent: this.$i18n.t('namespace.policy.replicatedClustersContent'),
       replicationClustersValue: [],
       replicationClustersOptions: [],
       dynamicValidateForm: {
@@ -719,23 +719,23 @@ export default {
       roleMapOptions: {},
       roleOptions: [{
         value: 'consume',
-        label: 'consume'
+        label: this.$i18n.t('role_actions.consume')
       }, {
         value: 'produce',
-        label: 'produce'
+        label: this.$i18n.t('role_actions.produce')
       }, {
         value: 'functions',
-        label: 'functions'
+        label: this.$i18n.t('role_actions.functions')
       }],
       authorizationContent: this.$i18n.t('namespace.policy.authorizationContent'),
       subscriptionAuthenticationMode: '',
       subscriptionAuthenticationModeContent: this.$i18n.t('namespace.policy.subscriptionAuthenticationModeContent'),
       subscriptionAuthenticationModeOptions: [{
         value: 'None',
-        label: 'None'
+        label: this.$i18n.t('subscription_auth_mode.none')
       }, {
         value: 'Prefix',
-        label: 'Prefix'
+        label: this.$i18n.t('subscription_auth_mode.prefix')
       }],
       replicationFactorContent: this.$i18n.t('namespace.policy.replicationFactorContent'),
       form: {
@@ -750,9 +750,9 @@ export default {
         autoUpdateStrategy: '',
         messageTTL: '',
         retentionTime: '',
-        encryptionRequireRadio: 'Disabled',
-        deduplicationRadio: 'Disabled',
-        schemaValidationEnforcedRadio: 'Disabled',
+        encryptionRequireRadio: this.$i18n.t('common.disabled'),
+        deduplicationRadio: this.$i18n.t('common.disabled'),
+        schemaValidationEnforcedRadio: this.$i18n.t('common.disabled'),
         dispatchRatePerTopicBytes: '',
         dispatchRatePerTopicMessage: '',
         dispatchRatePerTopicPeriod: '',
@@ -777,56 +777,56 @@ export default {
       backlogRententionPolicyRadio: 'consumer_backlog_eviction',
       backlogRententionPolicyOption: [{
         value: 'consumer_backlog_eviction',
-        label: 'consumer_backlog_eviction'
+        label: this.$i18n.t('backlog_policy.consumer_backlog_eviction')
       }, {
         value: 'producer_exception',
-        label: 'producer_exception'
+        label: this.$i18n.t('backlog_policy.producer_exception')
       }, {
         value: 'producer_request_hold',
-        lable: 'producer_request_hold'
+        label: this.$i18n.t('backlog_policy.producer_request_hold')
       }],
       encryptionRequireContent: this.$i18n.t('namespace.policy.encryptionRequireContent'),
       encryptionRequireOption: [{
         value: 'Enabled',
-        label: 'Enabled'
+        label: this.$i18n.t('common.enabled')
       }, {
         value: 'Disabled',
-        label: 'Disabled'
+        label: this.$i18n.t('common.disabled')
       }],
       deduplicationContent: this.$i18n.t('namespace.policy.deduplicationContent'),
       deduplication: '',
       deduplicationOption: [{
         value: 'Enabled',
-        label: 'Enabled'
+        label: this.$i18n.t('common.enabled')
       }, {
         value: 'Disabled',
-        label: 'Disabled'
+        label: this.$i18n.t('common.disabled')
       }],
       autoUpdateStrategyContent: this.$i18n.t('namespace.policy.autoUpdateStrategyContent'),
       autoUpdateStrategyOption: [{
         value: 'Full',
-        label: 'Full'
-      }, {
-        value: 'Forward',
-        label: 'Forward'
-      }, {
-        value: 'Backward',
-        label: 'Backward'
-      }, {
-        value: 'AlwaysCompatible',
-        label: 'Always Compatible'
-      }, {
-        value: 'AutoUpdateDisabled',
-        label: 'AutoUpdateDisabled'
-      }, {
-        value: 'BackwardTransitive',
-        label: 'BackwardTransitive'
-      }, {
-        value: 'ForwardTransitive',
-        label: 'ForwardTransitive'
+        label: this.$i18n.t('schema_bc.full')
       }, {
         value: 'FullTransitive',
-        label: 'FullTransitive'
+        label: this.$i18n.t('schema_bc.full_transitive')
+      }, {
+        value: 'Forward',
+        label: this.$i18n.t('schema_bc.forward')
+      }, {
+        value: 'ForwardTransitive',
+        label: this.$i18n.t('schema_bc.forward_transitive')
+      }, {
+        value: 'Backward',
+        label: this.$i18n.t('schema_bc.backward')
+      }, {
+        value: 'BackwardTransitive',
+        label: this.$i18n.t('schema_bc.backward_transitive')
+      }, {
+        value: 'AlwaysCompatible',
+        label: this.$i18n.t('schema_bc.always')
+      }, {
+        value: 'AutoUpdateDisabled',
+        label: this.$i18n.t('schema_bc.auto_update_disabled')
       }],
       schemaValidationEnforcedContent: this.$i18n.t('namespace.policy.schemaValidationEnforcedContent'),
       schemaValidationEnforced: '',
@@ -862,10 +862,11 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        create: this.$i18n.t('topic.newTopic')
+        create: this.$i18n.t('topic.newTopic'),
+        delete: this.$i18n.t('namespace.deleteNamespace')
       },
       currentTabName: '',
-      bundleInfoContent: this.$i18n.t('bundleInfoContent')
+      bundleInfoContent: this.$i18n.t('namespace.bundle.bundleInfoContent')
     }
   },
   created() {
@@ -1073,7 +1074,7 @@ export default {
       revokePermissions(this.tenantNamespace, tag).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Add success',
+          message: this.$i18n.t('namespace.notification.removeRoleSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1092,17 +1093,17 @@ export default {
       if (inputValue) {
         if (this.roleMap.hasOwnProperty(inputValue)) {
           this.$message({
-            message: 'This role is exist',
+            message: this.$i18n.t('namespace.policy.roleAlreadyExists'),
             type: 'error'
           })
           this.inputVisible = false
           this.inputValue = ''
           return
         }
-        grantPermissions(this.currentNamespace, inputValue, this.roleMap[inputValue]).then(response => {
+        grantPermissions(this.tenantNamespace, inputValue, this.roleMap[inputValue]).then(response => {
           this.$notify({
             title: 'success',
-            message: 'Add success',
+            message: this.$i18n.t('namespace.notification.addRoleSuccess'),
             type: 'success',
             duration: 3000
           })
@@ -1129,7 +1130,7 @@ export default {
       setPersistence(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set persistence success for namespace',
+          message: this.$i18n.t('namespace.notification.updatePersistenceSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1143,7 +1144,7 @@ export default {
       setBacklogQuota(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Add Backlog Quota success for namespace',
+          message: this.$i18n.t('namespace.notification.updateBacklogQuotaSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1153,7 +1154,7 @@ export default {
       splitBundle(this.tenantNamespace, row.bundle, false).then(response => {
         this.$notify({
           title: 'success',
-          message: 'splitBundle success for namespace',
+          message: this.$i18n.t('namespace.notification.splitBundleSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1165,7 +1166,7 @@ export default {
       unload(this.tenantNamespace).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Unload success for namespace',
+          message: this.$i18n.t('namespace.notification.unloadAllBundlesSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1177,7 +1178,7 @@ export default {
       unloadBundle(this.tenantNamespace, row.bundle).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Unload success for namespace',
+          message: this.$i18n.t('namespace.notification.unloadBundleSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1189,7 +1190,7 @@ export default {
       clearBacklog(this.tenantNamespace).then(response => {
         this.$notify({
           title: 'success',
-          message: 'clearBacklog success for namespace',
+          message: this.$i18n.t('namespace.notification.clearBacklogSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1199,7 +1200,7 @@ export default {
       clearBundleBacklog(this.tenantNamespace, row.bundle).then(response => {
         this.$notify({
           title: 'success',
-          message: 'clearBacklog success for bundle',
+          message: this.$i18n.t('namespace.notification.clearBundleBacklogSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1209,7 +1210,7 @@ export default {
       setClusters(this.tenantNamespace, this.replicationClustersValue).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Add clusters success for namespace',
+          message: this.$i18n.t('namespace.notification.updateReplicatedClustersSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1223,35 +1224,39 @@ export default {
       setSubscriptionAuthMode(this.tenantNamespace, subAuthMode).then(response => {
         this.$notify({
           title: 'success',
-          message: 'success',
+          message: this.$i18n.t('namespace.notification.updateSubscriptionAuthModeSuccess'),
           type: 'success',
           duration: 3000
         })
       })
     },
     handleEncryption() {
-      var encryptionRequire = false
+      let encryptionRequire = false
+      let successMessage = this.$i18n.t('namespace.notification.disableEncryptionSuccess')
       if (this.form.encryptionRequireRadio === 'Enabled') {
         encryptionRequire = true
+        successMessage = this.$i18n.t('namespace.notification.enableEncryptionSuccess')
       }
       setEncryptionRequired(this.tenantNamespace, encryptionRequire).then(response => {
         this.$notify({
           title: 'success',
-          message: 'success',
+          message: successMessage,
           type: 'success',
           duration: 3000
         })
       })
     },
     handleDeduplication() {
-      var deduplication = false
+      let deduplication = false
+      let successMessage = this.$i18n.t('namespace.notification.disableDeduplicationSuccess')
       if (this.form.deduplicationRadio === 'Enabled') {
         deduplication = true
+        successMessage = this.$i18n.t('namespace.notification.enableDeduplicationSuccess')
       }
       setDeduplication(this.tenantNamespace, deduplication).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set deduplication success for namespace',
+          message: successMessage,
           type: 'success',
           duration: 3000
         })
@@ -1279,7 +1284,7 @@ export default {
       setSchemaAutoupdateStrategy(this.tenantNamespace, strategy).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set SchemaAutoupdateStrategy success',
+          message: this.$i18n.t('namespace.notification.updateSchemaAutoUpdateStrategySuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1287,13 +1292,15 @@ export default {
     },
     handleSchemaValidationEnforced() {
       var schemaValidation = false
+      var successMessage = this.$i18n.t('namespace.notification.disableSchemaValidationEnforcedSuccess')
       if (this.form.schemaValidationEnforcedRadio === 'Enabled') {
         schemaValidation = true
+        successMessage = this.$i18n.t('namespace.notification.enableSchemaValidationEnforcedSuccess')
       }
       setSchemaValidationEnforced(this.tenantNamespace, schemaValidation).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set SchemaValidationEnforced success',
+          message: successMessage,
           type: 'success',
           duration: 3000
         })
@@ -1303,7 +1310,7 @@ export default {
       setMessageTtl(this.tenantNamespace, parseInt(this.form.messageTTL)).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set messageTTL success for namespace',
+          message: this.$i18n.t('namespace.notification.updateMessageTTLSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1314,7 +1321,7 @@ export default {
       setRetention(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set Retention success for namespace',
+          message: this.$i18n.t('namespace.notification.updateRetentionSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1324,7 +1331,7 @@ export default {
       setCompactionThreshold(this.tenantNamespace, this.form.compactionThreshold).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set threshold success',
+          message: this.$i18n.t('namespace.notification.updateCompactionThresholdSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1334,7 +1341,7 @@ export default {
       setOffloadThreshold(this.tenantNamespace, this.form.offloadThreshold).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set threshold success',
+          message: this.$i18n.t('namespace.notification.updateOffloadThresholdSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1344,7 +1351,7 @@ export default {
       setOffloadDeletionLag(this.tenantNamespace, this.form.offloadDeletionLag).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set DeletionLag success',
+          message: this.$i18n.t('namespace.notification.updateOffloadDeletionLagSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1354,7 +1361,7 @@ export default {
       setMaxProducersPerTopic(this.tenantNamespace, this.form.maxProducersPerTopic).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set max producers per topic success',
+          message: this.$i18n.t('namespace.notification.setMaxProducersSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1364,7 +1371,7 @@ export default {
       setMaxConsumersPerTopic(this.tenantNamespace, this.form.maxConsumersPerTopic).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set max consumers per topic success',
+          message: this.$i18n.t('namespace.notification.setMaxConsumersSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1374,7 +1381,7 @@ export default {
       setMaxConsumersPerSubscription(this.tenantNamespace, this.form.maxConsumerPerSub).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set max subscription per topic success',
+          message: this.$i18n.t('namespace.notification.setMaxConsumersPerSubscriptionSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1389,7 +1396,7 @@ export default {
       setDispatchRate(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'set DispatchRate success for namespace',
+          message: this.$i18n.t('namespace.notification.setDispatchRateSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1404,7 +1411,7 @@ export default {
       setSubscriptionDispatchRate(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'set subscription dispatchRate success for namespace',
+          message: this.$i18n.t('namespace.notification.setDispatchRatePerSubscriptionSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1418,7 +1425,7 @@ export default {
       setSubscribeRate(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'set subscription dispatchRate success for namespace',
+          message: this.$i18n.t('namespace.notification.setSubscribeRateSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1428,7 +1435,7 @@ export default {
       setAntiAffinityGroup(this.tenantNamespace, this.form.antiAffinityGroup).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set AntiAffinityGroup success for namespace',
+          message: this.$i18n.t('namespace.notification.setAntiAffinityGroupSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1442,7 +1449,7 @@ export default {
       deleteNamespace(this.tenantNamespace).then((response) => {
         this.$notify({
           title: 'success',
-          message: 'delete success',
+          message: this.$i18n.t('namespace.deleteNsSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -1464,7 +1471,7 @@ export default {
         this.form.topic, parseInt(this.form.partitions)).then(() => {
         this.$notify({
           title: 'success',
-          message: 'create topic success',
+          message: this.$i18n.t('topic.notification.createTopicSuccess'),
           type: 'success',
           duration: 2000
         })

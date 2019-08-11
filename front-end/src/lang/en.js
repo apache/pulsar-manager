@@ -11,6 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ * Licensed under the Apache License, Version 2.0 (the 'License');
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an 'AS IS' BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 export default {
   route: {
     dashboard: 'Dashboard',
@@ -93,6 +106,13 @@ export default {
     any: 'any',
     thirdparty: 'Or connect with',
     thirdpartyTips: 'Can not be simulated on local, so please combine you own business simulation! ! !'
+  },
+  sidebar: {
+    clusters: 'Clusters',
+    clusterInfo: 'Cluster Details',
+    tenants: 'Tenants',
+    namespaces: 'Namespaces',
+    topics: 'Topics'
   },
   documentation: {
     documentation: 'Documentation',
@@ -207,17 +227,64 @@ export default {
     closeOthers: 'Close Others',
     closeAll: 'Close All'
   },
+  breadcrumb: {
+    management: 'Management',
+    clusters: 'Clusters',
+    clusterInfo: 'Cluster Details',
+    brokers: 'Brokers',
+    brokerInfo: 'Broker Details',
+    isolationPolicies: 'Isolation Policies',
+    isolationPolicyInfo: 'Isolation Policy Details',
+    failureDomains: 'Failure Domains',
+    failureDomainInfo: 'Faillure Domain Details',
+    tenants: 'Tenants',
+    tenantInfo: 'Tenant Details',
+    namespaces: 'Namespaces',
+    namespaceInfo: 'Namespace Details',
+    topics: 'Topics',
+    topicInfo: 'Topic Details',
+    subscriptions: 'Subscriptions',
+    subscriptionInfo: 'Subscription Details'
+  },
   tabs: {
     config: 'CONFIG',
-    broker: 'BROKER',
-    bookie: 'BOOKIE',
-    namespace: 'NAMESPACE',
+    broker: 'BROKERS',
+    bookie: 'BOOKIES',
+    namespace: 'NAMESPACES',
     overview: 'OVERVIEW',
-    topic: 'TOPIC',
+    topic: 'TOPICS',
     policies: 'POLICIES',
     configuration: 'CONFIGURATION',
     failuredomains: 'FAILURE DOMAINS',
-    isolationpolicies: 'ISOLATION POLICIES'
+    isolationpolicies: 'ISOLATION POLICIES',
+    storage: 'STORAGE'
+  },
+  role: {
+    roleAlreadyExists: 'Role already exists'
+  },
+  role_actions: {
+    consume: 'consume',
+    produce: 'produce',
+    functions: 'functions'
+  },
+  subscription_auth_mode: {
+    none: 'None',
+    prefix: 'Prefix'
+  },
+  backlog_policy: {
+    consumer_backlog_eviction: 'consumer_backlog_eviction',
+    producer_exception: 'producer_exception',
+    producer_request_hold: 'producer_request_hold'
+  },
+  schema_bc: {
+    full: 'Full',
+    forward: 'Forward',
+    backward: 'Backward',
+    always: 'Always Compatible',
+    auto_update_disabled: 'AutoUpdate Disabled',
+    backward_transitive: 'Backward Transitive',
+    forward_transitive: 'Forward Transitive',
+    full_transitive: 'Full Transitive'
   },
   common: {
     dangerZone: 'Danger Zone',
@@ -235,7 +302,7 @@ export default {
   },
   tenant: {
     label: 'Tenant',
-    name: 'Tenant Name',
+    name: 'Tenant',
     searchTenant: 'Search Tenants',
     newTenant: 'New Tenant',
     deleteTenant: 'Delete Tenant',
@@ -248,18 +315,29 @@ export default {
     allowedClustersContent: 'This is Allowed Clusters Content',
     adminRolesContent: 'This is Admin Roles Content',
     permissions: 'Permissions',
-    newRole: '+ New Role'
+    newRole: '+ New Role',
+    tenantIsRequired: 'Tenant Name is required',
+    clusterIsRequired: 'Please select allowed clusters for a tenant',
+    createTenantSuccessNotification: 'Successfully create a tenant',
+    deleteTenantSuccessNotification: 'Successfully delete a tenant',
+    roleAlreadyExists: 'Role already exists',
+    updateRolesSuccessNotification: 'Successfully update roles for this tenant',
+    updateClustersSuccessNotification: 'Successfully update allowed clusters for this tenant'
   },
   namespace: {
     label: 'Namespace',
-    name: 'Namespace Name',
-    namespaceNumber: 'Namespace Number',
+    name: 'Namespace',
+    namespaceNumber: 'Namespaces',
     newNamespace: 'New Namespace',
     deleteNamespace: 'Delete Namespace',
     inputNamespaceMessage: 'Please input namespace',
     newTopic: 'New Topic',
     searchTopics: 'Search Topics',
     deleteNamespaceMessage: 'Are you sure you want to delete this namespace?',
+    namespaceNameIsRequired: 'Namespace name is required',
+    createNsSuccessNotification: 'Successfully create a namespace',
+    deleteNsSuccessNotification: 'Successfully delete the namespace',
+    searchNamespaces: 'Search namespaces',
     policy: {
       label: 'Policy',
       name: 'Policy Name',
@@ -357,7 +435,8 @@ export default {
       antiAffinity: 'Anti Affinity',
       antiAffinityGroup: 'Anti Affinity Group',
       antiAffinityGroupContent: 'This is antiAffinityGroupContent',
-      inputAntiAffinityGroup: 'Please input Anti Affinity Group'
+      inputAntiAffinityGroup: 'Please input Anti Affinity Group',
+      roleAlreadyExists: 'This role already exists'
     },
     clearBacklog: 'Clear Backlog',
     bundle: {
@@ -367,12 +446,45 @@ export default {
       split: 'Split',
       unload: 'Unload',
       bundleInfoContent: 'This is Bundle Info'
+    },
+    notification: {
+      updatePersistenceSuccess: 'Successfully update persistence settings for this namespace!',
+      updateBacklogQuotaSuccess: 'Successfully update backlog quota settings for this namespace!',
+      splitBundleSuccess: 'Successfully split a namespace bundle for this namespace!',
+      unloadAllBundlesSuccess: 'Successfully unload all the namespace bundles for this namespace!',
+      unloadBundleSuccess: 'Successfully unload a namespace bundle for this namespace!',
+      clearBacklogSuccess: 'Successfully clear backlog for this namespace!',
+      clearBundleBacklogSuccess: 'Successfully clear backlog of a namespace bundle for this namespace!',
+      updateReplicatedClustersSuccess: 'Successfully update replicated clusters for this namespace!',
+      updateSubscriptionAuthModeSuccess: 'Successfully update subscription authentication mode for this namespace!',
+      addRoleSuccess: 'Successfully add a role for this namespace!',
+      removeRoleSuccess: 'Successfully remove a role from this namespace!',
+      updateSchemaAutoUpdateStrategySuccess: 'Successfully change schema auto-update strategy for this namespace!',
+      enableSchemaValidationEnforcedSuccess: 'Successfully enable schema validation for this namespace!',
+      disableSchemaValidationEnforcedSuccess: 'Successfully disable schema validation for this namespace!',
+      updateMessageTTLSuccess: 'Successfully set message TTL for this namespace!',
+      updateRetentionSuccess: 'Successfully set message retention policy for this namespace!',
+      updateCompactionThresholdSuccess: 'Successfully set compaction threshold for this namespace!',
+      updateOffloadThresholdSuccess: 'Successfully set offload threshold for this namespace!',
+      updateOffloadDeletionLagSuccess: 'Successfully update offload deletion lag for this namespace!',
+      setMaxProducersSuccess: 'Successfully set max producers per topic for this namespace!',
+      setMaxConsumersSuccess: 'Successfully set max consumers per topic for this namespace!',
+      setMaxConsumersPerSubscriptionSuccess: 'Successfully set max consumers per subscription for this namespace!',
+      setDispatchRateSuccess: 'Successfully set max dispatch rate per topic for this namespace!',
+      setDispatchRatePerSubscriptionSuccess: 'Successfully set max dispatch rate per subscription for this namespace!',
+      setSubscribeRateSuccess: 'Successfully set max subscribe rate per topic for this namespace!',
+      setAntiAffinityGroupSuccess: 'Successfully set anti-affinity group for this namespace!',
+      enableEncryptionSuccess: 'Successfully enable message encryption for this namespace!',
+      disableEncryptionSuccess: 'Successfully disable message encryption for this namespace!',
+      enableDeduplicationSuccess: 'Successfully enable message de-duplication for this namespace!',
+      disableDeduplicationSuccess: 'Successfully disable message de-duplication for this namespace!'
     }
   },
   topic: {
     label: 'Topic',
-    name: 'Topic Name',
-    topicNumber: 'Topic Number',
+    name: 'Topic',
+    topicName: 'Topic Name',
+    topicNumber: 'Topics',
     newTopic: 'New Topic',
     deleteTopic: 'Delete Topic',
     delete: 'Delete',
@@ -380,8 +492,8 @@ export default {
     nonPersistent: 'Non-persistent',
     partition: 'Partition',
     partitions: 'Partitions',
-    partitionNumber: 'Partition Number',
-    topicDomain: 'Topic Domain',
+    partitionNumber: 'Partitions',
+    topicDomain: 'Domain',
     addRole: 'Add Role',
     producer: {
       label: 'Producer',
@@ -389,7 +501,7 @@ export default {
       producers: 'Producers',
       producerId: 'Producer Id',
       producerName: 'Producer Name',
-      producerNumber: 'Producer Number',
+      producerNumber: 'Producers',
       avgMsgSize: 'Avg Msg Size',
       address: 'Address',
       since: 'Since'
@@ -399,7 +511,7 @@ export default {
       name: 'Subscription Name',
       subscriptions: 'Subscriptions',
       type: 'Type',
-      subscriptionNumber: 'Subscription Number',
+      subscriptionNumber: 'Subscriptions',
       msgExpired: 'Msg Expired',
       backlog: 'Backlog',
       skip: 'SKIP',
@@ -452,14 +564,23 @@ export default {
       address: 'Address',
       since: 'Since'
     },
+    notification: {
+      createTopicSuccess: 'Successfully create a topic!',
+      deleteTopicSuccess: 'Successfully delete the topic!',
+      deletePartitionedTopicSuccess: 'Successfully delete the partitioned topic!',
+      unloadTopicSuccess: 'Successfully unload the topic!',
+      terminateTopicSuccess: 'Successfully terminate the topic!',
+      startCompactionSuccess: 'Successfully start compacting the topic!',
+      startOffloadSuccess: 'Successfully start offloading the topic!'
+    },
     info: 'INFO',
     column: 'column',
     data: 'data',
-    terminate: 'terminate',
+    terminate: 'Terminate',
     compactionName: 'COMPACTION',
-    compaction: 'compaction',
+    compaction: 'Compaction',
     offloadName: 'OFFLOAD',
-    offload: 'offload',
+    offload: 'Offload',
     status: 'STATUS',
     unload: 'Unload',
     deleteTopicMessage: 'Are you sure you want to delete this topic?',
@@ -492,24 +613,24 @@ export default {
   },
   broker: {
     label: 'Broker',
-    name: 'Broker Name',
+    name: 'Broker',
     brokerNumber: 'Brokers',
-    ownedNamespaceNumber: 'Owned Namespace Number',
-    throughput: 'Throughput',
-    bandwidth: 'Bandwidth',
+    ownedNamespaceNumber: 'Owned Namespaces',
+    throughput: 'Throughput (bytes/s)',
+    msgRate: 'Msg Rate (msgs/s)',
     placeholderSelectBroker: 'Please select brokers',
     brokerContent: 'This is Broker Content'
   },
   bookie: {
     label: 'Bookie',
-    name: 'Bookie Name',
-    state: 'Bookie state',
-    storage: 'Bookie storage'
+    name: 'Name',
+    state: 'State',
+    storage: 'Storage'
   },
   // failure domain
   fd: {
     label: 'Failure Domain',
-    failureDomainNumber: 'Failure Domain Number',
+    failureDomainNumber: 'Failure Domains',
     createFdTitle: 'Add a New Failure Domain',
     name: 'Domain Name',
     brokerList: 'Broker List',
@@ -534,8 +655,8 @@ export default {
     selectIp: 'Select Isolation Policy',
     newIp: 'New Isolation Policy',
     nameLabel: 'Isolation Policy',
-    numPBLabel: 'Number of Primary Brokers',
-    numSBLabel: 'Number of Secondary Brokers',
+    numPBLabel: 'Primary Brokers',
+    numSBLabel: 'Secondary Brokers',
     newIpName: 'Please input policy name',
     selectNsLabel: 'Select Namespaces',
     selectPbLabel: 'Select Brokers',
@@ -583,6 +704,7 @@ export default {
     serviceUrlIsRequired: 'Service URL is required',
     addEnvSuccessNotification: 'Successfully add an environment',
     deleteEnvSuccessNotification: 'Successfully delete an environment',
-    updateEnvSuccessNotification: 'Successfully update an environment'
+    updateEnvSuccessNotification: 'Successfully update an environment',
+    manageEnvs: 'Manage Environments'
   }
 }
