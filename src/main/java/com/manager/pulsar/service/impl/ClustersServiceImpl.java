@@ -16,7 +16,6 @@ package com.manager.pulsar.service.impl;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.manager.pulsar.entity.EnvironmentsRepository;
 import com.manager.pulsar.service.BrokersService;
 import com.manager.pulsar.service.ClustersService;
 import com.manager.pulsar.utils.HttpUtil;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
