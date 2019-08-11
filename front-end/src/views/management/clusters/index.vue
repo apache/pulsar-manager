@@ -32,19 +32,27 @@
           </el-table-column>
           <el-table-column :label="$t('cluster.serviceUrl')" min-width="150px" align="center">
             <template slot-scope="scope">
-              <span>
-                data: {{ scope.row.brokerServiceUrl }}
-                <br>
-                admin: {{ scope.row.serviceUrl }}
+              <span v-if="scope.row.brokerServiceUrl !== ''">
+                <i class="el-icon-sort" style="margin-right: 2px"/>
+                <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=brokers'" class="link-type">
+                  {{ scope.row.brokerServiceUrl }}
+                </router-link>
+              </span>
+              <br>
+              <span v-if="scope.row.serviceUrl !== ''">
+                <i class="el-icon-setting" style="margin-right: 2px"/>
+                <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'" class="link-type">
+                  {{ scope.row.serviceUrl }}
+                </router-link>
               </span>
             </template>
           </el-table-column>
           <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'">
-                <el-button type="primary" size="mini">{{ $t('table.edit') }}</el-button>
+                <el-button type="primary" class="el-icon-edit-outline" size="mini">{{ $t('table.edit') }}</el-button>
               </router-link>
-              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+              <el-button size="mini" class="el-icon-delete" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -102,7 +110,7 @@ import {
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
-import { validateEmpty } from '@/utils/validate'
+import { validateEmpty, validateServiceUrl } from '@/utils/validate'
 import MdInput from '@/components/MDinput'
 
 export default {
@@ -160,8 +168,23 @@ export default {
       },
       dialogPvVisible: false,
       rules: {
-        cluster: [{ required: true, message: this.$i18n.t('cluster.clusterNameIsRequired'), trigger: 'change' }],
-        serviceUrl: [{ required: true, message: this.$i18n.t('cluster.serviceUrlIsRequired'), trigger: 'change' }],
+        cluster: [
+          { required: true, message: this.$i18n.t('cluster.clusterNameIsRequired'), trigger: 'change' }
+        ],
+        serviceUrl: [
+          { required: true, message: this.$i18n.t('cluster.serviceUrlIsRequired'), trigger: 'change' },
+          { validator: validateServiceUrl('http:', false), trigger: 'blur' }
+        ],
+        serviceUrlTls: [
+          { validator: validateServiceUrl('https:', true), trigger: 'blur' }
+        ],
+        brokerServiceUrl: [
+          { required: true, message: this.$i18n.t('cluster.serviceUrlIsRequired'), trigger: 'change' },
+          { validator: validateServiceUrl('pulsar:', false), trigger: 'blur' }
+        ],
+        brokerServiceUrlTls: [
+          { validator: validateServiceUrl('pulsar+ssl:', true), trigger: 'blur' }
+        ],
         domainName: [{ required: true, message: 'domainName is required', trigger: 'change' }],
         domainNames: [{ required: true, message: 'domainNames is required', trigger: 'change' }]
       },

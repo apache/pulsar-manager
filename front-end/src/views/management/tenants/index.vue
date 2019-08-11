@@ -35,7 +35,6 @@
               <span
                 v-for="tag in scope.row.allowedClusters"
                 :key="tag"
-                :type="primary"
                 class="list-el-tag">
                 <router-link :to="'/management/clusters/' + tag + '/cluster?tab=brokers'" class="link-type">
                   {{ tag }}
@@ -48,7 +47,6 @@
               <el-tag
                 v-for="tag in scope.row.adminRoles"
                 :key="tag"
-                :type="primary"
                 effect="dark"
                 class="list-el-tag">
                 {{ tag }}

@@ -29,7 +29,15 @@
               </el-table-column>
               <el-table-column :label="$t('fd.failureDomainNumber')" align="center" min-width="100px">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.failureDomain }}</span>
+                  <el-tag
+                    v-for="tag in scope.row.failureDomain"
+                    :key="tag"
+                    effect="dark"
+                    class="list-el-tag">
+                    <router-link :to="'/management/clusters/' + scope.row.cluster + '/' + tag + '/failureDomainName'" class="link-type">
+                      {{ tag }}
+                    </router-link>
+                  </el-tag>
                 </template>
               </el-table-column>
               <el-table-column :label="$t('broker.ownedNamespaceNumber')" align="center" min-width="100px">
@@ -37,14 +45,22 @@
                   <span>{{ scope.row.ownedNamespaces }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('broker.throughput')" align="center" min-width="100px">
+              <el-table-column :label="$t('broker.msgRate')" align="center" min-width="100px">
                 <template slot-scope="scope">
-                  <span>In:{{ scope.row.throughputIn }}<br>Out:{{ scope.row.throughputOut }}</span>
+                  <i class="el-icon-download" style="margin-right: 2px"/>
+                  <span>{{ scope.row.msgRateIn }}</span>
+                  <br>
+                  <i class="el-icon-upload2" style="margin-right: 2px"/>
+                  <span>{{ scope.row.msgRateOut }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('broker.bandwidth')" align="center" min-width="100px">
+              <el-table-column :label="$t('broker.throughput')" align="center" min-width="100px">
                 <template slot-scope="scope">
-                  <span>In: {{ scope.row.bandwidthIn }}<br>Out: {{ scope.row.bandwidthOut }}</span>
+                  <i class="el-icon-download" style="margin-right: 2px"/>
+                  <span>{{ scope.row.throughputIn }}</span>
+                  <br>
+                  <i class="el-icon-upload2" style="margin-right: 2px"/>
+                  <span>{{ scope.row.throughputOut }}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -163,18 +179,18 @@
       <el-tab-pane :label="$t('tabs.config')" name="config">
         <el-row>
           <el-col :span="6">
-            <el-form :inline="false" :model="form" :rules="rules" label-position="top">
+            <el-form ref="form" :inline="false" :model="form" :rules="rules" label-position="top">
               <el-form-item :label="$t('cluster.webServiceUrlPrefix')" prop="httpServiceUrl">
                 <el-input v-model="form.httpServiceUrl" placeholder="http://"/>
               </el-form-item>
-              <el-form-item :label="$t('cluster.webServiceUrlTlsPrefix')" prop="httpsServiceUrlTls">
+              <el-form-item :label="$t('cluster.webServiceUrlTlsPrefix')" prop="httpsServiceUrl">
                 <el-input v-model="form.httpsServiceUrl" placeholder="https://"/>
               </el-form-item>
               <el-form-item :label="$t('cluster.brokerServiceUrlPrefix')" prop="brokerServiceUrl">
                 <el-input v-model="form.brokerServiceUrl" placeholder="pulsar://"/>
               </el-form-item>
-              <el-form-item :label="$t('cluster.brokerServiceUrlTlsPrefix')" prop="brokersServiceUrl">
-                <el-input v-model="form.brokersServiceUrl" placeholder="pulsar+ssl://"/>
+              <el-form-item :label="$t('cluster.brokerServiceUrlTlsPrefix')" prop="brokerServiceUrlTls">
+                <el-input v-model="form.brokerServiceUrlTls" placeholder="pulsar+ssl://"/>
               </el-form-item>
               <el-button type="primary" class="button" @click="handleServiceUrl">{{ $t('cluster.updateCluster') }}</el-button>
             </el-form>
@@ -252,7 +268,7 @@ import { fetchIsolationPolicies, deleteIsolationPolicies } from '@/api/isolation
 import { getBookiesList } from '@/api/bookies'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
-import { validateEmpty } from '@/utils/validate'
+import { validateEmpty, validateServiceUrl } from '@/utils/validate'
 
 const defaultForm = {
   cluster: ''
@@ -275,10 +291,10 @@ export default {
       activeName: 'brokers',
       clustersListOptions: [],
       form: {
-        serviceUrl: '',
+        httpServiceUrl: '',
         httpsServiceUrl: '',
         brokerServiceUrl: '',
-        brokersServiceUrl: ''
+        brokerServiceUrlTls: ''
       },
       brokerOptions: [],
       temp: {
@@ -287,6 +303,20 @@ export default {
         brokerValue: []
       },
       rules: {
+        httpServiceUrl: [
+          { required: true, message: this.$i18n.t('cluster.serviceUrlIsRequired'), trigger: 'change' },
+          { validator: validateServiceUrl('http:', false), trigger: 'blur' }
+        ],
+        httpsServiceUrl: [
+          { validator: validateServiceUrl('https:', true), trigger: 'blur' }
+        ],
+        brokerServiceUrl: [
+          { required: true, message: this.$i18n.t('cluster.serviceUrlIsRequired'), trigger: 'change' },
+          { validator: validateServiceUrl('pulsar:', false), trigger: 'blur' }
+        ],
+        brokerServiceUrlTls: [
+          { validator: validateServiceUrl('pulsar+ssl:', true), trigger: 'blur' }
+        ],
         domainName: [{ required: true, message: this.$i18n.t('fd.domainNameIsRequired'), trigger: 'change' }]
       },
       failureDomainList: [],
@@ -310,7 +340,8 @@ export default {
       tempFailureDomainList: [],
       deleteClusterMessage: this.$i18n.t('cluster.deleteClusterMessage'),
       deleteFdMessage: this.$i18n.t('fd.deleteFdMessage'),
-      deletePolicyMessage: this.$i18n.t('ip.deletePolicyMessage')
+      deletePolicyMessage: this.$i18n.t('ip.deletePolicyMessage'),
+      currentActiveTab: ''
     }
   },
   created() {
@@ -354,7 +385,7 @@ export default {
             this.form.httpServiceUrl = response.data.data[i].serviceUrl
             this.form.httpsServiceUrl = response.data.data[i].serviceUrlTls
             this.form.brokerServiceUrl = response.data.data[i].brokerServiceUrl
-            this.form.brokersServiceUrl = response.data.data[i].brokerServiceUrlTls
+            this.form.brokerServiceUrlTls = response.data.data[i].brokerServiceUrlTls
           }
         }
       })
@@ -363,23 +394,29 @@ export default {
       fetchBrokers(this.postForm.cluster).then(response => {
         if (!response.data) return
         for (var i = 0; i < response.data.data.length; i++) {
-          var brokerInfo = {}
+          var brokerInfo = {
+          }
           var throughputIn = 0
           var throughputOut = 0
-          var bandwidthIn = 0
-          var bandwidthOut = 0
+          var msgRateIn = 0
+          var msgRateOut = 0
           var numberNamespaces = 0
           brokerInfo['cluster'] = this.postForm.cluster
           brokerInfo['broker'] = response.data.data[i].broker
-          brokerInfo['failureDomain'] = response.data.data[i].failureDomain.join(',')
+          brokerInfo['ownedNamespaces'] = numberNamespaces
+          brokerInfo['throughputIn'] = throughputIn
+          brokerInfo['throughputOut'] = throughputOut
+          brokerInfo['msgRateOut'] = msgRateOut
+          brokerInfo['msgRateIn'] = msgRateIn
+          brokerInfo['failureDomain'] = response.data.data[i].failureDomain
           fetchBrokerStatsMetrics(response.data.data[i].broker).then(res => {
             for (var m = 0; m < res.data.length; m++) {
               if (res.data[m].dimensions.hasOwnProperty('namespace')) {
                 if (res.data[m].dimensions.namespace.split('/').length === 2) {
                   throughputIn += res.data[m].metrics.brk_in_tp_rate
                   throughputOut += res.data[m].metrics.brk_out_tp_rate
-                  bandwidthIn += res.data[m].metrics.brk_in_rate
-                  bandwidthOut += res.data[m].metrics.brk_out_rate
+                  msgRateIn += res.data[m].metrics.brk_in_rate
+                  msgRateOut += res.data[m].metrics.brk_out_rate
                   numberNamespaces += 1
                 }
               }
@@ -387,8 +424,8 @@ export default {
             brokerInfo['ownedNamespaces'] = numberNamespaces
             brokerInfo['throughputIn'] = throughputIn
             brokerInfo['throughputOut'] = throughputOut
-            brokerInfo['bandwidthOut'] = bandwidthOut
-            brokerInfo['bandwidthIn'] = bandwidthIn
+            brokerInfo['msgRateOut'] = msgRateOut
+            brokerInfo['msgRateIn'] = msgRateIn
           })
           this.brokersList.push(brokerInfo)
         }
@@ -412,28 +449,33 @@ export default {
       })
     },
     getClusterInfo() {
-      this.$router.push({ path: '/management/clusters/' + this.postForm.cluster + '/cluster?tab=config' })
+      this.$router.push({ path: '/management/clusters/' + this.postForm.cluster + '/cluster?tab=' + this.activeName })
     },
     handleClick(tab, event) {
+      this.activeName = tab.name
       if (tab.name === 'isolationPolicies') {
         this.getNamespaceIsolationPolicy()
       }
       this.$router.push({ query: { 'tab': tab.name }})
     },
     handleServiceUrl() {
-      var data = {
-        'serviceUrl': this.form.httpServiceUrl,
-        'serviceUrlTls': this.form.httpsServiceUrl,
-        'brokerServiceUrl': this.form.brokerServiceUrl,
-        'brokerServiceUrlTls': this.form.brokersServiceUrl
-      }
-      updateCluster(this.postForm.cluster, data).then(() => {
-        this.$notify({
-          title: 'success',
-          message: this.$i18n.t('cluster.updateClusterSuccessNotification'),
-          type: 'success',
-          duration: 2000
-        })
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          var data = {
+            'serviceUrl': this.form.httpServiceUrl,
+            'serviceUrlTls': this.form.httpsServiceUrl,
+            'brokerServiceUrl': this.form.brokerServiceUrl,
+            'brokerServiceUrlTls': this.form.brokerServiceUrlTls
+          }
+          updateCluster(this.postForm.cluster, data).then(() => {
+            this.$notify({
+              title: 'success',
+              message: this.$i18n.t('cluster.updateClusterSuccessNotification'),
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
       })
     },
     getFailureDomainsList() {
@@ -578,6 +620,10 @@ export default {
 </script>
 
 <style>
+.list-el-tag {
+  margin-left: 2px;
+  margin-right: 2px;
+}
 .md-input-style {
   width: 300px;
   margin-top: 15px;

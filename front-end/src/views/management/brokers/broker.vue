@@ -34,12 +34,16 @@
         style="width: 100%;">
         <el-table-column label="Tenant" align="center" min-width="100px">
           <template slot-scope="scope">
-            <span>{{ scope.row.tenant }}</span>
+            <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant + '?tab=namespaces'" class="link-type">
+              <span>{{ scope.row.tenant }}</span>
+            </router-link>
           </template>
         </el-table-column>
         <el-table-column label="Namespace" align="center" min-width="100px">
           <template slot-scope="scope">
-            <span>{{ scope.row.namespace }}</span>
+            <router-link :to="'/management/namespaces/' + scope.row.tenant + '/' + scope.row.namespace + '/namespace?tab=overview'" class="link-type">
+              <span>{{ scope.row.namespace }}</span>
+            </router-link>
           </template>
         </el-table-column>
         <el-table-column label="Bundle" align="center" min-width="100px">
@@ -60,17 +64,19 @@
         fit
         highlight-current-row
         style="width: 100%;">
-        <el-table-column label="Isolation Policy" align="center" min-width="100px">
+        <el-table-column :label="$t('ip.nameLabel')" align="center" min-width="100px">
           <template slot-scope="scope">
-            <span>{{ scope.row.isolationPolicy }}</span>
+            <router-link :to="'/management/clusters/' + scope.row.cluster + '/' + scope.row.isolationPolicy + '/namespaceIsolationPolicy'" class="link-type">
+              <span>{{ scope.row.isolationPolicy }}</span>
+            </router-link>
           </template>
         </el-table-column>
-        <el-table-column label="Number of Primary Brokers" align="center" min-width="100px">
+        <el-table-column :label="$t('ip.numPBLabel')" align="center" min-width="100px">
           <template slot-scope="scope">
             <span>{{ scope.row.primaryBrokers }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Number of Secondary Brokers" align="center" min-width="100px">
+        <el-table-column :label="$t('ip.numSBLabel')" align="center" min-width="100px">
           <template slot-scope="scope">
             <span>{{ scope.row.secondaryBrokers }}</span>
           </template>
@@ -115,12 +121,14 @@ export default {
       isolationPolicyList: [],
       isolationPolicyTableKey: 0,
       dialogFormVisible: false,
-      jsonValue: {}
+      jsonValue: {},
+      firstInit: false
     }
   },
   created() {
     this.postForm.cluster = this.$route.params && this.$route.params.cluster
     this.postForm.broker = this.$route.params && this.$route.params.broker
+    this.firstInit = true
     this.getBrokerInfo()
     this.getBrokerStats()
     this.getIsolationPolicy()
@@ -201,6 +209,7 @@ export default {
           }
           if (tempIsolationPolicy.indexOf(policy) >= 0) {
             this.isolationPolicyList.push({
+              'cluster': this.postForm.cluster,
               'isolationPolicy': policy,
               'primaryBrokers': res.data[policy].primary.length,
               'secondaryBrokers': res.data[policy].secondary.length
@@ -212,6 +221,11 @@ export default {
     getBrokersList() {
       fetchBrokers(this.postForm.cluster).then(response => {
         if (!response.data) return
+        if (this.firstInit) {
+          this.firstInit = false
+        } else {
+          this.postForm.broker = ''
+        }
         this.brokersListOptions = []
         for (var i = 0; i < response.data.data.length; i++) {
           this.brokersListOptions.push(response.data.data[i].broker)
