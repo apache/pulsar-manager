@@ -262,9 +262,7 @@ public class BrokerStatsServiceImplTest {
 
         Optional<TopicStatsEntity> deleteTopicStatsEntity = topicsStatsRepository.findMaxTime();
         Assert.assertFalse(deleteTopicStatsEntity.isPresent());
-        if (deleteTopicStatsEntity.isPresent()) {
-            TopicStatsEntity topicStatsEntity2 = deleteTopicStatsEntity.get();
-        }
+
         Page<SubscriptionStatsEntity> deleteSubscriptionStatsEntities = subscriptionsStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
         Assert.assertEquals(deleteSubscriptionStatsEntities.getTotal(), 0);
