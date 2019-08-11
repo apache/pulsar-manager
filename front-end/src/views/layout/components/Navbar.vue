@@ -7,13 +7,13 @@
     <div class="right-menu">
       <el-dropdown @command="handleCommand">
         <span class="el-dropdown-link">
-          Environment<i class="el-icon-arrow-down el-icon--right"/>
+          {{ currentEnv }}<i class="el-icon-arrow-down el-icon--right"/>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item v-for="(item,index) in environmentsListOptions" :command="item" :key="index" :label="item.label" :value="item.value">
             {{ item.value }}
           </el-dropdown-item>
-          <el-dropdown-item command="newEnvironment" divided>New Environment</el-dropdown-item>
+          <el-dropdown-item command="newEnvironment" divided>{{ $t('env.manageEnvs') }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       <template v-if="device!=='mobile'">
@@ -54,7 +54,7 @@ import ErrorLog from '@/components/ErrorLog'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import { fetchEnvironments } from '@/api/environments'
-import { setEnvironment } from '@/utils/environment'
+import { setEnvironment, getEnvironment } from '@/utils/environment'
 
 export default {
   components: {
@@ -66,6 +66,7 @@ export default {
   },
   data() {
     return {
+      currentEnv: 'Environments',
       environmentsListOptions: [{
         'label': 'localhost:8080',
         'value': 'localhost:8080'
@@ -82,6 +83,7 @@ export default {
   },
   created() {
     this.getEnvironmentsList()
+    this.currentEnv = getEnvironment()
   },
   methods: {
     toggleSideBar() {
