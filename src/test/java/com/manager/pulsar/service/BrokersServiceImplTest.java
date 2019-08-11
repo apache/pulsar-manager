@@ -13,12 +13,12 @@
  */
 package com.manager.pulsar.service;
 
-
 import com.google.common.collect.Maps;
+import com.manager.pulsar.PulsarManagerApplication;
 import com.manager.pulsar.entity.EnvironmentEntity;
-import com.manager.pulsar.entity.EnvironmentsRepository;
-import com.manager.pulsar.utils.EnvironmentTools;
+import com.manager.pulsar.profiles.SqliteDBTestProfile;
 import com.manager.pulsar.utils.HttpUtil;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,19 +29,20 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringRunner.class)
 @PowerMockIgnore( {"javax.management.*", "javax.net.ssl.*"})
 @PrepareForTest(HttpUtil.class)
-@SpringBootTest
+@SpringBootTest(
+    classes = {
+        PulsarManagerApplication.class,
+        SqliteDBTestProfile.class
+    }
+)
+@ActiveProfiles("test")
 public class BrokersServiceImplTest {
 
     @Autowired

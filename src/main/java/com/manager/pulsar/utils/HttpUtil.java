@@ -80,8 +80,8 @@ public class HttpUtil {
             } else {
                 request.abort();
             }
-        } catch (Exception e) {
-            log.error("http request exception:{}",e.getMessage());
+        } catch (Throwable cause) {
+            log.error("http request exception:{}", cause.getMessage());
         } finally {
             try{
                 if (response != null) {

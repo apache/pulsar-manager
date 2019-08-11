@@ -17,6 +17,7 @@ import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.manager.pulsar.entity.EnvironmentEntity;
 import com.manager.pulsar.entity.EnvironmentsRepository;
+import com.manager.pulsar.service.EnvironmentCacheService;
 import com.manager.pulsar.utils.HttpUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,6 +49,9 @@ public class EnvironmentsController {
 
     @Autowired
     private EnvironmentsRepository environmentsRepository;
+
+    @Autowired
+    private EnvironmentCacheService environmentCacheService;
 
     @ApiOperation(value = "Get the list of existing environments, support paging, the default is 10 per page")
     @ApiResponses({
@@ -104,6 +108,7 @@ public class EnvironmentsController {
             return ResponseEntity.ok(result);
         }
         environmentsRepository.save(environmentEntity);
+        environmentCacheService.reloadEnvironment(environmentEntity);
         result.put("message", "Add environment success");
         return ResponseEntity.ok(result);
     }
@@ -130,6 +135,7 @@ public class EnvironmentsController {
             return ResponseEntity.ok(result);
         }
         environmentsRepository.update(environmentEntity);
+        environmentCacheService.reloadEnvironment(environmentEntity);
         result.put("message", "Update environment success");
         return ResponseEntity.ok(result);
     }

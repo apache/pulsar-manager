@@ -13,8 +13,7 @@
  */
 package com.manager.pulsar.zuul;
 
-import com.manager.pulsar.entity.EnvironmentEntity;
-import com.manager.pulsar.entity.EnvironmentsRepository;
+import com.manager.pulsar.service.EnvironmentCacheService;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.slf4j.Logger;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
@@ -39,9 +37,8 @@ public class EnvirmentForward extends ZuulFilter {
 
     private static final Logger log = LoggerFactory.getLogger(EnvirmentForward.class);
 
-
     @Autowired
-    private EnvironmentsRepository environmentsRepository;
+    private EnvironmentCacheService environmentCacheService;
 
     @Override
     public String filterType() {
@@ -79,16 +76,16 @@ public class EnvirmentForward extends ZuulFilter {
             return null;
         }
         String environment = request.getHeader("environment");
-        Optional<EnvironmentEntity> entityOptional = environmentsRepository.findByName(environment);
-        if (entityOptional.isPresent()) {
-            EnvironmentEntity environmentEntity = entityOptional.get();
-            String broker = environmentEntity.getBroker();
-            ctx.put(REQUEST_URI_KEY, request.getRequestURI());
-            try {
-                ctx.setRouteHost(new URL(broker));
-            } catch(MalformedURLException mue) {
-                log.error("Route forward to {} path {} error: {}", broker, request.getRequestURI(), mue.getMessage());
-            }
+        if (null == environment) {
+            return null;
+        }
+        String serviceUrl = environmentCacheService.getServiceUrl(request);
+        ctx.put(REQUEST_URI_KEY, request.getRequestURI());
+        try {
+            ctx.setRouteHost(new URL(serviceUrl));
+        } catch (MalformedURLException e) {
+            log.error("Route forward to {} path {} error: {}",
+                serviceUrl, request.getRequestURI(), e.getMessage());
         }
         return null;
     }

@@ -14,14 +14,17 @@
 package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
+import com.manager.pulsar.PulsarManagerApplication;
 import com.manager.pulsar.entity.ClusterEntity;
 import com.manager.pulsar.entity.ClustersRepository;
+import com.manager.pulsar.profiles.SqliteDBTestProfile;
 import org.apache.pulsar.shade.com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashSet;
@@ -29,7 +32,13 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(
+    classes = {
+        PulsarManagerApplication.class,
+        SqliteDBTestProfile.class
+    }
+)
+@ActiveProfiles("test")
 public class ClustersRepositoryImplTest {
 
     @Autowired

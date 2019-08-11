@@ -13,9 +13,8 @@
  */
 package com.manager.pulsar.controller;
 
-import com.manager.pulsar.entity.EnvironmentsRepository;
+import com.manager.pulsar.service.EnvironmentCacheService;
 import com.manager.pulsar.service.TenantsService;
-import com.manager.pulsar.utils.EnvironmentTools;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,33 +42,33 @@ import java.util.Map;
 @Validated
 public class TenantsController {
 
-  @Autowired
-  private TenantsService tenantsService;
+    @Autowired
+    private TenantsService tenantsService;
 
     @Autowired
-    private EnvironmentsRepository environmentsRepository;
+    private EnvironmentCacheService environmentCacheService;
 
     @Autowired
     private HttpServletRequest request;
 
-  @ApiOperation(value = "Get the list of existing tenants, support paging, the default is 10 per page")
-  @ApiResponses({
-          @ApiResponse(code = 200, message = "ok"),
-          @ApiResponse(code = 404, message = "Not found"),
-          @ApiResponse(code = 500, message = "Internal server error")
-  })
-  @RequestMapping(value = "/tenants", method =  RequestMethod.GET)
-  public ResponseEntity<Map<String, Object>> getTenants(
-          @ApiParam(value = "page_num", defaultValue = "1", example = "1")
-          @RequestParam(name = "page_num", defaultValue = "1")
-          @Min(value = 1, message = "page_num is incorrect, should be greater than 0.")
-          Integer pageNum,
-          @ApiParam(value = "page_size", defaultValue = "10", example = "10")
-          @RequestParam(name="page_size", defaultValue = "10")
-          @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
-          Integer pageSize) {
-      String requestHost = EnvironmentTools.getEnvironment(request, environmentsRepository);
-      Map<String, Object> result = tenantsService.getTenantsList(pageNum, pageSize, requestHost);
-    return ResponseEntity.ok(result);
-  }
+    @ApiOperation(value = "Get the list of existing tenants, support paging, the default is 10 per page")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "ok"),
+        @ApiResponse(code = 404, message = "Not found"),
+        @ApiResponse(code = 500, message = "Internal server error")
+    })
+    @RequestMapping(value = "/tenants", method =  RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getTenants(
+        @ApiParam(value = "page_num", defaultValue = "1", example = "1")
+        @RequestParam(name = "page_num", defaultValue = "1")
+        @Min(value = 1, message = "page_num is incorrect, should be greater than 0.")
+            Integer pageNum,
+        @ApiParam(value = "page_size", defaultValue = "10", example = "10")
+        @RequestParam(name="page_size", defaultValue = "10")
+        @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
+            Integer pageSize) {
+        String requestHost = environmentCacheService.getServiceUrl(request);
+        Map<String, Object> result = tenantsService.getTenantsList(pageNum, pageSize, requestHost);
+        return ResponseEntity.ok(result);
+    }
 }
