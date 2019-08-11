@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.common.policies.data.ClusterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -53,7 +54,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
     @Override
     public String getServiceUrl(HttpServletRequest request) {
-        String cluster = request.getParameter("cluster");
+        String cluster = request.getHeader("x-pulsar-cluster");
         return getServiceUrl(request, cluster);
     }
 
@@ -64,7 +65,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     }
 
     public String getServiceUrl(String environment, String cluster) {
-        if (null == cluster) {
+        if (StringUtils.isBlank(cluster)) {
             // if there is no cluster is specified, forward the request to environment service url
             Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
             EnvironmentEntity environmentEntity = environmentEntityOptional.get();
@@ -76,10 +77,8 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     }
 
     private String getServiceUrl(String environment, String cluster, int numReloads) {
-        log.info("Get service url from {} @ {} : numReloads = {}", environment, cluster, numReloads);
         // if there is a cluster specified, lookup the cluster.
         Map<String, ClusterData> clusters = environments.get(environment);
-        log.info("cluster : {}", clusters);
         ClusterData clusterData;
         if (null == clusters) {
             clusterData = reloadCluster(environment, cluster);

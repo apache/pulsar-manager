@@ -14,7 +14,11 @@
 package com.manager.pulsar.service;
 
 import java.util.Map;
+import java.util.function.Function;
 
 public interface ClustersService {
-    Map<String, Object> getClustersList(Integer pageNum, Integer pageSize, String requestHost);
+    Map<String, Object> getClustersList(Integer pageNum,
+                                        Integer pageSize,
+                                        String requestHost,
+                                        Function<String, String> serviceUrlProvider);
 }
