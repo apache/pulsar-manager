@@ -14,19 +14,28 @@
 package com.manager.pulsar.dao;
 
 import com.github.pagehelper.Page;
+import com.manager.pulsar.PulsarManagerApplication;
 import com.manager.pulsar.entity.EnvironmentEntity;
 import com.manager.pulsar.entity.EnvironmentsRepository;
+import com.manager.pulsar.profiles.SqliteDBTestProfile;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(
+    classes = {
+        PulsarManagerApplication.class,
+        SqliteDBTestProfile.class
+    }
+)
+@ActiveProfiles("test")
 public class EnvironmentsRepositoryImplTest {
 
     @Autowired
