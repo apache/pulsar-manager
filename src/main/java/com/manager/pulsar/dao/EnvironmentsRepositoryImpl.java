@@ -21,6 +21,7 @@ import com.manager.pulsar.mapper.EnvironmentsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -54,6 +55,11 @@ public class EnvironmentsRepositoryImpl implements EnvironmentsRepository {
     @Override
     public Page<EnvironmentEntity> getEnvironmentsList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
+        return environmentsMapper.findEnvironmentsList();
+    }
+
+    @Override
+    public List<EnvironmentEntity> getAllEnvironments() {
         return environmentsMapper.findEnvironmentsList();
     }
 

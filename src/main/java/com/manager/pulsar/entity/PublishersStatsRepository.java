@@ -11,15 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.manager.pulsar.service;
+package com.manager.pulsar.entity;
 
-public interface BrokerStatsService {
+import com.github.pagehelper.Page;
+import org.springframework.stereotype.Repository;
 
-    String forwarBrokerStatsMetrics(String broker, String requestHost);
+@Repository
+public interface PublishersStatsRepository {
 
-    String forwardBrokerStatsTopics(String broker, String requestHost);
+    long save(PublisherStatsEntity publisherStatsEntity);
 
-    void convertStatsToDb(Integer pageNum, Integer pageSize, String requestHost);
+    Page<PublisherStatsEntity> findByTopicStatsId(Integer pageNum, Integer pageSize,
+                                                  long topicStatsId, long timestamp);
 
-    void clearStats(long nowTime, long timeInterval);
+    void remove(long timestamp, long timeInterval);
 }

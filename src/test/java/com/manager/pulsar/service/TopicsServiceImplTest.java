@@ -30,6 +30,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
@@ -47,6 +49,9 @@ public class TopicsServiceImplTest {
 
     @Autowired
     private TopicsService topicsService;
+
+    @Autowired
+    private BrokerStatsService brokerStatsService;
 
     private final String topics = "[" +
             "\"persistent://public/default/test789\"," +
@@ -75,5 +80,45 @@ public class TopicsServiceImplTest {
         Assert.assertFalse((Boolean) topicsMap.get("isPage"));
         Assert.assertEquals(topicsMap.get("topics").toString(),
                 "[{partitions=0, topic=test789, persistent=persistent}, {partitions=3, topic=test900, persistent=persistent}]");
+    }
+
+    @Test
+    public void getTopicsStatsImpleTest() {
+        PowerMockito.mockStatic(HttpUtil.class);
+        Map<String, String> header = Maps.newHashMap();
+        header.put("Content-Type", "application/json");
+        String requestHost = "http://localhost:8080";
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
+                .thenReturn("[\"standalone\"]");
+
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
+                .thenReturn("[\"localhost:8080\"]");
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/broker-stats/topics", header))
+                .thenReturn(BrokerStatsServiceImplTest.testData);
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
+                .thenReturn("{}");
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone", header))
+                .thenReturn("{\n" +
+                        "\"serviceUrl\" : \"http://tengdeMBP:8080\",\n" +
+                        "\"brokerServiceUrl\" : \"pulsar://tengdeMBP:6650\"\n" +
+                        "}");
+        brokerStatsService.convertStatsToDb(1, 1, requestHost);
+
+        List<Map<String, String>> topics = new ArrayList<>();
+        Map<String, String> topic = Maps.newHashMap();
+        topic.put("topic", "metadata");
+        topic.put("partitions", "0");
+        topics.add(topic);
+
+        List<Map<String, Object>> topicsList =  topicsService.getTopicsStatsList(
+                "http://localhost:8080", "public", "functions", "persistent", topics);
+        topicsList.forEach((t) -> {
+            Assert.assertEquals(t.get("partitions"), 0);
+            Assert.assertEquals(t.get("subscriptions"), 1);
+            Assert.assertEquals(t.get("inMsg"), 0.0);
+            Assert.assertEquals(t.get("producers"), 1);
+            Assert.assertEquals(t.get("persistent"), "persistent");
+            Assert.assertEquals(t.get("topic"), "metadata");
+        });
     }
 }

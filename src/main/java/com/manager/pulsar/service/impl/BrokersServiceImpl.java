@@ -63,8 +63,6 @@ public class BrokersServiceImpl implements BrokersService {
 
     private List<String> getFailureDomain(String broker, Map<String, Map<String, List<String>>> failureDomains) {
         List<String> failureDomainsList = new ArrayList<>();
-        Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
         for (String failureDomain: failureDomains.keySet()) {
             Map<String, List<String>> domains = failureDomains.get(failureDomain);
             for (String domain: domains.keySet()) {
