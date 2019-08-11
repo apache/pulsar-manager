@@ -21,7 +21,10 @@ import com.manager.pulsar.service.BrokersService;
 import com.manager.pulsar.service.ClustersService;
 import com.manager.pulsar.service.EnvironmentCacheService;
 import com.manager.pulsar.utils.HttpUtil;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +34,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 @Configuration
@@ -82,164 +83,155 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
 
     public String forwarBrokerStatsMetrics(String broker, String requestHost) {
 
-        broker = checkBroker(broker, requestHost);
+        broker = checkServiceUrl(broker, requestHost);
         return HttpUtil.doGet(broker + "/admin/v2/broker-stats/metrics", header);
     }
 
     public String forwardBrokerStatsTopics(String broker, String requestHost) {
 
-        broker = checkBroker(broker, requestHost);
+        broker = checkServiceUrl(broker, requestHost);
         return HttpUtil.doGet(broker + "/admin/v2/broker-stats/topics", header);
     }
 
     @Scheduled(initialDelayString = "${init.delay.interval}", fixedDelayString = "${insert.stats.interval}")
     private void scheduleCollectStats() {
+        long unixTime = System.currentTimeMillis() / 1000L;
         List<EnvironmentEntity> environmentEntities = environmentsRepository.getAllEnvironments();
-        List<String> brokerList = new ArrayList<>();
-        List<String> clusterList = new ArrayList<>();
-        environmentEntities.forEach((environmentEntity -> {
-            brokerList.add(environmentEntity.getBroker());
-        }));
-        Set<String> collectStatsBroker = new HashSet<>();
-        for (String b : brokerList) {
-            String broker = checkBroker(null, b);
+        Map<Pair<String, String>, String> collectStatsServiceUrls = new HashMap<>();
+        for (EnvironmentEntity env : environmentEntities) {
+            String serviceUrl = checkServiceUrl(null, env.getBroker());
             Map<String, Object> clusterObject =
-                clustersService.getClustersList(0, 0, broker, (c) -> broker);
+                clustersService.getClustersList(0, 0, serviceUrl, (c) -> serviceUrl);
             List<HashMap<String, Object>> clusterLists = (List<HashMap<String, Object>>) clusterObject.get("data");
             clusterLists.forEach((clusterMap) -> {
                 String cluster = (String) clusterMap.get("cluster");
-                if (!clusterList.contains(cluster)) {
-                    collectStatsBroker.add(b);
-                }
+                Pair<String, String> envCluster = Pair.of(env.getName(), cluster);
+                collectStatsServiceUrls.put(envCluster, (String) clusterMap.get("serviceUrl"));
             });
         }
-        collectStatsBroker.forEach((broker) -> {
-            log.info("Start collecting stats from broker: {}", broker);
-            convertStatsToDb(0, 0, checkBroker(null, broker), (c) -> broker);
+        collectStatsServiceUrls.forEach((envCluster, serviceUrl) -> {
+            log.info("Start collecting stats from env {} / cluster {} @ {}",
+                envCluster.getLeft(), envCluster.getRight(), serviceUrl);
+            collectStatsToDB(unixTime, envCluster.getLeft(), envCluster.getRight(), serviceUrl);
         });
 
         log.info("Start clearing stats from broker");
-        long unixTime = System.currentTimeMillis() / 1000L;
         clearStats(unixTime, clearStatsInterval);
     }
 
-    @Override
-    public void convertStatsToDb(Integer pageNum, Integer pageSize, String requestHost, Function<String, String> serviceUrlProvider) {
-        Map<String, Object> clusterObject = clustersService.getClustersList(pageNum, pageSize, requestHost, serviceUrlProvider);
-        List<HashMap<String, Object>> clusterLists = (List<HashMap<String, Object>>) clusterObject.get("data");
-        clusterLists.forEach((clusterMap) -> {
-            String cluster = (String) clusterMap.get("cluster");
-            Map<String, Object> brokerObject = brokersService.getBrokersList(pageNum, pageSize, cluster, requestHost);
-            List<HashMap<String, Object>> brokerLists = (List<HashMap<String, Object>>) brokerObject.get("data");
-            brokerLists.forEach((brokerMap) -> {
-                String tempBroker = (String) brokerMap.get("broker");
-                String broker = checkBroker(tempBroker, requestHost);
-                String result = HttpUtil.doGet(broker + "/admin/v2/broker-stats/topics", header);
-                Gson gson = new Gson();
-                HashMap<String, HashMap<String, HashMap<String, HashMap<String, PulsarManagerTopicStats>>>> brokerStatsTopicEntity = gson.fromJson(result,
-                        new TypeToken<HashMap<String, HashMap<String, HashMap<String, HashMap<String, PulsarManagerTopicStats>>>>>() {}.getType());
-                brokerStatsTopicEntity.forEach((namespace, namespaceStats) -> {
-                    namespaceStats.forEach((bundle, bundleStats) -> {
-                        bundleStats.forEach((persistent, persistentStats) -> {
-                            persistentStats.forEach((topic, topicStats) -> {
-                                long unixTime = System.currentTimeMillis() / 1000L;
-                                TopicStatsEntity topicStatsEntity = new TopicStatsEntity();
-                                String[] topicPath = this.parseTopic(topic);
-                                topicStatsEntity.setCluster(cluster);
-                                topicStatsEntity.setBroker(tempBroker);
-                                topicStatsEntity.setTenant(topicPath[0]);
-                                topicStatsEntity.setNamespace(topicPath[1]);
-                                topicStatsEntity.setBundle(bundle);
-                                topicStatsEntity.setPersistent(persistent);
-                                topicStatsEntity.setTopic(topicPath[2]);
-                                topicStatsEntity.setMsgRateIn(topicStats.getMsgRateIn());
-                                topicStatsEntity.setMsgRateOut(topicStats.getMsgRateOut());
-                                topicStatsEntity.setMsgThroughputIn(topicStats.getMsgThroughputIn());
-                                topicStatsEntity.setMsgThroughputOut(topicStats.getMsgThroughputOut());
-                                topicStatsEntity.setAverageMsgSize(topicStats.getAverageMsgSize());
-                                topicStatsEntity.setStorageSize(topicStats.getStorageSize());
-                                topicStatsEntity.setSubscriptionCount(topicStats.getSubscriptions().size());
-                                topicStatsEntity.setProducerCount(topicStats.getPublishers().size());
-                                topicStatsEntity.setTimestamp(unixTime);
-                                long topicStatsId = topicsStatsRepository.save(topicStatsEntity);
-                                if (topicStats.getSubscriptions() != null) {
-                                    topicStats.getSubscriptions().forEach((subscription, subscriptionStats) -> {
-                                        SubscriptionStatsEntity subscriptionStatsEntity = new SubscriptionStatsEntity();
-                                        subscriptionStatsEntity.setTopicStatsId(topicStatsId);
-                                        subscriptionStatsEntity.setSubscription(subscription);
-                                        subscriptionStatsEntity.setMsgRateOut(subscriptionStats.getMsgRateOut());
-                                        subscriptionStatsEntity.setMsgThroughputOut(subscriptionStats.getMsgThroughputOut());
-                                        subscriptionStatsEntity.setMsgRateRedeliver(subscriptionStats.getMsgRateRedeliver());
-                                        subscriptionStatsEntity.setNumberOfEntriesSinceFirstNotAckedMessage(
-                                                subscriptionStats.getNumberOfEntriesSinceFirstNotAckedMessage());
-                                        subscriptionStatsEntity.setTotalNonContiguousDeletedMessagesRange(
-                                                subscriptionStats.getTotalNonContiguousDeletedMessagesRange());
-                                        subscriptionStatsEntity.setMsgBacklog(subscriptionStats.getMsgBacklog());
-                                        subscriptionStatsEntity.setSubscriptionType(String.valueOf(subscriptionStats.getType()));
-                                        subscriptionStatsEntity.setMsgRateExpired(subscriptionStats.getMsgRateExpired());
-                                        subscriptionStatsEntity.setReplicated(subscriptionStats.isReplicated());
-                                        subscriptionStatsEntity.setTimestamp(unixTime);
-                                        long subscriptionStatsId = subscriptionsStatsRepository.save(subscriptionStatsEntity);
-                                        if (subscriptionStats.getConsumers() != null) {
-                                            subscriptionStats.getConsumers().forEach((consumerStats) -> {
-                                                ConsumerStatsEntity consumerStatsEntity = new ConsumerStatsEntity();
-                                                consumerStatsEntity.setSubscriptionStatsId(subscriptionStatsId);
-                                                consumerStatsEntity.setTopicStatsId(topicStatsId);
-                                                consumerStatsEntity.setReplicationStatsId(-1);
-                                                consumerStatsEntity.setConsumer(consumerStats.getConsumerName());
-                                                consumerStatsEntity.setMsgRateOut(consumerStats.getMsgRateOut());
-                                                consumerStatsEntity.setMsgThroughputOut(consumerStats.getMsgThroughputOut());
-                                                consumerStatsEntity.setMsgRateRedeliver(consumerStats.getMsgRateRedeliver());
-                                                consumerStatsEntity.setAvailablePermits(consumerStats.getAvailablePermits());
-                                                consumerStatsEntity.setAddress(consumerStats.getAddress());
-                                                consumerStatsEntity.setConnectedSince(consumerStats.getConnectedSince());
-                                                consumerStatsEntity.setClientVersion(consumerStats.getClientVersion());
-                                                consumerStatsEntity.setMetadata(gson.toJson(consumerStats.getMetadata()));
-                                                consumerStatsEntity.setTimestamp(unixTime);
-                                                consumersStatsRepository.save(consumerStatsEntity);
-                                            });
-                                        }
-                                    });
-                                }
-                                if (topicStats.getPublishers() != null) {
-                                    topicStats.getPublishers().forEach((producer) -> {
-                                        PublisherStatsEntity publisherStatsEntity = new PublisherStatsEntity();
-                                        publisherStatsEntity.setTopicStatsId(topicStatsId);
-                                        publisherStatsEntity.setProducerId(producer.getProducerId());
-                                        publisherStatsEntity.setProducerName(producer.getProducerName());
-                                        publisherStatsEntity.setMsgRateIn(producer.getMsgRateIn());
-                                        publisherStatsEntity.setMsgThroughputIn(producer.getMsgThroughputIn());
-                                        publisherStatsEntity.setAverageMsgSize(producer.getAverageMsgSize());
-                                        publisherStatsEntity.setAddress(producer.getAddress());
-                                        publisherStatsEntity.setConnectedSince(producer.getConnectedSince());
-                                        publisherStatsEntity.setClientVersion(producer.getClientVersion());
-                                        publisherStatsEntity.setMetadata(gson.toJson(producer.getMetadata()));
-                                        publisherStatsEntity.setTimestamp(unixTime);
-                                        publishersStatsRepository.save(publisherStatsEntity);
-                                    });
-                                }
-                                if (topicStats.getReplication() != null) {
-                                    topicStats.getReplication().forEach((replication, replicatorStats) -> {
-                                        ReplicationStatsEntity replicationStatsEntity = new ReplicationStatsEntity();
-                                        replicationStatsEntity.setCluster(replication);
-                                        replicationStatsEntity.setTopicStatsId(topicStatsId);
-                                        replicationStatsEntity.setMsgRateIn(replicatorStats.getMsgRateIn());
-                                        replicationStatsEntity.setMsgThroughputIn(replicatorStats.getMsgThroughputIn());
-                                        replicationStatsEntity.setMsgRateOut(replicatorStats.getMsgRateOut());
-                                        replicationStatsEntity.setMsgThroughputOut(replicatorStats.getMsgThroughputOut());
-                                        replicationStatsEntity.setMsgRateExpired(replicatorStats.getMsgRateExpired());
-                                        replicationStatsEntity.setReplicationBacklog(replicatorStats.getReplicationBacklog());
-                                        replicationStatsEntity.setConnected(replicatorStats.isConnected());
-                                        replicationStatsEntity.setReplicationDelayInSeconds(replicatorStats.getReplicationDelayInSeconds());
-                                        replicationStatsEntity.setInboundConnection(replicatorStats.getInboundConnection());
-                                        replicationStatsEntity.setInboundConnectedSince(replicatorStats.getInboundConnectedSince());
-                                        replicationStatsEntity.setOutboundConnection(replicatorStats.getOutboundConnection());
-                                        replicationStatsEntity.setOutboundConnectedSince(replicatorStats.getOutboundConnectedSince());
-                                        replicationStatsEntity.setTimestamp(unixTime);
-                                        replicationsStatsRepository.save(replicationStatsEntity);
-                                    });
-                                }
-                            });
+    public void collectStatsToDB(long unixTime, String env, String cluster, String serviceUrl) {
+        Map<String, Object> brokerObject = brokersService.getBrokersList(0, 0, cluster, serviceUrl);
+        List<HashMap<String, Object>> brokerLists = (List<HashMap<String, Object>>) brokerObject.get("data");
+        brokerLists.forEach((brokerMap) -> {
+            String tempBroker = (String) brokerMap.get("broker");
+            // TODO: handle other protocols
+            String broker = "http://" + tempBroker;
+            String result = HttpUtil.doGet(broker + "/admin/v2/broker-stats/topics", header);
+            Gson gson = new Gson();
+            HashMap<String, HashMap<String, HashMap<String, HashMap<String, PulsarManagerTopicStats>>>> brokerStatsTopicEntity = gson.fromJson(result,
+                new TypeToken<HashMap<String, HashMap<String, HashMap<String, HashMap<String, PulsarManagerTopicStats>>>>>() {
+                }.getType());
+            brokerStatsTopicEntity.forEach((namespace, namespaceStats) -> {
+                namespaceStats.forEach((bundle, bundleStats) -> {
+                    bundleStats.forEach((persistent, persistentStats) -> {
+                        persistentStats.forEach((topic, topicStats) -> {
+                            TopicStatsEntity topicStatsEntity = new TopicStatsEntity();
+                            String[] topicPath = this.parseTopic(topic);
+                            topicStatsEntity.setEnvironment(env);
+                            topicStatsEntity.setCluster(cluster);
+                            topicStatsEntity.setBroker(tempBroker);
+                            topicStatsEntity.setTenant(topicPath[0]);
+                            topicStatsEntity.setNamespace(topicPath[1]);
+                            topicStatsEntity.setBundle(bundle);
+                            topicStatsEntity.setPersistent(persistent);
+                            topicStatsEntity.setTopic(topicPath[2]);
+                            topicStatsEntity.setMsgRateIn(topicStats.getMsgRateIn());
+                            topicStatsEntity.setMsgRateOut(topicStats.getMsgRateOut());
+                            topicStatsEntity.setMsgThroughputIn(topicStats.getMsgThroughputIn());
+                            topicStatsEntity.setMsgThroughputOut(topicStats.getMsgThroughputOut());
+                            topicStatsEntity.setAverageMsgSize(topicStats.getAverageMsgSize());
+                            topicStatsEntity.setStorageSize(topicStats.getStorageSize());
+                            topicStatsEntity.setSubscriptionCount(topicStats.getSubscriptions().size());
+                            topicStatsEntity.setProducerCount(topicStats.getPublishers().size());
+                            topicStatsEntity.setTimestamp(unixTime);
+                            long topicStatsId = topicsStatsRepository.save(topicStatsEntity);
+                            if (topicStats.getSubscriptions() != null) {
+                                topicStats.getSubscriptions().forEach((subscription, subscriptionStats) -> {
+                                    SubscriptionStatsEntity subscriptionStatsEntity = new SubscriptionStatsEntity();
+                                    subscriptionStatsEntity.setTopicStatsId(topicStatsId);
+                                    subscriptionStatsEntity.setSubscription(subscription);
+                                    subscriptionStatsEntity.setMsgRateOut(subscriptionStats.getMsgRateOut());
+                                    subscriptionStatsEntity.setMsgThroughputOut(subscriptionStats.getMsgThroughputOut());
+                                    subscriptionStatsEntity.setMsgRateRedeliver(subscriptionStats.getMsgRateRedeliver());
+                                    subscriptionStatsEntity.setNumberOfEntriesSinceFirstNotAckedMessage(
+                                        subscriptionStats.getNumberOfEntriesSinceFirstNotAckedMessage());
+                                    subscriptionStatsEntity.setTotalNonContiguousDeletedMessagesRange(
+                                        subscriptionStats.getTotalNonContiguousDeletedMessagesRange());
+                                    subscriptionStatsEntity.setMsgBacklog(subscriptionStats.getMsgBacklog());
+                                    subscriptionStatsEntity.setSubscriptionType(String.valueOf(subscriptionStats.getType()));
+                                    subscriptionStatsEntity.setMsgRateExpired(subscriptionStats.getMsgRateExpired());
+                                    subscriptionStatsEntity.setReplicated(subscriptionStats.isReplicated());
+                                    subscriptionStatsEntity.setTimestamp(unixTime);
+                                    long subscriptionStatsId = subscriptionsStatsRepository.save(subscriptionStatsEntity);
+                                    if (subscriptionStats.getConsumers() != null) {
+                                        subscriptionStats.getConsumers().forEach((consumerStats) -> {
+                                            ConsumerStatsEntity consumerStatsEntity = new ConsumerStatsEntity();
+                                            consumerStatsEntity.setSubscriptionStatsId(subscriptionStatsId);
+                                            consumerStatsEntity.setTopicStatsId(topicStatsId);
+                                            consumerStatsEntity.setReplicationStatsId(-1);
+                                            consumerStatsEntity.setConsumer(consumerStats.getConsumerName());
+                                            consumerStatsEntity.setMsgRateOut(consumerStats.getMsgRateOut());
+                                            consumerStatsEntity.setMsgThroughputOut(consumerStats.getMsgThroughputOut());
+                                            consumerStatsEntity.setMsgRateRedeliver(consumerStats.getMsgRateRedeliver());
+                                            consumerStatsEntity.setAvailablePermits(consumerStats.getAvailablePermits());
+                                            consumerStatsEntity.setAddress(consumerStats.getAddress());
+                                            consumerStatsEntity.setConnectedSince(consumerStats.getConnectedSince());
+                                            consumerStatsEntity.setClientVersion(consumerStats.getClientVersion());
+                                            consumerStatsEntity.setMetadata(gson.toJson(consumerStats.getMetadata()));
+                                            consumerStatsEntity.setTimestamp(unixTime);
+                                            consumersStatsRepository.save(consumerStatsEntity);
+                                        });
+                                    }
+                                });
+                            }
+                            if (topicStats.getPublishers() != null) {
+                                topicStats.getPublishers().forEach((producer) -> {
+                                    PublisherStatsEntity publisherStatsEntity = new PublisherStatsEntity();
+                                    publisherStatsEntity.setTopicStatsId(topicStatsId);
+                                    publisherStatsEntity.setProducerId(producer.getProducerId());
+                                    publisherStatsEntity.setProducerName(producer.getProducerName());
+                                    publisherStatsEntity.setMsgRateIn(producer.getMsgRateIn());
+                                    publisherStatsEntity.setMsgThroughputIn(producer.getMsgThroughputIn());
+                                    publisherStatsEntity.setAverageMsgSize(producer.getAverageMsgSize());
+                                    publisherStatsEntity.setAddress(producer.getAddress());
+                                    publisherStatsEntity.setConnectedSince(producer.getConnectedSince());
+                                    publisherStatsEntity.setClientVersion(producer.getClientVersion());
+                                    publisherStatsEntity.setMetadata(gson.toJson(producer.getMetadata()));
+                                    publisherStatsEntity.setTimestamp(unixTime);
+                                    publishersStatsRepository.save(publisherStatsEntity);
+                                });
+                            }
+                            if (topicStats.getReplication() != null) {
+                                topicStats.getReplication().forEach((replication, replicatorStats) -> {
+                                    ReplicationStatsEntity replicationStatsEntity = new ReplicationStatsEntity();
+                                    replicationStatsEntity.setCluster(replication);
+                                    replicationStatsEntity.setTopicStatsId(topicStatsId);
+                                    replicationStatsEntity.setMsgRateIn(replicatorStats.getMsgRateIn());
+                                    replicationStatsEntity.setMsgThroughputIn(replicatorStats.getMsgThroughputIn());
+                                    replicationStatsEntity.setMsgRateOut(replicatorStats.getMsgRateOut());
+                                    replicationStatsEntity.setMsgThroughputOut(replicatorStats.getMsgThroughputOut());
+                                    replicationStatsEntity.setMsgRateExpired(replicatorStats.getMsgRateExpired());
+                                    replicationStatsEntity.setReplicationBacklog(replicatorStats.getReplicationBacklog());
+                                    replicationStatsEntity.setConnected(replicatorStats.isConnected());
+                                    replicationStatsEntity.setReplicationDelayInSeconds(replicatorStats.getReplicationDelayInSeconds());
+                                    replicationStatsEntity.setInboundConnection(replicatorStats.getInboundConnection());
+                                    replicationStatsEntity.setInboundConnectedSince(replicatorStats.getInboundConnectedSince());
+                                    replicationStatsEntity.setOutboundConnection(replicatorStats.getOutboundConnection());
+                                    replicationStatsEntity.setOutboundConnectedSince(replicatorStats.getOutboundConnectedSince());
+                                    replicationStatsEntity.setTimestamp(unixTime);
+                                    replicationsStatsRepository.save(replicationStatsEntity);
+                                });
+                            }
                         });
                     });
                 });
@@ -255,15 +247,15 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         topicsStatsRepository.remove(nowTime, timeInterval);
     }
 
-    public static String checkBroker(String broker, String requestHost) {
-        if (broker == null || broker.length() <= 0) {
-            broker = requestHost;
+    public static String checkServiceUrl(String serviceUrl, String requestHost) {
+        if (serviceUrl == null || serviceUrl.length() <= 0) {
+            serviceUrl = requestHost;
         }
 
-        if (!broker.startsWith("http")) {
-            broker = "http://" + broker;
+        if (!serviceUrl.startsWith("http")) {
+            serviceUrl = "http://" + serviceUrl;
         }
-        return broker;
+        return serviceUrl;
     }
 
     private String[] parseTopic(String topic) {

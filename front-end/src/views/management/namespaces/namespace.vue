@@ -73,11 +73,11 @@
               v-loading="topicsListLoading"
               :key="topicsTableKey"
               :data="topicsList"
-              border
+              :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
               fit
               highlight-current-row
-              style="width: 100%;">
-              <el-table-column :label="$t('topic.label')" min-width="50px" align="center">
+              row-key="id">
+              <el-table-column :label="$t('topic.label')" min-width="50px" align="left">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.topicLink" class="link-type">
                     <span>{{ scope.row.topic }}</span>
@@ -902,13 +902,11 @@ export default {
     getTopicsStats() {
       fetchTopicsStatsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
-        console.log(response)
       })
     },
     getTopics() {
       fetchTopicsStatsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
-        console.log(response)
         for (var i in response.data.topics) {
           var topicLink = ''
           if (response.data.topics[i]['partitions'] === 0) {
@@ -916,7 +914,29 @@ export default {
           } else {
             topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/partitionedTopic'
           }
+          var children = []
+          var clusters = response.data.topics[i]['clusters']
+          for (var j in clusters) {
+            var clusterTopicInfo = {
+              'id': 1000000 * (i + 1) + j,
+              'topic': clusters[j]['topic'],
+              'partitions': clusters[j]['partitions'],
+              'persistent': clusters[j]['persistent'],
+              'producers': clusters[j]['producerCount'],
+              'subscriptions': clusters[j]['subscriptionCount'],
+              'inMsg': clusters[j]['msgRateIn'],
+              'outMsg': clusters[j]['msgRateOut'],
+              'inBytes': clusters[j]['msgThroughputIn'],
+              'outBytes': clusters[j]['msgThroughputOut'],
+              'storageSize': clusters[j]['storageSize'],
+              'tenantNamespace': this.tenantNamespace,
+              'topicLink': topicLink
+            }
+            children.push(clusterTopicInfo)
+          }
+
           var topicInfo = {
+            'id': i,
             'topic': response.data.topics[i]['topic'],
             'partitions': response.data.topics[i]['partitions'],
             'persistent': response.data.topics[i]['persistent'],
@@ -927,6 +947,7 @@ export default {
             'inBytes': response.data.topics[i]['inBytes'],
             'outBytes': response.data.topics[i]['outBytes'],
             'storageSize': response.data.topics[i]['storageSize'],
+            'children': children,
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink
           }

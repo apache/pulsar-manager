@@ -13,6 +13,7 @@
  */
 package com.manager.pulsar.entity;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,8 +24,41 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@Data
 public class TopicStatsEntity {
+
+    @Data
+    @NoArgsConstructor
+    public static class TopicStatsSummary {
+
+        private String topic;
+        private int partitions;
+        private String persistent;
+        private int producerCount;
+        private int subscriptionCount;
+        private double msgRateIn;
+        private double msgThroughputIn;
+        private double msgRateOut;
+        private double msgThroughputOut;
+        private double averageMsgSize;
+        private double storageSize;
+
+        public TopicStatsSummary add(TopicStatsSummary other) {
+            TopicStatsSummary total = new TopicStatsSummary();
+            total.producerCount = producerCount + other.producerCount;
+            total.subscriptionCount = subscriptionCount + other.subscriptionCount;
+            total.msgRateIn = msgRateIn + other.msgRateIn;
+            total.msgRateOut = msgRateOut + other.msgRateOut;
+            total.msgThroughputIn = msgThroughputIn + other.msgThroughputIn;
+            total.msgThroughputOut = msgThroughputOut + other.msgThroughputOut;
+            total.averageMsgSize = (averageMsgSize + other.averageMsgSize) / 2;
+            total.storageSize = storageSize + other.storageSize;
+            return total;
+        }
+    }
+
     private long topicStatsId;
+    private String environment;
     private String cluster;
     private String broker;
     private String tenant;
@@ -41,4 +75,19 @@ public class TopicStatsEntity {
     private double averageMsgSize;
     private double storageSize;
     private long timestamp;
+
+
+    public TopicStatsSummary getSummary() {
+        TopicStatsSummary summary = new TopicStatsSummary();
+        summary.producerCount = producerCount;
+        summary.subscriptionCount = subscriptionCount;
+        summary.msgRateIn = msgRateIn;
+        summary.msgRateOut = msgRateOut;
+        summary.msgThroughputIn = msgThroughputIn;
+        summary.msgThroughputOut = msgThroughputOut;
+        summary.averageMsgSize = averageMsgSize;
+        summary.storageSize = storageSize;
+        return summary;
+    }
+
 }

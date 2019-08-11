@@ -22,7 +22,9 @@ public interface TopicsService {
             Integer pageNum, Integer pageSize, String tenant, String namespace, String requestHost);
 
     Map<String, Object> getTopicStats(
-            Integer pageNum, Integer pageSize, String tenant, String namespace, String requestHost);
+            Integer pageNum, Integer pageSize,
+            String tenant, String namespace,
+            String env, String serviceUrl);
 
     List<Map<String, Object>> getTopicsStatsList(String broker, String tenant, String namespace,
                                                  String persistent, List<Map<String, String>> topics);

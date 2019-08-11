@@ -41,26 +41,41 @@ public class TopicsStatsRepositoryImpl implements TopicsStatsRepository {
         return Optional.ofNullable(topicsStatsMapper.findMaxTime());
     }
 
-    public Page<TopicStatsEntity> findByClusterBroker(Integer pageNum, Integer pageSize,
-                                                      String cluster, String broker, long timestamp) {
+    public Page<TopicStatsEntity> findByClusterBroker(Integer pageNum,
+                                                      Integer pageSize,
+                                                      String environment,
+                                                      String cluster,
+                                                      String broker,
+                                                      long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<TopicStatsEntity> topicStatsEntities = topicsStatsMapper.findByClusterBroker(cluster, broker, timestamp);
+        Page<TopicStatsEntity> topicStatsEntities =
+            topicsStatsMapper.findByClusterBroker(environment, cluster, broker, timestamp);
         return topicStatsEntities;
     }
 
-    public Page<TopicStatsEntity> findByNamespace(Integer pageNum, Integer pageSize,
-                                                  String cluster, String broker, String tenant,
-                                                  String namespace, long timestamp) {
+    public Page<TopicStatsEntity> findByNamespace(Integer pageNum,
+                                                  Integer pageSize,
+                                                  String environment,
+                                                  String cluster,
+                                                  String tenant,
+                                                  String namespace,
+                                                  long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<TopicStatsEntity> topicStatsEntities= topicsStatsMapper.findByNamespace(cluster, broker, tenant, namespace, timestamp);
+        Page<TopicStatsEntity> topicStatsEntities =
+            topicsStatsMapper.findByNamespace(environment, cluster, tenant, namespace, timestamp);
         return topicStatsEntities;
     }
 
-    public Page<TopicStatsEntity> findByMultiTopic(Integer pageNum, Integer pageSize, String broker, String tenant,
-                                                   String namespace, String persistent, List<String> topicList, long timestamp) {
+    public Page<TopicStatsEntity> findByMultiTopic(Integer pageNum,
+                                                   Integer pageSize,
+                                                   String environment,
+                                                   String tenant,
+                                                   String namespace,
+                                                   String persistent,
+                                                   List<String> topicList, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
         Page<TopicStatsEntity> topicStatsEntities = topicsStatsMapper.findByMultiTopic(
-                broker, tenant, namespace, persistent, topicList, timestamp);
+                environment, tenant, namespace, persistent, topicList, timestamp);
         return topicStatsEntities;
     }
 
