@@ -246,7 +246,6 @@ export default {
     },
     handleUnloadBundle(row) {
       unloadBundleOnBroker(this.postForm.broker, row.tenant + '/' + row.namespace, row.bundle).then(response => {
-        console.log(response)
         if (isValidResponse(response)) {
           this.$notify({
             title: 'success',
