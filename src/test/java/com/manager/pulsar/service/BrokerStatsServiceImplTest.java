@@ -231,11 +231,8 @@ public class BrokerStatsServiceImplTest {
         topicStatsEntityPage.getResult().forEach((t) -> {
             checkTopicStatsResult(t);
         });
-        System.out.println(topicStatsEntity1.getTopicStatsId());
-        System.out.println(topicStatsEntity1.getTimestamp());
         Page<SubscriptionStatsEntity> subscriptionStatsEntities = subscriptionsStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
-        System.out.println(subscriptionStatsEntities);
         subscriptionStatsEntities.getResult().forEach((subscription) -> {
             checkSubscriptionStatsResult(subscription);
             Page<ConsumerStatsEntity> consumerStatsEntities = consumersStatsRepository.findBySubscriptionStatsId(
@@ -264,12 +261,9 @@ public class BrokerStatsServiceImplTest {
         }
 
         Optional<TopicStatsEntity> deleteTopicStatsEntity = topicsStatsRepository.findMaxTime();
-        System.out.println(deleteTopicStatsEntity);
         Assert.assertFalse(deleteTopicStatsEntity.isPresent());
         if (deleteTopicStatsEntity.isPresent()) {
             TopicStatsEntity topicStatsEntity2 = deleteTopicStatsEntity.get();
-            System.out.println(topicStatsEntity2.getTenant());
-            System.out.println(topicStatsEntity2.getTimestamp());
         }
         Page<SubscriptionStatsEntity> deleteSubscriptionStatsEntities = subscriptionsStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
