@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.common.policies.data.ClusterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -64,7 +65,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     }
 
     public String getServiceUrl(String environment, String cluster) {
-        if (null == cluster) {
+        if (StringUtils.isBlank(cluster)) {
             // if there is no cluster is specified, forward the request to environment service url
             Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
             EnvironmentEntity environmentEntity = environmentEntityOptional.get();

@@ -16,6 +16,7 @@ package com.manager.pulsar.zuul;
 import com.manager.pulsar.service.EnvironmentCacheService;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,14 +72,14 @@ public class EnvironmentForward extends ZuulFilter {
         }
 
         String broker = request.getHeader("x-pulsar-broker");
-        if (null != broker) { // the request should be forward to a pulsar broker
+        if (StringUtils.isNotBlank(broker)) { // the request should be forward to a pulsar broker
             // TODO: support https://
             String serviceUrl = "http://" + broker;
             return forwardRequest(ctx, request, serviceUrl);
         }
 
         String environment = request.getHeader("environment");
-        if (null == environment) {
+        if (StringUtils.isNotBlank(environment)) {
             return null;
         }
         String serviceUrl = environmentCacheService.getServiceUrl(request);
