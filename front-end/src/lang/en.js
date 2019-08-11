@@ -691,6 +691,7 @@ export default {
     serviceUrlIsRequired: 'Service URL is required',
     addEnvSuccessNotification: 'Successfully add an environment',
     deleteEnvSuccessNotification: 'Successfully delete an environment',
-    updateEnvSuccessNotification: 'Successfully update an environment'
+    updateEnvSuccessNotification: 'Successfully update an environment',
+    manageEnvs: 'Manage Environments'
   }
 }
