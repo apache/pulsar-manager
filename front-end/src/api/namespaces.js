@@ -182,8 +182,20 @@ export function unload(tenantNamespace, data) {
 }
 
 export function unloadBundle(tenantNamespace, bundle) {
+  return unloadBundleImpl('', '', tenantNamespace, bundle)
+}
+
+export function unloadBundleOnBroker(broker, tenantNamespace, bundle) {
+  return unloadBundleImpl('', broker, tenantNamespace, bundle)
+}
+
+export function unloadBundleImpl(cluster, broker, tenantNamespace, bundle) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster,
+      'x-pulsar-broker': broker
+    },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/unload`,
     method: 'put'
   })

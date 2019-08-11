@@ -17,6 +17,9 @@ const BASE_URL_V2 = '/admin/v2'
 
 export function fetchIsolationPolicies(cluster) {
   return request({
+    headers: {
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/clusters/${cluster}/namespaceIsolationPolicies`,
     method: 'get'
   })
@@ -24,7 +27,10 @@ export function fetchIsolationPolicies(cluster) {
 
 export function updateIsolationPolicies(cluster, policyName, data) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/clusters/${cluster}/namespaceIsolationPolicies/${policyName}`,
     method: 'post',
     data
@@ -33,7 +39,10 @@ export function updateIsolationPolicies(cluster, policyName, data) {
 
 export function deleteIsolationPolicies(cluster, policyName) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/clusters/${cluster}/namespaceIsolationPolicies/${policyName}`,
     method: 'delete'
   })

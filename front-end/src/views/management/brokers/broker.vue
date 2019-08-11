@@ -94,11 +94,13 @@ import { fetchClusters } from '@/api/clusters'
 import { fetchBrokerStatsMetrics, fetchBrokerStatsTopics } from '@/api/brokerStats'
 import { fetchBrokersHealth, fetchBrokers } from '@/api/brokers'
 import { fetchIsolationPolicies } from '@/api/isolationPolicies'
-import { unloadBundle } from '@/api/namespaces'
+import { unloadBundleOnBroker } from '@/api/namespaces'
 import { fetchBrokersRuntimeConfiguration } from '@/api/brokers'
 import jsonEditor from '@/components/JsonEditor'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
+import { isValidResponse } from '@/utils/http'
+
 const defaultForm = {
   cluster: '',
   broker: ''
@@ -140,6 +142,16 @@ export default {
       fetchBrokerStatsTopics(this.postForm.broker).then(response => {
         if (!response.data) return
         this.brokerStatsTopic = response.data
+        if ((typeof this.brokerStatsTopic) === 'string') {
+          // failed to fetch broker stats
+          this.brokerStatsTopic = {}
+          this.$notify({
+            title: 'error',
+            message: 'Failed to fetch broker stats from broker ' + this.postForm.broker,
+            type: 'error',
+            duration: 3000
+          })
+        }
         for (var tenantNamespace in this.brokerStatsTopic) {
           var tn = tenantNamespace.split('/')
           for (var bundle in this.brokerStatsTopic[tenantNamespace]) {
@@ -233,18 +245,28 @@ export default {
       })
     },
     handleUnloadBundle(row) {
-      unloadBundle(row.tenant + '/' + row.namespace, row.bundle).then(response => {
-        this.$notify({
-          title: 'success',
-          message: 'Unload bundle success',
-          type: 'success',
-          duration: 3000
-        })
+      unloadBundleOnBroker(this.postForm.broker, row.tenant + '/' + row.namespace, row.bundle).then(response => {
+        console.log(response)
+        if (isValidResponse(response)) {
+          this.$notify({
+            title: 'success',
+            message: 'Successfully unload namespace bundle from the broker',
+            type: 'success',
+            duration: 3000
+          })
+        } else {
+          this.$notify({
+            title: 'error',
+            message: 'Failed to unload namespace bundle from the broker : ' + response.data,
+            type: 'error',
+            duration: 3000
+          })
+        }
       })
     },
     handleHeartBeat() {
-      fetchBrokersHealth().then(response => {
-        if (response.data === 'ok') {
+      fetchBrokersHealth(this.postForm.broker).then(response => {
+        if (isValidResponse(response)) {
           this.$notify({
             title: 'success',
             message: 'Health Check success',
@@ -254,7 +276,7 @@ export default {
         } else {
           this.$notify({
             title: 'error',
-            message: 'Health Check failed',
+            message: 'Health Check failed: \n' + response.data,
             type: 'error',
             duration: 3000
           })
@@ -262,7 +284,7 @@ export default {
       })
     },
     handleRuntimeConfig() {
-      fetchBrokersRuntimeConfiguration().then(response => {
+      fetchBrokersRuntimeConfiguration(this.postForm.broker).then(response => {
         this.dialogFormVisible = true
         this.jsonValue = response.data
       })
