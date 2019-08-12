@@ -659,18 +659,18 @@ export default {
       fetchTopicStats(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.topicStats.push({
-          inMsg: response.data.msgRateIn,
-          outMsg: response.data.msgRateOut,
-          inBytes: response.data.msgThroughputIn,
-          outBytes: response.data.msgThroughputOut
+          inMsg: response.data.msgRateIn.toFixed(2),
+          outMsg: response.data.msgRateOut.toFixed(2),
+          inBytes: response.data.msgThroughputIn.toFixed(2),
+          outBytes: response.data.msgThroughputOut.toFixed(2)
         })
         for (var i in response.data.publishers) {
           this.producersList.push({
             'producerId': response.data.publishers[i].producerId,
             'producerName': response.data.publishers[i].producerName,
-            'inMsg': response.data.publishers[i].msgRateIn,
-            'inBytes': response.data.publishers[i].msgThroughputIn,
-            'avgMsgSize': response.data.publishers[i].averageMsgSize,
+            'inMsg': response.data.publishers[i].msgRateIn.toFixed(2),
+            'inBytes': response.data.publishers[i].msgThroughputIn.toFixed(2),
+            'avgMsgSize': response.data.publishers[i].averageMsgSize.toFixed(2),
             'address': response.data.publishers[i].address,
             'since': response.data.publishers[i].connectedSince
           })
@@ -682,9 +682,9 @@ export default {
           }
           this.subscriptionsList.push({
             'subscription': s,
-            'outMsg': response.data.subscriptions[s].msgRateOut,
-            'outBytes': response.data.subscriptions[s].msgThroughputOut,
-            'msgExpired': response.data.subscriptions[s].msgRateExpired,
+            'outMsg': response.data.subscriptions[s].msgRateOut.toFixed(2),
+            'outBytes': response.data.subscriptions[s].msgThroughputOut.toFixed(2),
+            'msgExpired': response.data.subscriptions[s].msgRateExpired.toFixed(2),
             'backlog': response.data.subscriptions[s].msgBacklog,
             'type': type,
             // subscriptions/:persistent/:tenant/:namespace/:topic/:subscription/subscription

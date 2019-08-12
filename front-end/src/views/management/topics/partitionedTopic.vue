@@ -30,6 +30,72 @@
           <el-table-column :label="$t('common.inBytes')" prop="inBytes"/>
           <el-table-column :label="$t('common.outBytes')" prop="outBytes"/>
         </el-table>
+        <h4>{{ $t('topic.subscription.subscriptions') }}</h4>
+        <el-row :gutter="24">
+          <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
+            <el-table
+              v-loading="subscriptionsListLoading"
+              :key="subscriptionTableKey"
+              :data="subscriptionsList"
+              :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+              border
+              fit
+              highlight-current-row
+              style="width: 100%;"
+              row-key="id">
+              <el-table-column :label="$t('topic.subscription.name')" min-width="50px" align="left">
+                <template slot-scope="scope">
+                  <router-link v-if="scope.row.enableSubscriptionLink===true" :to="scope.row.subscriptionLink" class="link-type">
+                    <span>{{ scope.row.subscription }}</span>
+                  </router-link>
+                  <span v-if="scope.row.enableSubscriptionLink===false">{{ scope.row.subscription }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('topic.subscription.type')" min-width="30px" align="left">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.type }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="left">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.outMsg }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="left">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.outBytes }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('topic.subscription.msgExpired')" min-width="30px" align="left">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.msgExpired }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('topic.subscription.backlog')" min-width="30px" align="left">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.backlog }}</span>
+                  <el-dropdown v-if="scope.row.enableSubscriptionLink===true">
+                    <span class="el-dropdown-link"><i class="el-icon-more"/></span>
+                    <el-dropdown-menu slot="dropdown">
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=skip'" class="link-type">
+                        <el-dropdown-item command="skip">{{ $t('topic.subscription.skip') }}</el-dropdown-item>
+                      </router-link>
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=expire'" class="link-type">
+                        <el-dropdown-item command="expire">{{ $t('topic.subscription.expire') }}</el-dropdown-item>
+                      </router-link>
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=clear'" class="link-type">
+                        <el-dropdown-item command="clear">{{ $t('topic.subscription.clear') }}</el-dropdown-item>
+                      </router-link>
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=reset'" class="link-type">
+                        <el-dropdown-item command="reset">{{ $t('topic.subscription.reset') }}</el-dropdown-item>
+                      </router-link>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
         <h4>{{ $t('topic.partitions') }}</h4>
         <hr class="split-line">
         <el-row :gutter="24">
@@ -41,44 +107,44 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column :label="$t('topic.partition')" min-width="50px" align="center">
+              <el-table-column :label="$t('topic.partition')" min-width="50px" align="left">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.partitionTopicLink" class="link-type">
                     <span>{{ scope.row.partition }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="left">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="left">
                 <template slot-scope="scope">
                   <span>{{ scope.row.subscriptions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="left">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="left">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="left">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="left">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="left">
                 <template slot-scope="scope">
                   <span>{{ scope.row.storageSize }}</span>
                 </template>
@@ -210,7 +276,15 @@ export default {
         delete: this.$i18n.t('topic.deleteTopic')
       },
       dialogFormVisible: false,
-      dialogStatus: ''
+      dialogStatus: '',
+      subscriptionsListLoading: false,
+      subscriptionTableKey: 0,
+      subscriptionsList: [],
+      subscriptionsTotal: 0,
+      subscriptionsListQuery: {
+        page: 1,
+        limit: 0
+      }
     }
   },
   created() {
@@ -243,10 +317,10 @@ export default {
       fetchPartitionTopicStats(this.postForm.persistent, this.tenantNamespaceTopic, true).then(response => {
         if (!response.data) return
         this.partitionTopicStats.push({
-          inMsg: response.data.msgRateIn,
-          outMsg: response.data.msgRateOut,
-          inBytes: response.data.msgThroughputIn,
-          outBytes: response.data.msgThroughputOut
+          inMsg: response.data.msgRateIn.toFixed(2),
+          outMsg: response.data.msgRateOut.toFixed(2),
+          inBytes: response.data.msgThroughputIn.toFixed(2),
+          outBytes: response.data.msgThroughputOut.toFixed(2)
         })
         for (var i in response.data.partitions) {
           var splitPartition = i.split('://')
@@ -255,12 +329,55 @@ export default {
             'partition': partition,
             'producers': response.data.partitions[i].publishers.length,
             'subscriptions': Object.keys(response.data.partitions[i].subscriptions).length,
-            'inMsg': response.data.partitions[i].msgRateIn,
-            'outMsg': response.data.partitions[i].msgRateOut,
-            'inBytes': response.data.partitions[i].msgThroughputIn,
-            'outBytes': response.data.partitions[i].msgThroughputOut,
-            'storageSize': response.data.partitions[i].storageSize,
+            'inMsg': response.data.partitions[i].msgRateIn.toFixed(2),
+            'outMsg': response.data.partitions[i].msgRateOut.toFixed(2),
+            'inBytes': response.data.partitions[i].msgThroughputIn.toFixed(2),
+            'outBytes': response.data.partitions[i].msgThroughputOut.toFixed(2),
+            'storageSize': response.data.partitions[i].storageSize.toFixed(2),
             'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + splitPartition[1] + '/topic'
+          })
+        }
+        var index = 0
+        for (var s in response.data.subscriptions) {
+          index += 1
+          var type = 'Exclusive'
+          var children = []
+          if (response.data.subscriptions[s].hasOwnProperty('type')) {
+            type = response.data.subscriptions[s].type
+          }
+          for (var j in response.data.partitions) {
+            var subSplitPartition = j.split('://')
+            var subPartition = subSplitPartition[1].split('/')[2]
+            if (response.data.partitions[j].hasOwnProperty('subscriptions')) {
+              for (var p in response.data.partitions[j].subscriptions) {
+                if (p === s) {
+                  children.push({
+                    'id': 1000000 * (index + 1) + j,
+                    'subscription': subPartition,
+                    'outMsg': response.data.partitions[j].subscriptions[p].msgRateOut.toFixed(2),
+                    'outBytes': response.data.partitions[j].subscriptions[p].msgThroughputOut.toFixed(2),
+                    'msgExpired': response.data.partitions[j].subscriptions[p].msgRateExpired.toFixed(2),
+                    'backlog': response.data.partitions[j].subscriptions[p].msgBacklog,
+                    'type': type,
+                    'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + subSplitPartition[1] + '/' + s + '/subscription',
+                    'enableSubscriptionLink': true
+                  })
+                }
+              }
+            }
+          }
+
+          this.subscriptionsList.push({
+            'id': index,
+            'subscription': s,
+            'outMsg': response.data.subscriptions[s].msgRateOut.toFixed(2),
+            'outBytes': response.data.subscriptions[s].msgThroughputOut.toFixed(2),
+            'msgExpired': response.data.subscriptions[s].msgRateExpired.toFixed(2),
+            'backlog': response.data.subscriptions[s].msgBacklog,
+            'type': type,
+            'children': children,
+            'subscriptionLink': '#',
+            'enableSubscriptionLink': false
           })
         }
       })

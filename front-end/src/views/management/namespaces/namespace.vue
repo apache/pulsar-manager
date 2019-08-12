@@ -935,6 +935,24 @@ export default {
             children.push(clusterTopicInfo)
           }
 
+          if (clusters.length <= 0) {
+            children.push({
+              'id': 1000000 * (i + 1),
+              'topic': '-',
+              'partitions': this.partitions,
+              'persistent': this.postForm.persistent,
+              'producers': 0,
+              'subscriptions': 0,
+              'inMsg': 0,
+              'outMsg': 0,
+              'inBytes': 0,
+              'outBytes': 0,
+              'storageSize': '-',
+              'tenantNamespace': this.tenantNamespace,
+              'topicLink': topicLink
+            })
+          }
+
           var topicInfo = {
             'id': i,
             'topic': response.data.topics[i]['topic'],

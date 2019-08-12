@@ -145,7 +145,7 @@
               <el-button type="primary" @click="handleResetCursorByMessageId">{{ $t('topic.subscription.resetById') }}</el-button>
               <span>{{ $t('topic.subscription.messageId') }}</span>
               <el-form-item>
-                <el-select v-model="form.ledgerValue" :placeholder="$t('topic.subscription.ledgerId')" style="width:150px">
+                <el-select v-model="form.ledgerValue" :placeholder="$t('topic.segment.ledgerId')" style="width:150px">
                   <el-option
                     v-for="item in ledgerOptions"
                     :key="item.value"
@@ -367,9 +367,9 @@ export default {
             for (var s in consumers) {
               this.consumersList.push({
                 'consumerName': consumers[s].consumerName,
-                'outMsg': consumers[s].msgRateOut,
-                'outBytes': consumers[s].msgThroughputOut,
-                'avgMsgSize': response.data.averageMsgSize,
+                'outMsg': consumers[s].msgRateOut.toFixed(2),
+                'outBytes': consumers[s].msgThroughputOut.toFixed(2),
+                'avgMsgSize': response.data.averageMsgSize.toFixed(2),
                 'address': consumers[s].address,
                 'since': consumers[s].connectedSince
               })

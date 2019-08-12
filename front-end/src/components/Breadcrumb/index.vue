@@ -150,7 +150,7 @@ export default {
             'redirect': matched[i].redirect
           })
           route.push({
-            'path': '/management/tenants/tenantInfo/' + pathList[3] + '?tab=namespaces',
+            'path': '/management/tenants/tenantInfo/' + pathList[4] + '?tab=namespaces',
             'redirect': matched[i].redirect,
             'meta': {
               'title': this.$i18n.t('breadcrumb.namespaces')
@@ -186,7 +186,7 @@ export default {
             'redirect': matched[i].redirect
           })
           route.push({
-            'path': '/management/tenants/tenantInfo/' + pathList[3] + '?tab=namespaces',
+            'path': '/management/tenants/tenantInfo/' + pathList[4] + '?tab=namespaces',
             'redirect': matched[i].redirect,
             'meta': {
               'title': this.$i18n.t('breadcrumb.namespaces')
