@@ -18,9 +18,19 @@
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('topic.partition')">
-          <el-select v-model="postForm.partition" :disabled="partitionDisabled" placeholder="select partition" @change="getTopicInfo()">
+          <el-select v-model="postForm.partition" :disabled="partitionDisabled" placeholder="select partition" @change="onPartitionChanged()">
             <el-option v-for="(item,index) in partitionsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
+        </el-form-item>
+      </el-form>
+      <el-form v-if="replicatedClusters.length > 0" :inline="true" :model="clusterForm" class="form-container">
+        <el-form-item :label="$t('table.cluster')">
+          <el-radio-group v-model="clusterForm.cluster" @change="onClusterChanged()">
+            <el-radio-button
+              v-for="cluster in replicatedClusters"
+              :key="cluster"
+              :label="cluster"/>
+          </el-radio-group>
         </el-form-item>
       </el-form>
     </div>
@@ -110,8 +120,16 @@
                 <span class="circle-font">{{ compaction }}</span>
               </el-button>
               <el-button
-                v-if="compaction !== 'RUNNING'"
+                v-if="compaction !== 'RUNNING' && compaction !== 'ERROR'"
                 type="primary"
+                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
+                icon="el-icon-minus"
+                @click="handleCompaction">
+                {{ $t('topic.compaction') }}
+              </el-button>
+              <el-button
+                v-if="compaction === 'ERROR'"
+                type="danger"
                 style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
                 icon="el-icon-minus"
                 @click="handleCompaction">
@@ -480,20 +498,20 @@
 
 <script>
 import { fetchTenants } from '@/api/tenants'
-import { fetchNamespaces } from '@/api/namespaces'
+import { fetchNamespaces, getClusters } from '@/api/namespaces'
 import {
   fetchTopicsByPulsarManager,
-  getBundleRange,
-  getTopicBroker,
-  unload,
+  getBundleRangeOnCluster,
+  getTopicBrokerOnCluster,
+  unloadOnCluster,
   fetchTopicStats,
   fetchTopicStatsInternal,
-  terminate,
-  compact,
-  compactionStatus,
-  offload,
-  offloadStatus,
-  deleteTopic
+  terminateOnCluster,
+  compactOnCluster,
+  compactionStatusOnCluster,
+  offloadOnCluster,
+  offloadStatusOnCluster,
+  deleteTopicOnCluster
 } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 const defaultForm = {
@@ -503,6 +521,9 @@ const defaultForm = {
   topic: '',
   partition: ''
 }
+const defaultClusterForm = {
+  cluster: ''
+}
 export default {
   name: 'TopicInfo',
   components: {
@@ -511,6 +532,8 @@ export default {
   data() {
     return {
       postForm: Object.assign({}, defaultForm),
+      clusterForm: Object.assign({}, defaultClusterForm),
+      replicatedClusters: [],
       tenantsListOptions: [],
       namespacesListOptions: [],
       topicsListOptions: [],
@@ -574,7 +597,11 @@ export default {
       dialogStatus: '',
       topicPartitions: {},
       partitionDisabled: false,
-      partitionsListOptions: []
+      partitionsListOptions: [],
+      routeTopic: '',
+      routeTopicPartition: -1,
+      routeCluster: '',
+      loaded: false
     }
   },
   created() {
@@ -582,6 +609,8 @@ export default {
     this.postForm.tenant = this.$route.params && this.$route.params.tenant
     this.postForm.namespace = this.$route.params && this.$route.params.namespace
     this.postForm.topic = this.$route.params && this.$route.params.topic
+    this.clusterForm.cluster = this.$route.query && this.$route.query.cluster
+    this.routeCluster = this.clusterForm.cluster
     this.tenantNamespaceTopic = this.postForm.tenant + '/' + this.postForm.namespace + '/' + this.postForm.topic
     if (this.postForm.topic.indexOf('-partition-') > 0) {
       var splitTopic = this.postForm.topic.split('-partition-')
@@ -591,9 +620,16 @@ export default {
       this.postForm.partition = '-1'
       this.partitionDisabled = true
     }
-    if (this.$route.query && this.$route.query.tab) {
-      this.activeName = this.$route.query.tab
+    this.routeTopic = this.postForm.topic
+    this.routeTopicPartition = this.postForm.partition
+    if (this.$route.query) {
+      if (this.$route.query.tab) {
+        this.activeName = this.$route.query.tab
+      } else {
+        this.activeName = 'overview'
+      }
     }
+    this.currentTabName = this.activeName
     if (this.postForm.persistent === 'persistent') {
       this.nonPersistent = false
     } else if (this.postForm.persistent === 'non-persistent') {
@@ -608,13 +644,25 @@ export default {
     this.initBundleRange()
     this.initTopicBroker()
     this.initTopicStats()
+    this.getReplicatedClusters()
     if (!this.nonPersistent) {
       this.initTerminateAndSegments()
       this.getCompactionStatus()
       this.getOffloadStatus()
     }
+    this.loaded = true
   },
   methods: {
+    onClusterChanged() {
+      if (this.loaded && this.routeCluster !== this.clusterForm.cluster) {
+        this.reload()
+      }
+    },
+    onPartitionChanged() {
+      if (this.loaded && parseInt(this.routeTopicPartition) !== parseInt(this.postForm.partition)) {
+        this.reload()
+      }
+    },
     generatePartitions() {
       var partitions = parseInt(this.topicPartitions[this.postForm.topic])
       this.partitionsListOptions = []
@@ -628,11 +676,10 @@ export default {
         }
       } else {
         this.partitionDisabled = true
-        if (this.postForm.partition !== '-1') {
-          this.getTopicInfo()
-        }
         this.postForm.partition = '-1'
-        this.partitionsListOptions.push('-1')
+        if (this.loaded && this.routeTopic !== this.postForm.topic) {
+          this.reload()
+        }
       }
     },
     getRemoteTenantsList() {
@@ -644,13 +691,13 @@ export default {
       })
     },
     getOffloadStatus() {
-      offloadStatus(this.postForm.persistent, this.getFullTopic()).then(response => {
+      offloadStatusOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.offload = response.data.status
       })
     },
     getCompactionStatus() {
-      compactionStatus(this.postForm.persistent, this.getFullTopic()).then(response => {
+      compactionStatusOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.compaction = response.data.status
       })
@@ -695,7 +742,7 @@ export default {
       })
     },
     initBundleRange() {
-      getBundleRange(this.postForm.persistent, this.getFullTopic()).then(response => {
+      getBundleRangeOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.infoData.push({
           infoColumn: 'bundle',
@@ -704,7 +751,7 @@ export default {
       })
     },
     initTopicBroker() {
-      getTopicBroker(this.postForm.persistent, this.getFullTopic()).then(response => {
+      getTopicBrokerOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.infoData.push({
           infoColumn: 'broker',
@@ -755,22 +802,41 @@ export default {
       })
     },
     getNamespacesList(tenant) {
+      // reset the namespaces, topics and clusters list
+      this.namespacesListOptions = []
+      this.topicsListOptions = []
+      this.replicatedClusters = []
+      if (this.firstInit) {
+        this.firstInit = false
+      } else {
+        this.postForm.namespace = ''
+        this.postForm.topic = ''
+        this.clusterForm.cluster = this.routeCluster || ''
+      }
       fetchNamespaces(tenant, this.query).then(response => {
         if (!response.data) return
         let namespace = []
-        this.namespacesListOptions = []
-        if (this.firstInit) {
-          this.firstInit = false
-        } else {
-          this.postForm.namespace = ''
-        }
         for (var i = 0; i < response.data.data.length; i++) {
           namespace = response.data.data[i].namespace
           this.namespacesListOptions.push(namespace)
         }
       })
     },
+    getReplicatedClusters() {
+      if (this.postForm.tenant && this.postForm.namespace) {
+        getClusters(this.postForm.tenant, this.postForm.namespace).then(response => {
+          if (!response.data) {
+            return
+          }
+          this.replicatedClusters = response.data
+          if (response.data.length > 0) {
+            this.clusterForm.cluster = this.routeCluster || this.replicatedClusters[0]
+          }
+        })
+      }
+    },
     getTopicsList() {
+      this.getReplicatedClusters()
       fetchTopicsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
         this.topicsListOptions = []
@@ -788,16 +854,24 @@ export default {
         }
       })
     },
-    getTopicInfo() {
+    reload() {
       this.$router.push({ path: '/management/topics/' + this.postForm.persistent +
-        '/' + this.getFullTopic() + '/topic?tab=' + this.currentTabName })
+        '/' + this.getFullTopic() + '/topic?tab=' + this.currentTabName + '&cluster=' + this.getCurrentCluster() })
+    },
+    getCurrentCluster() {
+      return this.clusterForm.cluster || ''
     },
     handleClick(tab, event) {
       this.currentTabName = tab.name
-      this.$router.push({ query: { 'tab': tab.name }})
+      this.$router.push({
+        query: {
+          'tab': tab.name,
+          'cluster': this.getCurrentCluster()
+        }
+      })
     },
     handleUnload() {
-      unload(this.postForm.persistent, this.getFullTopic()).then(response => {
+      unloadOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('topic.notification.unloadTopicSuccess'),
@@ -807,7 +881,7 @@ export default {
       })
     },
     handleTerminate() {
-      terminate(this.postForm.persistent, this.getFullTopic()).then(response => {
+      terminateOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('topic.notification.terminateTopicSuccess'),
@@ -864,7 +938,7 @@ export default {
       return fullTopic
     },
     handleCompaction() {
-      compact(this.postForm.persistent, this.getFullTopic()).then(response => {
+      compactOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('topic.notification.startCompactionSuccess'),
@@ -875,7 +949,7 @@ export default {
       })
     },
     handleOffload() {
-      offload(this.postForm.persistent, this.getFullTopic()).then(response => {
+      offloadOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('topic.notification.startOffloadSuccess'),
@@ -890,7 +964,7 @@ export default {
       this.dialogFormVisible = true
     },
     deleteTopic() {
-      deleteTopic(this.postForm.persistent, this.getFullTopic()).then(response => {
+      deleteTopicOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('topic.notification.deleteTopicSuccess'),

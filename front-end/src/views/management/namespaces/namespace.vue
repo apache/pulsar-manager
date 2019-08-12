@@ -677,7 +677,8 @@ import {
   unloadOnCluster,
   clearBacklogOnCluster,
   deleteNamespace,
-  clearBundleBacklogOnCluster
+  clearBundleBacklogOnCluster,
+  fetchNamespaceStats
 } from '@/api/namespaces'
 import { putTopic, fetchTopicsStatsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -896,7 +897,20 @@ export default {
     this.activeBundleCluster = this.replicationClustersValue.length > 0 ? this.replicationClustersValue[0] : ''
   },
   methods: {
+    getNamespaceStats() {
+      fetchNamespaceStats(this.postForm.tenant, this.postForm.namespace).then(response => {
+        if (!response.data) return
+        this.namespaceStats = []
+        this.namespaceStats.push({
+          inMsg: response.data.inMsg,
+          outMsg: response.data.outMsg,
+          inBytes: response.data.msgThroughputIn,
+          outBytes: response.data.msgThroughputOut
+        })
+      })
+    },
     getStats() {
+      this.getNamespaceStats()
       this.getTopics()
     },
     getTopicsStats() {
@@ -930,7 +944,7 @@ export default {
               'outBytes': clusters[j]['msgThroughputOut'],
               'storageSize': clusters[j]['storageSize'],
               'tenantNamespace': this.tenantNamespace,
-              'topicLink': topicLink
+              'topicLink': topicLink + '?cluster=' + clusters[j]['topic'] + '&tab='
             }
             children.push(clusterTopicInfo)
           }
@@ -967,7 +981,7 @@ export default {
             'storageSize': response.data.topics[i]['storageSize'],
             'children': children,
             'tenantNamespace': this.tenantNamespace,
-            'topicLink': topicLink
+            'topicLink': topicLink + '?tab='
           }
           this.topicsListLoading = false
           this.topicsList.push(topicInfo)

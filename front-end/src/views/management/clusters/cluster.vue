@@ -112,7 +112,7 @@
               border
               fit
               highlight-current-row
-              style="width: 100%;">
+              style="margin-top:10px">
               <el-table-column :label="$t('ip.nameLabel')" min-width="50px" align="center">
                 <template slot-scope="scope">
                   <router-link :to="'/management/clusters/' + scope.row.cluster + '/' + scope.row.isolationPolicy + '/namespaceIsolationPolicy'" class="link-type">
@@ -422,10 +422,10 @@ export default {
               }
             }
             brokerInfo['ownedNamespaces'] = numberNamespaces
-            brokerInfo['throughputIn'] = throughputIn
-            brokerInfo['throughputOut'] = throughputOut
-            brokerInfo['msgRateOut'] = msgRateOut
-            brokerInfo['msgRateIn'] = msgRateIn
+            brokerInfo['throughputIn'] = throughputIn.toFixed(2)
+            brokerInfo['throughputOut'] = throughputOut.toFixed(2)
+            brokerInfo['msgRateOut'] = msgRateOut.toFixed(2)
+            brokerInfo['msgRateIn'] = msgRateIn.toFixed(2)
           })
           this.brokersList.push(brokerInfo)
         }
