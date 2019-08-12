@@ -1527,7 +1527,7 @@ export default {
           type: 'success',
           duration: 2000
         })
-        this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant })
+        this.$router.push({ path: '/management/tenants/tenantInfo/' + this.postForm.tenant + '?tab=namespaces' })
       })
     },
     handleCreateTopic() {
