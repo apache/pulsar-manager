@@ -32,30 +32,35 @@
           </el-tooltip>
         </h4>
         <hr class="split-line">
-        <div class="filter-container">
-          <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadAll">Unload All</el-button>
-          <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
-        </div>
-        <el-table
-          :key="tableKey"
-          :data="localList"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%;">
-          <el-table-column :label="$t('namespace.bundle.label')" align="center" min-width="100px">
-            <template slot-scope="scope">
-              <span>{{ scope.row.bundle }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column :label="$t('namespace.bundle.operation')" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-share" @click="handleSplitBundle(scope.row)">{{ $t('namespace.bundle.split') }}</el-button>
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">{{ $t('namespace.bundle.unload') }}</el-button>
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="handleClearBundleBacklog(scope.row)">{{ $t('namespace.clearBacklog') }}</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <el-tabs v-model="activeBundleCluster" type="border-card" @tab-click="handleBundleTabClick">
+          <el-tab-pane v-for="(item,index) in replicationClustersValue" :key="item+index" :label="item" :name="item">
+            <div class="filter-container">
+              <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadAll">Unload All</el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
+            </div>
+            <el-table
+              :key="tableKey"
+              :data="localList"
+              border
+              fit
+              highlight-current-row
+              style="width: 100%;">
+              <el-table-column :label="$t('namespace.bundle.label')" align="center" min-width="100px">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.bundle }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('namespace.bundle.operation')" align="center" class-name="small-padding fixed-width">
+                <template slot-scope="scope">
+                  <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-share" @click="handleSplitBundle(scope.row)">{{ $t('namespace.bundle.split') }}</el-button>
+                  <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">{{ $t('namespace.bundle.unload') }}</el-button>
+                  <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="handleClearBundleBacklog(scope.row)">{{ $t('namespace.clearBacklog') }}</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+
         <!-- <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"/> -->
       </el-tab-pane>
       <el-tab-pane :label="$t('tabs.topic')" name="topics">
@@ -68,11 +73,11 @@
               v-loading="topicsListLoading"
               :key="topicsTableKey"
               :data="topicsList"
-              border
+              :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
               fit
               highlight-current-row
-              style="width: 100%;">
-              <el-table-column :label="$t('topic.label')" min-width="50px" align="center">
+              row-key="id">
+              <el-table-column :label="$t('topic.label')" min-width="50px" align="left">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.topicLink" class="link-type">
                     <span>{{ scope.row.topic }}</span>
@@ -638,7 +643,7 @@
   </div>
 </template>
 <script>
-import { fetchTenants } from '@/api/tenants'
+import { fetchTenants, fetchTenantsInfo } from '@/api/tenants'
 import {
   fetchNamespaces,
   fetchNamespacePolicies,
@@ -667,12 +672,12 @@ import {
   setSubscriptionDispatchRate,
   setSubscribeRate,
   setAntiAffinityGroup,
-  splitBundle,
-  unloadBundle,
-  unload,
-  clearBacklog,
+  splitBundleOnCluster,
+  unloadBundleOnCluster,
+  unloadOnCluster,
+  clearBacklogOnCluster,
   deleteNamespace,
-  clearBundleBacklog
+  clearBundleBacklogOnCluster
 } from '@/api/namespaces'
 import { putTopic, fetchTopicsStatsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -696,6 +701,7 @@ export default {
       tenantsListOptions: [],
       namespacesListOptions: [],
       activeName: 'overview',
+      activeBundleCluster: '',
       namespaceStats: [{
         inMsg: 0,
         outMsg: 0,
@@ -880,12 +886,14 @@ export default {
     }
     this.getRemoteTenantsList()
     this.getNamespacesList(this.postForm.tenant)
+    this.getTenantsInfo(this.postForm.tenant)
     this.getPolicies(this.tenantNamespace)
     this.initPermissions(this.tenantNamespace)
     this.initPersistence(this.tenantNamespace)
     this.initRetention(this.tenantNamespace)
     this.getStats()
     this.getTopicsStats()
+    this.activeBundleCluster = this.replicationClustersValue.length > 0 ? this.replicationClustersValue[0] : ''
   },
   methods: {
     getStats() {
@@ -894,13 +902,11 @@ export default {
     getTopicsStats() {
       fetchTopicsStatsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
-        console.log(response)
       })
     },
     getTopics() {
       fetchTopicsStatsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
-        console.log(response)
         for (var i in response.data.topics) {
           var topicLink = ''
           if (response.data.topics[i]['partitions'] === 0) {
@@ -908,7 +914,29 @@ export default {
           } else {
             topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/partitionedTopic'
           }
+          var children = []
+          var clusters = response.data.topics[i]['clusters']
+          for (var j in clusters) {
+            var clusterTopicInfo = {
+              'id': 1000000 * (i + 1) + j,
+              'topic': clusters[j]['topic'],
+              'partitions': clusters[j]['partitions'],
+              'persistent': clusters[j]['persistent'],
+              'producers': clusters[j]['producerCount'],
+              'subscriptions': clusters[j]['subscriptionCount'],
+              'inMsg': clusters[j]['msgRateIn'],
+              'outMsg': clusters[j]['msgRateOut'],
+              'inBytes': clusters[j]['msgThroughputIn'],
+              'outBytes': clusters[j]['msgThroughputOut'],
+              'storageSize': clusters[j]['storageSize'],
+              'tenantNamespace': this.tenantNamespace,
+              'topicLink': topicLink
+            }
+            children.push(clusterTopicInfo)
+          }
+
           var topicInfo = {
+            'id': i,
             'topic': response.data.topics[i]['topic'],
             'partitions': response.data.topics[i]['partitions'],
             'persistent': response.data.topics[i]['persistent'],
@@ -919,6 +947,7 @@ export default {
             'inBytes': response.data.topics[i]['inBytes'],
             'outBytes': response.data.topics[i]['outBytes'],
             'storageSize': response.data.topics[i]['storageSize'],
+            'children': children,
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink
           }
@@ -971,14 +1000,20 @@ export default {
         this.form.retentionTime = String(response.data.retentionTimeInMinutes)
       })
     },
+    getTenantsInfo(tenant) {
+      fetchTenantsInfo(tenant).then(response => {
+        this.replicationClustersOptions = []
+        for (let i = 0; i < response.data.allowedClusters.length; i++) {
+          this.replicationClustersOptions.push({
+            value: response.data.allowedClusters[i],
+            label: response.data.allowedClusters[i]
+          })
+        }
+      })
+    },
     initPoliciesOptions(policies) {
-      for (var i = 0; i < policies.replication_clusters.length; i++) {
-        this.replicationClustersOptions.push({
-          value: policies.replication_clusters[i],
-          label: policies.replication_clusters[i]
-        })
-      }
       this.replicationClustersValue = policies.replication_clusters
+      this.activeBundleCluster = this.activeBundleCluster || this.replicationClustersValue.length > 0 ? this.replicationClustersValue[0] : ''
       this.subscriptionAuthenticationMode = policies.subscription_auth_mode
       this.form.backlogQuotasLimit = String(policies.backlog_quota_map.destination_storage.limit)
       this.form.backlogRententionPolicy = String(policies.backlog_quota_map.destination_storage.policy)
@@ -1028,6 +1063,9 @@ export default {
     handleClick(tab, event) {
       this.currentTabName = tab.name
       this.$router.push({ query: { 'tab': tab.name }})
+    },
+    handleBundleTabClick(tab, event) {
+      this.activeBundleCluster = tab.name
     },
     getRemoteTenantsList() {
       fetchTenants().then(response => {
@@ -1151,7 +1189,7 @@ export default {
       })
     },
     handleSplitBundle(row) {
-      splitBundle(this.tenantNamespace, row.bundle, false).then(response => {
+      splitBundleOnCluster(this.activeBundleCluster, this.tenantNamespace, row.bundle, false).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('namespace.notification.splitBundleSuccess'),
@@ -1163,19 +1201,17 @@ export default {
       })
     },
     handleUnloadAll() {
-      unload(this.tenantNamespace).then(response => {
+      unloadOnCluster(this.activeBundleCluster, this.tenantNamespace).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('namespace.notification.unloadAllBundlesSuccess'),
           type: 'success',
           duration: 3000
         })
-        this.localList = []
-        this.getPolicies(this.tenantNamespace)
       })
     },
     handleUnloadBundle(row) {
-      unloadBundle(this.tenantNamespace, row.bundle).then(response => {
+      unloadBundleOnCluster(this.activeBundleCluster, this.tenantNamespace, row.bundle).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('namespace.notification.unloadBundleSuccess'),
@@ -1183,11 +1219,9 @@ export default {
           duration: 3000
         })
       })
-      this.localList = []
-      this.getPolicies(this.tenantNamespace)
     },
     hanldeClearAllBacklog() {
-      clearBacklog(this.tenantNamespace).then(response => {
+      clearBacklogOnCluster(this.activeBundleCluster, this.tenantNamespace).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('namespace.notification.clearBacklogSuccess'),
@@ -1197,7 +1231,7 @@ export default {
       })
     },
     handleClearBundleBacklog(row) {
-      clearBundleBacklog(this.tenantNamespace, row.bundle).then(response => {
+      clearBundleBacklogOnCluster(this.activeBundleCluster, this.tenantNamespace, row.bundle).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('namespace.notification.clearBundleBacklogSuccess'),

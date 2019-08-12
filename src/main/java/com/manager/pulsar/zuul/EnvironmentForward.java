@@ -79,7 +79,7 @@ public class EnvironmentForward extends ZuulFilter {
         }
 
         String environment = request.getHeader("environment");
-        if (StringUtils.isNotBlank(environment)) {
+        if (StringUtils.isBlank(environment)) {
             return null;
         }
         String serviceUrl = environmentCacheService.getServiceUrl(request);

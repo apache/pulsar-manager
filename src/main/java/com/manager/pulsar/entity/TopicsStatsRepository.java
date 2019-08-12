@@ -26,14 +26,28 @@ public interface TopicsStatsRepository {
 
     Optional<TopicStatsEntity> findMaxTime();
 
-    Page<TopicStatsEntity> findByClusterBroker(Integer pageNum, Integer pageSize, String cluster,
+    Page<TopicStatsEntity> findByClusterBroker(Integer pageNum,
+                                               Integer pageSize,
+                                               String environment,
+                                               String cluster,
                                                String broker, long timestamp);
 
-    Page<TopicStatsEntity> findByNamespace(Integer pageNum, Integer pageSize, String cluster, String broker,
-                                           String tenant, String namespace, long timestamp);
+    Page<TopicStatsEntity> findByNamespace(Integer pageNum,
+                                           Integer pageSize,
+                                           String environment,
+                                           String cluster,
+                                           String tenant,
+                                           String namespace,
+                                           long timestamp);
 
-    Page<TopicStatsEntity> findByMultiTopic(Integer pageNum, Integer pageSize, String broker, String tenant,
-                                            String namespace, String persistent, List<String> topicList, long timestamp);
+    Page<TopicStatsEntity> findByMultiTopic(Integer pageNum,
+                                            Integer pageSize,
+                                            String environment,
+                                            String tenant,
+                                            String namespace,
+                                            String persistent,
+                                            List<String> topicList,
+                                            long timestamp);
 
     void remove(long timestamp, long timeInterval);
 }

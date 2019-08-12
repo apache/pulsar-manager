@@ -18,10 +18,12 @@ import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.manager.pulsar.entity.TopicStatsEntity;
+import com.manager.pulsar.entity.TopicStatsEntity.TopicStatsSummary;
 import com.manager.pulsar.entity.TopicsStatsRepository;
 import com.manager.pulsar.service.BrokerStatsService;
 import com.manager.pulsar.service.TopicsService;
 import com.manager.pulsar.utils.HttpUtil;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,17 +61,21 @@ public class TopicsServiceImpl implements TopicsService {
     }
 
     public Map<String, Object> getTopicStats(
-            Integer pageNum, Integer pageSize, String tenant, String namespace, String requestHost) {
+            Integer pageNum,
+            Integer pageSize,
+            String tenant,
+            String namespace,
+            String env,
+            String serviceUrl) {
         Map<String, Object> topicsMap = Maps.newHashMap();
-        String broker = BrokerStatsServiceImpl.checkBroker(null, requestHost);
         List<Map<String, String>> persistentTopics = this.getTopicListByHttp(
-                tenant, namespace, "persistent", broker);
+                tenant, namespace, "persistent", serviceUrl);
         List<Map<String, Object>> persistentTopicsArray = this.getTopicsStatsList(
-                broker, tenant, namespace, "persistent", persistentTopics);
+                env, tenant, namespace, "persistent", persistentTopics);
         List<Map<String, String>> nonPersistentTopics = this.getTopicListByHttp(
-                tenant, namespace, "non-persistent", broker);
+                tenant, namespace, "non-persistent", serviceUrl);
         List<Map<String, Object>> nonPersistentTopicsArray = this.getTopicsStatsList(
-                broker, tenant, namespace, "non-persistent", nonPersistentTopics);
+                env, tenant, namespace, "non-persistent", nonPersistentTopics);
         persistentTopicsArray.addAll(nonPersistentTopicsArray);
         topicsMap.put("topics", persistentTopicsArray);
         topicsMap.put("isPage", false);
@@ -79,20 +85,15 @@ public class TopicsServiceImpl implements TopicsService {
         return topicsMap;
     }
 
-    public List<Map<String, Object>> getTopicsStatsList(String broker, String tenant, String namespace,
-                                   String persistent, List<Map<String, String>> topics) {
+    public List<Map<String, Object>> getTopicsStatsList(String env,
+                                                        String tenant,
+                                                        String namespace,
+                                                        String persistent,
+                                                        List<Map<String, String>> topics) {
         List<Map<String, Object>> topicsArray = new ArrayList<>();
         if (topics.size() <= 0) {
             return topicsArray;
         }
-        try {
-            URL url = new URL(broker);
-            broker = url.getHost() + ":" + url.getPort();
-        } catch (MalformedURLException e) {
-            log.error("Parse Url failed: {}, message: {}", broker, e.getMessage());
-            return topicsArray;
-        }
-
         List<String> topicList = new ArrayList<>();
         for (Map<String, String> topic: topics) {
             String topicName = topic.get("topic");
@@ -106,65 +107,71 @@ public class TopicsServiceImpl implements TopicsService {
             }
         }
         Optional<TopicStatsEntity> topicStatsEntity = topicsStatsRepository.findMaxTime();
-        Map<String, TopicStatsEntity> tempTopicsMap = new HashMap<>();
+        Map<String, Map<String, TopicStatsEntity>> tempTopicsMap = new HashMap<>();
         if (topicStatsEntity.isPresent()) {
             TopicStatsEntity topicStats = topicStatsEntity.get();
             Page<TopicStatsEntity> topicCountPage = topicsStatsRepository.findByMultiTopic(
-                    1, 1, broker, tenant, namespace, persistent, topicList, topicStats.getTimestamp());
+                    1, 1, env, tenant, namespace, persistent, topicList, topicStats.getTimestamp());
             topicCountPage.count(true);
             Page<TopicStatsEntity> topicStatsEntities = topicsStatsRepository.findByMultiTopic(
-                    0, (int) topicCountPage.getTotal(), broker, tenant, namespace, persistent, topicList, topicStats.getTimestamp());
+                    0, (int) topicCountPage.getTotal(), env, tenant, namespace, persistent, topicList, topicStats.getTimestamp());
             topicStatsEntities.getResult().forEach((t) -> {
-                tempTopicsMap.put(t.getTopic(), t);
+                tempTopicsMap.computeIfAbsent(t.getTopic(), (ignored) -> new HashMap<>())
+                    .put(t.getCluster(), t);
             });
         }
         for (Map<String, String> topic: topics) {
             String topicName = topic.get("topic");
             Map<String, Object> topicEntity = Maps.newHashMap();
             int partitions = Integer.parseInt(topic.get("partitions"));
-            int producerCount = 0;
-            int subscriptionCount = 0;
-            double msgRateIn = 0;
-            double msgThroughputIn = 0;
-            double msgRateOut = 0;
-            double msgThroughputOut = 0;
-            double storageSize = 0;
+            TopicStatsSummary totalStats = new TopicStatsSummary();
+            Map<String, TopicStatsSummary> clusterSummaries = new HashMap<>();
             if (partitions > 0) {
                 for (int i = 0; i < partitions; i++) {
-                    TopicStatsEntity partitionTopicStatsEntity = tempTopicsMap.get(
+                    Map<String, TopicStatsEntity> partitionTopicStatsEntity = tempTopicsMap.get(
                             topicName + PARTITIONED_TOPIC_SUFFIX + i);
                     if (partitionTopicStatsEntity != null) {
-                        producerCount += partitionTopicStatsEntity.getProducerCount();
-                        subscriptionCount += partitionTopicStatsEntity.getSubscriptionCount();
-                        msgRateIn += partitionTopicStatsEntity.getMsgRateIn();
-                        msgRateOut += partitionTopicStatsEntity.getMsgRateOut();
-                        msgThroughputIn += partitionTopicStatsEntity.getMsgThroughputIn();
-                        msgThroughputOut += partitionTopicStatsEntity.getMsgThroughputOut();
-                        storageSize += partitionTopicStatsEntity.getStorageSize();
+                        for (Map.Entry<String, TopicStatsEntity> cluster : partitionTopicStatsEntity.entrySet()) {
+                            TopicStatsSummary clusterSummary = cluster.getValue().getSummary();
+                            totalStats = totalStats.add(clusterSummary);
+
+                            TopicStatsSummary clusterTotalStats =
+                                clusterSummaries.computeIfAbsent(cluster.getKey(), (ignored) -> new TopicStatsSummary());
+                            clusterTotalStats = clusterTotalStats.add(clusterSummary);
+                            clusterSummaries.put(cluster.getKey(), clusterTotalStats);
+                        }
                     }
                 }
             } else {
                 if (tempTopicsMap.containsKey(topicName)) {
-                    TopicStatsEntity nonPartitionTopicStatsEntity = tempTopicsMap.get(topicName);
-                    producerCount = nonPartitionTopicStatsEntity.getProducerCount();
-                    subscriptionCount = nonPartitionTopicStatsEntity.getSubscriptionCount();
-                    msgRateIn = nonPartitionTopicStatsEntity.getMsgRateIn();
-                    msgRateOut = nonPartitionTopicStatsEntity.getMsgRateOut();
-                    msgThroughputIn = nonPartitionTopicStatsEntity.getMsgThroughputIn();
-                    msgThroughputOut = nonPartitionTopicStatsEntity.getMsgThroughputOut();
-                    storageSize = nonPartitionTopicStatsEntity.getStorageSize();
+                    Map<String, TopicStatsEntity> clusters = tempTopicsMap.get(topicName);
+                    for (Map.Entry<String, TopicStatsEntity> cluster : clusters.entrySet()) {
+                        TopicStatsEntity clusterEntity = cluster.getValue();
+                        TopicStatsSummary clusterSummary = clusterEntity.getSummary();
+
+                        totalStats = totalStats.add(clusterSummary);
+                        clusterSummaries.put(cluster.getKey(), clusterSummary);
+                    }
                 }
             }
+
+            for (Map.Entry<String, TopicStatsSummary> summary : clusterSummaries.entrySet()) {
+                summary.getValue().setTopic(summary.getKey());
+                summary.getValue().setPartitions(partitions);
+                summary.getValue().setPersistent(persistent);
+            }
+
             topicEntity.put("topic", topicName);
             topicEntity.put("partitions", partitions);
-            topicEntity.put("persistent", "persistent");
-            topicEntity.put("producers", producerCount);
-            topicEntity.put("subscriptions", subscriptionCount);
-            topicEntity.put("inMsg", msgRateIn);
-            topicEntity.put("outMsg", msgRateOut);
-            topicEntity.put("inBytes", msgThroughputIn);
-            topicEntity.put("outBytes", msgThroughputOut);
-            topicEntity.put("storageSize", storageSize);
+            topicEntity.put("persistent", persistent);
+            topicEntity.put("producers", totalStats.getProducerCount());
+            topicEntity.put("subscriptions", totalStats.getSubscriptionCount());
+            topicEntity.put("inMsg", totalStats.getMsgRateIn());
+            topicEntity.put("outMsg", totalStats.getMsgRateOut());
+            topicEntity.put("inBytes", totalStats.getMsgThroughputIn());
+            topicEntity.put("outBytes", totalStats.getMsgThroughputOut());
+            topicEntity.put("storageSize", totalStats.getStorageSize());
+            topicEntity.put("clusters", clusterSummaries.values());
             topicsArray.add(topicEntity);
         }
         return topicsArray;

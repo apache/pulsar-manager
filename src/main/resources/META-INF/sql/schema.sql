@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS environments (
 
 CREATE TABLE IF NOT EXISTS topicsStats (
   topicStatsId INTEGER PRIMARY KEY AUTOINCREMENT,
+  environment varchar(255) NOT NULL,
   cluster varchar(255) NOT NULL,
   broker varchar(255) NOT NULL,
   tenant varchar(255) NOT NULL,

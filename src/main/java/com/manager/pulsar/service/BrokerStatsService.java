@@ -19,7 +19,7 @@ public interface BrokerStatsService {
 
     String forwardBrokerStatsTopics(String broker, String requestHost);
 
-    void convertStatsToDb(Integer pageNum, Integer pageSize, String requestHost);
+    void collectStatsToDB(long unixTime, String environment, String cluster, String serviceUrl);
 
     void clearStats(long nowTime, long timeInterval);
 }

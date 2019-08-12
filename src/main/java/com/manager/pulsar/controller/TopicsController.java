@@ -99,8 +99,12 @@ public class TopicsController {
             @ApiParam(value = "The name of namespace")
             @Size(min = 1, max = 255)
             @PathVariable String namespace) {
-        String requestHost = environmentCacheService.getServiceUrl(request);
-        Map<String, Object> result = topicsService.getTopicStats(pageNum, pageSize, tenant, namespace, requestHost);
+        String env = request.getHeader("environment");
+        String serviceUrl = environmentCacheService.getServiceUrl(request);
+        Map<String, Object> result = topicsService.getTopicStats(
+            pageNum, pageSize,
+            tenant, namespace,
+            env, serviceUrl);
         return result;
     }
 }
