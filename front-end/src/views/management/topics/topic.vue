@@ -837,14 +837,16 @@ export default {
     },
     getTopicsList() {
       this.getReplicatedClusters()
+      this.topicsListOptions = []
+      this.partitionsListOptions = []
+      if (this.firstInitTopic) {
+        this.firstInitTopic = false
+      } else {
+        this.postForm.topic = ''
+        this.postForm.partition = ''
+      }
       fetchTopicsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
-        this.topicsListOptions = []
-        if (this.firstInitTopic) {
-          this.firstInitTopic = false
-        } else {
-          this.postForm.topic = ''
-        }
         for (var i in response.data.topics) {
           this.topicsListOptions.push(response.data.topics[i]['topic'])
           this.topicPartitions[response.data.topics[i]['topic']] = response.data.topics[i]['partitions']
