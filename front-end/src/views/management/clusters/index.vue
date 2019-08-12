@@ -50,9 +50,9 @@
           <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'">
-                <el-button type="primary" class="el-icon-edit-outline" size="mini">{{ $t('table.edit') }}</el-button>
+                <el-button type="primary" class="el-icon-edit-outline" size="small">{{ $t('table.edit') }}</el-button>
               </router-link>
-              <el-button size="mini" class="el-icon-delete" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+              <el-button size="small" class="el-icon-delete" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
             </template>
           </el-table-column>
         </el-table>
