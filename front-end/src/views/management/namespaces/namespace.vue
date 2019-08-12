@@ -997,11 +997,16 @@ export default {
       })
     },
     handleFilterTopic() {
+      if (this.tempTopicsList.length <= 0) {
+        for (var t = 0; t < this.topicsList.length; t++) {
+          this.tempTopicsList.push(this.topicsList[t])
+        }
+      }
       if (!validateEmpty(this.searchTopic)) {
         this.searchList = []
-        for (var i = 0; i < this.tempTopicsList.length; i++) {
-          if (this.tempTopicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
-            this.searchList.push(this.tempTopicsList[i])
+        for (var i = 0; i < this.topicsList.length; i++) {
+          if (this.topicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
+            this.searchList.push(this.topicsList[i])
           }
         }
         this.topicsList = this.searchList
