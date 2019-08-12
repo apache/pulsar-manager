@@ -930,7 +930,7 @@ export default {
               'outBytes': clusters[j]['msgThroughputOut'],
               'storageSize': clusters[j]['storageSize'],
               'tenantNamespace': this.tenantNamespace,
-              'topicLink': topicLink
+              'topicLink': topicLink + '?cluster=' + clusters[j]['topic'] + '&tab='
             }
             children.push(clusterTopicInfo)
           }
@@ -949,7 +949,7 @@ export default {
             'storageSize': response.data.topics[i]['storageSize'],
             'children': children,
             'tenantNamespace': this.tenantNamespace,
-            'topicLink': topicLink
+            'topicLink': topicLink + '?tab='
           }
           this.topicsListLoading = false
           this.topicsList.push(topicInfo)
