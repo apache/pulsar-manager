@@ -26,6 +26,6 @@ public interface TopicsService {
             String tenant, String namespace,
             String env, String serviceUrl);
 
-    List<Map<String, Object>> getTopicsStatsList(String broker, String tenant, String namespace,
+    List<Map<String, Object>> getTopicsStatsList(String env, String tenant, String namespace,
                                                  String persistent, List<Map<String, String>> topics);
 }

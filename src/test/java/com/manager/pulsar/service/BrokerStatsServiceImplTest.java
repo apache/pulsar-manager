@@ -222,12 +222,19 @@ public class BrokerStatsServiceImplTest {
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
                 .thenReturn("{}");
 
-        String requestHost = "http://localhost:8080";
-        brokerStatsService.convertStatsToDb(1, 1, requestHost);
+        String environment = "staging";
+        String cluster = "standalone";
+        String serviceUrl = "http://localhost:8080";
+        brokerStatsService.collectStatsToDB(
+            System.currentTimeMillis() / 1000,
+            environment,
+            cluster,
+            serviceUrl
+        );
         Optional<TopicStatsEntity> topicStatsEntity = topicsStatsRepository.findMaxTime();
         TopicStatsEntity topicStatsEntity1 = topicStatsEntity.get();
         Page<TopicStatsEntity> topicStatsEntityPage = topicsStatsRepository.findByClusterBroker(
-                1, 1, "standalone", "localhost:8080", topicStatsEntity1.getTimestamp());
+                1, 1, environment, cluster, "localhost:8080", topicStatsEntity1.getTimestamp());
         topicStatsEntityPage.getResult().forEach((t) -> {
             checkTopicStatsResult(t);
         });

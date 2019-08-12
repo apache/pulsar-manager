@@ -87,7 +87,6 @@ public class TopicsServiceImplTest {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
-        String requestHost = "http://localhost:8080";
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
                 .thenReturn("[\"standalone\"]");
 
@@ -102,7 +101,15 @@ public class TopicsServiceImplTest {
                         "\"serviceUrl\" : \"http://tengdeMBP:8080\",\n" +
                         "\"brokerServiceUrl\" : \"pulsar://tengdeMBP:6650\"\n" +
                         "}");
-        brokerStatsService.convertStatsToDb(1, 1, requestHost);
+        String environment = "staging";
+        String cluster = "standalone";
+        String serviceUrl = "http://localhost:8080";
+        brokerStatsService.collectStatsToDB(
+            System.currentTimeMillis() / 1000,
+            environment,
+            cluster,
+            serviceUrl
+        );
 
         List<Map<String, String>> topics = new ArrayList<>();
         Map<String, String> topic = Maps.newHashMap();
@@ -111,7 +118,7 @@ public class TopicsServiceImplTest {
         topics.add(topic);
 
         List<Map<String, Object>> topicsList =  topicsService.getTopicsStatsList(
-                "http://localhost:8080", "public", "functions", "persistent", topics);
+                environment, "public", "functions", "persistent", topics);
         topicsList.forEach((t) -> {
             Assert.assertEquals(t.get("partitions"), 0);
             Assert.assertEquals(t.get("subscriptions"), 1);
