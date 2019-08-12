@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-input :placeholder="$t('cluster.searchClusters')" v-model="listQuery.cluster" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter"/>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('cluster.addCluster') }}</el-button>
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('cluster.addCluster') }}</el-button> -->
     </div>
 
     <el-row :gutter="24">
@@ -52,7 +52,7 @@
               <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'">
                 <el-button type="primary" class="el-icon-edit-outline" size="small">{{ $t('table.edit') }}</el-button>
               </router-link>
-              <el-button size="small" class="el-icon-delete" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+              <!-- <el-button size="small" class="el-icon-delete" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button> -->
             </template>
           </el-table-column>
         </el-table>
