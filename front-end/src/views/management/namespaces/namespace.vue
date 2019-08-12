@@ -385,7 +385,8 @@
               :placeholder="$t('namespace.policy.inputMessageTTL')"
               class="md-input-style"
               name="messageTTL"
-              @keyup.enter.native="handleMessageTTL"/>
+              @keyup.enter.native="handleMessageTTL"
+              @submit.native.prevent/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
