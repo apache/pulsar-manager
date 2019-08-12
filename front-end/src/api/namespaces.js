@@ -94,6 +94,13 @@ export function setClusters(tenantNamespace, data) {
   })
 }
 
+export function getClusters(tenant, namespace) {
+  return request({
+    url: BASE_URL_V2 + `/namespaces/${tenant}/${namespace}/replication`,
+    method: 'get'
+  })
+}
+
 export function setBacklogQuota(tenantNamespace, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },

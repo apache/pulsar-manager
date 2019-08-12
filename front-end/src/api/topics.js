@@ -134,14 +134,30 @@ export function updateTopic(tenantNamespaceTopic, data) {
 }
 
 export function deleteTopic(persistent, tenantNamespaceTopic) {
+  return deleteTopicOnCluster('', persistent, tenantNamespaceTopic)
+}
+
+export function deleteTopicOnCluster(cluster, persistent, tenantNamespaceTopic) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}`,
     method: 'delete'
   })
 }
 
 export function deletePartitionTopic(persistent, tenantNamespaceTopic) {
+  return deletePartitionTopicOnCluster('', persistent, tenantNamespaceTopic)
+}
+
+export function deletePartitionTopicOnCluster(cluster, persistent, tenantNamespaceTopic) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/partitions`,
     method: 'delete'
   })
@@ -170,7 +186,15 @@ export function revokePermissions(tenantNamespaceTopic, role) {
 }
 
 export function unload(persistent, tenantNamespaceTopic) {
+  return unloadOnCluster('', persistent, tenantNamespaceTopic)
+}
+
+export function unloadOnCluster(cluster, persistent, tenantNamespaceTopic) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/unload`,
     method: 'put'
   })
@@ -243,21 +267,45 @@ export function resetNonPersistentCursor(tenantNamespaceTopic, subName, timestam
 }
 
 export function terminate(persistent, tenantNamespaceTopic) {
+  return terminateOnCluster('', persistent, tenantNamespaceTopic)
+}
+
+export function terminateOnCluster(cluster, persistent, tenantNamespaceTopic) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/terminate`,
     method: 'post'
   })
 }
 
 export function compact(persistent, tenantNamespaceTopic) {
+  return compactOnCluster('', persistent, tenantNamespaceTopic)
+}
+
+export function compactOnCluster(cluster, persistent, tenantNamespaceTopic) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/compaction`,
     method: 'put'
   })
 }
 
 export function compactionStatus(persistent, tenantNamespaceTopic, data) {
+  return compactionStatusOnCluster('', persistent, tenantNamespaceTopic, data)
+}
+
+export function compactionStatusOnCluster(cluster, persistent, tenantNamespaceTopic, data) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/compaction`,
     method: 'get',
     data
@@ -265,8 +313,14 @@ export function compactionStatus(persistent, tenantNamespaceTopic, data) {
 }
 
 export function offload(persistent, tenantNamespaceTopic, data) {
+  return offloadOnCluster('', persistent, tenantNamespaceTopic, data)
+}
+export function offloadOnCluster(cluster, persistent, tenantNamespaceTopic, data) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/offload`,
     method: 'put',
     data
@@ -274,7 +328,15 @@ export function offload(persistent, tenantNamespaceTopic, data) {
 }
 
 export function offloadStatus(persistent, tenantNamespaceTopic, data) {
+  return offloadStatusOnCluster('', persistent, tenantNamespaceTopic, data)
+}
+
+export function offloadStatusOnCluster(cluster, persistent, tenantNamespaceTopic, data) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/offload`,
     method: 'get',
     data
@@ -282,14 +344,30 @@ export function offloadStatus(persistent, tenantNamespaceTopic, data) {
 }
 
 export function getBundleRange(persistent, tenantNamespaceTopic) {
+  return getBundleRangeOnCluster('', persistent, tenantNamespaceTopic)
+}
+
+export function getBundleRangeOnCluster(cluster, persistent, tenantNamespaceTopic) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: LOOP_V2 + `/${persistent}/${tenantNamespaceTopic}/bundle`,
     method: 'get'
   })
 }
 
 export function getTopicBroker(persistent, tenantNamespaceTopic) {
+  return getTopicBrokerOnCluster('', persistent, tenantNamespaceTopic)
+}
+
+export function getTopicBrokerOnCluster(cluster, persistent, tenantNamespaceTopic) {
   return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: LOOP_V2 + `/${persistent}/${tenantNamespaceTopic}`,
     method: 'get'
   })
