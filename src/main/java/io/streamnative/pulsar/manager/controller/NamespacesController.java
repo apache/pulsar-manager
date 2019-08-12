@@ -123,4 +123,22 @@ public class NamespacesController {
         return ResponseEntity.ok(namespacesEntity);
     }
 
+    @ApiOperation(value = "Query namespace stats info by tenant and namespace")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "ok"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
+    @RequestMapping(value = "/namespaces/{tenant}/{namespace}/stats", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getNamespacesStats(
+            @ApiParam(value = "The name of tenant")
+            @Size(min = 1, max = 255)
+            @PathVariable String tenant,
+            @ApiParam(value = "The name of namespace")
+            @Size(min = 1, max = 255)
+            @PathVariable String namespace) {
+        String env = request.getHeader("environment");
+        Map<String, Object> namespaceStats = namespacesService.getNamespaceStats(tenant, namespace, env);
+        return ResponseEntity.ok(namespaceStats);
+    }
+
 }

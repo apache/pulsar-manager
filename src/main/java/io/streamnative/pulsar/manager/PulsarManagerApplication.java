@@ -20,7 +20,7 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
 @SpringBootApplication
 @EnableZuulProxy
-@MapperScan("com.manager.pulsar.mapper")
+@MapperScan("io.streamnative.pulsar.mapper")
 public class PulsarManagerApplication {
 
 	public static void main(String[] args) {
