@@ -13,9 +13,12 @@
  */
 package io.streamnative.pulsar.manager.service.impl;
 
+import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import io.streamnative.pulsar.manager.entity.TopicStatsEntity;
+import io.streamnative.pulsar.manager.entity.TopicsStatsRepository;
 import io.streamnative.pulsar.manager.service.NamespacesService;
 import io.streamnative.pulsar.manager.service.TopicsService;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
@@ -23,15 +26,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class NamespacesServiceImpl implements NamespacesService {
 
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
+
+    @Autowired
+    private TopicsStatsRepository topicsStatsRepository;
 
     @Autowired
     private TopicsService topicsService;
@@ -63,6 +67,37 @@ public class NamespacesServiceImpl implements NamespacesService {
             }
         }
         return namespacesMap;
+    }
+
+    public Map<String, Object> getNamespaceStats(
+            String tenant,
+            String namespace,
+            String env) {
+        Map<String, Object> namespaceStatsMap = Maps.newHashMap();
+        Optional<TopicStatsEntity> topicStatsEntity = topicsStatsRepository.findMaxTime();
+        if (topicStatsEntity.isPresent()) {
+            double msgRateIn = 0;
+            double msgThroughputIn = 0;
+            double msgRateOut = 0;
+            double msgThroughputOut = 0;
+            TopicStatsEntity topicStats = topicStatsEntity.get();
+            Page<TopicStatsEntity> topicCountPage = topicsStatsRepository.findByNamespace(
+                    1, 1, env, tenant, namespace, topicStats.getTimestamp());
+            topicCountPage.count(true);
+            Page<TopicStatsEntity> topicStatsEntities = topicsStatsRepository.findByNamespace(
+                    1, (int) topicCountPage.getTotal(), env, tenant, namespace, topicStats.getTimestamp());
+            for (TopicStatsEntity statsEntity : topicStatsEntities.getResult()) {
+                msgRateIn += statsEntity.getMsgRateIn();
+                msgRateOut += statsEntity.getMsgRateOut();
+                msgThroughputIn += statsEntity.getMsgThroughputIn();
+                msgThroughputOut += statsEntity.getMsgThroughputOut();
+            }
+            namespaceStatsMap.put("inMsg", msgRateIn);
+            namespaceStatsMap.put("outMsg", msgRateOut);
+            namespaceStatsMap.put("msgThroughputIn", msgThroughputIn);
+            namespaceStatsMap.put("msgThroughputOut", msgThroughputOut);
+        }
+        return namespaceStatsMap;
     }
 
 }

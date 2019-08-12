@@ -56,13 +56,12 @@ public class TopicsStatsRepositoryImpl implements TopicsStatsRepository {
     public Page<TopicStatsEntity> findByNamespace(Integer pageNum,
                                                   Integer pageSize,
                                                   String environment,
-                                                  String cluster,
                                                   String tenant,
                                                   String namespace,
                                                   long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
         Page<TopicStatsEntity> topicStatsEntities =
-            topicsStatsMapper.findByNamespace(environment, cluster, tenant, namespace, timestamp);
+            topicsStatsMapper.findByNamespace(environment, tenant, namespace, timestamp);
         return topicStatsEntities;
     }
 

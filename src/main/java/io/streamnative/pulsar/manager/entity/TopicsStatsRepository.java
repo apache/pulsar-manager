@@ -35,7 +35,6 @@ public interface TopicsStatsRepository {
     Page<TopicStatsEntity> findByNamespace(Integer pageNum,
                                            Integer pageSize,
                                            String environment,
-                                           String cluster,
                                            String tenant,
                                            String namespace,
                                            long timestamp);

@@ -47,11 +47,10 @@ public interface TopicsStatsMapper {
 
     @Select("SELECT topicStatsId,environment,cluster,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
             "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
-            "WHERE cluster=#{cluster} and environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} " +
+            "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} " +
             "and timestamp=#{timestamp}")
     Page<TopicStatsEntity> findByNamespace(
             @Param("environment") String environment,
-            @Param("cluster") String cluster,
             @Param("tenant") String tenant,
             @Param("namespace") String namespace,
             @Param("timestamp") long timestamp);
