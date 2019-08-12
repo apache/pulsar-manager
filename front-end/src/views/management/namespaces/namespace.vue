@@ -902,10 +902,10 @@ export default {
         if (!response.data) return
         this.namespaceStats = []
         this.namespaceStats.push({
-          inMsg: response.data.inMsg,
-          outMsg: response.data.outMsg,
-          inBytes: response.data.msgThroughputIn,
-          outBytes: response.data.msgThroughputOut
+          inMsg: response.data.inMsg.toFixed(2),
+          outMsg: response.data.outMsg.toFixed(2),
+          inBytes: response.data.msgThroughputIn.toFixed(2),
+          outBytes: response.data.msgThroughputOut.toFixed(2)
         })
       })
     },
@@ -938,11 +938,11 @@ export default {
               'persistent': clusters[j]['persistent'],
               'producers': clusters[j]['producerCount'],
               'subscriptions': clusters[j]['subscriptionCount'],
-              'inMsg': clusters[j]['msgRateIn'],
-              'outMsg': clusters[j]['msgRateOut'],
-              'inBytes': clusters[j]['msgThroughputIn'],
-              'outBytes': clusters[j]['msgThroughputOut'],
-              'storageSize': clusters[j]['storageSize'],
+              'inMsg': clusters[j]['msgRateIn'].toFixed(2),
+              'outMsg': clusters[j]['msgRateOut'].toFixed(2),
+              'inBytes': clusters[j]['msgThroughputIn'].toFixed(2),
+              'outBytes': clusters[j]['msgThroughputOut'].toFixed(2),
+              'storageSize': clusters[j]['storageSize'].toFixed(2),
               'tenantNamespace': this.tenantNamespace,
               'topicLink': topicLink + '?cluster=' + clusters[j]['topic'] + '&tab='
             }
@@ -950,21 +950,28 @@ export default {
           }
 
           if (clusters.length <= 0) {
-            children.push({
+            var tempCluster = {
               'id': 1000000 * (i + 1),
               'topic': '-',
-              'partitions': this.partitions,
-              'persistent': this.postForm.persistent,
+              'partitions': this.form.partitions,
+              'persistent': this.form.isPersistent,
               'producers': 0,
               'subscriptions': 0,
               'inMsg': 0,
               'outMsg': 0,
               'inBytes': 0,
               'outBytes': 0,
-              'storageSize': '-',
+              'storageSize': 0,
               'tenantNamespace': this.tenantNamespace,
               'topicLink': topicLink
-            })
+            }
+            if (this.replicationClustersValue.length <= 0) {
+              children.push(tempCluster)
+            }
+            for (var c in this.replicationClustersValue) {
+              tempCluster.topic = this.replicationClustersValue[c]
+              children.push(tempCluster)
+            }
           }
 
           var topicInfo = {
@@ -974,11 +981,11 @@ export default {
             'persistent': response.data.topics[i]['persistent'],
             'producers': response.data.topics[i]['producers'],
             'subscriptions': response.data.topics[i]['subscriptions'],
-            'inMsg': response.data.topics[i]['inMsg'],
-            'outMsg': response.data.topics[i]['outMsg'],
-            'inBytes': response.data.topics[i]['inBytes'],
-            'outBytes': response.data.topics[i]['outBytes'],
-            'storageSize': response.data.topics[i]['storageSize'],
+            'inMsg': response.data.topics[i]['inMsg'].toFixed(2),
+            'outMsg': response.data.topics[i]['outMsg'].toFixed(2),
+            'inBytes': response.data.topics[i]['inBytes'].toFixed(2),
+            'outBytes': response.data.topics[i]['outBytes'].toFixed(2),
+            'storageSize': response.data.topics[i]['storageSize'].toFixed(2),
             'children': children,
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink + '?tab='

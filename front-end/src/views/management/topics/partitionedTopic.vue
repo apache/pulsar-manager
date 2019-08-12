@@ -18,6 +18,16 @@
           </el-select>
         </el-form-item>
       </el-form>
+      <el-form v-if="replicatedClusters.length > 0" :inline="true" :model="clusterForm" class="form-container">
+        <el-form-item :label="$t('table.cluster')">
+          <el-radio-group v-model="clusterForm.cluster" @change="onClusterChanged()">
+            <el-radio-button
+              v-for="cluster in replicatedClusters"
+              :key="cluster"
+              :label="cluster"/>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane :label="$t('tabs.overview')" name="overview">
@@ -222,10 +232,10 @@
 
 <script>
 import { fetchTenants } from '@/api/tenants'
-import { fetchNamespaces } from '@/api/namespaces'
+import { fetchNamespaces, getClusters } from '@/api/namespaces'
 import {
   fetchPartitionTopicStats,
-  deletePartitionTopic
+  deletePartitionTopicOnCluster
 } from '@/api/topics'
 import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -235,6 +245,9 @@ const defaultForm = {
   namespace: '',
   topic: ''
 }
+const defaultClusterForm = {
+  cluster: ''
+}
 export default {
   name: 'ParititionTopicInfo',
   components: {
@@ -243,7 +256,9 @@ export default {
   data() {
     return {
       postForm: Object.assign({}, defaultForm),
+      clusterForm: Object.assign({}, defaultClusterForm),
       activeName: 'overview',
+      replicatedClusters: [],
       tenantsListOptions: [],
       namespacesListOptions: [],
       topicsListOptions: [],
@@ -302,6 +317,7 @@ export default {
     this.getRemoteTenantsList()
     this.getNamespacesList(this.postForm.tenant)
     this.getTopicsList()
+    this.getReplicatedClusters()
     this.initTopicStats()
   },
   methods: {
@@ -312,6 +328,19 @@ export default {
           this.tenantsListOptions.push(response.data.data[i].tenant)
         }
       })
+    },
+    getReplicatedClusters() {
+      if (this.postForm.tenant && this.postForm.namespace) {
+        getClusters(this.postForm.tenant, this.postForm.namespace).then(response => {
+          if (!response.data) {
+            return
+          }
+          this.replicatedClusters = response.data
+          if (response.data.length > 0) {
+            this.clusterForm.cluster = this.routeCluster || this.replicatedClusters[0]
+          }
+        })
+      }
     },
     initTopicStats() {
       fetchPartitionTopicStats(this.postForm.persistent, this.tenantNamespaceTopic, true).then(response => {
@@ -383,15 +412,17 @@ export default {
       })
     },
     getNamespacesList(tenant) {
+      let namespace = []
+      this.namespacesListOptions = []
+      this.topicsListOptions = []
+      if (this.firstInit) {
+        this.firstInit = false
+      } else {
+        this.postForm.namespace = ''
+        this.postForm.topic = ''
+      }
       fetchNamespaces(tenant, this.query).then(response => {
         if (!response.data) return
-        let namespace = []
-        this.namespacesListOptions = []
-        if (this.firstInit) {
-          this.firstInit = false
-        } else {
-          this.postForm.namespace = ''
-        }
         for (var i = 0; i < response.data.data.length; i++) {
           namespace = response.data.data[i].namespace
           this.namespacesListOptions.push(namespace)
@@ -399,6 +430,7 @@ export default {
       })
     },
     getTopicsList() {
+      this.getReplicatedClusters()
       fetchTopicsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
         this.topicsListOptions = []
@@ -416,11 +448,19 @@ export default {
     },
     getPartitionTopicInfo() {
       this.$router.push({ path: '/management/topics/' + this.postForm.persistent +
-        '/' + this.postForm.tenant + '/' + this.postForm.namespace + '/' + this.postForm.topic + '/partitionedTopic?tab=' + this.currentTabName })
+        '/' + this.postForm.tenant + '/' + this.postForm.namespace + '/' +
+        this.postForm.topic + '/partitionedTopic?tab=' + this.currentTabName + '&cluster=' + this.getCurrentCluster()
+      })
+    },
+    getCurrentCluster() {
+      return this.clusterForm.cluster || ''
     },
     handleClick(tab, event) {
       this.currentTabName = tab.name
-      this.$router.push({ query: { 'tab': tab.name }})
+      this.$router.push({ query: {
+        'tab': tab.name,
+        'cluster': this.getCurrentCluster()
+      }})
     },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
@@ -466,7 +506,7 @@ export default {
       this.dialogStatus = 'delete'
     },
     deleteParititionTopic() {
-      deletePartitionTopic(this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+      deletePartitionTopicOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('topic.notification.deletePartitionedTopicSuccess'),
