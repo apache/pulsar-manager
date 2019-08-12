@@ -851,7 +851,7 @@ export default {
       subscribeRatePerConsumerContent: this.$i18n.t('namespace.policy.subscribeRatePerConsumerContent'),
       antiAffinityGroupContent: this.$i18n.t('namespace.policy.antiAffinityGroupContent'),
       tableKey: 0,
-      topicsListLoading: true,
+      topicsListLoading: false,
       topicsTableKey: 0,
       brokerStats: null,
       topics: {},
