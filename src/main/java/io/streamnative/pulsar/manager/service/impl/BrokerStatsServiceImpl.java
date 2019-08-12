@@ -15,6 +15,8 @@ package io.streamnative.pulsar.manager.service.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import java.text.DecimalFormat;
 import io.streamnative.pulsar.manager.service.BrokerStatsService;
 import io.streamnative.pulsar.manager.service.BrokersService;
 import io.streamnative.pulsar.manager.service.ClustersService;
@@ -147,6 +149,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                 namespaceStats.forEach((bundle, bundleStats) -> {
                     bundleStats.forEach((persistent, persistentStats) -> {
                         persistentStats.forEach((topic, topicStats) -> {
+                            DecimalFormat df = new DecimalFormat("#.##");
                             TopicStatsEntity topicStatsEntity = new TopicStatsEntity();
                             String[] topicPath = this.parseTopic(topic);
                             topicStatsEntity.setEnvironment(env);
@@ -157,12 +160,12 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                             topicStatsEntity.setBundle(bundle);
                             topicStatsEntity.setPersistent(persistent);
                             topicStatsEntity.setTopic(topicPath[2]);
-                            topicStatsEntity.setMsgRateIn(topicStats.getMsgRateIn());
-                            topicStatsEntity.setMsgRateOut(topicStats.getMsgRateOut());
-                            topicStatsEntity.setMsgThroughputIn(topicStats.getMsgThroughputIn());
-                            topicStatsEntity.setMsgThroughputOut(topicStats.getMsgThroughputOut());
-                            topicStatsEntity.setAverageMsgSize(topicStats.getAverageMsgSize());
-                            topicStatsEntity.setStorageSize(topicStats.getStorageSize());
+                            topicStatsEntity.setMsgRateIn(Double.parseDouble(df.format(topicStats.getMsgRateIn())));
+                            topicStatsEntity.setMsgRateOut(Double.parseDouble(df.format(topicStats.getMsgRateOut())));
+                            topicStatsEntity.setMsgThroughputIn(Double.parseDouble(df.format(topicStats.getMsgThroughputIn())));
+                            topicStatsEntity.setMsgThroughputOut(Double.parseDouble(df.format(topicStats.getMsgThroughputOut())));
+                            topicStatsEntity.setAverageMsgSize(Double.parseDouble(df.format(topicStats.getAverageMsgSize())));
+                            topicStatsEntity.setStorageSize(Double.parseDouble(df.format(topicStats.getStorageSize())));
                             topicStatsEntity.setSubscriptionCount(topicStats.getSubscriptions().size());
                             topicStatsEntity.setProducerCount(topicStats.getPublishers().size());
                             topicStatsEntity.setTimestamp(unixTime);
@@ -172,16 +175,16 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                     SubscriptionStatsEntity subscriptionStatsEntity = new SubscriptionStatsEntity();
                                     subscriptionStatsEntity.setTopicStatsId(topicStatsId);
                                     subscriptionStatsEntity.setSubscription(subscription);
-                                    subscriptionStatsEntity.setMsgRateOut(subscriptionStats.getMsgRateOut());
-                                    subscriptionStatsEntity.setMsgThroughputOut(subscriptionStats.getMsgThroughputOut());
-                                    subscriptionStatsEntity.setMsgRateRedeliver(subscriptionStats.getMsgRateRedeliver());
+                                    subscriptionStatsEntity.setMsgRateOut(Double.parseDouble(df.format(subscriptionStats.getMsgRateOut())));
+                                    subscriptionStatsEntity.setMsgThroughputOut(Double.parseDouble(df.format(subscriptionStats.getMsgThroughputOut())));
+                                    subscriptionStatsEntity.setMsgRateRedeliver(Double.parseDouble(df.format(subscriptionStats.getMsgRateRedeliver())));
                                     subscriptionStatsEntity.setNumberOfEntriesSinceFirstNotAckedMessage(
                                         subscriptionStats.getNumberOfEntriesSinceFirstNotAckedMessage());
                                     subscriptionStatsEntity.setTotalNonContiguousDeletedMessagesRange(
                                         subscriptionStats.getTotalNonContiguousDeletedMessagesRange());
                                     subscriptionStatsEntity.setMsgBacklog(subscriptionStats.getMsgBacklog());
                                     subscriptionStatsEntity.setSubscriptionType(String.valueOf(subscriptionStats.getType()));
-                                    subscriptionStatsEntity.setMsgRateExpired(subscriptionStats.getMsgRateExpired());
+                                    subscriptionStatsEntity.setMsgRateExpired(Double.parseDouble(df.format(subscriptionStats.getMsgRateExpired())));
                                     subscriptionStatsEntity.setReplicated(subscriptionStats.isReplicated());
                                     subscriptionStatsEntity.setTimestamp(unixTime);
                                     long subscriptionStatsId = subscriptionsStatsRepository.save(subscriptionStatsEntity);
@@ -192,9 +195,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                             consumerStatsEntity.setTopicStatsId(topicStatsId);
                                             consumerStatsEntity.setReplicationStatsId(-1);
                                             consumerStatsEntity.setConsumer(consumerStats.getConsumerName());
-                                            consumerStatsEntity.setMsgRateOut(consumerStats.getMsgRateOut());
-                                            consumerStatsEntity.setMsgThroughputOut(consumerStats.getMsgThroughputOut());
-                                            consumerStatsEntity.setMsgRateRedeliver(consumerStats.getMsgRateRedeliver());
+                                            consumerStatsEntity.setMsgRateOut(Double.parseDouble(df.format(consumerStats.getMsgRateOut())));
+                                            consumerStatsEntity.setMsgThroughputOut(Double.parseDouble(df.format(consumerStats.getMsgThroughputOut())));
+                                            consumerStatsEntity.setMsgRateRedeliver(Double.parseDouble(df.format(consumerStats.getMsgRateRedeliver())));
                                             consumerStatsEntity.setAvailablePermits(consumerStats.getAvailablePermits());
                                             consumerStatsEntity.setAddress(consumerStats.getAddress());
                                             consumerStatsEntity.setConnectedSince(consumerStats.getConnectedSince());
@@ -212,9 +215,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                     publisherStatsEntity.setTopicStatsId(topicStatsId);
                                     publisherStatsEntity.setProducerId(producer.getProducerId());
                                     publisherStatsEntity.setProducerName(producer.getProducerName());
-                                    publisherStatsEntity.setMsgRateIn(producer.getMsgRateIn());
-                                    publisherStatsEntity.setMsgThroughputIn(producer.getMsgThroughputIn());
-                                    publisherStatsEntity.setAverageMsgSize(producer.getAverageMsgSize());
+                                    publisherStatsEntity.setMsgRateIn(Double.parseDouble(df.format(producer.getMsgRateIn())));
+                                    publisherStatsEntity.setMsgThroughputIn(Double.parseDouble(df.format(producer.getMsgThroughputIn())));
+                                    publisherStatsEntity.setAverageMsgSize(Double.parseDouble(df.format(producer.getAverageMsgSize())));
                                     publisherStatsEntity.setAddress(producer.getAddress());
                                     publisherStatsEntity.setConnectedSince(producer.getConnectedSince());
                                     publisherStatsEntity.setClientVersion(producer.getClientVersion());
@@ -228,11 +231,11 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                     ReplicationStatsEntity replicationStatsEntity = new ReplicationStatsEntity();
                                     replicationStatsEntity.setCluster(replication);
                                     replicationStatsEntity.setTopicStatsId(topicStatsId);
-                                    replicationStatsEntity.setMsgRateIn(replicatorStats.getMsgRateIn());
-                                    replicationStatsEntity.setMsgThroughputIn(replicatorStats.getMsgThroughputIn());
-                                    replicationStatsEntity.setMsgRateOut(replicatorStats.getMsgRateOut());
-                                    replicationStatsEntity.setMsgThroughputOut(replicatorStats.getMsgThroughputOut());
-                                    replicationStatsEntity.setMsgRateExpired(replicatorStats.getMsgRateExpired());
+                                    replicationStatsEntity.setMsgRateIn(Double.parseDouble(df.format(replicatorStats.getMsgRateIn())));
+                                    replicationStatsEntity.setMsgThroughputIn(Double.parseDouble(df.format(replicatorStats.getMsgThroughputIn())));
+                                    replicationStatsEntity.setMsgRateOut(Double.parseDouble(df.format(replicatorStats.getMsgRateOut())));
+                                    replicationStatsEntity.setMsgThroughputOut(Double.parseDouble(df.format(replicatorStats.getMsgThroughputOut())));
+                                    replicationStatsEntity.setMsgRateExpired(Double.parseDouble(df.format(replicatorStats.getMsgRateExpired())));
                                     replicationStatsEntity.setReplicationBacklog(replicatorStats.getReplicationBacklog());
                                     replicationStatsEntity.setConnected(replicatorStats.isConnected());
                                     replicationStatsEntity.setReplicationDelayInSeconds(replicatorStats.getReplicationDelayInSeconds());
