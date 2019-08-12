@@ -485,7 +485,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-position="top">
         <el-form-item v-if="dialogStatus==='delete'">
-          <h4>{{ $t(topic.deleteTopicMessage) }}</h4>
+          <h4>{{ $t('topic.deleteTopicMessage') }}</h4>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="deleteTopic">{{ $t('table.confirm') }}</el-button>
