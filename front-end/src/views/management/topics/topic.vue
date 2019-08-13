@@ -741,7 +741,7 @@ export default {
             'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + this.getFullTopic() + '/' + s + '/subscription'
           })
         }
-        this.storageSize = response.data.storageSize
+        this.storageSize = formatBytes(response.data.storageSize, 0)
       })
     },
     initBundleRange() {
@@ -791,7 +791,7 @@ export default {
             })
           }
         }
-        this.entries = response.data.numberOfEntries
+        this.entries = numberFormatter(response.data.numberOfEntries, 0)
         for (var c in response.data.cursors) {
           this.cursorsList.push({
             'name': c,

@@ -365,7 +365,7 @@ export default {
             'outMsg': numberFormatter(response.data.partitions[i].msgRateOut, 2),
             'inBytes': formatBytes(response.data.partitions[i].msgThroughputIn),
             'outBytes': formatBytes(response.data.partitions[i].msgThroughputOut),
-            'storageSize': formatBytes(response.data.partitions[i].storageSize),
+            'storageSize': formatBytes(response.data.partitions[i].storageSize, 0),
             'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + splitPartition[1] + '/topic'
           })
         }

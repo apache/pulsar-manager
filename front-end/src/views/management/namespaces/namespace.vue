@@ -945,7 +945,7 @@ export default {
               'outMsg': numberFormatter(clusters[j]['msgRateOut'], 2),
               'inBytes': formatBytes(clusters[j]['msgThroughputIn']),
               'outBytes': formatBytes(clusters[j]['msgThroughputOut']),
-              'storageSize': formatBytes(clusters[j]['storageSize']),
+              'storageSize': formatBytes(clusters[j]['storageSize'], 0),
               'tenantNamespace': this.tenantNamespace,
               'topicLink': topicLink + '?cluster=' + clusters[j]['topic'] + '&tab='
             }
@@ -988,7 +988,7 @@ export default {
             'outMsg': numberFormatter(response.data.topics[i]['outMsg'], 2),
             'inBytes': formatBytes(response.data.topics[i]['inBytes']),
             'outBytes': formatBytes(response.data.topics[i]['outBytes']),
-            'storageSize': formatBytes(response.data.topics[i]['storageSize']),
+            'storageSize': formatBytes(response.data.topics[i]['storageSize'], 0),
             'children': children,
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink + '?tab='
