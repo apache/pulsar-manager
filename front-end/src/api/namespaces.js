@@ -25,6 +25,13 @@ export function fetchNamespaces(tenant, query) {
   })
 }
 
+export function fetchNamespaceStats(tenant, namespace) {
+  return request({
+    url: SPRING_BASE_URL_V2 + `/namespaces/${tenant}/${namespace}/stats`,
+    method: 'get'
+  })
+}
+
 export function fetchNamespacePolicies(tenantNamespace) {
   return request({
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}`,

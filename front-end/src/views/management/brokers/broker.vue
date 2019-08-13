@@ -184,10 +184,10 @@ export default {
           }
         }
         this.brokerStats.push({
-          'inBytes': throughputIn,
-          'outBytes': throughputOut,
-          'inMsg': bandwidthIn,
-          'outMsg': bandwidthOut
+          'inBytes': throughputIn.toFixed(2),
+          'outBytes': throughputOut.toFixed(2),
+          'inMsg': bandwidthIn.toFixed(2),
+          'outMsg': bandwidthOut.toFixed(2)
         })
       })
     },
