@@ -12,7 +12,15 @@ For localhost debug
 ```bash
     proxyTable: {
       '/admin/*': {
-        target: 'http://localhost:8080/',
+        target: 'http://localhost:7750/',
+        changeOrigin: true
+      },
+      '/pulsar-manager/*': {
+        target: 'http://localhost:7750/',
+        changeOrigin: true
+      },
+      '/lookup/*': {
+        target: 'http://localhost:7750/',
         changeOrigin: true
       }
     },
@@ -36,8 +44,10 @@ module.exports = {
 
 ### Add configuration to the configuration file on Nginx server
 
+* Replace `localhost` with the IP address of the backend service.
+
 ```
-  listen       9526;
+  listen       9527;
   server_name  localhost;
 
 
@@ -47,7 +57,15 @@ module.exports = {
   }
 
   location /admin {
-    proxy_pass http://pulsar-service:8080;
+    proxy_pass http://localhost:7750;
+  }
+
+  location /pulsar-manager {
+    proxy_pass http://localhost:7750;
+  }
+
+  location /lookup {
+    proxy_pass http://localhost:7750;
   }
 ```
 
@@ -62,4 +80,4 @@ Copy file of dist to Nginx server /usr/share/nginx/html/dist
 ### Copy dist file to Nginx server and restart Nginx
 Open a browser and visit the following address:
 
-http://nginx-server:9526/#/login
+http://nginx-server:9527/#/login
