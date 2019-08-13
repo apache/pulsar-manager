@@ -2,35 +2,45 @@
   <div class="app-container">
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
-        <el-form-item label="Tenant">
+        <el-form-item :label="$t('tenant.label')">
           <el-select v-model="postForm.tenant" placeholder="select tenant" style="width: 150px;" @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="Namespace">
+        <el-form-item :label="$t('namespace.label')">
           <el-select v-model="postForm.namespace" placeholder="select namespace" style="width: 150px;" @change="getTopicsList()">
             <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="Topic">
+        <el-form-item :label="$t('topic.label')">
           <el-select v-model="postForm.topic" placeholder="select topic" style="width: 150px;" @change="generatePartitions()">
             <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="Partition">
+        <el-form-item :label="$t('topic.partition')">
           <el-select v-model="postForm.partition" :disabled="partitionDisabled" placeholder="select partition" style="width: 150px;" @change="getSubscriptionsList()">
             <el-option v-for="(item,index) in partitionsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="Subscription">
+        <el-form-item :label="$t('topic.subscription.label')">
           <el-select v-model="postForm.subscription" placeholder="select subscription" style="width: 150px;" @change="getSubscriptionsInfo()">
             <el-option v-for="(item,index) in subscriptionsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
       </el-form>
+      <el-form v-if="replicatedClusters.length > 0" :inline="true" :model="clusterForm" class="form-container">
+        <el-form-item :label="$t('table.cluster')">
+          <el-radio-group v-model="clusterForm.cluster" @change="onClusterChanged()">
+            <el-radio-button
+              v-for="cluster in replicatedClusters"
+              :key="cluster"
+              :label="cluster"/>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
     </div>
     <el-tabs v-model="topActiveName" @tab-click="handleClick">
-      <el-tab-pane label="Consumers" name="consumers">
+      <el-tab-pane :label="$t('topic.consumer.consumers')" name="consumers">
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
@@ -41,32 +51,32 @@
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column label="Consumer Name" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.consumer.name')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.consumerName }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - bytes/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Avg Msg Size" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.consumer.avgMsgSize')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.avgMsgSize }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Address" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.consumer.address')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.address }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Since" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.consumer.since')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.since }}</span>
                 </template>
@@ -75,7 +85,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="Backlog Operation" name="backlogOperation">
+      <el-tab-pane :label="$t('topic.backlogOpeartion')" name="backlogOperation">
         <el-tabs v-model="leftActiveName" :tab-position="tabPosition" @tab-click="handleLeftTabClick">
           <!-- <el-tab-pane label="INSPECT" name="inspect">
             <el-form :inline="true" :model="form">
@@ -109,50 +119,50 @@
               </el-col>
             </el-row>
           </el-tab-pane> -->
-          <el-tab-pane label="SKIP" name="skip">
+          <el-tab-pane :label="$t('topic.subscription.skip')" name="skip">
             <el-form :inline="true" :model="form">
-              <el-button type="primary" @click="handleSkipMessages">Skip</el-button>
+              <el-button type="primary" @click="handleSkipMessages">{{ $t('topic.subscription.skip') }}</el-button>
               <el-form-item>
                 <el-input v-model="form.skipNumMessages" placeholder="messages"/>
               </el-form-item>
-              <span>messages</span>
+              <span>{{ $t('topic.subscription.skipMessage') }}</span>
             </el-form>
           </el-tab-pane>
-          <el-tab-pane label="EXPIRE" name="expire">
+          <el-tab-pane :label="$t('topic.subscription.expire')" name="expire">
             <el-form :inline="true" :model="form">
-              <el-button type="primary" @click="handleExpireMessages">Expire</el-button>
+              <el-button type="primary" @click="handleExpireMessages">{{ $t('topic.subscription.expire') }}</el-button>
               <el-form-item>
                 <el-input v-model="form.expireNumMessages" placeholder="messages"/>
               </el-form-item>
-              <span>messages older than timestamp (in seconds)</span>
+              <span>{{ $t('topic.subscription.expireMessage') }}</span>
             </el-form>
           </el-tab-pane>
-          <el-tab-pane label="CLEAR" name="clear">
+          <el-tab-pane :label="$t('topic.subscription.clear')" name="clear">
             <el-form :inline="true" :model="form">
-              <el-button type="primary" @click="handleClearBacklog">Clear</el-button>
-              <span>the backlog</span>
+              <el-button type="primary" @click="handleClearBacklog">{{ $t('topic.subscription.clear') }}</el-button>
+              <span>{{ $t('topic.subscription.clearMessage') }}</span>
             </el-form>
           </el-tab-pane>
-          <el-tab-pane label="RESET" name="reset">
+          <el-tab-pane :label="$t('topic.subscription.reset')" name="reset">
             <el-form :inline="true" :model="form">
-              <el-button type="primary" @click="handleResetCursorByTime">Reset By Time</el-button>
+              <el-button type="primary" @click="handleResetCursorByTime">{{ $t('topic.subscription.resetByTimeMessage') }}</el-button>
               <span>The cursor to</span>
               <el-form-item>
                 <el-input v-model="form.minutes" placeholder="minutes"/>
               </el-form-item>
-              <span>mins</span>
+              <span>{{ $t('topic.subscription.mins') }}</span>
               <br>
-              <el-button type="primary" @click="handleResetCursorByMessageId">Reset By Message Id</el-button>
-              <span>Message ID</span>
+              <el-button type="primary" @click="handleResetCursorByMessageId">{{ $t('topic.subscription.resetById') }}</el-button>
+              <span>{{ $t('topic.subscription.messageId') }}</span>
               <el-form-item>
-                <el-select v-model="form.ledgerValue" style="width:150px" placeholder="LedgerId">
+                <el-select v-model="form.ledgerValue" :placeholder="$t('topic.segment.ledgerId')" style="width:150px">
                   <el-option
                     v-for="item in ledgerOptions"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"/>
                 </el-select>
-                <el-input v-model="form.messagesId" style="width: 150px" placeholder="Message id"/>
+                <el-input v-model="form.messagesId" :placeholder="$t('topic.subscription.messageId')" style="width: 150px"/>
               </el-form-item>
             </el-form>
           </el-tab-pane>
@@ -164,19 +174,21 @@
 
 <script>
 import { fetchTenants } from '@/api/tenants'
-import { fetchNamespaces } from '@/api/namespaces'
+import { fetchNamespaces, getClusters } from '@/api/namespaces'
 import {
   fetchTopicsByPulsarManager,
   fetchTopicStats,
   // peekMessages,
-  skip,
-  expireMessage,
-  clearBacklog,
+  skipOnCluster,
+  expireMessageOnCluster,
+  clearBacklogOnCluster,
   fetchTopicStatsInternal,
-  resetCursorByTimestamp,
-  resetCursorByPosition
+  resetCursorByTimestampOnCluster,
+  resetCursorByPositionOnCluster
 } from '@/api/topics'
 import { fetchSubscriptions } from '@/api/subscriptions'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
   persistent: '',
@@ -186,12 +198,17 @@ const defaultForm = {
   partition: '',
   subscription: ''
 }
+const defaultClusterForm = {
+  cluster: ''
+}
 export default {
   name: 'SubscriptionInfo',
   data() {
     return {
       postForm: Object.assign({}, defaultForm),
+      clusterForm: Object.assign({}, defaultClusterForm),
       subscriptionsListOptions: [],
+      replicatedClusters: [],
       topActiveName: 'consumers',
       leftActiveName: '',
       currentTopTabName: 'consumers',
@@ -255,6 +272,7 @@ export default {
     }
     this.getRemoteTenantsList()
     this.getNamespacesList(this.postForm.tenant)
+    this.getReplicatedClusters()
     this.getTopicsList()
     this.initTopicStats()
     this.handleStatsInternal()
@@ -271,12 +289,18 @@ export default {
         for (var i = 0; i < partitions; i++) {
           this.partitionsListOptions.push(i)
         }
+        if (this.firstInitSubscription) {
+          this.getSubscriptionsList()
+        } else {
+          this.subscriptionsListOptions = []
+          this.postForm.subscription = ''
+        }
       } else {
         this.partitionDisabled = true
         this.postForm.partition = '-1'
         this.partitionsListOptions.push('-1')
+        this.getSubscriptionsList()
       }
-      this.getSubscriptionsList()
     },
     getRemoteTenantsList() {
       fetchTenants().then(response => {
@@ -286,16 +310,38 @@ export default {
         }
       })
     },
+    getReplicatedClusters() {
+      if (this.postForm.tenant && this.postForm.namespace) {
+        getClusters(this.postForm.tenant, this.postForm.namespace).then(response => {
+          if (!response.data) {
+            return
+          }
+          this.replicatedClusters = response.data
+          if (response.data.length > 0) {
+            this.clusterForm.cluster = this.routeCluster || this.replicatedClusters[0]
+          }
+        })
+      }
+    },
+    getCurrentCluster() {
+      return this.clusterForm.cluster || ''
+    },
     getNamespacesList(tenant) {
+      let namespace = []
+      this.namespacesListOptions = []
+      this.topicsListOptions = []
+      this.partitionsListOptions = []
+      this.subscriptionsListOptions = []
+      if (this.firstInitNamespace) {
+        this.firstInitNamespace = false
+      } else {
+        this.postForm.namespace = ''
+        this.postForm.topic = ''
+        this.postForm.partition = ''
+        this.postForm.subscription = ''
+      }
       fetchNamespaces(tenant, this.query).then(response => {
         if (!response.data) return
-        let namespace = []
-        this.namespacesListOptions = []
-        if (this.firstInitNamespace) {
-          this.firstInitNamespace = false
-        } else {
-          this.postForm.namespace = ''
-        }
         for (var i = 0; i < response.data.data.length; i++) {
           namespace = response.data.data[i].namespace
           this.namespacesListOptions.push(namespace)
@@ -303,14 +349,19 @@ export default {
       })
     },
     getTopicsList() {
+      this.getReplicatedClusters()
+      this.topicsListOptions = []
+      this.partitionsListOptions = []
+      this.subscriptionsListOptions = []
+      if (this.firstInitTopic) {
+        this.firstInitTopic = false
+      } else {
+        this.postForm.topic = ''
+        this.postForm.partition = ''
+        this.postForm.subscription = ''
+      }
       fetchTopicsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
-        this.topicsListOptions = []
-        if (this.firstInitTopic) {
-          this.firstInitTopic = false
-        } else {
-          this.postForm.topic = ''
-        }
         for (var i in response.data.topics) {
           this.topicsListOptions.push(response.data.topics[i]['topic'])
           this.topicPartitions[response.data.topics[i]['topic']] = response.data.topics[i]['partitions']
@@ -323,10 +374,10 @@ export default {
     getSubscriptionsList() {
       fetchSubscriptions(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
-        this.subscriptionsListOptions = []
         if (this.firstInitSubscription) {
           this.firstInitSubscription = false
         } else {
+          this.subscriptionsListOptions = []
           this.postForm.subscription = ''
         }
         for (var i in response.data) {
@@ -367,9 +418,9 @@ export default {
             for (var s in consumers) {
               this.consumersList.push({
                 'consumerName': consumers[s].consumerName,
-                'outMsg': consumers[s].msgRateOut,
-                'outBytes': consumers[s].msgThroughputOut,
-                'avgMsgSize': response.data.averageMsgSize,
+                'outMsg': numberFormatter(consumers[s].msgRateOut, 2),
+                'outBytes': formatBytes(consumers[s].msgThroughputOut),
+                'avgMsgSize': formatBytes(response.data.averageMsgSize),
                 'address': consumers[s].address,
                 'since': consumers[s].connectedSince
               })
@@ -418,7 +469,7 @@ export default {
         })
         return
       }
-      skip(this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, this.form.skipNumMessages).then(response => {
+      skipOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, this.form.skipNumMessages).then(response => {
         this.$notify({
           title: 'success',
           message: 'Messages skip success',
@@ -437,7 +488,7 @@ export default {
         })
         return
       }
-      expireMessage(this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, this.form.expireNumMessages).then(response => {
+      expireMessageOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, this.form.expireNumMessages).then(response => {
         this.$notify({
           title: 'success',
           message: 'Messages expire success',
@@ -447,7 +498,7 @@ export default {
       })
     },
     handleClearBacklog() {
-      clearBacklog(this.postForm.persistent, this.getFullTopic(), this.postForm.subscription).then(response => {
+      clearBacklogOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.postForm.subscription).then(response => {
         this.$notify({
           title: 'success',
           message: 'Clear messages success',
@@ -468,7 +519,11 @@ export default {
       }
       var dateTime = new Date().getTime()
       var timestamp = Math.floor(dateTime / 1000) - parseInt(this.form.minutes) * 60 * 1000
-      resetCursorByTimestamp(this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, timestamp).then(response => {
+      resetCursorByTimestampOnCluster(
+        this.getCurrentCluster(),
+        this.postForm.persistent,
+        this.getFullTopic(),
+        this.postForm.subscription, timestamp).then(response => {
         this.$notify({
           title: 'success',
           message: 'Reset cursor success',
@@ -491,7 +546,7 @@ export default {
         'ledgerId': this.form.ledgerValue,
         'entryId': parseInt(this.form.messagesId)
       }
-      resetCursorByPosition(this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, data).then(response => {
+      resetCursorByPositionOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, data).then(response => {
         this.$notify({
           title: 'success',
           message: 'Reset cursor success',

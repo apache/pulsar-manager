@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-input :placeholder="$t('cluster.searchClusters')" v-model="listQuery.cluster" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter"/>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('cluster.addCluster') }}</el-button>
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('cluster.addCluster') }}</el-button> -->
     </div>
 
     <el-row :gutter="24">
@@ -16,35 +16,43 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column :label="$t('table.cluster')" min-width="150px" align="center">
+          <el-table-column :label="$t('cluster.name')" min-width="150px" align="center">
             <template slot-scope="scope">
               <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'" class="link-type">
                 <span>{{ scope.row.cluster }}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column label="Brokers" min-width="150px" align="center">
+          <el-table-column :label="$t('broker.brokerNumber')" min-width="150px" align="center">
             <template slot-scope="scope">
               <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=brokers'" class="link-type">
                 <span>{{ scope.row.brokers }}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column label="Service Urls" min-width="150px" align="center">
+          <el-table-column :label="$t('cluster.serviceUrl')" min-width="150px" align="center">
             <template slot-scope="scope">
-              <span>
-                data: {{ scope.row.brokerServiceUrl }}
-                <br>
-                admin: {{ scope.row.serviceUrl }}
+              <span v-if="scope.row.brokerServiceUrl !== ''">
+                <i class="el-icon-sort" style="margin-right: 2px"/>
+                <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=brokers'" class="link-type">
+                  {{ scope.row.brokerServiceUrl }}
+                </router-link>
+              </span>
+              <br>
+              <span v-if="scope.row.serviceUrl !== ''">
+                <i class="el-icon-setting" style="margin-right: 2px"/>
+                <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'" class="link-type">
+                  {{ scope.row.serviceUrl }}
+                </router-link>
               </span>
             </template>
           </el-table-column>
           <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <router-link :to="'/management/clusters/' + scope.row.cluster + '/cluster?tab=config'">
-                <el-button type="primary" size="mini">{{ $t('table.edit') }}</el-button>
+                <el-button type="primary" class="el-icon-edit-outline" size="small">{{ $t('table.edit') }}</el-button>
               </router-link>
-              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+              <!-- <el-button size="small" class="el-icon-delete" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button> -->
             </template>
           </el-table-column>
         </el-table>
@@ -80,7 +88,7 @@
         </div>
         <div v-if="dialogStatus==='delete'">
           <el-form-item>
-            <h4>Are you sure you want to delete this cluster?</h4>
+            <h4>{{ deleteClusterMessage }}</h4>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="deleteCluster()">{{ $t('table.confirm') }}</el-button>
@@ -102,7 +110,7 @@ import {
 import waves from '@/directive/waves' // Waves directive
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import jsonEditor from '@/components/JsonEditor'
-import { validateEmpty } from '@/utils/validate'
+import { validateEmpty, validateServiceUrl } from '@/utils/validate'
 import MdInput from '@/components/MDinput'
 
 export default {
@@ -155,16 +163,32 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        delete: 'Delete Cluster',
-        create: 'Add a new cluster'
+        delete: this.$i18n.t('cluster.deleteCluster'),
+        create: this.$i18n.t('cluster.addCluster')
       },
       dialogPvVisible: false,
       rules: {
-        cluster: [{ required: true, message: 'cluster name is required', trigger: 'change' }],
-        serviceUrl: [{ required: true, message: 'serviceUrl is required', trigger: 'change' }],
+        cluster: [
+          { required: true, message: this.$i18n.t('cluster.clusterNameIsRequired'), trigger: 'change' }
+        ],
+        serviceUrl: [
+          { required: true, message: this.$i18n.t('cluster.serviceUrlIsRequired'), trigger: 'change' },
+          { validator: validateServiceUrl('http:', false), trigger: 'blur' }
+        ],
+        serviceUrlTls: [
+          { validator: validateServiceUrl('https:', true), trigger: 'blur' }
+        ],
+        brokerServiceUrl: [
+          { required: true, message: this.$i18n.t('cluster.serviceUrlIsRequired'), trigger: 'change' },
+          { validator: validateServiceUrl('pulsar:', false), trigger: 'blur' }
+        ],
+        brokerServiceUrlTls: [
+          { validator: validateServiceUrl('pulsar+ssl:', true), trigger: 'blur' }
+        ],
         domainName: [{ required: true, message: 'domainName is required', trigger: 'change' }],
         domainNames: [{ required: true, message: 'domainNames is required', trigger: 'change' }]
-      }
+      },
+      deleteClusterMessage: this.$i18n.t('cluster.deleteClusterMessage')
     }
   },
   created() {
@@ -218,7 +242,7 @@ export default {
       fetchClusterConfig(this.temp.cluster).then(response => {
         this.jsonValue = {
           'serviceUrl': response.data.serviceUrl,
-          'serviceUrlTls': response.data.serverUrlTls,
+          'serviceUrlTls': response.data.serviceUrlTls,
           'brokerServiceUrl': response.data.brokerServiceUrl,
           'brokerServiceUrlTsl': response.data.brokerServiceUrlTls
         }
@@ -252,7 +276,7 @@ export default {
         this.getClusters()
         this.$notify({
           title: 'success',
-          message: 'create success',
+          message: this.$i18n.t('cluster.addClusterSuccessNotification'),
           type: 'success',
           duration: 2000
         })
@@ -295,7 +319,7 @@ export default {
       deleteCluster(this.temp.cluster).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Delete success',
+          message: this.$i18n.t('cluster.deleteClusterSuccessNotification'),
           type: 'success',
           duration: 2000
         })

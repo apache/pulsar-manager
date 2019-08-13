@@ -34,12 +34,16 @@
         style="width: 100%;">
         <el-table-column label="Tenant" align="center" min-width="100px">
           <template slot-scope="scope">
-            <span>{{ scope.row.tenant }}</span>
+            <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant + '?tab=namespaces'" class="link-type">
+              <span>{{ scope.row.tenant }}</span>
+            </router-link>
           </template>
         </el-table-column>
         <el-table-column label="Namespace" align="center" min-width="100px">
           <template slot-scope="scope">
-            <span>{{ scope.row.namespace }}</span>
+            <router-link :to="'/management/namespaces/' + scope.row.tenant + '/' + scope.row.namespace + '/namespace?tab=overview'" class="link-type">
+              <span>{{ scope.row.namespace }}</span>
+            </router-link>
           </template>
         </el-table-column>
         <el-table-column label="Bundle" align="center" min-width="100px">
@@ -60,17 +64,19 @@
         fit
         highlight-current-row
         style="width: 100%;">
-        <el-table-column label="Isolation Policy" align="center" min-width="100px">
+        <el-table-column :label="$t('ip.nameLabel')" align="center" min-width="100px">
           <template slot-scope="scope">
-            <span>{{ scope.row.isolationPolicy }}</span>
+            <router-link :to="'/management/clusters/' + scope.row.cluster + '/' + scope.row.isolationPolicy + '/namespaceIsolationPolicy'" class="link-type">
+              <span>{{ scope.row.isolationPolicy }}</span>
+            </router-link>
           </template>
         </el-table-column>
-        <el-table-column label="Number of Primary Brokers" align="center" min-width="100px">
+        <el-table-column :label="$t('ip.numPBLabel')" align="center" min-width="100px">
           <template slot-scope="scope">
             <span>{{ scope.row.primaryBrokers }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Number of Secondary Brokers" align="center" min-width="100px">
+        <el-table-column :label="$t('ip.numSBLabel')" align="center" min-width="100px">
           <template slot-scope="scope">
             <span>{{ scope.row.secondaryBrokers }}</span>
           </template>
@@ -88,11 +94,15 @@ import { fetchClusters } from '@/api/clusters'
 import { fetchBrokerStatsMetrics, fetchBrokerStatsTopics } from '@/api/brokerStats'
 import { fetchBrokersHealth, fetchBrokers } from '@/api/brokers'
 import { fetchIsolationPolicies } from '@/api/isolationPolicies'
-import { unloadBundle } from '@/api/namespaces'
+import { unloadBundleOnBroker } from '@/api/namespaces'
 import { fetchBrokersRuntimeConfiguration } from '@/api/brokers'
 import jsonEditor from '@/components/JsonEditor'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
+import { isValidResponse } from '@/utils/http'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
+
 const defaultForm = {
   cluster: '',
   broker: ''
@@ -115,12 +125,14 @@ export default {
       isolationPolicyList: [],
       isolationPolicyTableKey: 0,
       dialogFormVisible: false,
-      jsonValue: {}
+      jsonValue: {},
+      firstInit: false
     }
   },
   created() {
     this.postForm.cluster = this.$route.params && this.$route.params.cluster
     this.postForm.broker = this.$route.params && this.$route.params.broker
+    this.firstInit = true
     this.getBrokerInfo()
     this.getBrokerStats()
     this.getIsolationPolicy()
@@ -132,6 +144,16 @@ export default {
       fetchBrokerStatsTopics(this.postForm.broker).then(response => {
         if (!response.data) return
         this.brokerStatsTopic = response.data
+        if ((typeof this.brokerStatsTopic) === 'string') {
+          // failed to fetch broker stats
+          this.brokerStatsTopic = {}
+          this.$notify({
+            title: 'error',
+            message: 'Failed to fetch broker stats from broker ' + this.postForm.broker,
+            type: 'error',
+            duration: 3000
+          })
+        }
         for (var tenantNamespace in this.brokerStatsTopic) {
           var tn = tenantNamespace.split('/')
           for (var bundle in this.brokerStatsTopic[tenantNamespace]) {
@@ -164,10 +186,10 @@ export default {
           }
         }
         this.brokerStats.push({
-          'inBytes': throughputIn,
-          'outBytes': throughputOut,
-          'inMsg': bandwidthIn,
-          'outMsg': bandwidthOut
+          'inBytes': formatBytes(throughputIn),
+          'outBytes': formatBytes(throughputOut),
+          'inMsg': numberFormatter(bandwidthIn, 2),
+          'outMsg': numberFormatter(bandwidthOut, 2)
         })
       })
     },
@@ -201,6 +223,7 @@ export default {
           }
           if (tempIsolationPolicy.indexOf(policy) >= 0) {
             this.isolationPolicyList.push({
+              'cluster': this.postForm.cluster,
               'isolationPolicy': policy,
               'primaryBrokers': res.data[policy].primary.length,
               'secondaryBrokers': res.data[policy].secondary.length
@@ -212,6 +235,11 @@ export default {
     getBrokersList() {
       fetchBrokers(this.postForm.cluster).then(response => {
         if (!response.data) return
+        if (this.firstInit) {
+          this.firstInit = false
+        } else {
+          this.postForm.broker = ''
+        }
         this.brokersListOptions = []
         for (var i = 0; i < response.data.data.length; i++) {
           this.brokersListOptions.push(response.data.data[i].broker)
@@ -219,18 +247,27 @@ export default {
       })
     },
     handleUnloadBundle(row) {
-      unloadBundle(row.tenant + '/' + row.namespace, row.bundle).then(response => {
-        this.$notify({
-          title: 'success',
-          message: 'Unload bundle success',
-          type: 'success',
-          duration: 3000
-        })
+      unloadBundleOnBroker(this.postForm.broker, row.tenant + '/' + row.namespace, row.bundle).then(response => {
+        if (isValidResponse(response)) {
+          this.$notify({
+            title: 'success',
+            message: 'Successfully unload namespace bundle from the broker',
+            type: 'success',
+            duration: 3000
+          })
+        } else {
+          this.$notify({
+            title: 'error',
+            message: 'Failed to unload namespace bundle from the broker : ' + response.data,
+            type: 'error',
+            duration: 3000
+          })
+        }
       })
     },
     handleHeartBeat() {
-      fetchBrokersHealth().then(response => {
-        if (response.data === 'ok') {
+      fetchBrokersHealth(this.postForm.broker).then(response => {
+        if (isValidResponse(response)) {
           this.$notify({
             title: 'success',
             message: 'Health Check success',
@@ -240,7 +277,7 @@ export default {
         } else {
           this.$notify({
             title: 'error',
-            message: 'Health Check failed',
+            message: 'Health Check failed: \n' + response.data,
             type: 'error',
             duration: 3000
           })
@@ -248,7 +285,7 @@ export default {
       })
     },
     handleRuntimeConfig() {
-      fetchBrokersRuntimeConfiguration().then(response => {
+      fetchBrokersRuntimeConfiguration(this.postForm.broker).then(response => {
         this.dialogFormVisible = true
         this.jsonValue = response.data
       })

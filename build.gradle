@@ -79,4 +79,5 @@ dependencies {
     compile group: 'org.powermock', name: 'powermock-api-mockito', version: apiMockitoVersion
     compile group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    testCompile group: 'com.h2database', name: 'h2', version: h2databaseVersion
 }

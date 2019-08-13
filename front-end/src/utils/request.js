@@ -44,13 +44,6 @@ service.interceptors.request.use(
 
 // response interceptor
 service.interceptors.response.use(
-  // response => response,
-  /**
-   * 下面的注释为通过在response里，自定义code来标示请求状态
-   * 当code返回如下情况则说明权限有问题，登出并返回到登录页
-   * 如想通过 xmlhttprequest 来状态码标识 逻辑可写在下面error中
-   * 以下代码均为样例，请结合自生需求加以修改，若不需要，则可删除
-   */
   response => {
     // const res = response.data
     if (response.status < 500 && response.status >= 200) {
@@ -60,7 +53,6 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error) // for debug
     let message = ''
     if (error.response.status === 404) {
       if (error.response.data.length <= 0) {
@@ -76,11 +68,16 @@ service.interceptors.response.use(
       }
     } else if (error.response.status === 400) {
       if (error.response.data.hasOwnProperty('message') && error.response.data.message.indexOf('no active environment') > 0) {
-        router.replace({ path: '/environments' })
+        router.replace({
+          path: '/environments'
+        })
         return
       }
     } else {
-      message = error.response.data.reason
+      message = error.response.data
+      if (message.indexOf('Trying to subscribe with incompatible') >= 0) {
+        message = 'Incompatible schema detected while heartbeating'
+      }
     }
     Message({
       message: message,

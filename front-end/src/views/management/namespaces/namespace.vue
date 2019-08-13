@@ -2,63 +2,79 @@
   <div class="app-container">
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
-        <el-form-item class="postInfo-container-item" label="Tenant">
-          <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
+        <el-form-item :label="$t('tenant.label')" class="postInfo-container-item">
+          <el-select v-model="postForm.tenant" :placeholder="$t('tenant.name')" @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
-        <el-form-item class="postInfo-container-item" label="Namespace">
-          <el-select v-model="postForm.namespace" placeholder="select namespace" @change="getNamespaceInfo(postForm.tenant, postForm.namespace)">
+        <el-form-item :label="$t('namespace.label')" class="postInfo-container-item">
+          <el-select v-model="postForm.namespace" :placeholder="$t('namespace.name')" @change="getNamespaceInfo(postForm.tenant, postForm.namespace)">
             <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
       </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="OVERVIEW" name="overview">
+      <el-tab-pane :label="$t('tabs.overview')" name="overview">
         <el-table
           :data="namespaceStats"
           border
           style="width: 100%">
-          <el-table-column prop="inMsg" label="In - msg/s"/>
-          <el-table-column prop="outMsg" label="Out - msg/s"/>
-          <el-table-column prop="inBytes" label="In - bytes/s"/>
-          <el-table-column prop="outBytes" label="Out - bytes/s"/>
+          <el-table-column :label="$t('common.inMsg')" prop="inMsg"/>
+          <el-table-column :label="$t('common.outMsg')" prop="outMsg"/>
+          <el-table-column :label="$t('common.inBytes')" prop="inBytes"/>
+          <el-table-column :label="$t('common.outBytes')" prop="outBytes"/>
         </el-table>
         <h4>
           Bundles
-          <el-tooltip :content="bundleInfoContent" class="item" effect="dark" placement="top">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div slot="content">
+              {{ $t('namespace.bundle.bundleInfoContent') }}
+              <br>
+              <br>
+              <el-link
+                type="primary"
+                href="https://pulsar.apache.org/docs/en/next/administration-load-balance/#pulsar-load-manager-architecture"
+                target="_blank">
+                {{ $t('namespace.bundle.bundleInfoLink') }}
+              </el-link>
+            </div>
             <i class="el-icon-info"/>
           </el-tooltip>
         </h4>
         <hr class="split-line">
-        <div class="filter-container">
-          <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadAll">Unload All</el-button>
-          <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
-        </div>
-        <el-table
-          :key="tableKey"
-          :data="localList"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%;">
-          <el-table-column label="Bundle" align="center" min-width="100px">
-            <template slot-scope="scope">
-              <span>{{ scope.row.bundle }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="Operations" align="center" class-name="small-padding fixed-width">
-            <template slot-scope="scope">
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-share" @click="handleSplitBundle(scope.row)">Split</el-button>
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">Unload</el-button>
-              <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="handleClearBundleBacklog(scope.row)">Clear Backlog</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <el-tabs v-model="activeBundleCluster" type="border-card" @tab-click="handleBundleTabClick">
+          <el-tab-pane v-for="(item,index) in replicationClustersValue" :key="item+index" :label="item" :name="item">
+            <div class="filter-container">
+              <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadAll">Unload All</el-button>
+              <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
+            </div>
+            <el-table
+              :key="tableKey"
+              :data="localList"
+              border
+              fit
+              highlight-current-row
+              style="width: 100%;">
+              <el-table-column :label="$t('namespace.bundle.label')" align="center" min-width="100px">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.bundle }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('namespace.bundle.operation')" align="center" class-name="small-padding fixed-width">
+                <template slot-scope="scope">
+                  <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-share" @click="handleSplitBundle(scope.row)">{{ $t('namespace.bundle.split') }}</el-button>
+                  <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">{{ $t('namespace.bundle.unload') }}</el-button>
+                  <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="handleClearBundleBacklog(scope.row)">{{ $t('namespace.clearBacklog') }}</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+
         <!-- <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit"/> -->
       </el-tab-pane>
-      <el-tab-pane label="TOPICS" name="topics">
+      <el-tab-pane :label="$t('tabs.topic')" name="topics">
         <el-input v-model="searchTopic" :placeholder="$t('namespace.searchTopics')" style="width: 200px;" @keyup.enter.native="handleFilterTopic"/>
         <el-button type="primary" icon="el-icon-search" @click="handleFilterTopic"/>
         <el-button type="primary" icon="el-icon-plus" @click="handleCreateTopic">{{ $t('namespace.newTopic') }}</el-button>
@@ -68,58 +84,58 @@
               v-loading="topicsListLoading"
               :key="topicsTableKey"
               :data="topicsList"
-              border
+              :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
               fit
               highlight-current-row
-              style="width: 100%;">
-              <el-table-column label="Topic" min-width="50px" align="center">
+              row-key="id">
+              <el-table-column :label="$t('topic.label')" min-width="50px" align="left">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.topicLink" class="link-type">
                     <span>{{ scope.row.topic }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column label="Partitions" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.partitionNumber')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.partitions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Persistent" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.topicDomain')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.persistent }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Producers" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Subscriptions" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.subscriptions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="In - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.inMsg }}</span>
+                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ scope.row.inMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - msg/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.outMsg }}</span>
+                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="In - bytes/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.inBytes }}</span>
+                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ scope.row.inBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Out - bytes/s" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.outBytes }}</span>
+                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="Storage Size" min-width="30px" align="center">
+              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.storageSize }}</span>
                 </template>
@@ -128,26 +144,26 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="POLICIES" name="policies">
-        <h4>Clusters</h4>
+      <el-tab-pane :label="$t('tabs.policies')" name="policies">
+        <h4>{{ $t('namespace.policy.cluster') }}</h4>
         <hr class="split-line">
         <div class="component-item">
           <div class="section-title">
-            <span>Replicated Clusters</span>
-            <el-tooltip :content="replicatedClustersContent" class="item" effect="dark" placement="top">
+            <span>{{ $t('namespace.policy.replicatedCluster') }}</span>
+            <el-tooltip :content="$t('namespace.policy.replicatedClustersContent')" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
           </div>
           <el-select
             v-model="replicationClustersValue"
+            :placeholder="$t('cluster.selectClusterMessage')"
             style="width:500px;margin-top:20px"
             multiple
-            placeholder="Please Select Cluster"
             @change="handleReplicationsClusters()">
             <el-option v-for="item in replicationClustersOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </div>
-        <h4>Authorization
+        <h4>{{ $t('namespace.policy.authorization') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
           </el-tooltip>
@@ -166,8 +182,8 @@
             </div>
             <el-select
               v-model="roleMap[tag]"
+              :placeholder="$t('namespace.policy.selectRole')"
               multiple
-              placeholder="Please Select Options"
               style="width:300px;"
               @change="handleChangeOptions()">
               <el-option
@@ -177,7 +193,7 @@
                 :value="item.value"
                 style="width:300px"/>
             </el-select>
-            <el-button @click.prevent="handleClose(tag)">删除</el-button>
+            <el-button @click.prevent="handleClose(tag)">{{ $t('namespace.policy.deleteRole') }}</el-button>
           </el-tag>
           <el-form-item style="margin-top:30px">
             <el-input
@@ -190,15 +206,29 @@
               @keyup.enter.native="handleInputConfirm"
               @blur="handleInputConfirm"
             />
-            <el-button @click="showInput()">Add Role</el-button>
+            <el-button @click="showInput()">{{ $t('namespace.policy.addRole') }}</el-button>
             <!-- <el-button @click="revokeAllRole()">Revoke All</el-button> -->
           </el-form-item>
         </el-form>
-        <h4>Subscription Authentication</h4>
+        <h4>{{ $t('namespace.policy.subscriptionAuthentication') }}</h4>
         <hr class="split-line">
         <div class="section-title">
-          <span>Subscription Authentication Mode</span>
-          <el-tooltip :content="subscriptionAuthenticationModeContent" class="item" effect="dark" placement="top">
+          <span>{{ $t('namespace.policy.subscriptionAuthenticationMode') }}</span>
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div slot="content">
+              {{ $t('namespace.policy.subscriptionAuthenticationModeContent') }}
+              <br>
+              <br>
+              {{ $t('namespace.policy.subscriptionAuthenticationModeOptions') }}
+              <ul>
+                <li>{{ $t('namespace.policy.subscriptionAuthenticationModeNone') }}</li>
+                <li>
+                  {{ $t('namespace.policy.subscriptionAuthenticaitonModePrefix') }}
+                  <br>
+                  {{ $t('namespace.policy.subscriptionAuthenticaitonModePrefixExample') }}
+                </li>
+              </ul>
+            </div>
             <i class="el-icon-info"/>
           </el-tooltip>
         </div>
@@ -213,60 +243,68 @@
             :label="item.label"
             :value="item.value"/>
         </el-select>
-        <h4>Storage</h4>
+        <h4>{{ $t('namespace.policy.storage') }}</h4>
         <hr class="split-line">
         <div class="section-title">
-          <span>Replication Factor</span>
-          <el-tooltip :content="replicationFactorContent" class="item" effect="dark" placement="top">
+          <span>{{ $t('namespace.policy.replicationFactor') }}</span>
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div slot="content">
+              {{ $t('namespace.policy.replicationFactorContent') }}
+              <ul>
+                <li>{{ $t('namespace.policy.ensembleSize') }}{{ $t('namespace.policy.ensembleSizeDescription') }}</li>
+                <li>{{ $t('namespace.policy.writeQuorumSize') }}{{ $t('namespace.policy.writeQuorumSizeDescription') }}</li>
+                <li>{{ $t('namespace.policy.readQuorumSize') }}{{ $t('namespace.policy.ackQuorumSizeDescription') }}</li>
+              </ul>
+            </div>
             <i class="el-icon-info"/>
           </el-tooltip>
         </div>
         <el-form :inline="true" :model="form" :rules="rules">
-          <el-form-item prop="ensembelSize">
-            <span>Ensemble Size</span>
+          <el-form-item prop="ensembleSize">
+            <span>{{ $t('namespace.policy.ensembleSize') }}</span>
             <md-input
               v-model="form.ensembleSize"
+              :placeholder="$t('namespace.policy.inputEnsemble')"
               class="md-input-style"
-              name="ensembelSize"
-              placeholder="Please input Ensemble"
+              name="ensembleSize"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
           <el-form-item prop="writeQuorumSize">
-            <span>Write Quorum Size</span>
+            <span>{{ $t('namespace.policy.writeQuorumSize') }}</span>
             <md-input
               v-model="form.writeQuorumSize"
+              :placeholder="$t('namespace.policy.inputWriteQuorumSize')"
               class="md-input-style"
               name="writeQuorumSize"
-              placeholder="Please input Write Quorum Size"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
           <el-form-item prop="readQuorumSize">
-            <span>Read Quorum Size</span>
+            <span>{{ $t('namespace.policy.readQuorumSize') }}</span>
             <md-input
               v-model="form.readQuorumSize"
+              :placeholder="$t('namespace.policy.inputReadQuorumSize')"
               class="md-input-style"
               name="readQuorumSize"
-              placeholder="Please input Read Quorum Size"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="markDeleteMaxRate">
-            <span>Mark Delete Rate</span>
+            <span>{{ $t('namespace.policy.markDeleteRate') }}</span>
             <el-tooltip :content="markDeleteRateContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.markDeleteMaxRate"
+              :placeholder="$t('namespace.policy.inputDeleteMaxRate')"
               class="md-input-style"
               name="markDeleteMaxRate"
-              placeholder="Please input Delete Max Rate"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="encryptionRequire">
-            <span>Encryption Require</span>
+            <span>{{ $t('namespace.policy.encryptionRequire') }}</span>
             <el-tooltip :content="encryptionRequireContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
@@ -276,12 +314,12 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleEncryption()">
-              <el-radio label="Enabled"/>
-              <el-radio label="Disabled"/>
+              <el-radio :label="$t('common.enabled')"/>
+              <el-radio :label="$t('common.disabled')"/>
             </el-radio-group>
           </el-form-item>
           <el-form-item prop="deduplication">
-            <span>Deduplication</span>
+            <span>{{ $t('namespace.policy.deduplication') }}</span>
             <el-tooltip :content="deduplicationContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
@@ -291,35 +329,46 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleDeduplication()">
-              <el-radio label="Enabled"/>
-              <el-radio label="Disabled"/>
+              <el-radio :label="$t('common.enabled')"/>
+              <el-radio :label="$t('common.disabled')"/>
             </el-radio-group>
           </el-form-item>
         </el-form>
-        <h4>Backlog</h4>
+        <h4>{{ $t('namespace.policy.backlog') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="backlogQuotasLimit">
-            <span>Backlog Quotas Limit</span>
+            <span>{{ $t('namespace.policy.backlogQuotasLimit') }}</span>
             <el-tooltip :content="backlogQuotasLimitContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.backlogQuotasLimit"
+              :placeholder="$t('namespace.policy.inputBacklogQuotasLimit')"
               class="md-input-style"
               name="backlogQuotasLimit"
-              placeholder="Please input Backlog Quotas Limit"
               @keyup.enter.native="handleBacklogQuota"/>
           </el-form-item>
           <el-form-item style="width:300px">
-            <span>Backlog Retention Policy</span>
-            <el-tooltip :content="backlogRententionPolicyContent" class="item" effect="dark" placement="top">
+            <span>{{ $t('namespace.policy.backlogRententionPolicy') }}</span>
+            <el-tooltip class="item" effect="dark" placement="top">
+              <div slot="content">
+                {{ $t('namespace.policy.backlogRententionPolicyContent') }}
+                <br>
+                <br>
+                {{ $t('namespace.policy.backlogRententionPolicyOptions') }}
+                <ul>
+                  <li>{{ $t('namespace.policy.producerRequestHoldDesc') }}</li>
+                  <li>{{ $t('namespace.policy.producerExceptionDesc') }}</li>
+                  <li>{{ $t('namespace.policy.consumerEvictionDesc') }}</li>
+                </ul>
+              </div>
               <i class="el-icon-info"/>
             </el-tooltip>
             <br>
             <el-select
               v-model="form.backlogRententionPolicy"
-              placeholder="Please select backlog rentention policy"
+              :placeholder="$t('namespace.policy.inputBacklogRententionPolicyContent')"
               style="margin-top:8px;width:400px"
               @change="handleBacklogQuota()">
               <el-option
@@ -330,18 +379,29 @@
             </el-select>
           </el-form-item>
         </el-form>
-        <h4>Schema</h4>
+        <h4>{{ $t('namespace.policy.schema') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="autoUpdateStrategy">
-            <span>AutoUpdate Strategy</span>
-            <el-tooltip :content="autoUpdateStrategyContent" class="item" effect="dark" placement="top">
+            <span>{{ $t('namespace.policy.autoUpdateStrategy') }}</span>
+            <el-tooltip class="item" effect="dark" placement="top">
+              <div slot="content">
+                {{ $t('namespace.policy.autoUpdateStrategyContent') }}
+                <br>
+                <br>
+                <el-link
+                  type="primary"
+                  href="http://pulsar.apache.org/docs/en/next/schema-evolution-compatibility/#schema-compatibility-check-strategy"
+                  target="_blank">
+                  {{ $t('namespace.policy.schemaCompatibilityCheckStrategyLink') }}
+                </el-link>
+              </div>
               <i class="el-icon-info"/>
             </el-tooltip>
             <br>
             <el-select
               v-model="form.autoUpdateStrategy"
-              placeholder="Please select backlog autoUpdate strategy"
+              :placeholder="$t('namespace.policy.inputAutoUpdateStrategy')"
               style="margin-top:8px;width:300px"
               @change="handleSchemaAutoUpdateStrategy()">
               <el-option
@@ -352,7 +412,7 @@
             </el-select>
           </el-form-item>
           <el-form-item prop="schemaValidationEnforced">
-            <span>Schema Validation Enforced</span>
+            <span>{{ $t('namespace.policy.schemaValidationEnforced') }}</span>
             <el-tooltip :content="schemaValidationEnforcedContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
@@ -362,263 +422,263 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleSchemaValidationEnforced()">
-              <el-radio label="Enabled"/>
-              <el-radio label="Disabled"/>
+              <el-radio :label="$t('common.enabled')"/>
+              <el-radio :label="$t('common.disabled')"/>
             </el-radio-group>
           </el-form-item>
         </el-form>
-        <h4>Cleanup Policy</h4>
+        <h4>{{ $t('namespace.policy.cleanupPolicy') }}</h4>
         <hr class="split-line">
-        <el-form :inline="true" :model="form" :rules="rules">
+        <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="messageTTL">
-            <span>Message TTL(Unit Second)</span>
+            <span>{{ $t('namespace.policy.messageTTL') }}</span>
             <el-tooltip :content="messageTTLContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.messageTTL"
+              :placeholder="$t('namespace.policy.inputMessageTTL')"
               class="md-input-style"
               name="messageTTL"
-              placeholder="Please input Backlog Quotas Limit"
               @keyup.enter.native="handleMessageTTL"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="retentionSize">
-            <span>Retention Size</span>
+            <span>{{ $t('namespace.policy.retentionSize') }}</span>
             <el-tooltip :content="retentionSizeContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.retentionSize"
+              :placeholder="$t('namespace.policy.inputRententionSize')"
               class="md-input-style"
               name="retentionSize"
-              placeholder="Please input retention size"
               @keyup.enter.native="handleRetention"/>
           </el-form-item>
           <el-form-item prop="retentionTime">
-            <span>Retention Time(Unit Minutes)</span>
+            <span>{{ $t('namespace.policy.retentionTime') }}</span>
             <el-tooltip :content="retentionTimeContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.retentionTime"
+              :placeholder="$t('namespace.policy.inputRetentionTime')"
               class="md-input-style"
               name="retentionTime"
-              placeholder="Please input Retention Time"
               @keyup.enter.native="handleRetention"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="compactionThreshold">
-            <span>Compaction Threshold</span>
+            <span>{{ $t('namespace.policy.compactionThreshold') }}</span>
             <el-tooltip :content="compactionThresholdContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.compactionThreshold"
+              :placeholder="$t('namespace.policy.inputCompactionThreshold')"
               class="md-input-style"
               name="compactionThreshold"
-              placeholder="Please input retention size"
               @keyup.enter.native="handleCompactionThreshold"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="offloadThreshold">
-            <span>Offload Threshold</span>
+            <span>{{ $t('namespace.policy.offloadThreshold') }}</span>
             <el-tooltip :content="offloadThresholdContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.offloadThreshold"
+              :placeholder="$t('namespace.policy.inputOffloadThreshold')"
               class="md-input-style"
               name="offloadThreshold"
-              placeholder="Please input Offload Threshold"
               @keyup.enter.native="handleOffloadThreshold"/>
           </el-form-item>
           <el-form-item prop="offloadDeletionLag">
-            <span>Offload Deletion Lag</span>
+            <span>{{ $t('namespace.policy.offloadDeletionLag') }}</span>
             <el-tooltip :content="offloadDeletionLagContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.offloadDeletionLag"
+              :placeholder="$t('namespace.policy.inputOffloadDeleteLag')"
               class="md-input-style"
               name="offloadDeletionLag"
-              placeholder="Please input Retention Time"
               @keyup.enter.native="handleOffloadDeletionLag"/>
           </el-form-item>
         </el-form>
-        <h4>Throttling</h4>
+        <h4>{{ $t('namespace.policy.throttling') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="maxProducersPerTopic">
-            <span>Max Producers Per Topic</span>
+            <span>{{ $t('namespace.policy.maxProducersPerTopic') }}</span>
             <el-tooltip :content="maxProducersPerTopicContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.maxProducersPerTopic"
+              :placeholder="$t('namespace.policy.inputMaxProducersPerTopic')"
               class="md-input-style"
               name="maxProducersPerTopic"
-              placeholder="Please input max Producers"
               @keyup.enter.native="handleMaxProducersPerTopic"/>
           </el-form-item>
           <el-form-item prop="maxConsumersPerTopic">
-            <span>Max Consumers Per Topic</span>
+            <span>{{ $t('namespace.policy.maxConsumersPerTopic') }}</span>
             <el-tooltip :content="maxConsumersPerTopicContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.maxConsumersPerTopic"
+              :placeholder="$t('namespace.policy.inputMaxConsumersForTopic')"
               class="md-input-style"
               name="maxConsumersPerTopic"
-              placeholder="Please input max Consumers"
               @keyup.enter.native="handleMaxConsumersPerTopic"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="maxConsumerPerSub">
-            <span>Max Consumers Per Subscription</span>
+            <span>{{ $t('namespace.policy.maxConsumerPerSubscription') }}</span>
             <el-tooltip :content="maxConsumerPerSubContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.maxConsumerPerSub"
+              :placeholder="$t('namespace.policy.inputMaxConsumersForSub')"
               class="md-input-style"
               name="maxConsumerPerSub"
-              placeholder="Please input max Consumers"
               @keyup.enter.native="handleMaxConsuemrsPerSubscription"/>
           </el-form-item>
         </el-form>
-        <h4>Dispatch Rate</h4>
+        <h4>{{ $t('namespace.policy.dispatchRate') }}</h4>
         <hr class="split-line">
-        <span>Dispatch Rate Per Topic</span>
+        <span>{{ $t('namespace.policy.dispatchRatePerTopic') }}</span>
         <el-tooltip :content="dispatchRatePerTopicContent" class="item" effect="dark" placement="top">
           <i class="el-icon-info"/>
         </el-tooltip>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="dispatchRatePerTopicBytes">
-            <span>bytes/second</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerTopicBytes') }}</span>
             <md-input
               v-model="form.dispatchRatePerTopicBytes"
+              :placeholder="$t('namespace.policy.inputDispatchRateBytes')"
               class="md-input-style"
               name="dispatchRatePerTopicBytes"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerTopicMessage">
-            <span>message/second</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerTopicMessage') }}</span>
             <md-input
               v-model="form.dispatchRatePerTopicMessage"
+              :placeholder="$t('namespace.policy.inputDispatchRatePerTopicMessage')"
               class="md-input-style"
               name="dispatchRatePerTopicMessage"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerTopicPeriod">
-            <span>period(Unit second)</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerTopicPeriod') }}</span>
             <md-input
               v-model="form.dispatchRatePerTopicPeriod"
+              :placeholder="$t('namespace.policy.inputDispatchPerTopicPerPeriod')"
               class="md-input-style"
               name="dispatchRatePerTopicPeriod"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerTopic"/>
           </el-form-item>
         </el-form>
-        <span>Dispatch Rate Per Subscription</span>
+        <span>{{ $t('namespace.policy.dispatchRateForSub') }}</span>
         <el-tooltip :content="dispatchRatePerSubContent" class="item" effect="dark" placement="top">
           <i class="el-icon-info"/>
         </el-tooltip>
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="dispatchRatePerSubBytes">
-            <span>bytes/second</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerSubBytes') }}</span>
             <md-input
               v-model="form.dispatchRatePerSubBytes"
+              :placeholder="$t('namespace.policy.inputDispatchRatePerSubBytes')"
               class="md-input-style"
               name="dispatchRatePerSubBytes"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerSubMessage">
-            <span>message/second</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerSubMessage') }}</span>
             <md-input
               v-model="form.dispatchRatePerSubMessage"
+              :placeholder="$t('namespace.policy.inputDispatchRatePerSubMessage')"
               class="md-input-style"
               name="dispatchRatePerSubMessage"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
           <el-form-item prop="dispatchRatePerSubPeriod">
-            <span>period(Unit Second)</span>
+            <span>{{ $t('namespace.policy.dispatchRatePerSubPeriod') }}</span>
             <md-input
               v-model="form.dispatchRatePerSubPeriod"
+              :placeholder="$t('namespace.policy.inputDispatchRatePerSubPeriod')"
               class="md-input-style"
               name="dispatchRatePerSubPeriod"
-              placeholder="Please input dispatch rate"
               @keyup.enter.native="handleDispatchRatePerSub"/>
           </el-form-item>
         </el-form>
-        <span>Subscribe Rate Per Consumer</span>
+        <span>{{ $t('namespace.policy.subscribeRatePerConsumer') }}</span>
         <el-tooltip :content="subscribeRatePerConsumerContent" class="item" effect="dark" placement="top">
           <i class="el-icon-info"/>
         </el-tooltip>
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="subscribeRatePerConsumerSub">
-            <span>message/second</span>
+            <span>{{ $t('namespace.policy.subscribeRatePerConsumerSub') }}</span>
             <md-input
               v-model="form.subscribeRatePerConsumerSub"
+              :placeholder="$t('namespace.policy.inputSubscribeRate')"
               class="md-input-style"
               name="subscribeRatePerConsumerSub"
-              placeholder="Please input subscribe rate"
               @keyup.enter.native="handleSubscribeRate"/>
           </el-form-item>
           <el-form-item prop="subscribeRatePerConsumerPeriod">
-            <span>period(Unit Second)</span>
+            <span>{{ $t('namespace.policy.subscribeRatePerConsumerPeriod') }}</span>
             <md-input
               v-model="form.subscribeRatePerConsumerPeriod"
+              :placeholder="$t('namespace.policy.inputSubscribeRate')"
               class="md-input-style"
               name="subscribeRatePerConsumerPeriod"
-              placeholder="Please input subscribe rate"
               @keyup.enter.native="handleSubscribeRate"/>
           </el-form-item>
         </el-form>
-        <h4>Anti Affinity</h4>
+        <h4>{{ $t('namespace.policy.antiAffinity') }}</h4>
         <hr class="split-line">
         <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="antiAffinityGroup">
-            <span>Anti Affinity Group</span>
+            <span>{{ $t('namespace.policy.antiAffinityGroup') }}</span>
             <el-tooltip :content="antiAffinityGroupContent" class="item" effect="dark" placement="top">
               <i class="el-icon-info"/>
             </el-tooltip>
             <md-input
               v-model="form.antiAffinityGroup"
+              :placeholder="$t('namespace.policy.inputAntiAffinityGroup')"
               class="md-input-style"
               name="antiAffinityGroup"
-              placeholder="Please input Anti Affinity Group"
               @keyup.enter.native="handleAntiAffinityGroup"/>
           </el-form-item>
         </el-form>
-        <h4 style="color:#E57470">Danger Zone</h4>
+        <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" @click="handleDeleteNamespace">Delete Namespace</el-button>
+        <el-button type="danger" class="button" @click="handleDeleteNamespace">{{ $t('namespace.deleteNamespace') }}</el-button>
       </el-tab-pane>
     </el-tabs>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="form" :rules="rules" :model="form" label-position="top">
         <div v-if="dialogStatus==='create'">
-          <el-form-item label="Topic Domain">
+          <el-form-item :label="$t('topic.topicDomain')">
             <el-radio-group
               v-model="form.isPersistent"
               size="medium">
-              <el-radio label="Persistent"/>
-              <el-radio label="Non-persistent"/>
+              <el-radio :label="$t('topic.persistent')"/>
+              <el-radio :label="$t('topic.nonPersistent')"/>
             </el-radio-group>
           </el-form-item>
-          <el-form-item :label="$t('table.topic')" prop="topic">
+          <el-form-item :label="$t('topic.topicName')" prop="topic">
             <el-input v-model="form.topic"/>
           </el-form-item>
-          <el-form-item :label="$t('table.partition')" prop="partition">
+          <el-form-item :label="$t('topic.partitions')" prop="partition">
             <el-input v-model="form.partitions"/>
           </el-form-item>
           <el-form-item>
@@ -627,7 +687,7 @@
           </el-form-item>
         </div>
         <el-form-item v-if="dialogStatus==='delete'">
-          <h4>Are you sure you want to delete this namespace?</h4>
+          <h4>{{ $t('namespace.deleteNamespaceMessage') }}</h4>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='delete'">
           <el-button type="primary" @click="deleteNamespace()">{{ $t('table.confirm') }}</el-button>
@@ -638,7 +698,7 @@
   </div>
 </template>
 <script>
-import { fetchTenants } from '@/api/tenants'
+import { fetchTenants, fetchTenantsInfo } from '@/api/tenants'
 import {
   fetchNamespaces,
   fetchNamespacePolicies,
@@ -667,18 +727,20 @@ import {
   setSubscriptionDispatchRate,
   setSubscribeRate,
   setAntiAffinityGroup,
-  splitBundle,
-  unloadBundle,
-  unload,
-  clearBacklog,
+  splitBundleOnCluster,
+  unloadBundleOnCluster,
+  unloadOnCluster,
+  clearBacklogOnCluster,
   deleteNamespace,
-  clearBundleBacklog
+  clearBundleBacklogOnCluster,
+  fetchNamespaceStats
 } from '@/api/namespaces'
-import { fetchBrokerStatsTopics } from '@/api/brokerStats'
-import { putTopic, fetchTopicsByPulsarManager } from '@/api/topics'
+import { putTopic, fetchTopicsStatsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 import { validateEmpty } from '@/utils/validate'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
   tenant: '',
@@ -697,13 +759,14 @@ export default {
       tenantsListOptions: [],
       namespacesListOptions: [],
       activeName: 'overview',
+      activeBundleCluster: '',
       namespaceStats: [{
         inMsg: 0,
         outMsg: 0,
         inBytes: 0,
         outBytes: 0
       }],
-      replicatedClustersContent: 'This is Allowed Clusters',
+      replicatedClustersContent: this.$i18n.t('namespace.policy.replicatedClustersContent'),
       replicationClustersValue: [],
       replicationClustersOptions: [],
       dynamicValidateForm: {
@@ -720,27 +783,27 @@ export default {
       roleMapOptions: {},
       roleOptions: [{
         value: 'consume',
-        label: 'consume'
+        label: this.$i18n.t('role_actions.consume')
       }, {
         value: 'produce',
-        label: 'produce'
+        label: this.$i18n.t('role_actions.produce')
       }, {
         value: 'functions',
-        label: 'functions'
+        label: this.$i18n.t('role_actions.functions')
       }],
-      authorizationContent: 'This is AuthorizationContent',
+      authorizationContent: this.$i18n.t('namespace.policy.authorizationContent'),
       subscriptionAuthenticationMode: '',
-      subscriptionAuthenticationModeContent: 'This is subscriptionAuthenticationMode',
+      subscriptionAuthenticationModeContent: this.$i18n.t('namespace.policy.subscriptionAuthenticationModeContent'),
       subscriptionAuthenticationModeOptions: [{
         value: 'None',
-        label: 'None'
+        label: this.$i18n.t('subscription_auth_mode.none')
       }, {
         value: 'Prefix',
-        label: 'Prefix'
+        label: this.$i18n.t('subscription_auth_mode.prefix')
       }],
-      replicationFactorContent: 'This is replicationFactorContent',
+      replicationFactorContent: this.$i18n.t('namespace.policy.replicationFactorContent'),
       form: {
-        ensembelSize: '',
+        ensembleSize: '',
         writeQuorumSize: '',
         readQuorumSize: '',
         markDeleteMaxRate: '',
@@ -751,9 +814,9 @@ export default {
         autoUpdateStrategy: '',
         messageTTL: '',
         retentionTime: '',
-        encryptionRequireRadio: 'Disabled',
-        deduplicationRadio: 'Disabled',
-        schemaValidationEnforcedRadio: 'Disabled',
+        encryptionRequireRadio: this.$i18n.t('common.disabled'),
+        deduplicationRadio: this.$i18n.t('common.disabled'),
+        schemaValidationEnforcedRadio: this.$i18n.t('common.disabled'),
         dispatchRatePerTopicBytes: '',
         dispatchRatePerTopicMessage: '',
         dispatchRatePerTopicPeriod: '',
@@ -770,82 +833,81 @@ export default {
       },
       rules: {
         topic: [{ required: true, message: 'topic is required', trigger: 'blur' }]
-        // ensembelSize: [{ required: true, message: 'EnsembelSize is greater more than 0', trigger: 'blur' }]
       },
-      markDeleteRateContent: 'This is markDeleteRateContent',
-      backlogQuotasLimitContent: 'This is backlogQuotasLimitContent',
-      backlogRententionPolicyContent: 'This is backlogRententionPolicyContent',
+      markDeleteRateContent: this.$i18n.t('namespace.policy.markDeleteRateContent'),
+      backlogQuotasLimitContent: this.$i18n.t('namespace.policy.backlogQuotasLimitContent'),
+      backlogRententionPolicyContent: this.$i18n.t('namespace.policy.backlogRententionPolicyContent'),
       backlogRententionPolicyRadio: 'consumer_backlog_eviction',
       backlogRententionPolicyOption: [{
         value: 'consumer_backlog_eviction',
-        label: 'consumer_backlog_eviction'
+        label: this.$i18n.t('backlog_policy.consumer_backlog_eviction')
       }, {
         value: 'producer_exception',
-        label: 'producer_exception'
+        label: this.$i18n.t('backlog_policy.producer_exception')
       }, {
         value: 'producer_request_hold',
-        lable: 'producer_request_hold'
+        label: this.$i18n.t('backlog_policy.producer_request_hold')
       }],
-      encryptionRequireContent: 'This is encryptionRequireContent',
+      encryptionRequireContent: this.$i18n.t('namespace.policy.encryptionRequireContent'),
       encryptionRequireOption: [{
         value: 'Enabled',
-        label: 'Enabled'
+        label: this.$i18n.t('common.enabled')
       }, {
         value: 'Disabled',
-        label: 'Disabled'
+        label: this.$i18n.t('common.disabled')
       }],
-      deduplicationContent: 'This is deduplicationContent',
+      deduplicationContent: this.$i18n.t('namespace.policy.deduplicationContent'),
       deduplication: '',
       deduplicationOption: [{
         value: 'Enabled',
-        label: 'Enabled'
+        label: this.$i18n.t('common.enabled')
       }, {
         value: 'Disabled',
-        label: 'Disabled'
+        label: this.$i18n.t('common.disabled')
       }],
-      autoUpdateStrategyContent: 'This is schemaValidationEnforced',
+      autoUpdateStrategyContent: this.$i18n.t('namespace.policy.autoUpdateStrategyContent'),
       autoUpdateStrategyOption: [{
         value: 'Full',
-        label: 'Full'
-      }, {
-        value: 'Forward',
-        label: 'Forward'
-      }, {
-        value: 'Backward',
-        label: 'Backward'
-      }, {
-        value: 'AlwaysCompatible',
-        label: 'Always Compatible'
-      }, {
-        value: 'AutoUpdateDisabled',
-        label: 'AutoUpdateDisabled'
-      }, {
-        value: 'BackwardTransitive',
-        label: 'BackwardTransitive'
-      }, {
-        value: 'ForwardTransitive',
-        label: 'ForwardTransitive'
+        label: this.$i18n.t('schema_bc.full')
       }, {
         value: 'FullTransitive',
-        label: 'FullTransitive'
+        label: this.$i18n.t('schema_bc.full_transitive')
+      }, {
+        value: 'Forward',
+        label: this.$i18n.t('schema_bc.forward')
+      }, {
+        value: 'ForwardTransitive',
+        label: this.$i18n.t('schema_bc.forward_transitive')
+      }, {
+        value: 'Backward',
+        label: this.$i18n.t('schema_bc.backward')
+      }, {
+        value: 'BackwardTransitive',
+        label: this.$i18n.t('schema_bc.backward_transitive')
+      }, {
+        value: 'AlwaysCompatible',
+        label: this.$i18n.t('schema_bc.always')
+      }, {
+        value: 'AutoUpdateDisabled',
+        label: this.$i18n.t('schema_bc.auto_update_disabled')
       }],
-      schemaValidationEnforcedContent: 'This is schemaValidationEnforcedContent',
+      schemaValidationEnforcedContent: this.$i18n.t('namespace.policy.schemaValidationEnforcedContent'),
       schemaValidationEnforced: '',
-      messageTTLContent: 'This is messageTTLContent',
-      retentionSizeContent: 'This is retentionSizeContent',
-      retentionTimeContent: 'This is retentionTimeContent',
-      compactionThresholdContent: 'This is compactionThresholdContent',
-      offloadThresholdContent: 'This is offloadThresholdContent',
-      offloadDeletionLagContent: 'This is offloadDeletionLagContent',
-      maxProducersPerTopicContent: 'This is maxProducersPerTopicContent',
-      maxConsumersPerTopicContent: 'This is maxConsumersPerTopicContent',
-      maxConsumerPerSubContent: 'This is maxConsumerPerSubContent',
-      dispatchRatePerTopicContent: 'This is dispatchRatePerTopicContent',
-      dispatchRatePerSubContent: 'This is dispatchRatePerSubContent',
-      subscribeRatePerConsumerContent: 'This is subscribeRatePerConsumerContent',
-      antiAffinityGroupContent: 'This is antiAffinityGroupContent',
+      messageTTLContent: this.$i18n.t('namespace.policy.messageTTLContent'),
+      retentionSizeContent: this.$i18n.t('namespace.policy.retentionSizeContent'),
+      retentionTimeContent: this.$i18n.t('namespace.policy.retentionTimeContent'),
+      compactionThresholdContent: this.$i18n.t('namespace.policy.compactionThresholdContent'),
+      offloadThresholdContent: this.$i18n.t('namespace.policy.offloadThresholdContent'),
+      offloadDeletionLagContent: this.$i18n.t('namespace.policy.offloadDeletionLagContent'),
+      maxProducersPerTopicContent: this.$i18n.t('namespace.policy.maxProducersPerTopicContent'),
+      maxConsumersPerTopicContent: this.$i18n.t('namespace.policy.maxConsumersPerTopicContent'),
+      maxConsumerPerSubContent: this.$i18n.t('namespace.policy.maxConsumerPerSubContent'),
+      dispatchRatePerTopicContent: this.$i18n.t('namespace.policy.dispatchRatePerTopicContent'),
+      dispatchRatePerSubContent: this.$i18n.t('namespace.policy.dispatchRatePerSubContent'),
+      subscribeRatePerConsumerContent: this.$i18n.t('namespace.policy.subscribeRatePerConsumerContent'),
+      antiAffinityGroupContent: this.$i18n.t('namespace.policy.antiAffinityGroupContent'),
       tableKey: 0,
-      topicsListLoading: true,
+      topicsListLoading: false,
       topicsTableKey: 0,
       brokerStats: null,
       topics: {},
@@ -863,10 +925,11 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        create: 'Create Topic'
+        create: this.$i18n.t('topic.newTopic'),
+        delete: this.$i18n.t('namespace.deleteNamespace')
       },
       currentTabName: '',
-      bundleInfoContent: 'This is bundleInfoContent'
+      bundleInfoContent: this.$i18n.t('namespace.bundle.bundleInfoContent')
     }
   },
   created() {
@@ -880,106 +943,127 @@ export default {
     }
     this.getRemoteTenantsList()
     this.getNamespacesList(this.postForm.tenant)
+    this.getTenantsInfo(this.postForm.tenant)
     this.getPolicies(this.tenantNamespace)
     this.initPermissions(this.tenantNamespace)
     this.initPersistence(this.tenantNamespace)
     this.initRetention(this.tenantNamespace)
     this.getStats()
+    this.getTopicsStats()
+    this.activeBundleCluster = this.replicationClustersValue.length > 0 ? this.replicationClustersValue[0] : ''
   },
   methods: {
+    getNamespaceStats() {
+      fetchNamespaceStats(this.postForm.tenant, this.postForm.namespace).then(response => {
+        if (!response.data) return
+        this.namespaceStats = []
+        if (response.data.hasOwnProperty('inMsg')) {
+          this.namespaceStats.push({
+            inMsg: numberFormatter(response.data.inMsg, 2),
+            outMsg: numberFormatter(response.data.outMsg, 2),
+            inBytes: formatBytes(response.data.msgThroughputIn),
+            outBytes: formatBytes(response.data.msgThroughputOut)
+          })
+        }
+      })
+    },
     getStats() {
+      this.getNamespaceStats()
       this.getTopics()
     },
+    getTopicsStats() {
+      fetchTopicsStatsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
+        if (!response.data) return
+      })
+    },
     getTopics() {
-      fetchTopicsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
+      fetchTopicsStatsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
         for (var i in response.data.topics) {
-          this.topics[response.data.topics[i]['topic']] = i
           var topicLink = ''
-          if (response.data.topics[i]['partitions'] === '0') {
+          if (response.data.topics[i]['partitions'] === 0) {
             topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/topic'
           } else {
             topicLink = '/management/topics/' + response.data.topics[i]['persistent'] + '/' + this.tenantNamespace + '/' + response.data.topics[i]['topic'] + '/partitionedTopic'
           }
+          var children = []
+          var clusters = response.data.topics[i]['clusters']
+          for (var j in clusters) {
+            var clusterTopicInfo = {
+              'id': 1000000 * (i + 1) + j,
+              'topic': clusters[j]['topic'],
+              'partitions': clusters[j]['partitions'],
+              'persistent': clusters[j]['persistent'],
+              'producers': clusters[j]['producerCount'],
+              'subscriptions': clusters[j]['subscriptionCount'],
+              'inMsg': numberFormatter(clusters[j]['msgRateIn'], 2),
+              'outMsg': numberFormatter(clusters[j]['msgRateOut'], 2),
+              'inBytes': formatBytes(clusters[j]['msgThroughputIn']),
+              'outBytes': formatBytes(clusters[j]['msgThroughputOut']),
+              'storageSize': formatBytes(clusters[j]['storageSize'], 0),
+              'tenantNamespace': this.tenantNamespace,
+              'topicLink': topicLink + '?cluster=' + clusters[j]['topic'] + '&tab='
+            }
+            children.push(clusterTopicInfo)
+          }
+
+          if (clusters.length <= 0) {
+            var tempCluster = {
+              'id': 1000000 * (i + 1),
+              'topic': '-',
+              'partitions': this.form.partitions,
+              'persistent': this.form.isPersistent,
+              'producers': 0,
+              'subscriptions': 0,
+              'inMsg': 0,
+              'outMsg': 0,
+              'inBytes': 0,
+              'outBytes': 0,
+              'storageSize': 0,
+              'tenantNamespace': this.tenantNamespace,
+              'topicLink': topicLink
+            }
+            if (this.replicationClustersValue.length <= 0) {
+              children.push(tempCluster)
+            }
+            for (var c in this.replicationClustersValue) {
+              tempCluster.topic = this.replicationClustersValue[c]
+              children.push(tempCluster)
+            }
+          }
+
           var topicInfo = {
+            'id': i,
             'topic': response.data.topics[i]['topic'],
             'partitions': response.data.topics[i]['partitions'],
             'persistent': response.data.topics[i]['persistent'],
-            'producers': 0,
-            'subscriptions': 0,
-            'inMsg': 0,
-            'outMsg': 0,
-            'inBytes': 0,
-            'outBytes': 0,
-            'storageSize': 0,
+            'producers': response.data.topics[i]['producers'],
+            'subscriptions': response.data.topics[i]['subscriptions'],
+            'inMsg': numberFormatter(response.data.topics[i]['inMsg'], 2),
+            'outMsg': numberFormatter(response.data.topics[i]['outMsg'], 2),
+            'inBytes': formatBytes(response.data.topics[i]['inBytes']),
+            'outBytes': formatBytes(response.data.topics[i]['outBytes']),
+            'storageSize': formatBytes(response.data.topics[i]['storageSize'], 0),
+            'children': children,
             'tenantNamespace': this.tenantNamespace,
-            'topicLink': topicLink
+            'topicLink': topicLink + '?tab='
           }
+          this.topicsListLoading = false
           this.topicsList.push(topicInfo)
-          this.tempTopicsList.push(topicInfo)
         }
-        fetchBrokerStatsTopics('').then(res => {
-          if (!res.data) return
-          this.brokerStats = res.data
-          if (this.brokerStats.hasOwnProperty(this.tenantNamespace)) {
-            for (var bundle in this.brokerStats[this.tenantNamespace]) {
-              for (var p in this.brokerStats[this.tenantNamespace][bundle]) {
-                for (var topic in this.brokerStats[this.tenantNamespace][bundle][p]) {
-                  this.namespaceStats[0].inMsg += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateIn
-                  this.namespaceStats[0].outMsg += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateOut
-                  this.namespaceStats[0].inBytes += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputIn
-                  this.namespaceStats[0].outBytes += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputOut
-                  var topicName = topic.split('://')[1].split('/')[2]
-                  var isPartition = false
-                  if (topicName.indexOf('-partition-') > 0) {
-                    topicName = topicName.split('-partition-')[0]
-                    isPartition = true
-                  }
-                  if (this.topics.hasOwnProperty(topicName)) {
-                    if (isPartition) {
-                      this.topicsList[this.topics[topicName]]['producers'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].producerCount
-                      for (var psub in this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions) {
-                        this.topicsList[this.topics[topicName]]['subscriptions'] += Object.keys(this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions[psub].consumers).length
-                      }
-                      this.topicsList[this.topics[topicName]]['inMsg'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateIn
-                      this.topicsList[this.topics[topicName]]['outMsg'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateOut
-                      this.topicsList[this.topics[topicName]]['inBytes'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputIn
-                      this.topicsList[this.topics[topicName]]['outBytes'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputOut
-                      if (p === 'non-persistent') {
-                        this.topicsList[this.topics[topicName]]['storageSize'] = 0
-                      } else {
-                        this.topicsList[this.topics[topicName]]['storageSize'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].storageSize
-                      }
-                    } else {
-                      this.topicsList[this.topics[topicName]]['producers'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].producerCount
-                      for (var sub in this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions) {
-                        this.topicsList[this.topics[topicName]]['subscriptions'] = Object.keys(this.brokerStats[this.tenantNamespace][bundle][p][topic].subscriptions[sub].consumers).length
-                      }
-                      this.topicsList[this.topics[topicName]]['inMsg'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateIn
-                      this.topicsList[this.topics[topicName]]['outMsg'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgRateOut
-                      this.topicsList[this.topics[topicName]]['inBytes'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputIn
-                      this.topicsList[this.topics[topicName]]['outBytes'] = this.brokerStats[this.tenantNamespace][bundle][p][topic].msgThroughputOut
-                      if (p === 'non-persistent') {
-                        this.topicsList[this.topics[topicName]]['storageSize'] = 0
-                      } else {
-                        this.topicsList[this.topics[topicName]]['storageSize'] += this.brokerStats[this.tenantNamespace][bundle][p][topic].storageSize
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        })
-        this.topicsListLoading = false
       })
     },
     handleFilterTopic() {
+      if (this.tempTopicsList.length <= 0) {
+        for (var t = 0; t < this.topicsList.length; t++) {
+          this.tempTopicsList.push(this.topicsList[t])
+        }
+      }
       if (!validateEmpty(this.searchTopic)) {
         this.searchList = []
-        for (var i = 0; i < this.tempTopicsList.length; i++) {
-          if (this.tempTopicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
-            this.searchList.push(this.tempTopicsList[i])
+        for (var i = 0; i < this.topicsList.length; i++) {
+          if (this.topicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
+            this.searchList.push(this.topicsList[i])
           }
         }
         this.topicsList = this.searchList
@@ -1018,14 +1102,20 @@ export default {
         this.form.retentionTime = String(response.data.retentionTimeInMinutes)
       })
     },
+    getTenantsInfo(tenant) {
+      fetchTenantsInfo(tenant).then(response => {
+        this.replicationClustersOptions = []
+        for (let i = 0; i < response.data.allowedClusters.length; i++) {
+          this.replicationClustersOptions.push({
+            value: response.data.allowedClusters[i],
+            label: response.data.allowedClusters[i]
+          })
+        }
+      })
+    },
     initPoliciesOptions(policies) {
-      for (var i = 0; i < policies.replication_clusters.length; i++) {
-        this.replicationClustersOptions.push({
-          value: policies.replication_clusters[i],
-          label: policies.replication_clusters[i]
-        })
-      }
       this.replicationClustersValue = policies.replication_clusters
+      this.activeBundleCluster = this.activeBundleCluster || this.replicationClustersValue.length > 0 ? this.replicationClustersValue[0] : ''
       this.subscriptionAuthenticationMode = policies.subscription_auth_mode
       this.form.backlogQuotasLimit = String(policies.backlog_quota_map.destination_storage.limit)
       this.form.backlogRententionPolicy = String(policies.backlog_quota_map.destination_storage.policy)
@@ -1076,6 +1166,9 @@ export default {
       this.currentTabName = tab.name
       this.$router.push({ query: { 'tab': tab.name }})
     },
+    handleBundleTabClick(tab, event) {
+      this.activeBundleCluster = tab.name
+    },
     getRemoteTenantsList() {
       fetchTenants().then(response => {
         if (!response.data) return
@@ -1121,7 +1214,7 @@ export default {
       revokePermissions(this.tenantNamespace, tag).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Add success',
+          message: this.$i18n.t('namespace.notification.removeRoleSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1140,17 +1233,17 @@ export default {
       if (inputValue) {
         if (this.roleMap.hasOwnProperty(inputValue)) {
           this.$message({
-            message: 'This role is exist',
+            message: this.$i18n.t('namespace.policy.roleAlreadyExists'),
             type: 'error'
           })
           this.inputVisible = false
           this.inputValue = ''
           return
         }
-        grantPermissions(this.currentNamespace, inputValue, this.roleMap[inputValue]).then(response => {
+        grantPermissions(this.tenantNamespace, inputValue, this.roleMap[inputValue]).then(response => {
           this.$notify({
             title: 'success',
-            message: 'Add success',
+            message: this.$i18n.t('namespace.notification.addRoleSuccess'),
             type: 'success',
             duration: 3000
           })
@@ -1177,7 +1270,7 @@ export default {
       setPersistence(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set persistence success for namespace',
+          message: this.$i18n.t('namespace.notification.updatePersistenceSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1191,17 +1284,17 @@ export default {
       setBacklogQuota(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Add Backlog Quota success for namespace',
+          message: this.$i18n.t('namespace.notification.updateBacklogQuotaSuccess'),
           type: 'success',
           duration: 3000
         })
       })
     },
     handleSplitBundle(row) {
-      splitBundle(this.tenantNamespace, row.bundle, false).then(response => {
+      splitBundleOnCluster(this.activeBundleCluster, this.tenantNamespace, row.bundle, false).then(response => {
         this.$notify({
           title: 'success',
-          message: 'splitBundle success for namespace',
+          message: this.$i18n.t('namespace.notification.splitBundleSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1210,44 +1303,40 @@ export default {
       })
     },
     handleUnloadAll() {
-      unload(this.tenantNamespace).then(response => {
+      unloadOnCluster(this.activeBundleCluster, this.tenantNamespace).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Unload success for namespace',
+          message: this.$i18n.t('namespace.notification.unloadAllBundlesSuccess'),
           type: 'success',
           duration: 3000
         })
-        this.localList = []
-        this.getPolicies(this.tenantNamespace)
       })
     },
     handleUnloadBundle(row) {
-      unloadBundle(this.tenantNamespace, row.bundle).then(response => {
+      unloadBundleOnCluster(this.activeBundleCluster, this.tenantNamespace, row.bundle).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Unload success for namespace',
+          message: this.$i18n.t('namespace.notification.unloadBundleSuccess'),
           type: 'success',
           duration: 3000
         })
       })
-      this.localList = []
-      this.getPolicies(this.tenantNamespace)
     },
     hanldeClearAllBacklog() {
-      clearBacklog(this.tenantNamespace).then(response => {
+      clearBacklogOnCluster(this.activeBundleCluster, this.tenantNamespace).then(response => {
         this.$notify({
           title: 'success',
-          message: 'clearBacklog success for namespace',
+          message: this.$i18n.t('namespace.notification.clearBacklogSuccess'),
           type: 'success',
           duration: 3000
         })
       })
     },
     handleClearBundleBacklog(row) {
-      clearBundleBacklog(this.tenantNamespace, row.bundle).then(response => {
+      clearBundleBacklogOnCluster(this.activeBundleCluster, this.tenantNamespace, row.bundle).then(response => {
         this.$notify({
           title: 'success',
-          message: 'clearBacklog success for bundle',
+          message: this.$i18n.t('namespace.notification.clearBundleBacklogSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1257,7 +1346,7 @@ export default {
       setClusters(this.tenantNamespace, this.replicationClustersValue).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Add clusters success for namespace',
+          message: this.$i18n.t('namespace.notification.updateReplicatedClustersSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1271,35 +1360,39 @@ export default {
       setSubscriptionAuthMode(this.tenantNamespace, subAuthMode).then(response => {
         this.$notify({
           title: 'success',
-          message: 'success',
+          message: this.$i18n.t('namespace.notification.updateSubscriptionAuthModeSuccess'),
           type: 'success',
           duration: 3000
         })
       })
     },
     handleEncryption() {
-      var encryptionRequire = false
+      let encryptionRequire = false
+      let successMessage = this.$i18n.t('namespace.notification.disableEncryptionSuccess')
       if (this.form.encryptionRequireRadio === 'Enabled') {
         encryptionRequire = true
+        successMessage = this.$i18n.t('namespace.notification.enableEncryptionSuccess')
       }
       setEncryptionRequired(this.tenantNamespace, encryptionRequire).then(response => {
         this.$notify({
           title: 'success',
-          message: 'success',
+          message: successMessage,
           type: 'success',
           duration: 3000
         })
       })
     },
     handleDeduplication() {
-      var deduplication = false
+      let deduplication = false
+      let successMessage = this.$i18n.t('namespace.notification.disableDeduplicationSuccess')
       if (this.form.deduplicationRadio === 'Enabled') {
         deduplication = true
+        successMessage = this.$i18n.t('namespace.notification.enableDeduplicationSuccess')
       }
       setDeduplication(this.tenantNamespace, deduplication).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set deduplication success for namespace',
+          message: successMessage,
           type: 'success',
           duration: 3000
         })
@@ -1327,7 +1420,7 @@ export default {
       setSchemaAutoupdateStrategy(this.tenantNamespace, strategy).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set SchemaAutoupdateStrategy success',
+          message: this.$i18n.t('namespace.notification.updateSchemaAutoUpdateStrategySuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1335,13 +1428,15 @@ export default {
     },
     handleSchemaValidationEnforced() {
       var schemaValidation = false
+      var successMessage = this.$i18n.t('namespace.notification.disableSchemaValidationEnforcedSuccess')
       if (this.form.schemaValidationEnforcedRadio === 'Enabled') {
         schemaValidation = true
+        successMessage = this.$i18n.t('namespace.notification.enableSchemaValidationEnforcedSuccess')
       }
       setSchemaValidationEnforced(this.tenantNamespace, schemaValidation).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set SchemaValidationEnforced success',
+          message: successMessage,
           type: 'success',
           duration: 3000
         })
@@ -1351,7 +1446,7 @@ export default {
       setMessageTtl(this.tenantNamespace, parseInt(this.form.messageTTL)).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set messageTTL success for namespace',
+          message: this.$i18n.t('namespace.notification.updateMessageTTLSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1362,7 +1457,7 @@ export default {
       setRetention(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set Retention success for namespace',
+          message: this.$i18n.t('namespace.notification.updateRetentionSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1372,7 +1467,7 @@ export default {
       setCompactionThreshold(this.tenantNamespace, this.form.compactionThreshold).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set threshold success',
+          message: this.$i18n.t('namespace.notification.updateCompactionThresholdSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1382,7 +1477,7 @@ export default {
       setOffloadThreshold(this.tenantNamespace, this.form.offloadThreshold).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set threshold success',
+          message: this.$i18n.t('namespace.notification.updateOffloadThresholdSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1392,7 +1487,7 @@ export default {
       setOffloadDeletionLag(this.tenantNamespace, this.form.offloadDeletionLag).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set DeletionLag success',
+          message: this.$i18n.t('namespace.notification.updateOffloadDeletionLagSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1402,7 +1497,7 @@ export default {
       setMaxProducersPerTopic(this.tenantNamespace, this.form.maxProducersPerTopic).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set max producers per topic success',
+          message: this.$i18n.t('namespace.notification.setMaxProducersSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1412,7 +1507,7 @@ export default {
       setMaxConsumersPerTopic(this.tenantNamespace, this.form.maxConsumersPerTopic).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set max consumers per topic success',
+          message: this.$i18n.t('namespace.notification.setMaxConsumersSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1422,7 +1517,7 @@ export default {
       setMaxConsumersPerSubscription(this.tenantNamespace, this.form.maxConsumerPerSub).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set max subscription per topic success',
+          message: this.$i18n.t('namespace.notification.setMaxConsumersPerSubscriptionSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1437,7 +1532,7 @@ export default {
       setDispatchRate(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'set DispatchRate success for namespace',
+          message: this.$i18n.t('namespace.notification.setDispatchRateSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1452,7 +1547,7 @@ export default {
       setSubscriptionDispatchRate(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'set subscription dispatchRate success for namespace',
+          message: this.$i18n.t('namespace.notification.setDispatchRatePerSubscriptionSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1466,7 +1561,7 @@ export default {
       setSubscribeRate(this.tenantNamespace, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'set subscription dispatchRate success for namespace',
+          message: this.$i18n.t('namespace.notification.setSubscribeRateSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1476,7 +1571,7 @@ export default {
       setAntiAffinityGroup(this.tenantNamespace, this.form.antiAffinityGroup).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Set AntiAffinityGroup success for namespace',
+          message: this.$i18n.t('namespace.notification.setAntiAffinityGroupSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -1490,11 +1585,11 @@ export default {
       deleteNamespace(this.tenantNamespace).then((response) => {
         this.$notify({
           title: 'success',
-          message: 'delete success',
+          message: this.$i18n.t('namespace.deleteNsSuccessNotification'),
           type: 'success',
           duration: 2000
         })
-        this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant })
+        this.$router.push({ path: '/management/tenants/tenantInfo/' + this.postForm.tenant + '?tab=namespaces' })
       })
     },
     handleCreateTopic() {
@@ -1512,7 +1607,7 @@ export default {
         this.form.topic, parseInt(this.form.partitions)).then(() => {
         this.$notify({
           title: 'success',
-          message: 'create topic success',
+          message: this.$i18n.t('topic.notification.createTopicSuccess'),
           type: 'success',
           duration: 2000
         })
