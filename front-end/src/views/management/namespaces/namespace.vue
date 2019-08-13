@@ -27,7 +27,18 @@
         </el-table>
         <h4>
           Bundles
-          <el-tooltip :content="$t('namespace.bundle.bundleInfoContent')" class="item" effect="dark" placement="top">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div slot="content">
+              {{ $t('namespace.bundle.bundleInfoContent') }}
+              <br>
+              <br>
+              <el-link
+                type="primary"
+                href="https://pulsar.apache.org/docs/en/next/administration-load-balance/#pulsar-load-manager-architecture"
+                target="_blank">
+                {{ $t('namespace.bundle.bundleInfoLink') }}
+              </el-link>
+            </div>
             <i class="el-icon-info"/>
           </el-tooltip>
         </h4>
@@ -203,7 +214,21 @@
         <hr class="split-line">
         <div class="section-title">
           <span>{{ $t('namespace.policy.subscriptionAuthenticationMode') }}</span>
-          <el-tooltip :content="subscriptionAuthenticationModeContent" class="item" effect="dark" placement="top">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div slot="content">
+              {{ $t('namespace.policy.subscriptionAuthenticationModeContent') }}
+              <br>
+              <br>
+              {{ $t('namespace.policy.subscriptionAuthenticationModeOptions') }}
+              <ul>
+                <li>{{ $t('namespace.policy.subscriptionAuthenticationModeNone') }}</li>
+                <li>
+                  {{ $t('namespace.policy.subscriptionAuthenticaitonModePrefix') }}
+                  <br>
+                  {{ $t('namespace.policy.subscriptionAuthenticaitonModePrefixExample') }}
+                </li>
+              </ul>
+            </div>
             <i class="el-icon-info"/>
           </el-tooltip>
         </div>
@@ -222,18 +247,26 @@
         <hr class="split-line">
         <div class="section-title">
           <span>{{ $t('namespace.policy.replicationFactor') }}</span>
-          <el-tooltip :content="replicationFactorContent" class="item" effect="dark" placement="top">
+          <el-tooltip class="item" effect="dark" placement="top">
+            <div slot="content">
+              {{ $t('namespace.policy.replicationFactorContent') }}
+              <ul>
+                <li>{{ $t('namespace.policy.ensembleSize') }}{{ $t('namespace.policy.ensembleSizeDescription') }}</li>
+                <li>{{ $t('namespace.policy.writeQuorumSize') }}{{ $t('namespace.policy.writeQuorumSizeDescription') }}</li>
+                <li>{{ $t('namespace.policy.readQuorumSize') }}{{ $t('namespace.policy.ackQuorumSizeDescription') }}</li>
+              </ul>
+            </div>
             <i class="el-icon-info"/>
           </el-tooltip>
         </div>
         <el-form :inline="true" :model="form" :rules="rules">
-          <el-form-item prop="ensembelSize">
-            <span>{{ $t('namespace.policy.ensembelSize') }}</span>
+          <el-form-item prop="ensembleSize">
+            <span>{{ $t('namespace.policy.ensembleSize') }}</span>
             <md-input
               v-model="form.ensembleSize"
               :placeholder="$t('namespace.policy.inputEnsemble')"
               class="md-input-style"
-              name="ensembelSize"
+              name="ensembleSize"
               @keyup.enter.native="handlePersistence"/>
           </el-form-item>
           <el-form-item prop="writeQuorumSize">
@@ -318,7 +351,18 @@
           </el-form-item>
           <el-form-item style="width:300px">
             <span>{{ $t('namespace.policy.backlogRententionPolicy') }}</span>
-            <el-tooltip :content="backlogRententionPolicyContent" class="item" effect="dark" placement="top">
+            <el-tooltip class="item" effect="dark" placement="top">
+              <div slot="content">
+                {{ $t('namespace.policy.backlogRententionPolicyContent') }}
+                <br>
+                <br>
+                {{ $t('namespace.policy.backlogRententionPolicyOptions') }}
+                <ul>
+                  <li>{{ $t('namespace.policy.producerRequestHoldDesc') }}</li>
+                  <li>{{ $t('namespace.policy.producerExceptionDesc') }}</li>
+                  <li>{{ $t('namespace.policy.consumerEvictionDesc') }}</li>
+                </ul>
+              </div>
               <i class="el-icon-info"/>
             </el-tooltip>
             <br>
@@ -340,7 +384,18 @@
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="autoUpdateStrategy">
             <span>{{ $t('namespace.policy.autoUpdateStrategy') }}</span>
-            <el-tooltip :content="autoUpdateStrategyContent" class="item" effect="dark" placement="top">
+            <el-tooltip class="item" effect="dark" placement="top">
+              <div slot="content">
+                {{ $t('namespace.policy.autoUpdateStrategyContent') }}
+                <br>
+                <br>
+                <el-link
+                  type="primary"
+                  href="http://pulsar.apache.org/docs/en/next/schema-evolution-compatibility/#schema-compatibility-check-strategy"
+                  target="_blank">
+                  {{ $t('namespace.policy.schemaCompatibilityCheckStrategyLink') }}
+                </el-link>
+              </div>
               <i class="el-icon-info"/>
             </el-tooltip>
             <br>
@@ -749,7 +804,7 @@ export default {
       }],
       replicationFactorContent: this.$i18n.t('namespace.policy.replicationFactorContent'),
       form: {
-        ensembelSize: '',
+        ensembleSize: '',
         writeQuorumSize: '',
         readQuorumSize: '',
         markDeleteMaxRate: '',
@@ -779,7 +834,6 @@ export default {
       },
       rules: {
         topic: [{ required: true, message: 'topic is required', trigger: 'blur' }]
-        // ensembelSize: [{ required: true, message: 'EnsembelSize is greater more than 0', trigger: 'blur' }]
       },
       markDeleteRateContent: this.$i18n.t('namespace.policy.markDeleteRateContent'),
       backlogQuotasLimitContent: this.$i18n.t('namespace.policy.backlogQuotasLimitContent'),
