@@ -13,6 +13,53 @@ Back end is based on [spring boot](https://github.com/spring-projects/spring-boo
 * Clusters Management
 * Multi environment dynamic change
 
+### Feature preview
+
+#### Login
+
+Open your browser and use the account and the password to access the following address.
+username: pulsar
+password: pulsar
+http://frond-end-ip:9527/
+
+![pulsar-manager-login](docs/img/pulsar-manager-login.gif)
+
+#### Configuration environment
+
+The puslar-manager supports multi-environment configuration and can conveniently manage multiple environments.
+
+![pulsar-manager-environment](docs/img/pulsar-manager-environment.gif)
+
+#### Manage tenants
+
+![pulsar-manager-tenants](docs/img/pulsar-manager-tenants.gif)
+
+
+#### Manage namespaces
+
+![pulsar-manager-namespaces](docs/img/pulsar-manager-namespaces.gif)
+
+#### Manage topics
+
+![pulsar-manager-topics](docs/img/pulsar-manager-topics.gif)
+
+
+#### Manage subscriptions
+
+![pulsar-manager-subscriptions](docs/img/pulsar-manager-subscriptions.gif)
+
+#### Manage clusters and brokers
+
+![pulsar-manager-clusters-and-brokers](docs/img/pulsar-manager-clusters-brokers.gif)
+
+
+#### Topics monitoring
+
+The pulsar-manager can do some simple monitoring on topics and subscriptions.
+
+![pulsar-manager-topics-monitors](docs/img/pulsar-manager-topics-monitors.gif)
+
+
 ### Prerequisites
 * Java 8 or later
 * Node 10.15.3 or later
