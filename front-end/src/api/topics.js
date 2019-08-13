@@ -148,7 +148,7 @@ export function deleteTopicOnCluster(cluster, persistent, tenantNamespaceTopic) 
   })
 }
 
-export function deletePartitionTopic(persistent, tenantNamespaceTopic) {
+export function deletePartitionTopicOnCl(persistent, tenantNamespaceTopic) {
   return deletePartitionTopicOnCluster('', persistent, tenantNamespaceTopic)
 }
 
@@ -207,6 +207,17 @@ export function skip(persistent, tenantNamespaceTopic, subName, numMessages) {
   })
 }
 
+export function skipOnCluster(cluster, persistent, tenantNamespaceTopic, subName, numMessages) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/skip/${numMessages}`,
+    method: 'post'
+  })
+}
+
 export function clearBacklog(persistent, tenantNamespaceTopic, subName) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/skip_all`,
@@ -214,8 +225,30 @@ export function clearBacklog(persistent, tenantNamespaceTopic, subName) {
   })
 }
 
+export function clearBacklogOnCluster(cluster, persistent, tenantNamespaceTopic, subName) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/skip_all`,
+    method: 'post'
+  })
+}
+
 export function expireMessage(persistent, tenantNamespaceTopic, subName, expireTimeInSeconds) {
   return request({
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/expireMessages/${expireTimeInSeconds}`,
+    method: 'post'
+  })
+}
+
+export function expireMessageOnCluster(cluster, persistent, tenantNamespaceTopic, subName, expireTimeInSeconds) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/expireMessages/${expireTimeInSeconds}`,
     method: 'post'
   })
@@ -242,8 +275,31 @@ export function resetCursorByTimestamp(persistent, tenantNamespaceTopic, subName
   })
 }
 
+export function resetCursorByTimestampOnCluster(cluster, persistent, tenantNamespaceTopic, subName, timestamp) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/resetcursor/${timestamp}`,
+    method: 'post'
+  })
+}
+
 export function resetCursorByPosition(persistent, tenantNamespaceTopic, subName, data) {
   return request({
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/resetcursor`,
+    method: 'post',
+    data
+  })
+}
+
+export function resetCursorByPositionOnCluster(cluster, persistent, tenantNamespaceTopic, subName, data) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/resetcursor`,
     method: 'post',
     data

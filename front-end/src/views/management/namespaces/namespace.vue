@@ -385,7 +385,8 @@
               :placeholder="$t('namespace.policy.inputMessageTTL')"
               class="md-input-style"
               name="messageTTL"
-              @keyup.enter.native="handleMessageTTL"/>
+              @keyup.enter.native="handleMessageTTL"
+              @submit.native.prevent/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
@@ -684,6 +685,8 @@ import { putTopic, fetchTopicsStatsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 import { validateEmpty } from '@/utils/validate'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
   tenant: '',
@@ -851,7 +854,7 @@ export default {
       subscribeRatePerConsumerContent: this.$i18n.t('namespace.policy.subscribeRatePerConsumerContent'),
       antiAffinityGroupContent: this.$i18n.t('namespace.policy.antiAffinityGroupContent'),
       tableKey: 0,
-      topicsListLoading: true,
+      topicsListLoading: false,
       topicsTableKey: 0,
       brokerStats: null,
       topics: {},
@@ -902,10 +905,10 @@ export default {
         if (!response.data) return
         this.namespaceStats = []
         this.namespaceStats.push({
-          inMsg: response.data.inMsg,
-          outMsg: response.data.outMsg,
-          inBytes: response.data.msgThroughputIn,
-          outBytes: response.data.msgThroughputOut
+          inMsg: numberFormatter(response.data.inMsg, 2),
+          outMsg: numberFormatter(response.data.outMsg, 2),
+          inBytes: formatBytes(response.data.msgThroughputIn),
+          outBytes: formatBytes(response.data.msgThroughputOut)
         })
       })
     },
@@ -938,15 +941,40 @@ export default {
               'persistent': clusters[j]['persistent'],
               'producers': clusters[j]['producerCount'],
               'subscriptions': clusters[j]['subscriptionCount'],
-              'inMsg': clusters[j]['msgRateIn'],
-              'outMsg': clusters[j]['msgRateOut'],
-              'inBytes': clusters[j]['msgThroughputIn'],
-              'outBytes': clusters[j]['msgThroughputOut'],
-              'storageSize': clusters[j]['storageSize'],
+              'inMsg': numberFormatter(clusters[j]['msgRateIn'], 2),
+              'outMsg': numberFormatter(clusters[j]['msgRateOut'], 2),
+              'inBytes': formatBytes(clusters[j]['msgThroughputIn']),
+              'outBytes': formatBytes(clusters[j]['msgThroughputOut']),
+              'storageSize': formatBytes(clusters[j]['storageSize'], 0),
               'tenantNamespace': this.tenantNamespace,
               'topicLink': topicLink + '?cluster=' + clusters[j]['topic'] + '&tab='
             }
             children.push(clusterTopicInfo)
+          }
+
+          if (clusters.length <= 0) {
+            var tempCluster = {
+              'id': 1000000 * (i + 1),
+              'topic': '-',
+              'partitions': this.form.partitions,
+              'persistent': this.form.isPersistent,
+              'producers': 0,
+              'subscriptions': 0,
+              'inMsg': 0,
+              'outMsg': 0,
+              'inBytes': 0,
+              'outBytes': 0,
+              'storageSize': 0,
+              'tenantNamespace': this.tenantNamespace,
+              'topicLink': topicLink
+            }
+            if (this.replicationClustersValue.length <= 0) {
+              children.push(tempCluster)
+            }
+            for (var c in this.replicationClustersValue) {
+              tempCluster.topic = this.replicationClustersValue[c]
+              children.push(tempCluster)
+            }
           }
 
           var topicInfo = {
@@ -956,11 +984,11 @@ export default {
             'persistent': response.data.topics[i]['persistent'],
             'producers': response.data.topics[i]['producers'],
             'subscriptions': response.data.topics[i]['subscriptions'],
-            'inMsg': response.data.topics[i]['inMsg'],
-            'outMsg': response.data.topics[i]['outMsg'],
-            'inBytes': response.data.topics[i]['inBytes'],
-            'outBytes': response.data.topics[i]['outBytes'],
-            'storageSize': response.data.topics[i]['storageSize'],
+            'inMsg': numberFormatter(response.data.topics[i]['inMsg'], 2),
+            'outMsg': numberFormatter(response.data.topics[i]['outMsg'], 2),
+            'inBytes': formatBytes(response.data.topics[i]['inBytes']),
+            'outBytes': formatBytes(response.data.topics[i]['outBytes']),
+            'storageSize': formatBytes(response.data.topics[i]['storageSize'], 0),
             'children': children,
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink + '?tab='
@@ -971,11 +999,16 @@ export default {
       })
     },
     handleFilterTopic() {
+      if (this.tempTopicsList.length <= 0) {
+        for (var t = 0; t < this.topicsList.length; t++) {
+          this.tempTopicsList.push(this.topicsList[t])
+        }
+      }
       if (!validateEmpty(this.searchTopic)) {
         this.searchList = []
-        for (var i = 0; i < this.tempTopicsList.length; i++) {
-          if (this.tempTopicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
-            this.searchList.push(this.tempTopicsList[i])
+        for (var i = 0; i < this.topicsList.length; i++) {
+          if (this.topicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
+            this.searchList.push(this.topicsList[i])
           }
         }
         this.topicsList = this.searchList
@@ -1501,7 +1534,7 @@ export default {
           type: 'success',
           duration: 2000
         })
-        this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant })
+        this.$router.push({ path: '/management/tenants/tenantInfo/' + this.postForm.tenant + '?tab=namespaces' })
       })
     },
     handleCreateTopic() {

@@ -100,6 +100,8 @@ import jsonEditor from '@/components/JsonEditor'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 import { isValidResponse } from '@/utils/http'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
   cluster: '',
@@ -184,10 +186,10 @@ export default {
           }
         }
         this.brokerStats.push({
-          'inBytes': throughputIn.toFixed(2),
-          'outBytes': throughputOut.toFixed(2),
-          'inMsg': bandwidthIn.toFixed(2),
-          'outMsg': bandwidthOut.toFixed(2)
+          'inBytes': formatBytes(throughputIn),
+          'outBytes': formatBytes(throughputOut),
+          'inMsg': numberFormatter(bandwidthIn, 2),
+          'outMsg': numberFormatter(bandwidthOut, 2)
         })
       })
     },
