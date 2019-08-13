@@ -485,7 +485,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-position="top">
         <el-form-item v-if="dialogStatus==='delete'">
-          <h4>{{ $t(topic.deleteTopicMessage) }}</h4>
+          <h4>{{ $t('topic.deleteTopicMessage') }}</h4>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="deleteTopic">{{ $t('table.confirm') }}</el-button>
@@ -514,6 +514,9 @@ import {
   deleteTopicOnCluster
 } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
+
 const defaultForm = {
   persistent: '',
   tenant: '',
@@ -706,18 +709,18 @@ export default {
       fetchTopicStats(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.topicStats.push({
-          inMsg: response.data.msgRateIn,
-          outMsg: response.data.msgRateOut,
-          inBytes: response.data.msgThroughputIn,
-          outBytes: response.data.msgThroughputOut
+          inMsg: numberFormatter(response.data.msgRateIn, 2),
+          outMsg: numberFormatter(response.data.msgRateOut, 2),
+          inBytes: formatBytes(response.data.msgThroughputIn),
+          outBytes: formatBytes(response.data.msgThroughputOut)
         })
         for (var i in response.data.publishers) {
           this.producersList.push({
             'producerId': response.data.publishers[i].producerId,
             'producerName': response.data.publishers[i].producerName,
-            'inMsg': response.data.publishers[i].msgRateIn,
-            'inBytes': response.data.publishers[i].msgThroughputIn,
-            'avgMsgSize': response.data.publishers[i].averageMsgSize,
+            'inMsg': numberFormatter(response.data.publishers[i].msgRateIn, 2),
+            'inBytes': formatBytes(response.data.publishers[i].msgThroughputIn),
+            'avgMsgSize': numberFormatter(response.data.publishers[i].averageMsgSize, 2),
             'address': response.data.publishers[i].address,
             'since': response.data.publishers[i].connectedSince
           })
@@ -729,16 +732,16 @@ export default {
           }
           this.subscriptionsList.push({
             'subscription': s,
-            'outMsg': response.data.subscriptions[s].msgRateOut,
-            'outBytes': response.data.subscriptions[s].msgThroughputOut,
-            'msgExpired': response.data.subscriptions[s].msgRateExpired,
+            'outMsg': numberFormatter(response.data.subscriptions[s].msgRateOut, 2),
+            'outBytes': formatBytes(response.data.subscriptions[s].msgThroughputOut),
+            'msgExpired': numberFormatter(response.data.subscriptions[s].msgRateExpired, 2),
             'backlog': response.data.subscriptions[s].msgBacklog,
             'type': type,
             // subscriptions/:persistent/:tenant/:namespace/:topic/:subscription/subscription
             'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + this.getFullTopic() + '/' + s + '/subscription'
           })
         }
-        this.storageSize = response.data.storageSize
+        this.storageSize = formatBytes(response.data.storageSize, 0)
       })
     },
     initBundleRange() {
@@ -788,7 +791,7 @@ export default {
             })
           }
         }
-        this.entries = response.data.numberOfEntries
+        this.entries = numberFormatter(response.data.numberOfEntries, 0)
         for (var c in response.data.cursors) {
           this.cursorsList.push({
             'name': c,
@@ -837,14 +840,16 @@ export default {
     },
     getTopicsList() {
       this.getReplicatedClusters()
+      this.topicsListOptions = []
+      this.partitionsListOptions = []
+      if (this.firstInitTopic) {
+        this.firstInitTopic = false
+      } else {
+        this.postForm.topic = ''
+        this.postForm.partition = ''
+      }
       fetchTopicsByPulsarManager(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
-        this.topicsListOptions = []
-        if (this.firstInitTopic) {
-          this.firstInitTopic = false
-        } else {
-          this.postForm.topic = ''
-        }
         for (var i in response.data.topics) {
           this.topicsListOptions.push(response.data.topics[i]['topic'])
           this.topicPartitions[response.data.topics[i]['topic']] = response.data.topics[i]['partitions']
