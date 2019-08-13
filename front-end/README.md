@@ -18,7 +18,7 @@ For localhost debug
     },
 ```
 
-## Deploy to production environment
+## Deploy production environment
 
 * Add the following parameters to the Nginx server configuration file [prod.env.js](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/prod.env.js).
 ```

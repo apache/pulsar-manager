@@ -120,4 +120,5 @@ Back end is based on [spring boot](https://github.com/spring-projects/spring-boo
 
 ### Front end
 
-[front-end-deploy](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md)
+For more information about the front end, see [front-end-deploy](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md)
+
