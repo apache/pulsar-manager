@@ -15,11 +15,10 @@ import request from '@/utils/request'
 
 const BASE_URL_V2 = '/admin/v2'
 
-export function fetchSubscriptions(tenant, namespace, topic, query) {
+export function fetchSubscriptions(persistent, tenantNamespaceTopic) {
   return request({
-    url: BASE_URL_V2 + `/persistent/${tenant}/${namespace}/${topic}/subscriptions`,
-    method: 'get',
-    params: { query }
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscriptions`,
+    method: 'get'
   })
 }
 

@@ -65,3 +65,24 @@ export function validateEmpty(obj) {
   }
   return false
 }
+
+export function validateServiceUrl(expectedProtocol, allowEmpty) {
+  return (rule, value, callback) => {
+    if (!value || value.length === 0) {
+      if (allowEmpty) {
+        callback()
+        return
+      }
+    }
+    try {
+      const parsedUrl = new URL(value)
+      if (parsedUrl.protocol !== expectedProtocol) {
+        callback(new Error('Please input an `' + expectedProtocol + '` service URL'))
+        return
+      }
+      callback()
+    } catch (e) {
+      callback(new Error('Please input a valid service URL'))
+    }
+  }
+}

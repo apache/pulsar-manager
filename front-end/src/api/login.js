@@ -11,60 +11,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// import request from '@/utils/request'
-
-// export function loginByUsername(username, password) {
-//   const data = {
-//     username,
-//     password
-//   }
-//   return request({
-//     url: '/login/login',
-//     method: 'post',
-//     data
-//   })
-// }
-
-// export function logout() {
-//   return request({
-//     url: '/login/logout',
-//     method: 'post'
-//   })
-// }
-
-// export function getUserInfo(token) {
-//   return request({
-//     url: '/user/info',
-//     method: 'get',
-//     params: { token }
-//   })
-// }
-
-const userMap = {
-  admin: {
-    roles: ['admin'],
-    token: 'admin',
-    introduction: '我是超级管理员',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    name: 'Super Admin'
-  },
-  editor: {
-    roles: ['editor'],
-    token: 'editor',
-    introduction: '我是编辑',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    name: 'Normal Editor'
-  }
-}
+import request from '@/utils/request'
 
 export function loginByUsername(username, password) {
-  return { data: userMap['admin'] }
-}
-
-export function getUserInfo(config) {
-  return { data: userMap['admin'] }
+  const data = {
+    username,
+    password
+  }
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: '/pulsar-manager/login',
+    method: 'post',
+    data
+  })
 }
 
 export function logout() {
-  return 'success'
+  return request({
+    url: '/pulsar-manager/logout',
+    method: 'post'
+  })
+}
+
+export function getUserInfo(token) {
+  return request({
+    url: '/user/info',
+    method: 'get',
+    params: { token }
+  })
 }

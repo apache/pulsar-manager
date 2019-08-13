@@ -70,13 +70,19 @@ export const constantRouterMap = [
     hidden: true
   },
   {
+    path: '/environments',
+    component: () => import('@/views/management/environments/index'),
+    hidden: true
+  },
+  {
     path: '',
     component: Layout,
-    redirect: 'prometheus',
+    redirect: 'management/tenants',
     meta: {
       title: 'Dashboard',
       icon: 'dashboard'
     },
+    hidden: true,
     children: [
       {
         path: 'prometheus',
@@ -95,7 +101,8 @@ export const constantRouterMap = [
   {
     path: '/management',
     component: Layout,
-    redirect: 'management',
+    name: 'Management',
+    redirect: 'management/tenants',
     meta: {
       title: 'Management',
       icon: 'component'
@@ -108,79 +115,117 @@ export const constantRouterMap = [
         meta: { title: 'Clusters', noCache: true }
       },
       {
+        path: 'clusters/:cluster/cluster',
+        component: () => import('@/views/management/clusters/cluster'),
+        name: 'ClusterInfo',
+        meta: { title: 'ClusterInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'clusters/:cluster/:failureDomainName/failureDomainName',
+        component: () => import('@/views/management/clusters/failureDomain'),
+        name: 'FailureDomainInfo',
+        meta: { title: 'FailureDomainInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'clusters/:cluster/:namespaceIsolation/namespaceIsolationPolicy',
+        component: () => import('@/views/management/namespaceIsolations/namespaceIsolationPolicy'),
+        name: 'NamespaceIsolationPolicy',
+        meta: { title: 'NamespaceIsolationPolicy', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'brokers/:cluster/:broker/broker',
+        component: () => import('@/views/management/brokers/broker'),
+        name: 'BrokerInfo',
+        meta: { title: 'BrokerInfo', noCache: true },
+        hidden: true
+      },
+      {
         path: 'tenants',
         component: () => import('@/views/management/tenants/index'),
         name: 'Tenants',
         meta: { title: 'Tenants', noCache: true }
       },
       {
-        path: 'namespaces',
-        component: () => import('@/views/management/namespaces/index'),
+        path: 'tenants/tenantInfo/:tenant',
+        component: () => import('@/views/management/tenants/tenant'),
+        name: 'Tenant',
+        meta: { title: 'TenantInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'tenants/tenantInfo/public?tab=namespaces',
         name: 'Namespaces',
         meta: { title: 'Namespaces', noCache: true }
       },
       {
-        path: 'topics',
-        component: () => import('@/views/management/topics/index'),
+        path: 'namespaces/public/default/namespace?tab=topics',
         name: 'Topics',
         meta: { title: 'Topics', noCache: true }
       },
       {
-        path: 'subscriptions',
-        component: () => import('@/views/management/subscriptions/index'),
-        name: 'Subscriptions',
-        meta: { title: 'Subscriptions', noCache: true }
+        path: 'topics/:persistent/:tenant/:namespace/:topic/topic',
+        component: () => import('@/views/management/topics/topic'),
+        name: 'TopicInfo',
+        meta: { title: 'TopicInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'topics/:persistent/:tenant/:namespace/:topic/partitionedTopic',
+        component: () => import('@/views/management/topics/partitionedTopic'),
+        name: 'ParititionTopicInfo',
+        meta: { title: 'ParititionTopicInfo', noCache: true },
+        hidden: true
+      },
+      {
+        path: 'subscriptions/:persistent/:tenant/:namespace/:topic/:subscription/subscription',
+        component: () => import('@/views/management/subscriptions/subscription'),
+        name: 'SubscriptionInfo',
+        meta: { title: 'SubscriptionInfo', noCache: true },
+        hidden: true
       },
       {
         path: 'namespaces/:tenant',
-        component: () => import('@/views/management/namespaces/index'),
         name: 'NamespacesTenant',
         meta: { title: 'Namespaces', noCache: true },
         hidden: true
       },
       {
-        path: 'tenantNamespace/:tenant/:namespace',
-        component: () => import('@/views/management/topics/index'),
-        name: 'TenantNamespace',
-        meta: { title: 'Topics', noCache: true },
+        path: 'namespaces/:tenant/:namespace/namespace',
+        component: () => import('@/views/management/namespaces/namespace'),
+        name: 'NamespacesInfo',
+        meta: { title: 'NamespacesInfo', noCache: true },
         hidden: true
-      },
-      {
-        path: 'namespaces/:tenant/:namespace/policies',
-        component: () => import('@/views/management/namespaces/policies'),
-        name: 'NamespacesPolicies',
-        meta: { title: 'NamespacesPolicies', noCache: true },
-        hidden: true
-      },
-      {
-        path: 'brokers',
-        component: () => import('@/views/management/brokers'),
-        name: 'Brokers',
-        meta: { title: 'Brokers', noCache: true }
       },
       {
         path: 'functions',
         component: () => import('@/views/management/functions'),
         name: 'Functions',
-        meta: { title: 'Functions', noCache: true }
+        meta: { title: 'Functions', noCache: true },
+        hidden: true
       },
       {
         path: 'sources',
         component: () => import('@/views/management/sources'),
         name: 'Sources',
-        meta: { title: 'Sources', noCache: true }
+        meta: { title: 'Sources', noCache: true },
+        hidden: true
       },
       {
         path: 'sinks',
         component: () => import('@/views/management/sinks'),
         name: 'Sinks',
-        meta: { title: 'Sinks', noCache: true }
+        meta: { title: 'Sinks', noCache: true },
+        hidden: true
       },
       {
         path: 'bookies',
         component: () => import('@/views/management/bookies'),
         name: 'Bookies',
-        meta: { title: 'Bookies', noCache: true }
+        meta: { title: 'Bookies', noCache: true },
+        hidden: true
       }
     ]
   }

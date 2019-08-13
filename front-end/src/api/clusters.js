@@ -15,9 +15,11 @@ import request from '@/utils/request'
 
 const BASE_URL_V2 = '/admin/v2'
 
+const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+
 export function fetchClusters(query) {
   return request({
-    url: BASE_URL_V2 + '/clusters',
+    url: SPRING_BASE_URL_V2 + '/clusters',
     method: 'get',
     params: { query }
   })
@@ -25,6 +27,7 @@ export function fetchClusters(query) {
 
 export function fetchClusterConfig(cluster) {
   return request({
+    headers: { 'x-pulsar-cluster': cluster },
     url: BASE_URL_V2 + `/clusters/${cluster}`,
     method: 'get'
   })
@@ -32,6 +35,7 @@ export function fetchClusterConfig(cluster) {
 
 export function putCluster(cluster, data) {
   return request({
+    headers: { 'x-pulsar-cluster': cluster },
     url: BASE_URL_V2 + `/clusters/${cluster}`,
     method: 'put',
     data
@@ -40,6 +44,7 @@ export function putCluster(cluster, data) {
 
 export function updateCluster(cluster, data) {
   return request({
+    headers: { 'x-pulsar-cluster': cluster },
     url: BASE_URL_V2 + `/clusters/${cluster}`,
     method: 'post',
     data
@@ -48,6 +53,7 @@ export function updateCluster(cluster, data) {
 
 export function deleteCluster(cluster) {
   return request({
+    headers: { 'x-pulsar-cluster': cluster },
     url: BASE_URL_V2 + `/clusters/${cluster}`,
     method: 'delete'
   })
@@ -55,7 +61,10 @@ export function deleteCluster(cluster) {
 
 export function updateClusterPeer(cluster, data) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/clusters/${cluster}/peers`,
     method: 'post',
     data
@@ -64,6 +73,7 @@ export function updateClusterPeer(cluster, data) {
 
 export function getClusterPeer(cluster) {
   return request({
+    headers: { 'x-pulsar-cluster': cluster },
     url: BASE_URL_V2 + `/clusters/${cluster}/peers`,
     method: 'get'
   })
@@ -71,6 +81,7 @@ export function getClusterPeer(cluster) {
 
 export function listClusterDomainName(cluster) {
   return request({
+    headers: { 'x-pulsar-cluster': cluster },
     url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains`,
     method: 'get'
   })
@@ -78,6 +89,7 @@ export function listClusterDomainName(cluster) {
 
 export function getClusterDomainName(cluster, domainName) {
   return request({
+    headers: { 'x-pulsar-cluster': cluster },
     url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains/${domainName}`,
     method: 'get'
   })
@@ -85,7 +97,10 @@ export function getClusterDomainName(cluster, domainName) {
 
 export function createClusterDomainName(cluster, domainName, data) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains/${domainName}`,
     method: 'post',
     data
@@ -94,7 +109,10 @@ export function createClusterDomainName(cluster, domainName, data) {
 
 export function updateClusterDomainName(cluster, domainName, data) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains/${domainName}`,
     method: 'post',
     data
@@ -103,7 +121,10 @@ export function updateClusterDomainName(cluster, domainName, data) {
 
 export function deleteClusterDomainName(cluster, domainName) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/clusters/${cluster}/failureDomains/${domainName}`,
     method: 'post'
   })

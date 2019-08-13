@@ -13,13 +13,22 @@
  */
 import request from '@/utils/request'
 
+const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+
 const BASE_URL_V2 = '/admin/v2'
 
 export function fetchNamespaces(tenant, query) {
   return request({
-    url: BASE_URL_V2 + `/namespaces/${tenant}`,
+    url: SPRING_BASE_URL_V2 + `/namespaces/${tenant}`,
     method: 'get',
     params: { query }
+  })
+}
+
+export function fetchNamespaceStats(tenant, namespace) {
+  return request({
+    url: SPRING_BASE_URL_V2 + `/namespaces/${tenant}/${namespace}/stats`,
+    method: 'get'
   })
 }
 
@@ -85,6 +94,13 @@ export function setClusters(tenantNamespace, data) {
   })
 }
 
+export function getClusters(tenant, namespace) {
+  return request({
+    url: BASE_URL_V2 + `/namespaces/${tenant}/${namespace}/replication`,
+    method: 'get'
+  })
+}
+
 export function setBacklogQuota(tenantNamespace, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
@@ -98,6 +114,14 @@ export function removeBacklogQuota(tenantNamespace) {
   return request({
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/backlogQuota`,
     method: 'delete'
+  })
+}
+
+export function getPersistence(tenantNamespace) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/persistence`,
+    method: 'get'
   })
 }
 
@@ -145,6 +169,14 @@ export function setDeduplication(tenantNamespace, data) {
   })
 }
 
+export function getRetention(tenantNamespace) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/retention`,
+    method: 'get'
+  })
+}
+
 export function setRetention(tenantNamespace, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
@@ -155,8 +187,15 @@ export function setRetention(tenantNamespace, data) {
 }
 
 export function unload(tenantNamespace, data) {
+  return unloadOnCluster('', tenantNamespace, data)
+}
+
+export function unloadOnCluster(cluster, tenantNamespace, data) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/unload`,
     method: 'put',
     data
@@ -164,16 +203,39 @@ export function unload(tenantNamespace, data) {
 }
 
 export function unloadBundle(tenantNamespace, bundle) {
+  return unloadBundleImpl('', '', tenantNamespace, bundle)
+}
+
+export function unloadBundleOnBroker(broker, tenantNamespace, bundle) {
+  return unloadBundleImpl('', broker, tenantNamespace, bundle)
+}
+
+export function unloadBundleOnCluster(cluster, tenantNamespace, bundle) {
+  return unloadBundleImpl(cluster, '', tenantNamespace, bundle)
+}
+
+export function unloadBundleImpl(cluster, broker, tenantNamespace, bundle) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster,
+      'x-pulsar-broker': broker
+    },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/unload`,
     method: 'put'
   })
 }
 
 export function splitBundle(tenantNamespace, bundle, unload) {
+  return splitBundleOnCluster('', tenantNamespace, bundle, unload)
+}
+
+export function splitBundleOnCluster(cluster, tenantNamespace, bundle, unload) {
   return request({
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/split?unload=${unload}`,
     method: 'put'
   })
@@ -188,10 +250,50 @@ export function setDispatchRate(tenantNamespace, data) {
   })
 }
 
-export function clearBacklog(tenantNamespace) {
+export function setSubscribeRate(tenantNamespace, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/subscribeRate`,
+    method: 'post',
+    data
+  })
+}
+
+export function setSubscriptionDispatchRate(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/subscriptionDispatchRate`,
+    method: 'post',
+    data
+  })
+}
+
+export function clearBacklog(tenantNamespace) {
+  return clearBacklogOnCluster('', tenantNamespace)
+}
+
+export function clearBacklogOnCluster(cluster, tenantNamespace) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/clearBacklog`,
+    method: 'post'
+  })
+}
+
+export function clearBundleBacklog(tenantNamespace, bundle) {
+  return clearBundleBacklogOnCluster('', tenantNamespace, bundle)
+}
+
+export function clearBundleBacklogOnCluster(cluster, tenantNamespace, bundle) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/${bundle}/clearBacklog`,
     method: 'post'
   })
 }
@@ -305,6 +407,15 @@ export function setSchemaAutoupdateStrategy(tenantNamespace, data) {
     headers: { 'Content-Type': 'application/json' },
     url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/schemaAutoUpdateCompatibilityStrategy`,
     method: 'put',
+    data
+  })
+}
+
+export function setSchemaValidationEnforced(tenantNamespace, data) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: BASE_URL_V2 + `/namespaces/${tenantNamespace}/schemaValidationEnforced`,
+    method: 'post',
     data
   })
 }

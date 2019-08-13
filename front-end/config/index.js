@@ -16,7 +16,17 @@ module.exports = {
       },
       '/admin/*': {
         // target: 'http://localhost:443/',
-        target: 'http://localhost:8080/',
+        target: 'http://localhost:7750/',
+        changeOrigin: true
+      },
+      '/pulsar-manager/*': {
+        // target: 'http://localhost:443/',
+        target: 'http://localhost:7750/',
+        changeOrigin: true
+      },
+      '/lookup/*': {
+        // target: 'http://localhost:443/',
+        target: 'http://localhost:7750/',
         changeOrigin: true
       }
     },
@@ -25,7 +35,7 @@ module.exports = {
 
     // can be overwritten by process.env.HOST
     // if you want dev by ip, please set host: '0.0.0.0'
-    host: 'localhost',
+    host: '0.0.0.0',
     port: 9527, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: true,
     errorOverlay: true,

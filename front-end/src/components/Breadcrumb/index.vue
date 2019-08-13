@@ -1,9 +1,9 @@
 <template>
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
-      <el-breadcrumb-item v-for="(item,index) in levelList" v-if="item.meta.title" :key="item.path">
+      <el-breadcrumb-item v-for="(item,index) in levelList" :key="item.path">
         <span v-if="item.redirect==='noredirect'||index==levelList.length-1" class="no-redirect">{{ generateTitle(item.meta.title) }}</span>
-        <router-link v-else :to="item.redirect||item.path">{{ generateTitle(item.meta.title) }}</router-link>
+        <router-link v-else :to="item.path">{{ generateTitle(item.meta.title) }}</router-link>
       </el-breadcrumb-item>
     </transition-group>
   </el-breadcrumb>
@@ -31,7 +31,7 @@ export default {
     generateTitle,
     getBreadcrumb() {
       const { params } = this.$route
-      let matched = this.$route.matched.filter(item => {
+      const matched = this.$route.matched.filter(item => {
         if (item.name) {
           // To solve this problem https://github.com/PanJiaChen/vue-element-admin/issues/561
           var toPath = pathToRegexp.compile(item.path)
@@ -39,11 +39,216 @@ export default {
           return true
         }
       })
-      const first = matched[0]
-      if (first && first.name.trim().toLocaleLowerCase() !== 'Dashboard'.toLocaleLowerCase()) {
-        matched = [{ path: '/dashboard', meta: { title: 'dashboard' }}].concat(matched)
+      var route = []
+      for (var i = 0; i < matched.length; i++) {
+        var path = matched[i].path
+        if (path === '/management') {
+          route.push({
+            'path': matched[i].path,
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.management')
+            }
+          })
+        }
+        var pathList = path.split('/')
+        if (pathList.indexOf('brokers') === 2) {
+          route.push({
+            'path': '/management/clusters',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.clusters')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': '/management/clusters/' + pathList[3] + '/cluster?tab=brokers',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.brokers')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': matched[i].path,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.brokerInfo')
+            },
+            'redirect': matched[i].redirect
+          })
+        } else if (pathList.indexOf('namespaceIsolationPolicy') === 5) {
+          route.push({
+            'path': '/management/clusters',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.clusters')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': '/management/clusters/' + pathList[3] + '/cluster?tab=isolationPolicies',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.isolationPolicies')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': matched[i].path,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.isolationPolicyInfo')
+            },
+            'redirect': matched[i].redirect
+          })
+        } else if (pathList.indexOf('failureDomainName') === 5) {
+          route.push({
+            'path': '/management/clusters',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.clusters')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': '/management/clusters/' + pathList[3] + '/cluster?tab=failureDomains',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.failureDomains')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': matched[i].path,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.failureDomainInfo')
+            },
+            'redirect': matched[i].redirect
+          })
+        } else if (pathList.indexOf('cluster') === 4) {
+          route.push({
+            'path': '/management/clusters',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.clusters')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': matched[i].path,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.clusterInfo')
+            },
+            'redirect': matched[i].redirect
+          })
+        } else if (pathList.indexOf('clusters') === 2) {
+          route.push({
+            'path': '/management/clusters',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.clusters')
+            },
+            'redirect': matched[i].redirect
+          })
+        } else if (pathList.indexOf('subscriptions') === 2) {
+          route.push({
+            'path': '/management/tenants',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.tenants')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': '/management/tenants/tenantInfo/' + pathList[4] + '?tab=namespaces',
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.namespaces')
+            }
+          })
+          route.push({
+            'path': '/management/namespaces/' + pathList[4] + '/' + pathList[5] + '/namespace' + '?tab=topics',
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.topics')
+            }
+          })
+          route.push({
+            'path': '/management/topics/' + pathList[3] + '/' + pathList[4] + '/' + pathList[5] + '/' + pathList[6] + '/topic',
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.subscriptions')
+            }
+          })
+          route.push({
+            'path': matched[i].path,
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.subscriptionInfo')
+            }
+          })
+        } else if (pathList.indexOf('topics') === 2) {
+          route.push({
+            'path': '/management/tenants',
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.tenants')
+            },
+            'redirect': matched[i].redirect
+          })
+          route.push({
+            'path': '/management/tenants/tenantInfo/' + pathList[4] + '?tab=namespaces',
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.namespaces')
+            }
+          })
+          route.push({
+            'path': '/management/namespaces/' + pathList[4] + '/' + pathList[5] + '/namespace' + '?tab=topics',
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.topics')
+            }
+          })
+          route.push({
+            'path': matched[i].path,
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.topicInfo')
+            }
+          })
+        } else if (pathList.indexOf('namespaces') === 2) {
+          route.push({
+            'path': '/management/tenants',
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.tenants')
+            }
+          })
+          route.push({
+            'path': '/management/tenants/tenantInfo/' + pathList[3] + '?tab=namespaces',
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.namespaces')
+            }
+          })
+          route.push({
+            'path': matched[i].path,
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.namespaceInfo')
+            }
+          })
+        } else if (pathList.indexOf('tenantInfo') === 3) {
+          route.push({
+            'path': '/management/tenants',
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.tenants')
+            }
+          })
+          route.push({
+            'path': matched[i].path,
+            'redirect': matched[i].redirect,
+            'meta': {
+              'title': this.$i18n.t('breadcrumb.tenantInfo')
+            }
+          })
+        }
       }
-      this.levelList = matched
+      // if (first && first.name.trim().toLocaleLowerCase() !== 'Management'.toLocaleLowerCase()) {
+      //   matched = [{ path: '/management', meta: { title: 'management' }}].concat(matched)
+      // }
+      this.levelList = route
     }
   }
 }

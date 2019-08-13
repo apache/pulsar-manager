@@ -5,12 +5,19 @@
     <breadcrumb class="breadcrumb-container"/>
 
     <div class="right-menu">
+      <el-dropdown @command="handleCommand">
+        <span class="el-dropdown-link">
+          {{ currentEnv }}<i class="el-icon-arrow-down el-icon--right"/>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item v-for="(item,index) in environmentsListOptions" :command="item" :key="index" :label="item.label" :value="item.value">
+            {{ item.value }}
+          </el-dropdown-item>
+          <el-dropdown-item command="newEnvironment" divided>{{ $t('env.manageEnvs') }}</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
       <template v-if="device!=='mobile'">
         <error-log class="errLog-container right-menu-item"/>
-
-        <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
-          <screenfull class="screenfull right-menu-item"/>
-        </el-tooltip>
 
         <el-tooltip :content="$t('navbar.size')" effect="dark" placement="bottom">
           <size-select class="international right-menu-item"/>
@@ -18,22 +25,13 @@
 
         <lang-select class="international right-menu-item"/>
 
-        <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
-          <theme-picker class="theme-switch right-menu-item"/>
-        </el-tooltip>
       </template>
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
-        <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-          <i class="el-icon-caret-bottom"/>
-        </div>
+        <span class="avatar-wrapper">
+          Admin<i class="el-icon-arrow-down el-icon--right"/>
+        </span>
         <el-dropdown-menu slot="dropdown">
-          <!-- <router-link to="/">
-            <el-dropdown-item>
-              {{ $t('navbar.dashboard') }}
-            </el-dropdown-item>
-          </router-link> -->
           <a target="_blank" href="https://github.com/apache/pulsar">
             <el-dropdown-item>
               {{ $t('navbar.github') }}
@@ -53,20 +51,27 @@ import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import ErrorLog from '@/components/ErrorLog'
-import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
-import ThemePicker from '@/components/ThemePicker'
+import { fetchEnvironments } from '@/api/environments'
+import { setEnvironment, getEnvironment } from '@/utils/environment'
 
 export default {
   components: {
     Breadcrumb,
     Hamburger,
     ErrorLog,
-    Screenfull,
     SizeSelect,
-    LangSelect,
-    ThemePicker
+    LangSelect
+  },
+  data() {
+    return {
+      currentEnv: 'Environments',
+      environmentsListOptions: [{
+        'label': 'localhost:8080',
+        'value': 'localhost:8080'
+      }]
+    }
   },
   computed: {
     ...mapGetters([
@@ -76,6 +81,10 @@ export default {
       'device'
     ])
   },
+  created() {
+    this.getEnvironmentsList()
+    this.currentEnv = getEnvironment()
+  },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('toggleSideBar')
@@ -84,12 +93,36 @@ export default {
       this.$store.dispatch('LogOut').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })
+    },
+    handleCommand(command) {
+      if (command === 'newEnvironment') {
+        this.$router.push({ path: '/environments' })
+        return
+      }
+      setEnvironment(command.value)
+      window.location.reload()
+    },
+    getEnvironmentsList() {
+      fetchEnvironments().then(response => {
+        if (!response.data) return
+        this.environmentsListOptions = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.environmentsListOptions.push({
+            'value': response.data.data[i].name,
+            'label': response.data.data[i].broker,
+            'status': response.data.data[i].status
+          })
+        }
+      })
     }
   }
 }
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+.el-icon-arrow-down {
+  font-size: 12px;
+}
 .navbar {
   height: 50px;
   line-height: 50px;

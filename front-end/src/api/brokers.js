@@ -15,43 +15,73 @@ import request from '@/utils/request'
 
 const BASE_URL_V2 = '/admin/v2'
 
+const SPRING_BASE_URL_V2 = '/pulsar-manager/admin/v2'
+
 export function fetchBrokers(cluster) {
   return request({
+    headers: {
+      'x-pulsar-cluster': cluster
+    },
+    url: SPRING_BASE_URL_V2 + `/brokers/${cluster}`,
+    method: 'get'
+  })
+}
+
+export function fetchBrokersByDirectBroker(cluster) {
+  return request({
+    headers: {
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/brokers/${cluster}`,
     method: 'get'
   })
 }
 
-export function fetchBrokersConfiguration() {
+export function fetchBrokersConfiguration(broker) {
   return request({
+    headers: {
+      'x-pulsar-broker': broker
+    },
     url: BASE_URL_V2 + `/brokers/configuration`,
     method: 'get'
   })
 }
 
-export function fetchBrokersRuntimeConfiguration() {
+export function fetchBrokersRuntimeConfiguration(broker) {
   return request({
+    headers: {
+      'x-pulsar-broker': broker
+    },
     url: BASE_URL_V2 + `/brokers/configuration/runtime`,
     method: 'get'
   })
 }
 
-export function fetchBrokersInternalConfiguration() {
+export function fetchBrokersInternalConfiguration(cluster) {
   return request({
+    headers: {
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/brokers/internal-configuration`,
     method: 'get'
   })
 }
 
-export function fetchBrokersDynamicConfiguration() {
+export function fetchBrokersDynamicConfiguration(cluster) {
   return request({
+    headers: {
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/brokers/configuration/values`,
     method: 'get'
   })
 }
 
-export function updateBrokersDynamicConfiguration(configName, configValue) {
+export function updateBrokersDynamicConfiguration(cluster, configName, configValue) {
   return request({
+    headers: {
+      'x-pulsar-cluster': cluster
+    },
     url: BASE_URL_V2 + `/brokers/configuration/${configName}/${configValue}`,
     method: 'post'
   })
@@ -59,13 +89,19 @@ export function updateBrokersDynamicConfiguration(configName, configValue) {
 
 export function fetchBrokersOwnedNamespaces(cluster, broker) {
   return request({
+    headers: {
+      'x-pulsar-broker': broker
+    },
     url: BASE_URL_V2 + `/brokers/${cluster}/${broker}/ownedNamespaces`,
     method: 'get'
   })
 }
 
-export function fetchBrokersHealth() {
+export function fetchBrokersHealth(broker) {
   return request({
+    headers: {
+      'x-pulsar-broker': broker
+    },
     url: BASE_URL_V2 + `/brokers/health`,
     method: 'get'
   })

@@ -1,13 +1,13 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input :placeholder="$t('table.tenant')" v-model="listQuery.tenant" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-input :placeholder="$t('tenant.searchTenant')" v-model="listQuery.tenant" style="width: 200px;" @keyup.enter.native="handleFilter"/>
+      <el-button type="primary" icon="el-icon-search" @click="handleFilter"/>
+      <el-button type="primary" icon="el-icon-plus" @click="handleCreate">{{ $t('tenant.newTenant') }}</el-button>
     </div>
 
-    <el-row :gutter="8">
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
+    <el-row :gutter="24">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
         <el-table
           v-loading="listLoading"
           :key="tableKey"
@@ -16,100 +16,108 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column :label="$t('table.tenant')" min-width="50px" align="center">
+          <el-table-column :label="$t('tenant.name')" min-width="50px" align="center">
             <template slot-scope="scope">
-              <router-link :to="'/management/namespaces/' + scope.row.tenant" class="link-type">
+              <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant + '?tab=namespaces'" class="link-type">
                 <span>{{ scope.row.tenant }}</span>
               </router-link>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.config')" align="center" min-width="100px">
+          <el-table-column :label="$t('namespace.namespaceNumber')" align="center" min-width="100px">
             <template slot-scope="scope">
-              <span class="link-type" @click="handleGetConfig(scope.row)">config</span>
+              <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant + '?tab=namespaces'" class="link-type">
+                <span>{{ scope.row.namespace }}</span>
+              </router-link>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.actions')" align="center" width="240" class-name="small-padding fixed-width">
+          <el-table-column :label="$t('tenant.allowedClustersLabel')" align="center" min-width="100px">
             <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-              <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+              <span
+                v-for="tag in scope.row.allowedClusters"
+                :key="tag"
+                class="list-el-tag">
+                <router-link :to="'/management/clusters/' + tag + '/cluster?tab=brokers'" class="link-type">
+                  {{ tag }}
+                </router-link>
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('tenant.adminRolesLabel')" align="center" min-width="100px">
+            <template slot-scope="scope">
+              <el-tag
+                v-for="tag in scope.row.adminRoles"
+                :key="tag"
+                effect="dark"
+                class="list-el-tag">
+                {{ tag }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
+            <template slot-scope="scope">
+              <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant">
+                <el-button type="primary" size="mini">{{ $t('table.edit') }}</el-button>
+              </router-link>
+              <el-button size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getTenants" />
-      </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;">
-        <jsonEditor :value="jsonValue"/>
       </el-col>
     </el-row>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" class="el-dialog-for-test">
-      <el-form ref="temp" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
+      <el-form ref="form" :rules="rules" :model="form" label-position="top">
         <el-form-item v-if="dialogStatus==='create'" :label="$t('table.tenant')" prop="tenant">
-          <el-input v-model="temp.tenant" placeholder="Please input tenant"/>
+          <el-input v-model="form.tenant" :placeholder="$t('tenant.selectTenantMessage')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('table.clusters')" prop="clusters">
-          <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('tenant.allowedClustersLabel')" prop="clusters">
+          <el-select v-model="form.clusters" :placeholder="$t('cluster.selectClusterMessage')" multiple style="width:100%">
             <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
-          </el-drag-select>
+          </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.tenant')">
-          <span>{{ temp.tenant }}</span>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('tenant.adminRolesLabel')" prop="roles">
+          <el-tag
+            v-for="tag in form.dynamicRoles"
+            :key="tag"
+            :disable-transitions="false"
+            closable
+            @close="handleClose(tag)">
+            {{ tag }}
+          </el-tag>
+          <el-input
+            v-if="inputVisible"
+            ref="saveTagInput"
+            v-model="inputValue"
+            size="small"
+            class="input-new-tag"
+            @keyup.enter.native="handleInputConfirm"/>
+          <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Role</el-button>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.role')">
-          <el-input v-model="temp.adminRoles"/>
+        <el-form-item v-if="dialogStatus==='delete'">
+          <h4>{{ deleteTenantMessage }}</h4>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('table.clusters')">
-          <el-drag-select v-model="temp.clusters" style="width:330px;" multiple placeholder="Please select clusters">
-            <el-option v-for="item in clusterListOptions" :label="item.label" :value="item.value" :key="item.value" />
-          </el-drag-select>
+        <el-form-item>
+          <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
+          <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" submit="Confirm" @click="dialogStatus==='create'?createData():updateData()">{{ $t('table.confirm') }}</el-button>
-      </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
 import {
-  updateTenant,
   putTenant,
   fetchTenants,
-  fetchTenantsInfo,
   deleteTenant
 } from '@/api/tenants'
 import { fetchClusters } from '@/api/clusters'
-import waves from '@/directive/waves' // Waves directive
-import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-import jsonEditor from '@/components/JsonEditor'
 import { validateEmpty } from '@/utils/validate'
-import ElDragSelect from '@/components/DragSelect' // base on element-ui
-
 const defaultForm = {
   cluster: ''
 }
-
 export default {
   name: 'Tenants',
-  components: {
-    Pagination,
-    jsonEditor,
-    ElDragSelect
-  },
-  directives: { waves },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
   data() {
     return {
       postForm: Object.assign({}, defaultForm),
@@ -120,28 +128,29 @@ export default {
       searchList: [],
       total: 0,
       listLoading: true,
-      jsonValue: {},
       listQuery: {
         tenant: '',
         page: 1,
         limit: 10
       },
-      temp: {
+      form: {
         tenant: '',
-        adminRoles: '',
-        allowedClusters: '',
-        clusters: []
+        clusters: [],
+        dynamicRoles: []
       },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        create: this.$i18n.t('tenant.newTenant'),
+        delete: this.$i18n.t('tenant.deleteTenant')
       },
       rules: {
-        tenant: [{ required: true, message: 'Tenant is required', trigger: 'blur' }],
-        clusters: [{ required: true, message: 'Cluster is required', trigger: 'blur' }]
-      }
+        tenant: [{ required: true, message: this.$i18n.t('tenant.tenantIsRequired'), trigger: 'blur' }],
+        clusters: [{ required: true, message: this.$i18n.t('tenant.clusterIsRequired'), trigger: 'blur' }]
+      },
+      inputVisible: false,
+      inputValue: '',
+      deleteTenantMessage: this.$i18n.t('tenant.deleteTenantMessage')
     }
   },
   created() {
@@ -156,10 +165,33 @@ export default {
       } else {
         this.listLoading = true
         fetchTenants().then(response => {
-          for (var i = 0; i < response.data.length; i++) {
-            this.localList.push({ 'tenant': response.data[i] })
+          for (var i = 0; i < response.data.total; i++) {
+            let allowedClusters = ''
+            let adminRoles = ''
+            if (response.data.data[i]['allowedClusters'].length > 0) {
+              allowedClusters = response.data.data[i]['allowedClusters']
+            }
+            if (response.data.data[i]['adminRoles'].length > 0) {
+              adminRoles = response.data.data[i]['adminRoles']
+            }
+            let adminRolesArray = []
+            if (adminRoles !== '') {
+              adminRolesArray = adminRoles.split(',')
+            }
+            let allowedClustersArray = []
+            if (allowedClusters !== '') {
+              allowedClustersArray = allowedClusters.split(',')
+            }
+            this.localList.push({
+              'tenant': response.data.data[i]['tenant'],
+              'namespace': response.data.data[i]['namespaces'],
+              'allowedClusters': allowedClustersArray,
+              'adminRoles': adminRolesArray
+            })
           }
-          this.total = this.localList.length
+          this.total = response.data.total
+          this.listQuery.page = response.data.pageNum
+          this.listQuery.limit = response.data.pageSize
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
           // this.localPaging()
           // Just to simulate the time of the request
@@ -173,7 +205,6 @@ export default {
       this.listLoading = true
       if (!validateEmpty(this.listQuery.tenant)) {
         this.searchList = []
-        console.log(this.localList)
         for (var i = 0; i < this.localList.length; i++) {
           if (this.localList[i]['tenant'].indexOf(this.listQuery.tenant) !== -1) {
             this.searchList.push(this.localList[i])
@@ -185,57 +216,65 @@ export default {
         this.total = this.localList.length
         this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
       }
-      console.log(this.searchList)
       this.listLoading = false
-    },
-    handleGetConfig(row) {
-      fetchTenantsInfo(row.tenant).then(response => {
-        // response
-        this.jsonValue = {
-          'adminRoles': response.data.adminRoles,
-          'allowedClusters': response.data.allowedClusters
-        }
-      })
     },
     handleFilter() {
       this.getTenants()
     },
-    resetTemp() {
-      this.temp = {
+    resetForm() {
+      this.form = {
         tenant: '',
         adminRoles: '',
         allowedClusters: '',
         clusters: []
       }
     },
+    handleOptions() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          switch (this.dialogStatus) {
+            case 'create':
+              this.createData()
+              break
+            case 'delete':
+              this.deleteData()
+              break
+          }
+        }
+      })
+    },
     handleCreate() {
-      this.resetTemp()
+      this.resetForm()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.temp.clusters = []
+      this.form.clusters = []
       this.clusterListOptions = []
+      this.form.dynamicRoles = []
       fetchClusters(this.listQuery).then(response => {
-        for (var i = 0; i < response.data.length; i++) {
-          this.clusterListOptions.push({ 'value': response.data[i], 'label': response.data[i] })
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.clusterListOptions.push({ 'value': response.data.data[i].cluster, 'label': response.data.data[i].cluster })
         }
       })
       this.$nextTick(() => {
-        this.$refs['temp'].clearValidate()
+        this.$refs['form'].clearValidate()
       })
     },
     createData() {
-      this.$refs['temp'].validate((valid) => {
+      this.$refs['form'].validate((valid) => {
         if (valid) {
-          const data = { allowedClusters: this.temp.clusters }
-          putTenant(this.temp.tenant, data).then((response) => {
-            this.temp.adminRoles = 'empty'
-            this.temp.allowedClusters = 'empty'
+          const data = {
+            allowedClusters: this.form.clusters,
+            adminRoles: this.form.dynamicRoles
+          }
+          putTenant(this.form.tenant, data).then((response) => {
+            this.form.adminRoles = 'empty'
+            this.form.allowedClusters = 'empty'
             this.localList = []
             this.getTenants()
             this.dialogFormVisible = false
             this.$notify({
               title: 'success',
-              message: 'create success',
+              message: this.$i18n.t('tenant.createTenantSuccessNotification'),
               type: 'success',
               duration: 2000
             })
@@ -243,65 +282,61 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.temp.tenant = row.tenant
-      fetchTenantsInfo(row.tenant).then(response => {
-        this.temp.adminRoles = response.data.adminRoles.join(',')
-        this.temp.clusters = response.data.allowedClusters
-      })
-      this.clusterListOptions = []
-      fetchClusters(this.listQuery).then(response => {
-        for (var i = 0; i < response.data.length; i++) {
-          this.clusterListOptions.push({ 'value': response.data[i], 'label': response.data[i] })
-        }
-      })
-    },
-    updateData() {
-      this.$refs['temp'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          const data = {}
-          if (this.temp.clusters.length > 0) {
-            data.allowedClusters = this.temp.clusters
-          }
-          if (tempData.adminRoles.length > 0) {
-            data.adminRoles = tempData.adminRoles.split(',')
-          }
-          if (this.temp.clusters.length > 0 || tempData.adminRoles.length > 0) {
-            updateTenant(this.temp.tenant, data).then(() => {
-              this.dialogFormVisible = false
-              this.$notify({
-                title: 'success',
-                message: 'update success',
-                type: 'success',
-                duration: 2000
-              })
-            })
-          } else {
-            this.$notify({
-              title: 'success',
-              message: 'no need update',
-              type: 'success',
-              duration: 2000
-            })
-          }
-        }
-      })
-    },
     handleDelete(row) {
-      deleteTenant(row.tenant).then((response) => {
+      this.dialogStatus = 'delete'
+      this.dialogFormVisible = true
+      this.form.tenant = row.tenant
+    },
+    deleteData() {
+      deleteTenant(this.form.tenant).then((response) => {
         this.$notify({
           title: 'success',
-          message: 'delete success',
+          message: this.$i18n.t('tenant.deleteTenantSuccessNotification'),
           type: 'success',
           duration: 2000
         })
+        this.dialogFormVisible = false
         this.localList = []
         this.getTenants()
       })
+    },
+    handleClose(tag) {
+      this.form.dynamicRoles.splice(this.form.dynamicRoles.indexOf(tag), 1)
+    },
+    showInput() {
+      this.inputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    handleInputConfirm() {
+      const inputValue = this.inputValue
+      if (inputValue) {
+        if (this.form.dynamicRoles.indexOf(this.inputValue) >= 0) {
+          this.$notify({
+            title: 'error',
+            message: this.$i18n.t('tenant.roleAlreadyExists'),
+            type: 'error',
+            duration: 2000
+          })
+          return
+        }
+        this.form.dynamicRoles.push(inputValue)
+      }
+      this.inputVisible = false
+      this.inputValue = ''
     }
   }
 }
 </script>
+
+<style>
+.list-el-tag {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+.el-form {
+  margin-left: 0% !important;
+  margin-right: 0% !important;
+}
+</style>
