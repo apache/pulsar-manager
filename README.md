@@ -28,7 +28,7 @@ http://frond-end-ip:9527/
 
 The puslar-manager supports multi-environment configuration and can conveniently manage multiple environments.
 
-![pulsar-manager-environment](docs/img/pulsar-manager-environment.gif)
+![pulsar-manager-environments](docs/img/pulsar-manager-environments.gif)
 
 #### Manage tenants
 
