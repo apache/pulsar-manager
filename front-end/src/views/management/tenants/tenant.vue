@@ -105,7 +105,7 @@
                   size="small"
                   class="input-new-tag"
                   @keyup.enter.native="handleInputConfirm"/>
-                <el-button v-else class="button-new-tag" size="small" @click="showInput">{{ $t('tenant.newRole') }}</el-button>
+                <el-button v-else class="button-new-tag" size="small" icon="el-icon-plus" @click="showInput">{{ $t('tenant.newRole') }}</el-button>
               </div>
             </div>
             <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>

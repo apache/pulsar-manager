@@ -197,12 +197,12 @@ export default {
     return {
       postForm: Object.assign({}, defaultForm),
       clustersListOptions: [],
-      namespaceContent: 'This is namespaces Content',
-      brokerContent: 'This is broker content',
-      secondaryBrokersContent: 'This is secondary brokers content',
-      policyTypeContent: 'This is policy type content',
-      brokerUsageThresholdContent: 'This is brokerUsageThresholdContent',
-      minimalAvailableBrokerContent: 'This is minimalAvailableBrokerContent',
+      namespaceContent: this.$i18n.t('ip.namespaceDesc'),
+      brokerContent: this.$i18n.t('ip.primaryBrokerDesc'),
+      secondaryBrokersContent: this.$i18n.t('ip.secondaryBrokerDesc'),
+      policyTypeContent: this.$i18n.t('ip.policyTypeDesc'),
+      brokerUsageThresholdContent: this.$i18n.t('ip.brokerUsageThresholdDesc'),
+      minimalAvailableBrokerContent: this.$i18n.t('ip.minimalAvailableBrokerDesc'),
       form: {
         namespaces: '',
         broker: '',
