@@ -429,7 +429,7 @@
         </el-form>
         <h4>{{ $t('namespace.policy.cleanupPolicy') }}</h4>
         <hr class="split-line">
-        <el-form :inline="true" :model="form" :rules="rules">
+        <el-form :inline="true" :model="form" :rules="rules" @submit.native.prevent>
           <el-form-item prop="messageTTL">
             <span>{{ $t('namespace.policy.messageTTL') }}</span>
             <el-tooltip :content="messageTTLContent" class="item" effect="dark" placement="top">
@@ -440,8 +440,7 @@
               :placeholder="$t('namespace.policy.inputMessageTTL')"
               class="md-input-style"
               name="messageTTL"
-              @keyup.enter.native="handleMessageTTL"
-              @submit.native.prevent/>
+              @keyup.enter.native="handleMessageTTL"/>
           </el-form-item>
         </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
@@ -958,12 +957,14 @@ export default {
       fetchNamespaceStats(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
         this.namespaceStats = []
-        this.namespaceStats.push({
-          inMsg: numberFormatter(response.data.inMsg, 2),
-          outMsg: numberFormatter(response.data.outMsg, 2),
-          inBytes: formatBytes(response.data.msgThroughputIn),
-          outBytes: formatBytes(response.data.msgThroughputOut)
-        })
+        if (response.data.hasOwnProperty('inMsg')) {
+          this.namespaceStats.push({
+            inMsg: numberFormatter(response.data.inMsg, 2),
+            outMsg: numberFormatter(response.data.outMsg, 2),
+            inBytes: formatBytes(response.data.msgThroughputIn),
+            outBytes: formatBytes(response.data.msgThroughputOut)
+          })
+        }
       })
     },
     getStats() {
