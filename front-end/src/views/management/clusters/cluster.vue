@@ -269,6 +269,8 @@ import { getBookiesList } from '@/api/bookies'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 import { validateEmpty, validateServiceUrl } from '@/utils/validate'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
   cluster: ''
@@ -422,10 +424,10 @@ export default {
               }
             }
             brokerInfo['ownedNamespaces'] = numberNamespaces
-            brokerInfo['throughputIn'] = throughputIn.toFixed(2)
-            brokerInfo['throughputOut'] = throughputOut.toFixed(2)
-            brokerInfo['msgRateOut'] = msgRateOut.toFixed(2)
-            brokerInfo['msgRateIn'] = msgRateIn.toFixed(2)
+            brokerInfo['throughputIn'] = formatBytes(throughputIn)
+            brokerInfo['throughputOut'] = formatBytes(throughputOut)
+            brokerInfo['msgRateOut'] = numberFormatter(msgRateOut, 2)
+            brokerInfo['msgRateIn'] = numberFormatter(msgRateIn, 2)
           })
           this.brokersList.push(brokerInfo)
         }

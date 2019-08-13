@@ -187,6 +187,8 @@ import {
   resetCursorByPositionOnCluster
 } from '@/api/topics'
 import { fetchSubscriptions } from '@/api/subscriptions'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
   persistent: '',
@@ -416,9 +418,9 @@ export default {
             for (var s in consumers) {
               this.consumersList.push({
                 'consumerName': consumers[s].consumerName,
-                'outMsg': consumers[s].msgRateOut.toFixed(2),
-                'outBytes': consumers[s].msgThroughputOut.toFixed(2),
-                'avgMsgSize': response.data.averageMsgSize.toFixed(2),
+                'outMsg': numberFormatter(consumers[s].msgRateOut, 2),
+                'outBytes': formatBytes(consumers[s].msgThroughputOut),
+                'avgMsgSize': formatBytes(response.data.averageMsgSize),
                 'address': consumers[s].address,
                 'since': consumers[s].connectedSince
               })

@@ -685,6 +685,8 @@ import { putTopic, fetchTopicsStatsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 import { validateEmpty } from '@/utils/validate'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
   tenant: '',
@@ -903,10 +905,10 @@ export default {
         if (!response.data) return
         this.namespaceStats = []
         this.namespaceStats.push({
-          inMsg: response.data.inMsg.toFixed(2),
-          outMsg: response.data.outMsg.toFixed(2),
-          inBytes: response.data.msgThroughputIn.toFixed(2),
-          outBytes: response.data.msgThroughputOut.toFixed(2)
+          inMsg: numberFormatter(response.data.inMsg, 2),
+          outMsg: numberFormatter(response.data.outMsg, 2),
+          inBytes: formatBytes(response.data.msgThroughputIn),
+          outBytes: formatBytes(response.data.msgThroughputOut)
         })
       })
     },
@@ -939,11 +941,11 @@ export default {
               'persistent': clusters[j]['persistent'],
               'producers': clusters[j]['producerCount'],
               'subscriptions': clusters[j]['subscriptionCount'],
-              'inMsg': clusters[j]['msgRateIn'].toFixed(2),
-              'outMsg': clusters[j]['msgRateOut'].toFixed(2),
-              'inBytes': clusters[j]['msgThroughputIn'].toFixed(2),
-              'outBytes': clusters[j]['msgThroughputOut'].toFixed(2),
-              'storageSize': clusters[j]['storageSize'].toFixed(2),
+              'inMsg': numberFormatter(clusters[j]['msgRateIn'], 2),
+              'outMsg': numberFormatter(clusters[j]['msgRateOut'], 2),
+              'inBytes': formatBytes(clusters[j]['msgThroughputIn']),
+              'outBytes': formatBytes(clusters[j]['msgThroughputOut']),
+              'storageSize': formatBytes(clusters[j]['storageSize']),
               'tenantNamespace': this.tenantNamespace,
               'topicLink': topicLink + '?cluster=' + clusters[j]['topic'] + '&tab='
             }
@@ -982,11 +984,11 @@ export default {
             'persistent': response.data.topics[i]['persistent'],
             'producers': response.data.topics[i]['producers'],
             'subscriptions': response.data.topics[i]['subscriptions'],
-            'inMsg': response.data.topics[i]['inMsg'].toFixed(2),
-            'outMsg': response.data.topics[i]['outMsg'].toFixed(2),
-            'inBytes': response.data.topics[i]['inBytes'].toFixed(2),
-            'outBytes': response.data.topics[i]['outBytes'].toFixed(2),
-            'storageSize': response.data.topics[i]['storageSize'].toFixed(2),
+            'inMsg': numberFormatter(response.data.topics[i]['inMsg'], 2),
+            'outMsg': numberFormatter(response.data.topics[i]['outMsg'], 2),
+            'inBytes': formatBytes(response.data.topics[i]['inBytes']),
+            'outBytes': formatBytes(response.data.topics[i]['outBytes']),
+            'storageSize': formatBytes(response.data.topics[i]['storageSize']),
             'children': children,
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink + '?tab='

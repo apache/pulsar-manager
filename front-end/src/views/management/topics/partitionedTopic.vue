@@ -239,6 +239,9 @@ import {
 } from '@/api/topics'
 import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
+
 const defaultForm = {
   persistent: '',
   tenant: '',
@@ -346,10 +349,10 @@ export default {
       fetchPartitionTopicStats(this.postForm.persistent, this.tenantNamespaceTopic, true).then(response => {
         if (!response.data) return
         this.partitionTopicStats.push({
-          inMsg: response.data.msgRateIn.toFixed(2),
-          outMsg: response.data.msgRateOut.toFixed(2),
-          inBytes: response.data.msgThroughputIn.toFixed(2),
-          outBytes: response.data.msgThroughputOut.toFixed(2)
+          inMsg: numberFormatter(response.data.msgRateIn, 2),
+          outMsg: numberFormatter(response.data.msgRateOut, 2),
+          inBytes: formatBytes(response.data.msgThroughputIn),
+          outBytes: formatBytes(response.data.msgThroughputOut)
         })
         for (var i in response.data.partitions) {
           var splitPartition = i.split('://')
@@ -358,11 +361,11 @@ export default {
             'partition': partition,
             'producers': response.data.partitions[i].publishers.length,
             'subscriptions': Object.keys(response.data.partitions[i].subscriptions).length,
-            'inMsg': response.data.partitions[i].msgRateIn.toFixed(2),
-            'outMsg': response.data.partitions[i].msgRateOut.toFixed(2),
-            'inBytes': response.data.partitions[i].msgThroughputIn.toFixed(2),
-            'outBytes': response.data.partitions[i].msgThroughputOut.toFixed(2),
-            'storageSize': response.data.partitions[i].storageSize.toFixed(2),
+            'inMsg': numberFormatter(response.data.partitions[i].msgRateIn, 2),
+            'outMsg': numberFormatter(response.data.partitions[i].msgRateOut, 2),
+            'inBytes': formatBytes(response.data.partitions[i].msgThroughputIn),
+            'outBytes': formatBytes(response.data.partitions[i].msgThroughputOut),
+            'storageSize': formatBytes(response.data.partitions[i].storageSize),
             'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + splitPartition[1] + '/topic'
           })
         }
@@ -383,9 +386,9 @@ export default {
                   children.push({
                     'id': 1000000 * (index + 1) + j,
                     'subscription': subPartition,
-                    'outMsg': response.data.partitions[j].subscriptions[p].msgRateOut.toFixed(2),
-                    'outBytes': response.data.partitions[j].subscriptions[p].msgThroughputOut.toFixed(2),
-                    'msgExpired': response.data.partitions[j].subscriptions[p].msgRateExpired.toFixed(2),
+                    'outMsg': numberFormatter(response.data.partitions[j].subscriptions[p].msgRateOut, 2),
+                    'outBytes': formatBytes(response.data.partitions[j].subscriptions[p].msgThroughputOut),
+                    'msgExpired': numberFormatter(response.data.partitions[j].subscriptions[p].msgRateExpired, 2),
                     'backlog': response.data.partitions[j].subscriptions[p].msgBacklog,
                     'type': type,
                     'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + subSplitPartition[1] + '/' + s + '/subscription',
@@ -399,9 +402,9 @@ export default {
           this.subscriptionsList.push({
             'id': index,
             'subscription': s,
-            'outMsg': response.data.subscriptions[s].msgRateOut.toFixed(2),
-            'outBytes': response.data.subscriptions[s].msgThroughputOut.toFixed(2),
-            'msgExpired': response.data.subscriptions[s].msgRateExpired.toFixed(2),
+            'outMsg': numberFormatter(response.data.subscriptions[s].msgRateOut, 2),
+            'outBytes': formatBytes(response.data.subscriptions[s].msgThroughputOut),
+            'msgExpired': numberFormatter(response.data.subscriptions[s].msgRateExpired, 2),
             'backlog': response.data.subscriptions[s].msgBacklog,
             'type': type,
             'children': children,
