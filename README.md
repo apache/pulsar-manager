@@ -49,6 +49,10 @@ The puslar-manager supports multi-environment configuration and can conveniently
 
 ![pulsar-manager-clusters](docs/img/pulsar-manager-clusters.gif)
 
+#### Manage brokers
+
+![pulsar-manager-brokers](docs/img/pulsar-manager-brokers.gif)
+
 
 #### Topics monitoring
 
