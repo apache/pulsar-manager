@@ -71,14 +71,16 @@ The pulsar-manager can monitor topics and subscriptions.
 
 1. Start Pulsar standalone
 
-```
-docker pull apachepulsar/pulsar:2.4.0
-docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pulsar-manager-standalone apachepulsar/pulsar:2.4.0 bin/pulsar standalone
-```
+  ```
+  docker pull apachepulsar/pulsar:2.4.0
+  docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pulsar-manager-standalone apachepulsar/pulsar:2.4.0 bin/pulsar standalone
+  ```
 
-2. Build environment with Docker or Local
+2. Build an environment
 
-  * Build environment with Docker
+  You can `build an environment` or `build a local environment`.
+
+  + Build an environment with Docker
 
     ```
     docker pull streamnative/pulsar-manager
@@ -88,7 +90,7 @@ docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pul
     * REDIRECT_PORT: the port of the front-end server.
 
 
-  * Build local environment
+  + Build a local environment
 
     (1) Download the source code.
 
@@ -113,11 +115,11 @@ docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pul
 
 3. Access Pulsar manager website
 
-Use the account and the password to log in to the Pulsar manager website.  
-account: `pulsar`  
-password: `pulsar`  
+  Use the account and the password to log in to the Pulsar manager website.  
+  account: `pulsar`  
+  password: `pulsar`  
 
-http://localhost:9527/
+  http://localhost:9527/
 
 
 # Back end
