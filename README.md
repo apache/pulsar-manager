@@ -135,6 +135,6 @@ For more information about the front end, see [pulsar-manager-frontend](https://
 * Support Bookie
 * Support back-end paging query and filtering
 * Support authentication and authorization
-* Embeded Prometheus 和 Grafana
+* Embeded Prometheus and Grafana
 * Support peek messages (include single and batch)
 
