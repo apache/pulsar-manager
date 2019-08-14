@@ -69,49 +69,49 @@ The pulsar-manager can monitor topics and subscriptions.
 
 ## Preparation
 
-### Start Pulsar standalone
+1. Start Pulsar standalone
 
 ```
 docker pull apachepulsar/pulsar:2.4.0
 docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pulsar-manager-standalone apachepulsar/pulsar:2.4.0 bin/pulsar standalone
 ```
 
-### Build environment with Docker or Local
+2. Build environment with Docker or Local
 
-#### Build environment with Docker
+  * Build environment with Docker
 
-```
-docker pull streamnative/pulsar-manager
-docker run -it  -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port streamnative/pulsar-manager
-```
-* REDIRECT_HOST: the IP address of the front-end server.
-* REDIRECT_PORT: the port of the front-end server.
+    ```
+    docker pull streamnative/pulsar-manager
+    docker run -it  -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port streamnative/pulsar-manager
+    ```
+    * REDIRECT_HOST: the IP address of the front-end server.
+    * REDIRECT_PORT: the port of the front-end server.
 
 
-#### Build local environment
+  * Build local environment
 
-1. Download the source code.
+    (1) Download the source code.
 
-```
-git clone https://github.com/streamnative/pulsar-manager
-```
+    ```
+    git clone https://github.com/streamnative/pulsar-manager
+    ```
 
-2. Build and start the backend.
-```
-cd pulsar-manager
-./gradlew build -x test
-java -jar ./build/libs/pulsar-manager.jar
-```
+    (2) Build and start the backend.
+    ```
+    cd pulsar-manager
+    ./gradlew build -x test
+    java -jar ./build/libs/pulsar-manager.jar
+    ```
 
-3. Build and start the front end.
+    (3) Build and start the front end.
 
-```
-cd pulsar-manager/front-end
-npm install --save
-npm run dev
-```
+    ```
+    cd pulsar-manager/front-end
+    npm install --save
+    npm run dev
+    ```
 
-## Access Pulsar manager website
+3. Access Pulsar manager website
 
 Use the account and the password to log in to the Pulsar manager website.  
 account: `pulsar`  
