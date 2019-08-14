@@ -642,7 +642,7 @@ export default {
     name: 'Broker',
     brokerNumber: 'Brokers',
     ownedNamespaceNumber: 'Owned Namespaces',
-    throughput: 'Throughput (bytes/s)',
+    throughput: 'Throughput',
     msgRate: 'Msg Rate (msgs/s)',
     placeholderSelectBroker: 'Please select brokers',
     brokerContent: 'The list of brokers belong to this failure domain.'
