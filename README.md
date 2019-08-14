@@ -113,9 +113,10 @@ npm run dev
 
 ## Access Pulsar manager website
 
-Use the account and the password to log in to the Pulsar manager website as below.  
+Use the account and the password to log in to the Pulsar manager website.  
 account: `pulsar`  
-password: `pulsar` 
+password: `pulsar`  
+
 http://localhost:9527/
 
 
