@@ -32,13 +32,7 @@ For localhost debug
 ```
 module.exports = {
   NODE_ENV: '"production"',
-  ENV_CONFIG: '"prod"',
-  BASE_API: '"your nginx server address"',
-  USE_TLS: 'false',
-  GRAFANA_ADDRESS: '""',
-  PROMETHEUS_ADDRESS: '""',
-  GRAFANA_ENABLE: 'false',
-  GRAFANA_TOKEN: '""'
+  ENV_CONFIG: '"prod"'
 }
 ```
 
@@ -48,7 +42,7 @@ module.exports = {
 
 ```
   listen       9527;
-  server_name  localhost;
+  server_name  0.0.0.0;
 
 
   location / {
