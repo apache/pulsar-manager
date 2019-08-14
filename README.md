@@ -78,7 +78,7 @@ The pulsar-manager can monitor topics and subscriptions.
 
 2. Build an environment
 
-  You can `build an environment` or `build a local environment`.
+    You can `build an environment` or `build a local environment`.
 
   + Build an environment with Docker
 
@@ -112,14 +112,12 @@ The pulsar-manager can monitor topics and subscriptions.
     npm install --save
     npm run dev
     ```
-
 3. Access Pulsar manager website
+    Use the account and the password to log in to the Pulsar manager website.  
+    account: `pulsar`  
+    password: `pulsar`  
 
-  Use the account and the password to log in to the Pulsar manager website.  
-  account: `pulsar`  
-  password: `pulsar`  
-
-  http://localhost:9527/
+    http://localhost:9527/
 
 
 # Back end
