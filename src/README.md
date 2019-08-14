@@ -1,7 +1,5 @@
 # Pulsar manager backend
 
-* Back end is based on [spring boot](https://github.com/spring-projects/spring-boot).  
-
 Pulsar manager backend is a supplement and improvement to Pulsar broker.
 
 * Handle complex query requests

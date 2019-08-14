@@ -127,7 +127,7 @@ For more information about the front end, see [pulsar-manager-backend](https://g
 
 # Front end
 
-For more information about the front end, see [pulsar-manager-frontend](https://github.com/tuteng/pulsar-manager/tree/feature/add-readme-for-backend-and-front-end/front-end)
+For more information about the front end, see [pulsar-manager-frontend](https://github.com/tuteng/pulsar-manager/tree/feature/add-readme-for-backend-and-front-end/front-end).
 
 ## To Do
 
