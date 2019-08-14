@@ -126,7 +126,7 @@ For more information about the front end, see [pulsar-manager-backend](https://g
 
 # Front end
 
-For more information about the front end, see [front-end-deploy](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md)
+For more information about the front end, see [pulsar-manager-frontend](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md)
 
 ## To Do
 
