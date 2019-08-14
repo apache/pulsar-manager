@@ -116,7 +116,7 @@ npm run dev
 
 
 ### Back end
-Back end is based on [spring boot](https://github.com/spring-projects/spring-boot).
+For more information about the front end, see [pulsar-manager-backend](https://github.com/tuteng/pulsar-manager/blob/feature/add-readme-for-backend-and-front-end/src/README.md).
 
 
 ### Front end
