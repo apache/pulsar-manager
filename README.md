@@ -1,8 +1,5 @@
 ## Pulsar Admin manager
 
-Front end is based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
-Back end is based on [spring boot](https://github.com/spring-projects/spring-boot).
-
 ### Feature
 
 * Tenants Management
