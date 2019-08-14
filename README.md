@@ -1,6 +1,6 @@
-# Pulsar manager
+# Apache Pulsar manager
 
-Pulsar manager is a web-based GUI management tool for managing and monitoring Pulsar.
+Apache Pulsar manager is a web-based GUI management tool for managing and monitoring Pulsar.
 
 ## Feature
 
