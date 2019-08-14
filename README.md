@@ -90,7 +90,7 @@ docker run -it  -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=fron
 
 #### Build local environment
 
-1. Download source code.
+1. Download the source code.
 
 ```
 git clone https://github.com/streamnative/pulsar-manager
