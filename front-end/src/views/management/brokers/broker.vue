@@ -19,10 +19,10 @@
         :data="brokerStats"
         border
         style="width: 100%">
-        <el-table-column prop="inMsg" label="In - msg/s"/>
-        <el-table-column prop="outMsg" label="Out - msg/s"/>
-        <el-table-column prop="inBytes" label="In - bytes/s"/>
-        <el-table-column prop="outBytes" label="Out - bytes/s"/>
+        <el-table-column :label="$t('common.inMsg')" prop="inMsg"/>
+        <el-table-column :label="$t('common.outMsg')" prop="outMsg"/>
+        <el-table-column :label="$t('common.inBytes')" prop="inBytes"/>
+        <el-table-column :label="$t('common.outBytes')" prop="outBytes"/>
       </el-table>
       <h4>Owned Namespaces</h4>
       <el-table
@@ -32,26 +32,26 @@
         fit
         highlight-current-row
         style="width: 100%;">
-        <el-table-column label="Tenant" align="center" min-width="100px">
+        <el-table-column :label="$t('tenant.label')" align="center" min-width="100px">
           <template slot-scope="scope">
             <router-link :to="'/management/tenants/tenantInfo/' + scope.row.tenant + '?tab=namespaces'" class="link-type">
               <span>{{ scope.row.tenant }}</span>
             </router-link>
           </template>
         </el-table-column>
-        <el-table-column label="Namespace" align="center" min-width="100px">
+        <el-table-column :label="$t('namespace.label')" align="center" min-width="100px">
           <template slot-scope="scope">
             <router-link :to="'/management/namespaces/' + scope.row.tenant + '/' + scope.row.namespace + '/namespace?tab=overview'" class="link-type">
               <span>{{ scope.row.namespace }}</span>
             </router-link>
           </template>
         </el-table-column>
-        <el-table-column label="Bundle" align="center" min-width="100px">
+        <el-table-column :label="$t('namespace.bundle.label')" align="center" min-width="100px">
           <template slot-scope="scope">
             <span>{{ scope.row.bundle }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Operations" align="center" class-name="small-padding fixed-width">
+        <el-table-column :label="$t('namespace.bundle.operation')" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button size="medium" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">Unload</el-button>
           </template>
