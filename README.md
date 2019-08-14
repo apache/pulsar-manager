@@ -69,55 +69,58 @@ The pulsar-manager can monitor topics and subscriptions.
 
 ## Preparation
 
-1. Start Pulsar standalone
-
-  ```
-  docker pull apachepulsar/pulsar:2.4.0
-  docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pulsar-manager-standalone apachepulsar/pulsar:2.4.0 bin/pulsar standalone
-  ```
-
-2. Build an environment
-
-    You can `build an environment` or `build a local environment`.
-
-  + Build an environment with Docker
+1. Start Pulsar standalone.
 
     ```
-    docker pull streamnative/pulsar-manager
-    docker run -it  -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port streamnative/pulsar-manager
-    ```
-    * REDIRECT_HOST: the IP address of the front-end server.
-    * REDIRECT_PORT: the port of the front-end server.
-
-
-  + Build a local environment
-
-    (1) Download the source code.
-
-    ```
-    git clone https://github.com/streamnative/pulsar-manager
+    docker pull apachepulsar/pulsar:2.4.0
+    docker run -d -it -p 6650:6650 -p 8080:8080 -v $PWD/data:/pulsar/data --name pulsar-manager-standalone apachepulsar/pulsar:2.4.0 bin/pulsar standalone
     ```
 
-    (2) Build and start the backend.
-    ```
-    cd pulsar-manager
-    ./gradlew build -x test
-    java -jar ./build/libs/pulsar-manager.jar
-    ```
+2. Build an environment. 
 
-    (3) Build and start the front end.
+    You can **build an environment with Docker** or **build a local environment**.
 
-    ```
-    cd pulsar-manager/front-end
-    npm install --save
-    npm run dev
-    ```
-3. Access Pulsar manager website
-    Use the account and the password to log in to the Pulsar manager website.  
-    account: `pulsar`  
-    password: `pulsar`  
+   * Build an environment with Docker
 
-    http://localhost:9527/
+        * `REDIRECT_HOST`: the IP address of the front-end server.
+            
+        * `REDIRECT_PORT`: the port of the front-end server.
+
+        ```
+        docker pull streamnative/pulsar-manager
+        docker run -it  -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port streamnative/pulsar-manager
+        ```
+
+   * Build a local environment
+
+        (1) Download the source code.
+
+        ```
+        git clone https://github.com/streamnative/pulsar-manager
+        ```
+
+        (2) Build and start the backend.
+        ```
+        cd pulsar-manager
+        ./gradlew build -x test
+        java -jar ./build/libs/pulsar-manager.jar
+        ```
+
+        (3) Build and start the front end.
+
+        ```
+        cd pulsar-manager/front-end
+        npm install --save
+        npm run dev
+        ```
+
+3. Access Pulsar manager website.
+
+    Use the account and the password to log in to the Pulsar manager website as below.  
+          
+   * Account: `pulsar`  
+   * Password: `pulsar`  
+   * Pulsar manager website: http://localhost:9527/
 
 
 # Back end
