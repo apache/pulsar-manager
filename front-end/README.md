@@ -1,6 +1,6 @@
-# Pulsar Admin UI
+# Pulsar manager front end
 
-The admin UI is based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
+* Front end is based on [vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard).
 
 ## Compatibility
 
