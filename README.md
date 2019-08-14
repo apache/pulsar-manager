@@ -123,3 +123,13 @@ For more information about the front end, see [pulsar-manager-backend](https://g
 
 For more information about the front end, see [front-end-deploy](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md)
 
+## To Do
+
+* Support Schema
+* Support Function, Source and Sink
+* Support Bookie
+* Support back-end paging query and filtering
+* Support authentication and authorization
+* Embeded Prometheus 和 Grafana
+* Support peek messages (include single and batch)
+
