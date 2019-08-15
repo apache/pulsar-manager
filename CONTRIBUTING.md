@@ -69,7 +69,7 @@ Refer to [Vue coding style](https://vuejs.org/v2/style-guide/)
 ## Format header for new file
 
 The project uses the open source protocol of Apache License 2.0. If you need to create a new file when developing new features, 
-add the license at the beginning of each file. Run the following command.
+add the license at the beginning of each file by run the following command.
 
 ```bash
 ./gradlew licenseFormat
