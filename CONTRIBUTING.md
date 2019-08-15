@@ -35,15 +35,10 @@ To configure annotation processing in IntelliJ:
 2. Select the following buttons:
    1. "Enable annotation processing"
    2. "Obtain processors from project classpath"
-   3. "Store generated sources relative to: Module content root"
 
-3. Set the generated source directories to be equal to the Maven directories:
-   1. Set "Production sources directory:" to "target/generated-sources/annotations".
-   2. Set "Test sources directory:" to "target/generated-test-sources/test-annotations".
+3. Click “OK”.
 
-4. Click “OK”.
-
-5. Install the lombok plugin in intellij.
+4. Install the lombok plugin in intellij.
 
 ### Eclipse
 
