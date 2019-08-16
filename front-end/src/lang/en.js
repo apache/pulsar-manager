@@ -548,8 +548,11 @@ export default {
       expireTimeRequired: 'Expire Time is required',
       clear: 'CLEAR',
       clearMessage: 'Clear Message',
+      clearMessageConfirm: 'Do you confirm clear backlog?',
       reset: 'RESET',
-      resetByTimeMessage: 'Reset By Time',
+      resetByTime: 'Reset by time',
+      resetByTimeMessage: 'Reset by time older than timestamp (in seconds)',
+      resetByTimeRequired: 'Reset Time is required',
       resetById: 'Reset By Message Id',
       messageId: 'Message ID',
       mins: 'Mins',
@@ -600,7 +603,9 @@ export default {
       terminateTopicSuccess: 'Successfully terminate the topic!',
       startCompactionSuccess: 'Successfully start compacting the topic!',
       startOffloadSuccess: 'Successfully start offloading the topic!',
-      expireMessageSuccess: 'Successfully expire messages the topic'
+      expireMessageSuccess: 'Successfully expire messages the topic!',
+      resetMessageSuccess: 'Successfully reset messages the topic!',
+      clearMessageSuccess: 'Successfully clear messages the topic'
     },
     info: 'INFO',
     column: 'column',

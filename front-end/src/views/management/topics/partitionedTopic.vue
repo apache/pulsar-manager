@@ -104,7 +104,15 @@
                   <el-dropdown v-else @command="handleAllSub">
                     <span class="el-dropdown-link"><i class="el-icon-more"/></span>
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item command="expire">{{ $t('topic.subscription.expire') }}</el-dropdown-item>
+                      <el-dropdown-item :command="{'action': 'expire', 'subscription': scope.row.subscription }">
+                        {{ $t('topic.subscription.expire') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item :command="{'action': 'reset', 'subscription': scope.row.subscription }">
+                        {{ $t('topic.subscription.reset') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item :command="{'action': 'clear', 'subscription': scope.row.subscription }">
+                        {{ $t('topic.subscription.clear') }}
+                      </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </template>
@@ -234,6 +242,17 @@
           </el-form-item>
           <span>{{ $t('topic.subscription.expireMessage') }}</span>
         </el-form-item>
+        <el-form-item v-if="dialogStatus==='reset'">
+          <el-form-item prop="resetByTime">
+            <el-input v-model="form.resetByTime"/>
+          </el-form-item>
+          <span>{{ $t('topic.subscription.resetByTimeMessage') }}</span>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='clear'">
+          <el-form-item>
+            <span>{{ $t('topic.subscription.clearMessageConfirm') }}</span>
+          </el-form-item>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
           <el-button @click="dialogFormVisible=false">{{ $t('table.cancel') }}</el-button>
@@ -249,7 +268,9 @@ import { fetchNamespaces, getClusters } from '@/api/namespaces'
 import {
   fetchPartitionTopicStats,
   deletePartitionTopicOnCluster,
-  expireMessagesAllSubscriptions
+  expireMessagesAllSubscriptionsOnCluster,
+  resetCursorByTimestampOnCluster,
+  clearBacklogOnCluster
 } from '@/api/topics'
 import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -306,7 +327,9 @@ export default {
       currentTabName: '',
       textMap: {
         delete: this.$i18n.t('topic.deleteTopic'),
-        expire: this.$i18n.t('topic.subscription.msgExpired')
+        expire: this.$i18n.t('topic.subscription.msgExpired'),
+        clear: this.$i18n.t('topic.subscription.clearMessage'),
+        reset: this.$i18n.t('topic.subscription.resetByTime')
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -319,11 +342,14 @@ export default {
         limit: 0
       },
       form: {
-        expireTime: ''
+        expireTime: '',
+        resetByTime: ''
       },
       rules: {
-        expireTime: [{ required: true, message: this.$i18n.t('topic.subscription.expireTimeRequired'), trigger: 'blur' }]
-      }
+        expireTime: [{ required: true, message: this.$i18n.t('topic.subscription.expireTimeRequired'), trigger: 'blur' }],
+        resetByTime: [{ required: true, message: this.$i18n.t('topic.subscription.resetByTimeRequired'), trigger: 'blur' }]
+      },
+      currentSubscription: ''
     }
   },
   created() {
@@ -551,12 +577,22 @@ export default {
             case 'expire':
               this.expireAllSubMessage()
               break
+            case 'reset':
+              this.resetAllSubMessage()
+              break
+            case 'clear':
+              this.clearAllSubMessage()
+              break
           }
         }
       })
     },
     expireAllSubMessage() {
-      expireMessagesAllSubscriptions(this.postForm.persistent, this.tenantNamespaceTopic, this.form.expireTime).then(response => {
+      expireMessagesAllSubscriptionsOnCluster(
+        this.getCurrentCluster(),
+        this.postForm.persistent,
+        this.tenantNamespaceTopic,
+        this.form.expireTime).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('topic.notification.expireMessageSuccess'),
@@ -566,9 +602,42 @@ export default {
         this.dialogFormVisible = false
       })
     },
-    handleAllSub(command) {
+    handleAllSub(command, subscription) {
       this.dialogFormVisible = true
-      this.dialogStatus = 'expire'
+      this.dialogStatus = command.action
+      this.currentSubscription = command.subscription
+    },
+    resetAllSubMessage() {
+      resetCursorByTimestampOnCluster(
+        this.getCurrentCluster(),
+        this.postForm.persistent,
+        this.tenantNamespaceTopic,
+        this.currentSubscription,
+        this.form.expireTime).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.notification.resetMessageSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+      })
+    },
+    clearAllSubMessage() {
+      clearBacklogOnCluster(
+        this.getCurrentCluster(),
+        this.postForm.persistent,
+        this.tenantNamespaceTopic,
+        this.currentSubscription).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.notification.clearMessageSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+        this.getPartitionTopicInfo()
+      })
     }
   }
 }
