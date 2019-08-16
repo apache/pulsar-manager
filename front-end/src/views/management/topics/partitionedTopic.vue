@@ -113,48 +113,49 @@
             <el-table
               :key="partitionTableKey"
               :data="partitionsList"
+              :default-sort = "{prop: 'partition', order: 'descending'}"
               border
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column :label="$t('topic.partition')" min-width="50px" align="left">
+              <el-table-column :label="$t('topic.partition')" sortable min-width="50px" align="left" prop="partiton">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.partitionTopicLink" class="link-type">
                     <span>{{ scope.row.partition }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="left">
+              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="left" prop="producers">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="left">
+              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="left" prop="subscriptions">
                 <template slot-scope="scope">
                   <span>{{ scope.row.subscriptions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="left" prop="inMsg">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="left" prop="outMsg">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="left" prop="inBytes">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="left" prop="outBytes">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="left" prop="storageSize">
                 <template slot-scope="scope">
                   <span>{{ scope.row.storageSize }}</span>
                 </template>
@@ -354,19 +355,21 @@ export default {
           inBytes: formatBytes(response.data.msgThroughputIn),
           outBytes: formatBytes(response.data.msgThroughputOut)
         })
-        for (var i in response.data.partitions) {
-          var splitPartition = i.split('://')
-          var partition = splitPartition[1].split('/')[2]
+        var prefix = this.postForm.persistent + '://' + this.tenantNamespaceTopic
+        var tempPartitionsList = Object.keys(response.data.partitions)
+        for (var i = 0; i < tempPartitionsList.length; i++) {
+          var key = prefix + '-partition-' + i
+          var partition = this.postForm.topic + '-partition-' + i
           this.partitionsList.push({
             'partition': partition,
-            'producers': response.data.partitions[i].publishers.length,
-            'subscriptions': Object.keys(response.data.partitions[i].subscriptions).length,
-            'inMsg': numberFormatter(response.data.partitions[i].msgRateIn, 2),
-            'outMsg': numberFormatter(response.data.partitions[i].msgRateOut, 2),
-            'inBytes': formatBytes(response.data.partitions[i].msgThroughputIn),
-            'outBytes': formatBytes(response.data.partitions[i].msgThroughputOut),
-            'storageSize': formatBytes(response.data.partitions[i].storageSize, 0),
-            'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + splitPartition[1] + '/topic'
+            'producers': response.data.partitions[key].publishers.length,
+            'subscriptions': Object.keys(response.data.partitions[key].subscriptions).length,
+            'inMsg': numberFormatter(response.data.partitions[key].msgRateIn, 2),
+            'outMsg': numberFormatter(response.data.partitions[key].msgRateOut, 2),
+            'inBytes': formatBytes(response.data.partitions[key].msgThroughputIn),
+            'outBytes': formatBytes(response.data.partitions[key].msgThroughputOut),
+            'storageSize': formatBytes(response.data.partitions[key].storageSize, 0),
+            'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + key + '/topic'
           })
         }
         var index = 0
@@ -374,9 +377,6 @@ export default {
           index += 1
           var type = 'Exclusive'
           var children = []
-          if (response.data.subscriptions[s].hasOwnProperty('type')) {
-            type = response.data.subscriptions[s].type
-          }
           for (var j in response.data.partitions) {
             var subSplitPartition = j.split('://')
             var subPartition = subSplitPartition[1].split('/')[2]
@@ -390,10 +390,11 @@ export default {
                     'outBytes': formatBytes(response.data.partitions[j].subscriptions[p].msgThroughputOut),
                     'msgExpired': numberFormatter(response.data.partitions[j].subscriptions[p].msgRateExpired, 2),
                     'backlog': response.data.partitions[j].subscriptions[p].msgBacklog,
-                    'type': type,
+                    'type': response.data.partitions[j].subscriptions[p].type,
                     'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + subSplitPartition[1] + '/' + s + '/subscription',
                     'enableSubscriptionLink': true
                   })
+                  type = response.data.partitions[j].subscriptions[p].type
                 }
               }
             }
