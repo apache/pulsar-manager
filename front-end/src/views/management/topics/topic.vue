@@ -777,7 +777,7 @@ export default {
             this.segmentsList.push({
               'ledgerId': response.data.ledgers[i]['ledgerId'],
               'entries': response.data.currentLedgerEntries,
-              'size': response.data.currentLedgerSize,
+              'size': numberFormatter(response.data.currentLedgerSize, 2),
               'offload': response.data.ledgers[i]['offloaded'],
               'status': 'opening'
             })
@@ -785,7 +785,7 @@ export default {
             this.segmentsList.push({
               'ledgerId': response.data.ledgers[i]['ledgerId'],
               'entries': response.data.ledgers[i]['entries'],
-              'size': response.data.ledgers[i]['size'],
+              'size': numberFormatter(response.data.ledgers[i]['size'], 2),
               'offload': response.data.ledgers[i]['offloaded'],
               'status': 'closing'
             })
