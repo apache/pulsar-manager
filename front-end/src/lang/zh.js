@@ -544,6 +544,8 @@ export default {
       skipMessage: 'Messages',
       expire: 'EXPIRE',
       expireMessage: 'messages older than timestamp (in seconds)',
+      expireTimePlaceholder: 'Expire Time for Messages',
+      expireTimeRequired: 'Expire Time is required',
       clear: 'CLEAR',
       clearMessage: 'Clear Message',
       reset: 'RESET',
@@ -597,7 +599,8 @@ export default {
       unloadTopicSuccess: 'Successfully unload the topic!',
       terminateTopicSuccess: 'Successfully terminate the topic!',
       startCompactionSuccess: 'Successfully start compacting the topic!',
-      startOffloadSuccess: 'Successfully start offloading the topic!'
+      startOffloadSuccess: 'Successfully start offloading the topic!',
+      expireMessageSuccess: 'Successfully expire messages the topic!'
     },
     info: 'INFO',
     column: 'column',

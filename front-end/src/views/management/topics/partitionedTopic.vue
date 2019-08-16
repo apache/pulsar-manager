@@ -101,6 +101,12 @@
                       </router-link>
                     </el-dropdown-menu>
                   </el-dropdown>
+                  <el-dropdown v-else @command="handleAllSub">
+                    <span class="el-dropdown-link"><i class="el-icon-more"/></span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item command="expire">{{ $t('topic.subscription.expire') }}</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
                 </template>
               </el-table-column>
             </el-table>
@@ -214,16 +220,22 @@
         </el-form>
         <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" @click="handleDeletePartitionTopic">Delete Topic</el-button>
+        <el-button type="danger" class="button" @click="handleDeletePartitionTopic">{{ $t('topic.deleteTopic') }}</el-button>
       </el-tab-pane>
     </el-tabs>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
-      <el-form label-position="top">
+      <el-form ref="form" :model="form" :rules="rules" label-position="top">
         <el-form-item v-if="dialogStatus==='delete'">
           <h4>{{ $t('topic.deleteTopicMessage') }}</h4>
         </el-form-item>
+        <el-form-item v-if="dialogStatus==='expire'">
+          <el-form-item prop="expireTime">
+            <el-input v-model="form.expireTime" :placeholder="$t('topic.subscription.expireTimePlaceholder')"/>
+          </el-form-item>
+          <span>{{ $t('topic.subscription.expireMessage') }}</span>
+        </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="deleteParititionTopic">{{ $t('table.confirm') }}</el-button>
+          <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
           <el-button @click="dialogFormVisible=false">{{ $t('table.cancel') }}</el-button>
         </el-form-item>
       </el-form>
@@ -236,7 +248,8 @@ import { fetchTenants } from '@/api/tenants'
 import { fetchNamespaces, getClusters } from '@/api/namespaces'
 import {
   fetchPartitionTopicStats,
-  deletePartitionTopicOnCluster
+  deletePartitionTopicOnCluster,
+  expireMessagesAllSubscriptions
 } from '@/api/topics'
 import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -292,7 +305,8 @@ export default {
       firstInitTopic: false,
       currentTabName: '',
       textMap: {
-        delete: this.$i18n.t('topic.deleteTopic')
+        delete: this.$i18n.t('topic.deleteTopic'),
+        expire: this.$i18n.t('topic.subscription.msgExpired')
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -303,6 +317,12 @@ export default {
       subscriptionsListQuery: {
         page: 1,
         limit: 0
+      },
+      form: {
+        expireTime: ''
+      },
+      rules: {
+        expireTime: [{ required: true, message: this.$i18n.t('topic.subscription.expireTimeRequired'), trigger: 'blur' }]
       }
     }
   },
@@ -506,6 +526,7 @@ export default {
       this.$forceUpdate()
     },
     handleDeletePartitionTopic() {
+      this.postForm.expireTime = ''
       this.dialogFormVisible = true
       this.dialogStatus = 'delete'
     },
@@ -519,6 +540,35 @@ export default {
         })
         this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant + '/' + this.postForm.namespace + '/namespace?tab=topics' })
       })
+    },
+    handleOptions() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          switch (this.dialogStatus) {
+            case 'delete':
+              this.deleteParititionTopic()
+              break
+            case 'expire':
+              this.expireAllSubMessage()
+              break
+          }
+        }
+      })
+    },
+    expireAllSubMessage() {
+      expireMessagesAllSubscriptions(this.postForm.persistent, this.tenantNamespaceTopic, this.form.expireTime).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.notification.expireMessageSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+      })
+    },
+    handleAllSub(command) {
+      this.dialogFormVisible = true
+      this.dialogStatus = 'expire'
     }
   }
 }
@@ -534,5 +584,12 @@ export default {
   background: red;
   border: none;
   height: 1px;
+}
+.el-icon-more {
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg); 	/* IE 9 */
+  -moz-transform: rotate(90deg); 	/* Firefox */
+  -webkit-transform: rotate(90deg); /* Safari 和 Chrome */
+  -o-transform: rotate(90deg); 	/* Opera */
 }
 </style>
