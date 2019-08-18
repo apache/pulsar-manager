@@ -254,9 +254,13 @@ export function expireMessageOnCluster(cluster, persistent, tenantNamespaceTopic
   })
 }
 
-export function expireMessagesAllSubscriptions(tenantNamespaceTopic, expireTimeInSeconds) {
+export function expireMessagesAllSubscriptionsOnCluster(cluster, persistent, tenantNamespaceTopic, expireTimeInSeconds) {
   return request({
-    url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/all_subscription/expireMessages/${expireTimeInSeconds}`,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/all_subscription/expireMessages/${expireTimeInSeconds}`,
     method: 'post'
   })
 }
