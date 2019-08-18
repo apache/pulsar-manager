@@ -101,6 +101,20 @@
                       </router-link>
                     </el-dropdown-menu>
                   </el-dropdown>
+                  <el-dropdown v-else @command="handleAllSub">
+                    <span class="el-dropdown-link"><i class="el-icon-more"/></span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item :command="{'action': 'expire', 'subscription': scope.row.subscription }">
+                        {{ $t('topic.subscription.expire') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item :command="{'action': 'reset', 'subscription': scope.row.subscription }">
+                        {{ $t('topic.subscription.reset') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item :command="{'action': 'clear', 'subscription': scope.row.subscription }">
+                        {{ $t('topic.subscription.clear') }}
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
                 </template>
               </el-table-column>
             </el-table>
@@ -113,48 +127,49 @@
             <el-table
               :key="partitionTableKey"
               :data="partitionsList"
+              :default-sort = "{prop: 'partition', order: 'descending'}"
               border
               fit
               highlight-current-row
               style="width: 100%;">
-              <el-table-column :label="$t('topic.partition')" min-width="50px" align="left">
+              <el-table-column :label="$t('topic.partition')" sortable min-width="50px" align="left" prop="partiton">
                 <template slot-scope="scope">
                   <router-link :to="scope.row.partitionTopicLink" class="link-type">
                     <span>{{ scope.row.partition }}</span>
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="left">
+              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="left" prop="producers">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="left">
+              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="left" prop="subscriptions">
                 <template slot-scope="scope">
                   <span>{{ scope.row.subscriptions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="left" prop="inMsg">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="left" prop="outMsg">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outMsg }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="left" prop="inBytes">
                 <template slot-scope="scope">
                   <span>{{ scope.row.inBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="left" prop="outBytes">
                 <template slot-scope="scope">
                   <span>{{ scope.row.outBytes }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="left">
+              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="left" prop="storageSize">
                 <template slot-scope="scope">
                   <span>{{ scope.row.storageSize }}</span>
                 </template>
@@ -213,16 +228,33 @@
         </el-form>
         <h4 style="color:#E57470">{{ $t('common.dangerZone') }}</h4>
         <hr class="danger-line">
-        <el-button type="danger" class="button" @click="handleDeletePartitionTopic">Delete Topic</el-button>
+        <el-button type="danger" class="button" @click="handleDeletePartitionTopic">{{ $t('topic.deleteTopic') }}</el-button>
       </el-tab-pane>
     </el-tabs>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
-      <el-form label-position="top">
+      <el-form ref="form" :model="form" :rules="rules" label-position="top">
         <el-form-item v-if="dialogStatus==='delete'">
           <h4>{{ $t('topic.deleteTopicMessage') }}</h4>
         </el-form-item>
+        <el-form-item v-if="dialogStatus==='expire'">
+          <el-form-item prop="expireTime">
+            <el-input v-model="form.expireTime" :placeholder="$t('topic.subscription.expireTimePlaceholder')"/>
+          </el-form-item>
+          <span>{{ $t('topic.subscription.expireMessage') }}</span>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='reset'">
+          <el-form-item prop="resetByTime">
+            <el-input v-model="form.resetByTime"/>
+          </el-form-item>
+          <span>{{ $t('topic.subscription.resetByTimeMessage') }}</span>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='clear'">
+          <el-form-item>
+            <span>{{ $t('topic.subscription.clearMessageConfirm') }}</span>
+          </el-form-item>
+        </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="deleteParititionTopic">{{ $t('table.confirm') }}</el-button>
+          <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
           <el-button @click="dialogFormVisible=false">{{ $t('table.cancel') }}</el-button>
         </el-form-item>
       </el-form>
@@ -235,7 +267,10 @@ import { fetchTenants } from '@/api/tenants'
 import { fetchNamespaces, getClusters } from '@/api/namespaces'
 import {
   fetchPartitionTopicStats,
-  deletePartitionTopicOnCluster
+  deletePartitionTopicOnCluster,
+  expireMessagesAllSubscriptionsOnCluster,
+  resetCursorByTimestampOnCluster,
+  clearBacklogOnCluster
 } from '@/api/topics'
 import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -291,7 +326,10 @@ export default {
       firstInitTopic: false,
       currentTabName: '',
       textMap: {
-        delete: this.$i18n.t('topic.deleteTopic')
+        delete: this.$i18n.t('topic.deleteTopic'),
+        expire: this.$i18n.t('topic.subscription.msgExpired'),
+        clear: this.$i18n.t('topic.subscription.clearMessage'),
+        reset: this.$i18n.t('topic.subscription.resetByTime')
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -302,7 +340,16 @@ export default {
       subscriptionsListQuery: {
         page: 1,
         limit: 0
-      }
+      },
+      form: {
+        expireTime: '',
+        resetByTime: ''
+      },
+      rules: {
+        expireTime: [{ required: true, message: this.$i18n.t('topic.subscription.expireTimeRequired'), trigger: 'blur' }],
+        resetByTime: [{ required: true, message: this.$i18n.t('topic.subscription.resetByTimeRequired'), trigger: 'blur' }]
+      },
+      currentSubscription: ''
     }
   },
   created() {
@@ -354,19 +401,21 @@ export default {
           inBytes: formatBytes(response.data.msgThroughputIn),
           outBytes: formatBytes(response.data.msgThroughputOut)
         })
-        for (var i in response.data.partitions) {
-          var splitPartition = i.split('://')
-          var partition = splitPartition[1].split('/')[2]
+        var prefix = this.postForm.persistent + '://' + this.tenantNamespaceTopic
+        var tempPartitionsList = Object.keys(response.data.partitions)
+        for (var i = 0; i < tempPartitionsList.length; i++) {
+          var key = prefix + '-partition-' + i
+          var partition = this.postForm.topic + '-partition-' + i
           this.partitionsList.push({
             'partition': partition,
-            'producers': response.data.partitions[i].publishers.length,
-            'subscriptions': Object.keys(response.data.partitions[i].subscriptions).length,
-            'inMsg': numberFormatter(response.data.partitions[i].msgRateIn, 2),
-            'outMsg': numberFormatter(response.data.partitions[i].msgRateOut, 2),
-            'inBytes': formatBytes(response.data.partitions[i].msgThroughputIn),
-            'outBytes': formatBytes(response.data.partitions[i].msgThroughputOut),
-            'storageSize': formatBytes(response.data.partitions[i].storageSize, 0),
-            'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + splitPartition[1] + '/topic'
+            'producers': response.data.partitions[key].publishers.length,
+            'subscriptions': Object.keys(response.data.partitions[key].subscriptions).length,
+            'inMsg': numberFormatter(response.data.partitions[key].msgRateIn, 2),
+            'outMsg': numberFormatter(response.data.partitions[key].msgRateOut, 2),
+            'inBytes': formatBytes(response.data.partitions[key].msgThroughputIn),
+            'outBytes': formatBytes(response.data.partitions[key].msgThroughputOut),
+            'storageSize': formatBytes(response.data.partitions[key].storageSize, 0),
+            'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + key + '/topic'
           })
         }
         var index = 0
@@ -374,9 +423,6 @@ export default {
           index += 1
           var type = 'Exclusive'
           var children = []
-          if (response.data.subscriptions[s].hasOwnProperty('type')) {
-            type = response.data.subscriptions[s].type
-          }
           for (var j in response.data.partitions) {
             var subSplitPartition = j.split('://')
             var subPartition = subSplitPartition[1].split('/')[2]
@@ -390,10 +436,11 @@ export default {
                     'outBytes': formatBytes(response.data.partitions[j].subscriptions[p].msgThroughputOut),
                     'msgExpired': numberFormatter(response.data.partitions[j].subscriptions[p].msgRateExpired, 2),
                     'backlog': response.data.partitions[j].subscriptions[p].msgBacklog,
-                    'type': type,
+                    'type': response.data.partitions[j].subscriptions[p].type,
                     'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + subSplitPartition[1] + '/' + s + '/subscription',
                     'enableSubscriptionLink': true
                   })
+                  type = response.data.partitions[j].subscriptions[p].type
                 }
               }
             }
@@ -505,6 +552,7 @@ export default {
       this.$forceUpdate()
     },
     handleDeletePartitionTopic() {
+      this.postForm.expireTime = ''
       this.dialogFormVisible = true
       this.dialogStatus = 'delete'
     },
@@ -517,6 +565,78 @@ export default {
           duration: 3000
         })
         this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant + '/' + this.postForm.namespace + '/namespace?tab=topics' })
+      })
+    },
+    handleOptions() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          switch (this.dialogStatus) {
+            case 'delete':
+              this.deleteParititionTopic()
+              break
+            case 'expire':
+              this.expireAllSubMessage()
+              break
+            case 'reset':
+              this.resetAllSubMessage()
+              break
+            case 'clear':
+              this.clearAllSubMessage()
+              break
+          }
+        }
+      })
+    },
+    expireAllSubMessage() {
+      expireMessagesAllSubscriptionsOnCluster(
+        this.getCurrentCluster(),
+        this.postForm.persistent,
+        this.tenantNamespaceTopic,
+        this.form.expireTime).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.notification.expireMessageSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+      })
+    },
+    handleAllSub(command, subscription) {
+      this.dialogFormVisible = true
+      this.dialogStatus = command.action
+      this.currentSubscription = command.subscription
+    },
+    resetAllSubMessage() {
+      resetCursorByTimestampOnCluster(
+        this.getCurrentCluster(),
+        this.postForm.persistent,
+        this.tenantNamespaceTopic,
+        this.currentSubscription,
+        this.form.expireTime).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.notification.resetMessageSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+      })
+    },
+    clearAllSubMessage() {
+      clearBacklogOnCluster(
+        this.getCurrentCluster(),
+        this.postForm.persistent,
+        this.tenantNamespaceTopic,
+        this.currentSubscription).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.notification.clearMessageSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.dialogFormVisible = false
+        this.getPartitionTopicInfo()
       })
     }
   }
@@ -533,5 +653,12 @@ export default {
   background: red;
   border: none;
   height: 1px;
+}
+.el-icon-more {
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg); 	/* IE 9 */
+  -moz-transform: rotate(90deg); 	/* Firefox */
+  -webkit-transform: rotate(90deg); /* Safari 和 Chrome */
+  -o-transform: rotate(90deg); 	/* Opera */
 }
 </style>
