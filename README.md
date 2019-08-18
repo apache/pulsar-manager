@@ -123,22 +123,12 @@ The pulsar-manager can monitor topics and subscriptions.
    * Pulsar manager website: http://localhost:9527/
 
 
-# Back end
+## Back end
 
 For more information about the front end, see [pulsar-manager-backend](https://github.com/streamnative/pulsar-manager/blob/feature/add-readme-for-backend-and-front-end/src/README.md).
 
 
-# Front end
+## Front end
 
 For more information about the front end, see [pulsar-manager-frontend](https://github.com/streamnative/pulsar-manager/tree/feature/add-readme-for-backend-and-front-end/front-end).
-
-## To Do
-
-* Support Schema
-* Support Function, Source and Sink
-* Support Bookie
-* Support back-end paging query and filtering
-* Support authentication and authorization
-* Embeded Prometheus and Grafana
-* Support peek messages (include single and batch)
 
