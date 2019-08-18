@@ -125,7 +125,7 @@ The pulsar-manager can monitor topics and subscriptions.
 
 ## Back end
 
-For more information about the front end, see [pulsar-manager-backend](https://github.com/streamnative/pulsar-manager/blob/feature/add-readme-for-backend-and-front-end/src/README.md).
+For more information about the back end, see [pulsar-manager-backend](https://github.com/streamnative/pulsar-manager/blob/feature/add-readme-for-backend-and-front-end/src/README.md).
 
 
 ## Front end
