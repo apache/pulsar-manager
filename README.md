@@ -96,7 +96,7 @@ The pulsar-manager can monitor topics and subscriptions.
 
         ```
         docker pull streamnative/pulsar-manager
-        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=com.mysql.jdbc.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar pulsar-manager:v0.0.1 /bin/sh
+        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=com.mysql.jdbc.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar pulsar-manager /bin/sh
         ```
 
    * Build a local environment
