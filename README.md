@@ -86,9 +86,17 @@ The pulsar-manager can monitor topics and subscriptions.
             
         * `REDIRECT_PORT`: the port of the front-end server.
 
+        * `DRIVER_CLASS_NAME`: the dirver class name of MySQL.
+
+        * `URL`: the url of MySQL jdbc, example: jdbc:mysql://localhost:3306/pulsar_manager?useSSL=false
+
+        * `USERNAME`: the username of MySQL
+
+        * `PASSWORD`: the password of MySQL
+
         ```
         docker pull streamnative/pulsar-manager
-        docker run -it  -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port streamnative/pulsar-manager
+        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=com.mysql.jdbc.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar pulsar-manager:v0.0.1 /bin/sh
         ```
 
    * Build a local environment

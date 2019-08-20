@@ -35,7 +35,8 @@ RUN apk update
 
 RUN apk add nginx \
   && apk add supervisor \
-  && apk add sqlite \
+  && apk add mysql \
+  && apk add mysql-client \
   && rm  -rf /tmp/* \
   && rm /var/cache/apk/*
 
@@ -43,11 +44,17 @@ RUN mkdir -p /run/nginx
 
 WORKDIR /pulsar-manager
 
+COPY docker/my.cnf /etc/
+
 COPY build/libs/*.jar pulsar-manager.jar
 
 COPY docker/supervisord.conf /etc/
 
 COPY docker/default.conf /etc/nginx/conf.d/
+
+COPY docker/startup.sh /pulsar-manager/
+
+COPY docker/init_db.sql /pulsar-manager/
 
 COPY docker/entrypoint.sh /pulsar-manager/
 

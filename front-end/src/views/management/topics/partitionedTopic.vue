@@ -415,7 +415,7 @@ export default {
             'inBytes': formatBytes(response.data.partitions[key].msgThroughputIn),
             'outBytes': formatBytes(response.data.partitions[key].msgThroughputOut),
             'storageSize': formatBytes(response.data.partitions[key].storageSize, 0),
-            'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + key + '/topic'
+            'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + this.tenantNamespaceTopic + '-partition-' + i + '/topic'
           })
         }
         var index = 0
