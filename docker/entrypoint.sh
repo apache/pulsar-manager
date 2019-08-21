@@ -1,5 +1,9 @@
 #!/bin/sh
 
+echo 'Starting Mysql Server'
+
+/pulsar-manager/startup.sh
+
 echo 'Starting Pulsar Manager Front end'
 nginx
 
