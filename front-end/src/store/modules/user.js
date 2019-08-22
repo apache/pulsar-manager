@@ -14,6 +14,7 @@
 import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { removeEnvironment } from '@/utils/environment'
+import { Message } from 'element-ui'
 
 const user = {
   state: {
@@ -62,6 +63,14 @@ const user = {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
+          if (response.data.login.indexOf('error') >= 0) {
+            Message({
+              message: 'The username or password is incorrect',
+              type: 'error',
+              duration: 5 * 1000
+            })
+            reject('login error')
+          }
           commit('SET_TOKEN', response.headers.token)
           setToken(response.headers.token)
           resolve()
