@@ -1,76 +1,107 @@
 # How to contribute
 
-If you would like to contribute code to this project, fork the repository and send a pull request.
+If you want to make contributions to Apache Pulsar Manager, follow the steps below.
 
 ## Prerequisite
 
-If you have not installed Java and Node, install it according to the [installation Java8 instruction](https://openjdk.java.net/install/) and [install Node10.15 instruction](https://nodejs.org/en/).
+Before committing code changes to Apache Pulsar Manager, you need to install required dependencies, fork the pulsar-manager repository and configure IDE.
 
-## Fork
+### Install system dependency
 
-Before contributing, you need to fork [pulsar-manager](https://github.com/streamnative/pulsar-manager) to your github repository.
+If you have not installed Java and Node, follow the instructions below.
 
-## Install dependency on Mac OS or Linux
+Dependency | Installation guide 
+|---|---
+Java 8 | https://openjdk.java.net/install/
+Node 10.15 | https://nodejs.org/en/
 
-```bash
-$ git clone git@github.com:[your-github-id]/pulsar-manager.git
-$ cd pulsar-manager
-$ ./gradlew build -x test
-$ cd front-end
-$ npm install --save
-```
+### Fork pulsar-manager repository
 
-## Setting up your IDE
+Fork the [pulsar-manager](https://github.com/streamnative/pulsar-manager) repository to your GitHub repository.
 
-pulsar-manager is using [lombok](https://projectlombok.org/) so you have to ensure your IDE setup with
-required plugins.
+### Install pulsar-manager dependency 
 
-### Intellij
+1. Clone pulsar-manager code to your machine.
+   
+    ```bash
+    $ git clone git@github.com:[your-github-id]/pulsar-manager.git
+    ```
 
-To configure annotation processing in IntelliJ:
+2. Install pulsar-manger dependencies.
+   
+    ```bash
+    $ cd pulsar-manager
 
-1. Open Annotation Processors Settings dialog box by going to
-   `Settings -> Build, Execution, Deployment -> Compiler -> Annotation Processors`.
+    $ ./gradlew build -x test
 
-2. Select the following buttons:
-   1. "Enable annotation processing"
-   2. "Obtain processors from project classpath"
+    $ cd front-end
 
-3. Click “OK”.
+    $ npm install --save
+    ```
 
-4. Install the lombok plugin in intellij.
+## Configure IDE 
 
-### Eclipse
+Apache Pulsar Manager uses [lombok](https://projectlombok.org/), so set up your IDE with the required plugins.
 
-Follow the instructions [here](https://howtodoinjava.com/automation/lombok-eclipse-installation-examples/)
-to configure your Eclipse setup.
+### Configure Intellij 
 
-## Contribution flow
+To configure annotation processing in IntelliJ, follow the steps below.
 
-```bash
-$ git remote add streamnative git@github.com:streamnative/pulsar-manager.git
-// sync with remote master
-$ git checkout master
-$ git pull streamnative master
-$ git push origin master
-// create PR branch
-$ git checkout -b your_branch   
-# do your work, and then
-$ git add [your change files]
-$ git commit -sm "commit messages"
-$ git push origin your_branch
-```
+1. In IntelliJ, click **Settings** > **Build, Execution, Deployment** > **Compiler** > **Annotation Processors** to open the **Annotation Processors Settings** window.
+
+2. Tick the checkboxes of **Enable annotation processing** and **Obtain processors from project classpath**.
+
+3. Click **OK**.
+
+### Configure Eclipse
+
+Follow the instructions [here](https://howtodoinjava.com/automation/lombok-eclipse-installation-examples/).
+
+## Contribution workflow
+
+1. Add a remote repository.
+   
+    ```bash
+    $ git remote add streamnative git@github.com:streamnative/pulsar-manager.git
+    ```
+
+2. Sync you local repository with the remote repository.
+
+    ```bash
+    $ git checkout master
+    $ git pull streamnative master
+    ```
+
+3. Create your PR and commit code changes.
+
+    ```bash
+    $ git checkout -b your_branch
+
+    $ git add [your change files]
+
+    $ git commit -m "commit messages"
+
+    $ git push origin your_branch
+    ```
+
+> #### Note
+> 
+> Apache Pulsar Manager uses the open-source protocol of Apache License 2.0. 
+>
+> If you commit code changes with new files, run the following command to add the license at the beginning of each file. 
+>
+> ```bash
+> ./gradlew licenseFormat
+> ```
 
 ## Code style
 
-Refer to [Java style doc](https://google.github.io/styleguide/javaguide.html).  
-Refer to [Vue coding style](https://vuejs.org/v2/style-guide/)
+Follow the code styles below to keep code consistent and easy to maintain.
 
-## Format header for new file
+Make sure your code looks plain and simple.
 
-The project uses the open source protocol of Apache License 2.0. If you need to create a new file when developing new features, 
-add the license at the beginning of each file by run the following command.
+Language | Code style guide 
+|---|---
+Java | https://google.github.io/styleguide/javaguide.html
+Vue | https://vuejs.org/v2/style-guide/
 
-```bash
-./gradlew licenseFormat
-```
