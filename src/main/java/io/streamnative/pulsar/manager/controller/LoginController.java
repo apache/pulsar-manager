@@ -64,7 +64,7 @@ public class LoginController {
         String userAccount = body.get("username");
         String userPassword = body.get("password");
         Map<String, Object> result = Maps.newHashMap();
-        if (userAccount != account && userPassword != password) {
+        if (userAccount.equals(account) && userPassword.equals(password)) {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String token = jwtService.toToken(account + "-" + password);
             result.put("login", "success");
