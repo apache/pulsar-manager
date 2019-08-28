@@ -396,8 +396,8 @@ export default {
       fetchBrokers(this.postForm.cluster).then(response => {
         if (!response.data) return
         for (var i = 0; i < response.data.data.length; i++) {
-          var brokerInfo = {
-          }
+          var tempBrokerList = []
+          var brokerInfo = {}
           var throughputIn = 0
           var throughputOut = 0
           var msgRateIn = 0
@@ -428,9 +428,10 @@ export default {
             brokerInfo['throughputOut'] = formatBytes(throughputOut)
             brokerInfo['msgRateOut'] = numberFormatter(msgRateOut, 2)
             brokerInfo['msgRateIn'] = numberFormatter(msgRateIn, 2)
+            tempBrokerList.push(brokerInfo)
           })
-          this.brokersList.push(brokerInfo)
         }
+        this.brokersList = tempBrokerList
       })
     },
     getNamespaceIsolationPolicy() {
