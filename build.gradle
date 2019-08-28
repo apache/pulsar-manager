@@ -20,7 +20,6 @@ plugins {
 
 repositories {
     maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
-    maven { url "https://dl.bintray.com/streamnative/maven" }
     jcenter()
 }
 
@@ -72,12 +71,10 @@ dependencies {
     compile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
     compile group: 'com.google.code.gson', name: 'gson', version: gsonVersion
-    compile group: 'org.apache.pulsar', name: 'pulsar-client', version: pulsarVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-common', version: pulsarVersion
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggeruiVersion
     compile group: 'org.powermock', name: 'powermock-api-mockito', version: apiMockitoVersion
     compile group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
-    testCompile group: 'com.h2database', name: 'h2', version: h2databaseVersion
 }

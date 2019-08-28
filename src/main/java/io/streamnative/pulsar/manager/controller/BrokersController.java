@@ -72,19 +72,5 @@ public class BrokersController {
         Map<String, Object> result = brokersService.getBrokersList(pageNum, pageSize, cluster, requestServiceUrl);
         return ResponseEntity.ok(result);
     }
-//
-//    @ApiOperation(value = "Query broker info")
-//    @ApiResponses({
-//            @ApiResponse(code = 200, message = "ok"),
-//            @ApiResponse(code = 500, message = "Internal server error")
-//    })
-//    @RequestMapping(value = "/brokers/{broker}", method = RequestMethod.GET)
-//    public ResponseEntity<Optional<BrokerEntity>> getBroker(
-//            @ApiParam(value = "The name of broker")
-//            @Size(min = 1, max = 255)
-//            @PathVariable String broker) {
-//        Optional<BrokerEntity> brokersEntity = brokersRepository.findByBroker(broker);
-//        return ResponseEntity.ok(brokersEntity);
-//    }
 
 }
