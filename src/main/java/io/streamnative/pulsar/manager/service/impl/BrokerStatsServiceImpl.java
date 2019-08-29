@@ -130,7 +130,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         });
 
         log.info("Start clearing stats from broker");
-        clearStats(unixTime, clearStatsInterval);
+        clearStats(unixTime, clearStatsInterval / 1000);
     }
 
     public void collectStatsToDB(long unixTime, String env, String cluster, String serviceUrl) {
