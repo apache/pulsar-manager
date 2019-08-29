@@ -13,10 +13,6 @@
  */
 package io.streamnative.pulsar.manager.controller;
 
-import com.github.pagehelper.Page;
-import com.google.common.collect.Maps;
-import io.streamnative.pulsar.manager.entity.NamespaceEntity;
-import io.streamnative.pulsar.manager.entity.NamespacesRepository;
 import io.streamnative.pulsar.manager.service.EnvironmentCacheService;
 import io.streamnative.pulsar.manager.service.NamespacesService;
 import io.swagger.annotations.Api;
@@ -38,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Namespace Controller class
@@ -50,9 +45,6 @@ import java.util.Optional;
 public class NamespacesController {
 
     @Autowired
-    private NamespacesRepository namespacesRepository;
-
-    @Autowired
     private NamespacesService namespacesService;
 
     @Autowired
@@ -60,28 +52,6 @@ public class NamespacesController {
 
     @Autowired
     private HttpServletRequest request;
-
-    @ApiOperation(value = "Get the list of existing namespaces, support paging, the default is 10 per page")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/namespaces", method =  RequestMethod.GET)
-    public ResponseEntity<Map<String, Object>> getNamespaces(
-            @ApiParam(value = "page_num", defaultValue = "1", example = "1")
-            @RequestParam(name = "page_num", defaultValue = "1")
-            @Min(value = 1, message = "page_num is incorrect, should be greater than 0.")
-            Integer pageNum,
-            @ApiParam(value = "page_size", defaultValue = "10", example = "10")
-            @RequestParam(name="page_size", defaultValue = "10")
-            @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
-            Integer pageSize) {
-        Page<NamespaceEntity> namespacesEntities = namespacesRepository.getNamespacesList(pageNum, pageSize);
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("total", namespacesEntities.getTotal());
-        result.put("data", namespacesEntities);
-        return ResponseEntity.ok(result);
-    }
 
     @ApiOperation(value = "Query list by the name of tenant or namespace, support paging, the default is 10 per page")
     @ApiResponses({
@@ -104,23 +74,6 @@ public class NamespacesController {
         String requestHost = environmentCacheService.getServiceUrl(request);
         Map<String, Object> result = namespacesService.getNamespaceList(pageNum, pageSize, tenantOrNamespace, requestHost);
         return ResponseEntity.ok(result);
-    }
-
-    @ApiOperation(value = "Query namespace info by tenant and namespace")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/namespaces/{tenant}/{namespace}", method = RequestMethod.GET)
-    public ResponseEntity<Optional<NamespaceEntity>> getNamespacesByTenantNamespace(
-            @ApiParam(value = "The name of tenant")
-            @Size(min = 1, max = 255)
-            @PathVariable String tenant,
-            @ApiParam(value = "The name of namespace")
-            @Size(min = 1, max = 255)
-            @PathVariable String namespace) {
-        Optional<NamespaceEntity> namespacesEntity = namespacesRepository.findByTenantNamespace(tenant, namespace);
-        return ResponseEntity.ok(namespacesEntity);
     }
 
     @ApiOperation(value = "Query namespace stats info by tenant and namespace")

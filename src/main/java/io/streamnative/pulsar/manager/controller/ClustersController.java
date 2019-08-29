@@ -13,8 +13,6 @@
  */
 package io.streamnative.pulsar.manager.controller;
 
-import io.streamnative.pulsar.manager.entity.ClusterEntity;
-import io.streamnative.pulsar.manager.entity.ClustersRepository;
 import io.streamnative.pulsar.manager.service.ClustersService;
 import io.streamnative.pulsar.manager.service.EnvironmentCacheService;
 import io.swagger.annotations.Api;
@@ -26,7 +24,6 @@ import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,9 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Cluster rest api
@@ -46,9 +41,6 @@ import java.util.Optional;
 @Api(description = "Support more flexible queries to clusters.")
 @Validated
 public class ClustersController {
-
-    @Autowired
-    private ClustersRepository clustersRepository;
 
     @Autowired
     private ClustersService clusterService;
@@ -86,19 +78,5 @@ public class ClustersController {
             });
 
         return ResponseEntity.ok(result);
-    }
-
-    @ApiOperation(value = "Query cluster info")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/clusters/{cluster}", method = RequestMethod.GET)
-    public ResponseEntity<Optional<ClusterEntity>> getCluster(
-            @ApiParam(value = "The name of cluster")
-            @Size(min = 1, max = 255)
-            @PathVariable String cluster) {
-        Optional<ClusterEntity> clustersEntity = clustersRepository.findByCluster(cluster);
-        return ResponseEntity.ok(clustersEntity);
     }
 }
