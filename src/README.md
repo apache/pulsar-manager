@@ -14,7 +14,7 @@ Pulsar manager backend is a supplement and improvement to Pulsar broker.
 | `pulsar-manager.account` | pulsar | Login account |
 | `pulsar-manager.password` | pulsar | Login password |
 | `redirect.host` | localhost | IP address of front-end service |
-| `redirect.port` | 9627 | Port of front-end service |
+| `redirect.port` | 9527 | Port of front-end service |
 | `insert.stats.interval` | 30000ms | Time interval for collecting statistical information |
 | `clear.stats.interval` | 300000ms | Time interval for cleaning statistics |
 
