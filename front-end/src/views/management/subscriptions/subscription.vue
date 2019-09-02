@@ -518,7 +518,7 @@ export default {
         return
       }
       var dateTime = new Date().getTime()
-      var timestamp = Math.floor(dateTime / 1000) - parseInt(this.form.minutes) * 60 * 1000
+      var timestamp = Math.floor(dateTime) - parseInt(this.form.minutes) * 60 * 1000
       resetCursorByTimestampOnCluster(
         this.getCurrentCluster(),
         this.postForm.persistent,

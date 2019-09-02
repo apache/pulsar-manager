@@ -551,7 +551,7 @@ export default {
       clearMessageConfirm: 'Do you confirm clear backlog?',
       reset: 'RESET',
       resetByTime: 'Reset by time',
-      resetByTimeMessage: 'Reset by time older than timestamp (in seconds)',
+      resetByTimeMessage: 'Reset by time older than timestamp (in minutes)',
       resetByTimeRequired: 'Reset Time is required',
       resetById: 'Reset By Message Id',
       messageId: 'Message ID',

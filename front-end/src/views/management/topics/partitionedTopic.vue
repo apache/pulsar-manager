@@ -608,12 +608,14 @@ export default {
       this.currentSubscription = command.subscription
     },
     resetAllSubMessage() {
+      var dateTime = new Date().getTime()
+      var timestamp = Math.floor(dateTime) - parseInt(this.form.resetByTime) * 60 * 1000
       resetCursorByTimestampOnCluster(
         this.getCurrentCluster(),
         this.postForm.persistent,
         this.tenantNamespaceTopic,
         this.currentSubscription,
-        this.form.expireTime).then(response => {
+        timestamp).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('topic.notification.resetMessageSuccess'),
