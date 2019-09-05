@@ -37,6 +37,6 @@ public interface ReplicationsStatsMapper {
     Page<ReplicationStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                     @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM replicationsStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM replicationsStats WHERE `timestamp` <= #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

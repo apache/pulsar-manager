@@ -44,7 +44,7 @@ public class PublishersStatsRepositoryImpl implements PublishersStatsRepository 
     }
 
     public void remove(long timestamp, long timeInterval) {
-        publishersStatsMapper.delete(timestamp, timeInterval);
+        publishersStatsMapper.delete(timestamp - timeInterval);
     }
 
 }

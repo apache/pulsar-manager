@@ -22,7 +22,7 @@ public interface SubscriptionsStatsMapper {
 
     @Insert("INSERT INTO subscriptionsStats(topicStatsId,subscription,msgBacklog,msgRateExpired," +
             "msgRateOut,msgThroughputOut,msgRateRedeliver,numberOfEntriesSinceFirstNotAckedMessage," +
-            "totalNonContiguousDeletedMessagesRange,subscriptionType,timestamp) " +
+            "totalNonContiguousDeletedMessagesRange,subscriptionType,`timestamp`) " +
             "VALUES(#{topicStatsId},#{subscription},#{msgBacklog},#{msgRateExpired},#{msgRateOut}," +
             "#{msgThroughputOut},#{msgRateRedeliver},#{numberOfEntriesSinceFirstNotAckedMessage}," +
             "#{totalNonContiguousDeletedMessagesRange},#{subscriptionType}," +
@@ -32,11 +32,11 @@ public interface SubscriptionsStatsMapper {
 
     @Select("SELECT subscriptionStatsId,topicStatsId,subscription,msgBacklog,msgRateExpired,msgRateOut," +
             "msgThroughputOut,msgRateRedeliver,numberOfEntriesSinceFirstNotAckedMessage," +
-            "totalNonContiguousDeletedMessagesRange,subscriptionType,timestamp FROM subscriptionsStats " +
-            "where topicStatsId=#{topicStatsId} and timestamp=#{timestamp}")
+            "totalNonContiguousDeletedMessagesRange,subscriptionType,`timestamp` FROM subscriptionsStats " +
+            "where topicStatsId=#{topicStatsId} and `timestamp`=#{timestamp}")
     Page<SubscriptionStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                      @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM subscriptionsStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM subscriptionsStats WHERE `timestamp` <= #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

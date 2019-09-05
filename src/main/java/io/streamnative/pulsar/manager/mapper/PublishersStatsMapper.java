@@ -21,18 +21,18 @@ import org.apache.ibatis.annotations.*;
 public interface PublishersStatsMapper {
 
     @Insert("INSERT INTO publishersStats(producerId,topicStatsId,producerName,msgRateIn," +
-            "msgThroughputIn,averageMsgSize,address,connectedSince,clientVersion,metadata,timestamp) " +
+            "msgThroughputIn,averageMsgSize,address,connectedSince,clientVersion,metadata,`timestamp`) " +
             "VALUES(#{producerId},#{topicStatsId},#{producerName},#{msgRateIn},#{msgThroughputIn}," +
             "#{averageMsgSize},#{address},#{connectedSince},#{clientVersion},#{metadata},#{timestamp})")
     @Options(useGeneratedKeys=true, keyProperty="publisherStatsId", keyColumn="publisherStatsId")
     void save(PublisherStatsEntity publisherStatsEntity);
 
     @Select("SELECT publisherStatsId,producerId,topicStatsId,producerName,msgRateIn,msgThroughputIn,averageMsgSize," +
-            "address,connectedSince,clientVersion,metadata,timestamp From publishersStats " +
+            "address,connectedSince,clientVersion,metadata,`timestamp` From publishersStats " +
             "WHERE topicStatsId=#{topicStatsId} and timestamp=#{timestamp}")
     Page<PublisherStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                   @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM publishersStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM publishersStats WHERE `timestamp` <= #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

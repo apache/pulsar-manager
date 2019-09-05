@@ -32,13 +32,13 @@ public interface TopicsStatsMapper {
     void insert(TopicStatsEntity topicStatsEntity);
 
     @Select("SELECT topicStatsId,environment,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
-            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
+            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,`timestamp` FROM topicsStats " +
             "ORDER BY timestamp DESC limit 1 ")
     TopicStatsEntity findMaxTime();
 
     @Select("SELECT topicStatsId,environment,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
-            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
-            "WHERE environment=#{environment} and cluster=#{cluster} and broker=#{broker} and timestamp=#{timestamp}")
+            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,`timestamp` FROM topicsStats " +
+            "WHERE environment=#{environment} and cluster=#{cluster} and broker=#{broker} and `timestamp`=#{timestamp}")
     Page<TopicStatsEntity> findByClusterBroker(
             @Param("environment") String environment,
             @Param("cluster") String cluster,
@@ -46,7 +46,7 @@ public interface TopicsStatsMapper {
             @Param("timestamp") long timestamp);
 
     @Select("SELECT topicStatsId,environment,cluster,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
-            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
+            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,`timestamp` FROM topicsStats " +
             "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} " +
             "and timestamp=#{timestamp}")
     Page<TopicStatsEntity> findByNamespace(
@@ -65,7 +65,7 @@ public interface TopicsStatsMapper {
                 + "sum(msgThroughputOut) as msgThroughputOut,"
                 + "avg(averageMsgSize) as averageMsgSize,"
                 + "sum(storageSize) as storageSize, timestamp FROM topicsStats",
-            "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} and timestamp=#{timestamp} and " +
+            "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} and `timestamp`=#{timestamp} and " +
                     "topic IN <foreach collection='topicList' item='topic' open='(' separator=',' close=')'> #{topic} </foreach>" +
             "GROUP BY cluster, persistent, topic" +
             "</script>"})
@@ -77,6 +77,6 @@ public interface TopicsStatsMapper {
             @Param("topicList") List<String> topicList,
             @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM topicsStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM topicsStats WHERE `timestamp` <= #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }
