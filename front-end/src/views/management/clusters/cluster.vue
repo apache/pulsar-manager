@@ -269,7 +269,7 @@ import { getBookiesList } from '@/api/bookies'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import MdInput from '@/components/MDinput'
 import { validateEmpty, validateServiceUrl } from '@/utils/validate'
-import { formatBytes } from '@/utils/index'
+import { formatBytes, getQueryObject } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
@@ -395,23 +395,26 @@ export default {
     getBrokerList() {
       fetchBrokers(this.postForm.cluster).then(response => {
         if (!response.data) return
+        var tempBroker = {}
         for (var i = 0; i < response.data.data.length; i++) {
-          var tempBrokerList = []
           var brokerInfo = {}
-          var throughputIn = 0
-          var throughputOut = 0
-          var msgRateIn = 0
-          var msgRateOut = 0
-          var numberNamespaces = 0
           brokerInfo['cluster'] = this.postForm.cluster
           brokerInfo['broker'] = response.data.data[i].broker
-          brokerInfo['ownedNamespaces'] = numberNamespaces
-          brokerInfo['throughputIn'] = throughputIn
-          brokerInfo['throughputOut'] = throughputOut
-          brokerInfo['msgRateOut'] = msgRateOut
-          brokerInfo['msgRateIn'] = msgRateIn
+          brokerInfo['ownedNamespaces'] = 0
+          brokerInfo['throughputIn'] = formatBytes(0)
+          brokerInfo['throughputOut'] = formatBytes(0)
+          brokerInfo['msgRateOut'] = numberFormatter(0, 2)
+          brokerInfo['msgRateIn'] = numberFormatter(0, 2)
           brokerInfo['failureDomain'] = response.data.data[i].failureDomain
+          this.brokersList.push(brokerInfo)
+          tempBroker[response.data.data[i].broker] = i
           fetchBrokerStatsMetrics(response.data.data[i].broker).then(res => {
+            var url = getQueryObject(res.request.responseURL)
+            var throughputIn = 0
+            var throughputOut = 0
+            var msgRateIn = 0
+            var msgRateOut = 0
+            var numberNamespaces = 0
             for (var m = 0; m < res.data.length; m++) {
               if (res.data[m].dimensions.hasOwnProperty('namespace')) {
                 if (res.data[m].dimensions.namespace.split('/').length === 2) {
@@ -423,15 +426,13 @@ export default {
                 }
               }
             }
-            brokerInfo['ownedNamespaces'] = numberNamespaces
-            brokerInfo['throughputIn'] = formatBytes(throughputIn)
-            brokerInfo['throughputOut'] = formatBytes(throughputOut)
-            brokerInfo['msgRateOut'] = numberFormatter(msgRateOut, 2)
-            brokerInfo['msgRateIn'] = numberFormatter(msgRateIn, 2)
-            tempBrokerList.push(brokerInfo)
+            this.brokersList[tempBroker[url['broker']]]['ownedNamespaces'] = numberNamespaces
+            this.brokersList[tempBroker[url['broker']]]['throughputIn'] = formatBytes(throughputIn)
+            this.brokersList[tempBroker[url['broker']]]['throughputOut'] = formatBytes(throughputOut)
+            this.brokersList[tempBroker[url['broker']]]['msgRateOut'] = numberFormatter(msgRateOut, 2)
+            this.brokersList[tempBroker[url['broker']]]['msgRateIn'] = numberFormatter(msgRateIn, 2)
           })
         }
-        this.brokersList = tempBrokerList
       })
     },
     getNamespaceIsolationPolicy() {
