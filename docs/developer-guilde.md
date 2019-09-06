@@ -2,7 +2,7 @@
 
 Pulsar Manager is a web-based GUI management and monitoring tool that helps administrators and users manage and monitor tenants, namespaces, topics, subscriptions, brokers, clusters, and so on, and supports dynamic configuration of multiple environments.
 
-![architecture](img/pulsar-mangaer-architecture.png)
+![architecture](img/pulsar-manager-architecture.png)
 
 The figure above illustrates how does Pulsar Manager work and how it manages multiple Pulsar environments. The Pulsar Manager comprises two parts: frontend and backend.
 
