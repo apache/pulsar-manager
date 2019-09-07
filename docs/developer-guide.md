@@ -29,6 +29,7 @@ Restful API defines the specification. If the RESTful API needs backend processi
 
 Let's take a new tenant as an example to illustrate how to develop the Pulsar Manager project.
 1. Define a RESTful API
+
 Restful API that requires backend processing
 
 * List all tenants
