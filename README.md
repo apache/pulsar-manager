@@ -29,6 +29,7 @@ The puslar-manager supports multiple environment configurations and can manage m
 ### Manage tenants
 
 ![pulsar-manager-tenants](docs/img/pulsar-manager-tenants.gif)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager?ref=badge_shield)
 
 
 ### Manage namespaces
@@ -140,3 +141,7 @@ For more information about the back end, see [pulsar-manager-backend](https://gi
 
 For more information about the front end, see [pulsar-manager-frontend](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md).
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager?ref=badge_large)
