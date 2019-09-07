@@ -28,7 +28,7 @@ The code structure of the backend is shown below.
 Restful API defines the specification. If the RESTful API needs backend processing, it needs to be prefixed with pulsar-manager. If you want to directly forward the request to the broker, you can directly define it according to the specification of Pulsar RESTful API.
 
 Let's take a new tenant as an example to illustrate how to develop the Pulsar Manager project.
-1. Define a RESTful API
+1. Define a RESTful API   
 
 Restful API that requires backend processing
 
