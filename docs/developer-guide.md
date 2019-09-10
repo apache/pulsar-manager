@@ -78,7 +78,7 @@ The development of the frontend is [here](https://github.com/streamnative/pulsar
 
 ![frontend-code](img/frontend-code.png)
 
-The frontend code structure is shown as below.
+The frontend code structure is shown as above.
 * api: code of RESTful API icons
 * router: code of frontend routings
 * lang: code of multiple languages
@@ -88,7 +88,7 @@ The frontend code structure is shown as below.
 
 1. Add a RESTful API interface.
 
-The RESTful interface is defined below the folder api. 
+The RESTful interface is defined in the `api` folder. 
 
 ![tenants-api](img/tenants-api.png)
 
