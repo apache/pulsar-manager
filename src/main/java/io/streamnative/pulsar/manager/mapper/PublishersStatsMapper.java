@@ -29,7 +29,7 @@ public interface PublishersStatsMapper {
 
     @Select("SELECT publisherStatsId,producerId,topicStatsId,producerName,msgRateIn,msgThroughputIn,averageMsgSize," +
             "address,connectedSince,clientVersion,metadata,`timestamp` From publishersStats " +
-            "WHERE topicStatsId=#{topicStatsId} and timestamp=#{timestamp}")
+            "WHERE topicStatsId=#{topicStatsId} and `timestamp`=#{timestamp}")
     Page<PublisherStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                   @Param("timestamp") long timestamp);
 

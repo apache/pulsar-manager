@@ -22,7 +22,7 @@ public interface ReplicationsStatsMapper {
 
     @Insert("INSERT INTO replicationsStats(topicStatsId,cluster,connected,msgRateIn,msgRateOut,msgThroughputIn," +
             "msgThroughputOut,replicationBacklog,replicationDelayInSeconds,inboundConnection," +
-            "inboundConnectedSince,outboundConnection,outboundConnectedSince,timestamp,msgRateExpired) " +
+            "inboundConnectedSince,outboundConnection,outboundConnectedSince,`timestamp`,msgRateExpired) " +
             "VALUES(#{topicStatsId},#{cluster},#{connected},#{msgRateIn},#{msgRateOut},#{msgThroughputIn}," +
             "#{msgThroughputOut},#{replicationBacklog},#{replicationDelayInSeconds}," +
             "#{inboundConnection},#{inboundConnectedSince},#{outboundConnection},#{outboundConnectedSince}," +
@@ -32,8 +32,8 @@ public interface ReplicationsStatsMapper {
 
     @Select("SELECT replicationStatsId,topicStatsId,cluster,connected,msgRateIn,msgRateOut,msgThroughputIn,msgThroughputOut," +
             "replicationBacklog,replicationDelayInSeconds,inboundConnection,inboundConnectedSince," +
-            "outboundConnection,outboundConnectedSince,timestamp,msgRateExpired FROM replicationsStats " +
-            "where topicStatsId=#{topicStatsId} and timestamp=#{timestamp}")
+            "outboundConnection,outboundConnectedSince,`timestamp`,msgRateExpired FROM replicationsStats " +
+            "where topicStatsId=#{topicStatsId} and `timestamp`=#{timestamp}")
     Page<ReplicationStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                     @Param("timestamp") long timestamp);
 

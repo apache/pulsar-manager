@@ -24,7 +24,7 @@ public interface TopicsStatsMapper {
 
     @Insert("INSERT INTO topicsStats(environment, cluster,broker,tenant,namespace,bundle,persistent,topic," +
             "producerCount,subscriptionCount,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "averageMsgSize,storageSize,timestamp) " +
+            "averageMsgSize,storageSize,`timestamp`) " +
             "VALUES(#{environment},#{cluster},#{broker},#{tenant},#{namespace},#{bundle},#{persistent},#{topic}," +
             "#{producerCount},#{subscriptionCount},#{msgRateIn},#{msgThroughputIn},#{msgRateOut},#{msgThroughputOut}," +
             "#{averageMsgSize},#{storageSize},#{timestamp})")
@@ -33,7 +33,7 @@ public interface TopicsStatsMapper {
 
     @Select("SELECT topicStatsId,environment,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
             "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,`timestamp` FROM topicsStats " +
-            "ORDER BY timestamp DESC limit 1 ")
+            "ORDER BY `timestamp` DESC limit 1 ")
     TopicStatsEntity findMaxTime();
 
     @Select("SELECT topicStatsId,environment,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
@@ -48,7 +48,7 @@ public interface TopicsStatsMapper {
     @Select("SELECT topicStatsId,environment,cluster,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
             "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,`timestamp` FROM topicsStats " +
             "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} " +
-            "and timestamp=#{timestamp}")
+            "and `timestamp`=#{timestamp}")
     Page<TopicStatsEntity> findByNamespace(
             @Param("environment") String environment,
             @Param("tenant") String tenant,
