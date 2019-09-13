@@ -13,9 +13,8 @@
 --
 
 CREATE TABLE IF NOT EXISTS environments (
-  name varchar(256) NOT NULL,
+  name varchar(256) NOT NULL PRIMARY KEY,
   broker varchar(1024) NOT NULL,
-  CONSTRAINT PK_name PRIMARY KEY (name),
   UNIQUE (broker)
 ) ;
 
@@ -73,8 +72,7 @@ CREATE TABLE IF NOT EXISTS replicationsStats (
   inboundConnectedSince varchar(255),
   outboundConnection varchar(255),
   outboundConnectedSince varchar(255),
-  timestamp BIGINT,
-  CONSTRAINT FK_replications_stats_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
+  timestamp BIGINT
 ) ;
 
 CREATE TABLE IF NOT EXISTS subscriptionsStats (
@@ -91,8 +89,7 @@ CREATE TABLE IF NOT EXISTS subscriptionsStats (
   subscriptionType varchar(16),
   blockedSubscriptionOnUnackedMsgs BOOLEAN,
   timestamp BIGINT,
-  UNIQUE (topicStatsId, subscription),
-  CONSTRAINT FK_subscriptions_stats_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
+  UNIQUE (topicStatsId, subscription)
 ) ;
 
 CREATE TABLE IF NOT EXISTS consumersStats (
