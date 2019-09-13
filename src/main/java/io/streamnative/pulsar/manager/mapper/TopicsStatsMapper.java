@@ -67,7 +67,7 @@ public interface TopicsStatsMapper {
                 + "sum(storageSize) as storageSize, `timestamp` FROM topicsStats",
             "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} and `timestamp`=#{timestamp} and " +
                     "topic IN <foreach collection='topicList' item='topic' open='(' separator=',' close=')'> #{topic} </foreach>" +
-            "GROUP BY cluster, persistent, topic" +
+            "GROUP BY environment, cluster, tenant, namespace, persistent, topic, `timestamp` " +
             "</script>"})
     Page<TopicStatsEntity> findByMultiTopic(
             @Param("environment") String environment,
