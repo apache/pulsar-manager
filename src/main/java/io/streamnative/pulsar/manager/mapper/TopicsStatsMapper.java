@@ -64,7 +64,7 @@ public interface TopicsStatsMapper {
                 + "sum(msgRateOut) as msgRateOut,"
                 + "sum(msgThroughputOut) as msgThroughputOut,"
                 + "avg(averageMsgSize) as averageMsgSize,"
-                + "sum(storageSize) as storageSize, timestamp FROM topicsStats",
+                + "sum(storageSize) as storageSize, `timestamp` FROM topicsStats",
             "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} and `timestamp`=#{timestamp} and " +
                     "topic IN <foreach collection='topicList' item='topic' open='(' separator=',' close=')'> #{topic} </foreach>" +
             "GROUP BY cluster, persistent, topic" +
