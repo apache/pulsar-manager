@@ -63,7 +63,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: springBootVersion
     compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: springMybatisVersion
-    compile group: 'mysql', name: 'mysql-connector-java', version: mysqlConnectorVersion
+    compile group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
     compile group: 'javax.validation', name: 'validation-api', version: javaxValidationVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt', version: jsonWebTokenVersion
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: sqliteVersion

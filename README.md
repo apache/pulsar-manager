@@ -100,6 +100,12 @@ The pulsar-manager can monitor topics and subscriptions.
         docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=com.mysql.jdbc.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar pulsar-manager /bin/sh
         ```
 
+        This is an example:
+        
+        ```
+        docker run -it -p 9527:9527 -e REDIRECT_HOST=http://192.168.0.104 -e REDIRECT_PORT=9527 -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc:postgresql://127.0.0.1:5432/pulsar_manager' -e USERNAME=pulsar -e PASSWORD=pulsar -v $PWD:/data pulsar-manager:latest /bin/sh
+        ```
+
    * Build a local environment
 
         (1) Download the source code.

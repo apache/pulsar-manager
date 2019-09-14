@@ -20,23 +20,26 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface SubscriptionsStatsMapper {
 
-    @Insert("INSERT INTO subscriptionsStats(topicStatsId,subscription,msgBacklog,msgRateExpired," +
-            "msgRateOut,msgThroughputOut,msgRateRedeliver,numberOfEntriesSinceFirstNotAckedMessage," +
-            "totalNonContiguousDeletedMessagesRange,subscriptionType,timestamp) " +
+    @Insert("INSERT INTO subscriptions_stats(topic_stats_id,subscription,msg_backlog,msg_rate_expired," +
+            "msg_rate_out,msg_throughput_out,msg_rate_redeliver,number_of_entries_since_first_not_acked_message," +
+            "total_non_contiguous_deleted_messages_range,subscription_type,time_stamp) " +
             "VALUES(#{topicStatsId},#{subscription},#{msgBacklog},#{msgRateExpired},#{msgRateOut}," +
             "#{msgThroughputOut},#{msgRateRedeliver},#{numberOfEntriesSinceFirstNotAckedMessage}," +
             "#{totalNonContiguousDeletedMessagesRange},#{subscriptionType}," +
             "#{timestamp})")
-    @Options(useGeneratedKeys=true, keyProperty="subscriptionStatsId", keyColumn="subscriptionStatsId")
+    @Options(useGeneratedKeys=true, keyProperty="subscriptionStatsId", keyColumn="subscription_stats_id")
     void save(SubscriptionStatsEntity subscriptionStatsEntity);
 
-    @Select("SELECT subscriptionStatsId,topicStatsId,subscription,msgBacklog,msgRateExpired,msgRateOut," +
-            "msgThroughputOut,msgRateRedeliver,numberOfEntriesSinceFirstNotAckedMessage," +
-            "totalNonContiguousDeletedMessagesRange,subscriptionType,timestamp FROM subscriptionsStats " +
-            "where topicStatsId=#{topicStatsId} and timestamp=#{timestamp}")
+    @Select("SELECT subscription_stats_id as subscriptionStatsId,topic_stats_id as topicStatsId," +
+            "subscription as subscription,msg_backlog as msgBacklog,msg_rate_expired as msgRateExpired," +
+            "msg_rate_out as msgRateOut,msg_throughput_out as msgThroughputOut,msg_rate_redeliver as msgRateRedeliver," +
+            "number_of_entries_since_first_not_acked_message as numberOfEntriesSinceFirstNotAckedMessage," +
+            "total_non_contiguous_deleted_messages_range as totalNonContiguousDeletedMessagesRange," +
+            "subscription_type as subscriptionType,time_stamp as timestamp FROM subscriptions_stats " +
+            "where topic_stats_id=#{topicStatsId} and time_stamp=#{timestamp}")
     Page<SubscriptionStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                      @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM subscriptionsStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
+    @Delete("DELETE FROM subscriptions_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
     void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
 }

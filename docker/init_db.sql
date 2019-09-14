@@ -1,22 +1,31 @@
-USE mysql;
-FLUSH PRIVILEGES;
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY "pulsar" WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-UPDATE user SET password=PASSWORD("pulsar") WHERE user='root';
+--
+-- Licensed under the Apache License, Version 2.0 (the "License");
+-- you may not use this file except in compliance with the License.
+-- You may obtain a copy of the License at
+--
+--     http://www.apache.org/licenses/LICENSE-2.0
+--
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
+--
+alter user pulsar with password 'pulsar';
+CREATE DATABASE pulsar_manager OWNER pulsar;
+GRANT ALL PRIVILEGES ON DATABASE pulsar_manager to pulsar;
 
-CREATE DATABASE IF NOT EXISTS pulsar_manager;
-
-USE pulsar_manager;
+\c pulsar_manager;
 
 CREATE TABLE IF NOT EXISTS environments (
   name varchar(256) NOT NULL,
   broker varchar(1024) NOT NULL,
   CONSTRAINT PK_name PRIMARY KEY (name),
   UNIQUE (broker)
-) ENGINE=InnoDB CHARACTER SET utf8;
+);
 
-CREATE TABLE IF NOT EXISTS topicsStats (
-  topicStatsId BIGINT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS topics_stats (
+  topic_stats_id BIGSERIAL PRIMARY KEY,
   environment varchar(255) NOT NULL,
   cluster varchar(255) NOT NULL,
   broker varchar(255) NOT NULL,
@@ -25,85 +34,85 @@ CREATE TABLE IF NOT EXISTS topicsStats (
   bundle varchar(255) NOT NULL,
   persistent varchar(36) NOT NULL,
   topic varchar(255) NOT NULL,
-  producerCount BIGINT,
-  subscriptionCount BIGINT,
-  msgRateIn double,
-  msgThroughputIn double,
-  msgRateOut double,
-  msgThroughputOut double,
-  averageMsgSize double,
-  storageSize double,
-  timestamp BIGINT
-) ENGINE=InnoDB CHARACTER SET utf8;
+  producer_count BIGINT,
+  subscription_count BIGINT,
+  msg_rate_in double precision	,
+  msg_throughput_in double precision	,
+  msg_rate_out double precision	,
+  msg_throughput_out double precision	,
+  average_msg_size double precision	,
+  storage_size double precision	,
+  time_stamp BIGINT
+);
 
-CREATE TABLE IF NOT EXISTS publishersStats (
-  publisherStatsId  BIGINT PRIMARY KEY AUTO_INCREMENT,
-  producerId BIGINT,
-  topicStatsId BIGINT NOT NULL,
-  producerName varchar(255) NOT NULL,
-  msgRateIn double,
-  msgThroughputIn double,
-  averageMsgSize double,
+CREATE TABLE IF NOT EXISTS publishers_stats (
+  publisher_stats_id BIGSERIAL PRIMARY KEY,
+  producer_id BIGINT,
+  topic_stats_id BIGINT NOT NULL,
+  producer_name varchar(255) NOT NULL,
+  msg_rate_in double precision	,
+  msg_throughput_in double precision	,
+  average_msg_size double precision	,
   address varchar(255),
-  connectedSince varchar(128),
-  clientVersion varchar(36),
+  connected_since varchar(128),
+  client_version varchar(36),
   metadata text,
-  timestamp BIGINT,
-  CONSTRAINT FK_publishers_stats_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
-) ENGINE=InnoDB CHARACTER SET utf8;
+  time_stamp BIGINT,
+  CONSTRAINT fk_publishers_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
+);
 
-CREATE TABLE IF NOT EXISTS replicationsStats (
-  replicationStatsId BIGINT PRIMARY KEY AUTO_INCREMENT,
-  topicStatsId BIGINT NOT NULL,
+CREATE TABLE IF NOT EXISTS replications_stats (
+  replication_stats_id BIGSERIAL PRIMARY KEY,
+  topic_stats_id BIGINT NOT NULL,
   cluster varchar(255) NOT NULL,
   connected BOOLEAN,
-  msgRateIn double,
-  msgRateOut double,
-  msgRateExpired double,
-  msgThroughputIn double,
-  msgThroughputOut double,
-  msgRateRedeliver double,
-  replicationBacklog BIGINT,
-  replicationDelayInSeconds BIGINT,
-  inboundConnection varchar(255),
-  inboundConnectedSince varchar(255),
-  outboundConnection varchar(255),
-  outboundConnectedSince varchar(255),
-  timestamp BIGINT,
-  CONSTRAINT FK_replications_stats_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
-) ENGINE=InnoDB CHARACTER SET utf8;
+  msg_rate_in double precision	,
+  msg_rate_out double precision	,
+  msg_rate_expired double precision	,
+  msg_throughput_in double precision	,
+  msg_throughput_out double precision	,
+  msg_rate_redeliver double precision	,
+  replication_backlog BIGINT,
+  replication_delay_in_seconds BIGINT,
+  inbound_connection varchar(255),
+  inbound_connected_since varchar(255),
+  outbound_connection varchar(255),
+  outbound_connected_since varchar(255),
+  time_stamp BIGINT,
+  CONSTRAINT FK_replications_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
+);
 
-CREATE TABLE IF NOT EXISTS subscriptionsStats (
-  subscriptionStatsId BIGINT PRIMARY KEY AUTO_INCREMENT,
-  topicStatsId BIGINT NOT NULL,
+CREATE TABLE IF NOT EXISTS subscriptions_stats (
+  subscription_stats_id BIGSERIAL PRIMARY KEY,
+  topic_stats_id BIGINT NOT NULL,
   subscription varchar(255) NULL,
-  msgBacklog BIGINT,
-  msgRateExpired double,
-  msgRateOut double,
-  msgThroughputOut double,
-  msgRateRedeliver double,
-  numberOfEntriesSinceFirstNotAckedMessage BIGINT,
-  totalNonContiguousDeletedMessagesRange BIGINT,
-  subscriptionType varchar(16),
-  blockedSubscriptionOnUnackedMsgs BOOLEAN,
-  timestamp BIGINT,
-  UNIQUE (topicStatsId, subscription),
-  CONSTRAINT FK_subscriptions_stats_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
-) ENGINE=InnoDB CHARACTER SET utf8;
+  msg_backlog BIGINT,
+  msg_rate_expired double precision	,
+  msg_rate_out double precision	,
+  msg_throughput_out double precision	,
+  msg_rate_redeliver double precision	,
+  number_of_entries_since_first_not_acked_message BIGINT,
+  total_non_contiguous_deleted_messages_range BIGINT,
+  subscription_type varchar(16),
+  blocked_subscription_on_unacked_msgs BOOLEAN,
+  time_stamp BIGINT,
+  UNIQUE (topic_stats_id, subscription),
+  CONSTRAINT FK_subscriptions_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
+);
 
-CREATE TABLE IF NOT EXISTS consumersStats (
-  consumerStatsId BIGINT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS consumers_stats (
+  consumer_stats_id BIGSERIAL PRIMARY KEY,
   consumer varchar(255) NOT NULL,
-  topicStatsId BIGINT NOT NUll,
-  replicationStatsId BIGINT,
-  subscriptionStatsId BIGINT,
+  topic_stats_id BIGINT NOT NUll,
+  replication_stats_id BIGINT,
+  subscription_stats_id BIGINT,
   address varchar(255),
-  availablePermits BIGINT,
-  connectedSince varchar(255),
-  msgRateOut double,
-  msgThroughputOut double,
-  msgRateRedeliver double,
-  clientVersion varchar(36),
-  timestamp BIGINT,
+  available_permits BIGINT,
+  connected_since varchar(255),
+  msg_rate_out double precision	,
+  msg_throughput_out double precision	,
+  msg_rate_redeliver double precision	,
+  client_version varchar(36),
+  time_stamp BIGINT,
   metadata text
-) ENGINE=InnoDB CHARACTER SET utf8;
+);

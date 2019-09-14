@@ -43,3 +43,4 @@ testdb
 build/
 *.db
 front-end/data/
+*.log
