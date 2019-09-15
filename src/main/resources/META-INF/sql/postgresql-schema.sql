@@ -12,19 +12,19 @@
 -- limitations under the License.
 --
 
-CREATE DATABASE IF NOT EXISTS pulsar_manager;
+CREATE DATABASE pulsar_manager;
 
-USE pulsar_manager;
+\c pulsar_manager;
 
 CREATE TABLE IF NOT EXISTS environments (
   name varchar(256) NOT NULL,
   broker varchar(1024) NOT NULL,
   CONSTRAINT PK_name PRIMARY KEY (name),
   UNIQUE (broker)
-)ENGINE=InnoDB CHARACTER SET utf8;
+);
 
 CREATE TABLE IF NOT EXISTS topics_stats (
-  topic_stats_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  topic_stats_id BIGSERIAL PRIMARY KEY,
   environment varchar(255) NOT NULL,
   cluster varchar(255) NOT NULL,
   broker varchar(255) NOT NULL,
@@ -35,42 +35,42 @@ CREATE TABLE IF NOT EXISTS topics_stats (
   topic varchar(255) NOT NULL,
   producer_count BIGINT,
   subscription_count BIGINT,
-  msg_rate_in double,
-  msg_throughput_in double,
-  msg_rate_out double,
-  msg_throughput_out double,
-  average_msg_size double,
-  storage_size double,
+  msg_rate_in double precision	,
+  msg_throughput_in double precision	,
+  msg_rate_out double precision	,
+  msg_throughput_out double precision	,
+  average_msg_size double precision	,
+  storage_size double precision	,
   time_stamp BIGINT
-)ENGINE=InnoDB CHARACTER SET utf8;
+);
 
 CREATE TABLE IF NOT EXISTS publishers_stats (
-  publisher_stats_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  publisher_stats_id BIGSERIAL PRIMARY KEY,
   producer_id BIGINT,
   topic_stats_id BIGINT NOT NULL,
   producer_name varchar(255) NOT NULL,
-  msg_rate_in double,
-  msg_throughput_in double,
-  average_msg_size double,
+  msg_rate_in double precision	,
+  msg_throughput_in double precision	,
+  average_msg_size double precision	,
   address varchar(255),
   connected_since varchar(128),
   client_version varchar(36),
   metadata text,
   time_stamp BIGINT,
-  CONSTRAINT FK_publishers_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
-)ENGINE=InnoDB CHARACTER SET utf8;
+  CONSTRAINT fk_publishers_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
+);
 
 CREATE TABLE IF NOT EXISTS replications_stats (
-  replication_stats_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  replication_stats_id BIGSERIAL PRIMARY KEY,
   topic_stats_id BIGINT NOT NULL,
   cluster varchar(255) NOT NULL,
   connected BOOLEAN,
-  msg_rate_in double,
-  msg_rate_out double,
-  msg_rate_expired double,
-  msg_throughput_in double,
-  msg_throughput_out double,
-  msg_rate_redeliver double,
+  msg_rate_in double precision	,
+  msg_rate_out double precision	,
+  msg_rate_expired double precision	,
+  msg_throughput_in double precision	,
+  msg_throughput_out double precision	,
+  msg_rate_redeliver double precision	,
   replication_backlog BIGINT,
   replication_delay_in_seconds BIGINT,
   inbound_connection varchar(255),
@@ -79,17 +79,17 @@ CREATE TABLE IF NOT EXISTS replications_stats (
   outbound_connected_since varchar(255),
   time_stamp BIGINT,
   CONSTRAINT FK_replications_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
-)ENGINE=InnoDB CHARACTER SET utf8;
+);
 
 CREATE TABLE IF NOT EXISTS subscriptions_stats (
-  subscription_stats_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  subscription_stats_id BIGSERIAL PRIMARY KEY,
   topic_stats_id BIGINT NOT NULL,
   subscription varchar(255) NULL,
   msg_backlog BIGINT,
-  msg_rate_expired double,
-  msg_rate_out double,
-  msg_throughput_out double,
-  msg_rate_redeliver double,
+  msg_rate_expired double precision	,
+  msg_rate_out double precision	,
+  msg_throughput_out double precision	,
+  msg_rate_redeliver double precision	,
   number_of_entries_since_first_not_acked_message BIGINT,
   total_non_contiguous_deleted_messages_range BIGINT,
   subscription_type varchar(16),
@@ -97,10 +97,10 @@ CREATE TABLE IF NOT EXISTS subscriptions_stats (
   time_stamp BIGINT,
   UNIQUE (topic_stats_id, subscription),
   CONSTRAINT FK_subscriptions_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
-)ENGINE=InnoDB CHARACTER SET utf8;
+);
 
 CREATE TABLE IF NOT EXISTS consumers_stats (
-  consumer_stats_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  consumer_stats_id BIGSERIAL PRIMARY KEY,
   consumer varchar(255) NOT NULL,
   topic_stats_id BIGINT NOT NUll,
   replication_stats_id BIGINT,
@@ -108,11 +108,10 @@ CREATE TABLE IF NOT EXISTS consumers_stats (
   address varchar(255),
   available_permits BIGINT,
   connected_since varchar(255),
-  msg_rate_out double,
-  msg_throughput_out double,
-  msg_rate_redeliver double,
+  msg_rate_out double precision	,
+  msg_throughput_out double precision	,
+  msg_rate_redeliver double precision	,
   client_version varchar(36),
   time_stamp BIGINT,
   metadata text
-)ENGINE=InnoDB CHARACTER SET utf8;
-
+);

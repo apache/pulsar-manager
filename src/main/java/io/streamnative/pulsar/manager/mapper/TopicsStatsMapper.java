@@ -22,33 +22,45 @@ import java.util.List;
 @Mapper
 public interface TopicsStatsMapper {
 
-    @Insert("INSERT INTO topicsStats(environment, cluster,broker,tenant,namespace,bundle,persistent,topic," +
-            "producerCount,subscriptionCount,msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut," +
-            "averageMsgSize,storageSize,timestamp) " +
+    @Insert("INSERT INTO topics_stats(environment, cluster,broker,tenant,namespace,bundle,persistent,topic," +
+            "producer_count,subscription_count,msg_rate_in,msg_throughput_in,msg_rate_out,msg_throughput_out," +
+            "average_msg_size,storage_size,time_stamp) " +
             "VALUES(#{environment},#{cluster},#{broker},#{tenant},#{namespace},#{bundle},#{persistent},#{topic}," +
             "#{producerCount},#{subscriptionCount},#{msgRateIn},#{msgThroughputIn},#{msgRateOut},#{msgThroughputOut}," +
             "#{averageMsgSize},#{storageSize},#{timestamp})")
-    @Options(useGeneratedKeys=true, keyProperty="topicStatsId", keyColumn="topicStatsId")
+    @Options(useGeneratedKeys=true, keyProperty="topicStatsId", keyColumn="topic_stats_id")
     void insert(TopicStatsEntity topicStatsEntity);
 
-    @Select("SELECT topicStatsId,environment,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
-            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
+    @Select("SELECT topic_stats_id as topicStatsId,environment as environment,cluster as cluster,broker as broker," +
+            "tenant as tenant,namespace as namespace,bundle as bundle,persistent as persistent," +
+            "topic as topic,producer_count as producerCount,subscription_count as subscriptionCount," +
+            "msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn,msg_rate_out as msgRateOut," +
+            "msg_throughput_out as msgThroughputOut,average_msg_size as averageMsgSize,storage_size as storageSize," +
+            "time_stamp as timestamp FROM topics_stats " +
             "ORDER BY timestamp DESC limit 1 ")
     TopicStatsEntity findMaxTime();
 
-    @Select("SELECT topicStatsId,environment,cluster,broker,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
-            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
-            "WHERE environment=#{environment} and cluster=#{cluster} and broker=#{broker} and timestamp=#{timestamp}")
+    @Select("SELECT topic_stats_id as topicStatsId,environment as environment,cluster as cluster,broker as broker," +
+            "tenant as tenant,namespace as namespace,bundle as bundle,persistent as persistent," +
+            "topic as topic,producer_count as producerCount,subscription_count as subscriptionCount," +
+            "msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn,msg_rate_out as msgRateOut," +
+            "msg_throughput_out as msgThroughputOut,average_msg_size as averageMsgSize,storage_size as storageSize," +
+            "time_stamp as timestamp FROM topics_stats " +
+            "WHERE environment=#{environment} and cluster=#{cluster} and broker=#{broker} and time_stamp=#{timestamp}")
     Page<TopicStatsEntity> findByClusterBroker(
             @Param("environment") String environment,
             @Param("cluster") String cluster,
             @Param("broker") String broker,
             @Param("timestamp") long timestamp);
 
-    @Select("SELECT topicStatsId,environment,cluster,tenant,namespace,bundle,persistent,topic,producerCount,subscriptionCount," +
-            "msgRateIn,msgThroughputIn,msgRateOut,msgThroughputOut,averageMsgSize,storageSize,timestamp FROM topicsStats " +
+    @Select("SELECT topic_stats_id as topicStatsId,environment as environment,cluster as cluster,broker as broker," +
+            "tenant as tenant,namespace as namespace,bundle as bundle,persistent as persistent," +
+            "topic as topic,producer_count as producerCount,subscription_count as subscriptionCount," +
+            "msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn,msg_rate_out as msgRateOut," +
+            "msg_throughput_out as msgThroughputOut,average_msg_size as averageMsgSize,storage_size as storageSize," +
+            "time_stamp as timestamp FROM topics_stats " +
             "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} " +
-            "and timestamp=#{timestamp}")
+            "and time_stamp=#{timestamp}")
     Page<TopicStatsEntity> findByNamespace(
             @Param("environment") String environment,
             @Param("tenant") String tenant,
@@ -57,17 +69,17 @@ public interface TopicsStatsMapper {
 
     @Select({"<script>",
             "SELECT environment, cluster, tenant, namespace, persistent, topic,"
-                + "sum(producerCount) as producerCount,"
-                + "sum(subscriptionCount) as subscriptionCount,"
-                + "sum(msgRateIn) as msgRateIn,"
-                + "sum(msgThroughputIn) as msgThroughputIn,"
-                + "sum(msgRateOut) as msgRateOut,"
-                + "sum(msgThroughputOut) as msgThroughputOut,"
-                + "avg(averageMsgSize) as averageMsgSize,"
-                + "sum(storageSize) as storageSize, timestamp FROM topicsStats",
-            "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} and timestamp=#{timestamp} and " +
+                + "sum(producer_count) as producerCount,"
+                + "sum(subscription_count) as subscriptionCount,"
+                + "sum(msg_rate_in) as msgRateIn,"
+                + "sum(msg_throughput_in) as msgThroughputIn,"
+                + "sum(msg_rate_out) as msgRateOut,"
+                + "sum(msg_throughput_out) as msgThroughputOut,"
+                + "avg(average_msg_size) as averageMsgSize,"
+                + "sum(storage_size) as storageSize, time_stamp as timestamp FROM topics_stats",
+            "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} and time_stamp=#{timestamp} and " +
                     "topic IN <foreach collection='topicList' item='topic' open='(' separator=',' close=')'> #{topic} </foreach>" +
-            "GROUP BY cluster, persistent, topic" +
+            "GROUP BY environment, cluster, tenant, namespace, persistent, topic, timestamp" +
             "</script>"})
     Page<TopicStatsEntity> findByMultiTopic(
             @Param("environment") String environment,
@@ -77,6 +89,6 @@ public interface TopicsStatsMapper {
             @Param("topicList") List<String> topicList,
             @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM topicsStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
+    @Delete("DELETE FROM topics_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
     void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
 }

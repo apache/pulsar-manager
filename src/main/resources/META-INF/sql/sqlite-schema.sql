@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS environments (
   UNIQUE (broker)
 );
 
-CREATE TABLE IF NOT EXISTS topicsStats (
-  topicStatsId INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS topics_stats (
+  topic_stats_id INTEGER PRIMARY KEY AUTOINCREMENT,
   environment varchar(255) NOT NULL,
   cluster varchar(255) NOT NULL,
   broker varchar(255) NOT NULL,
@@ -29,85 +29,85 @@ CREATE TABLE IF NOT EXISTS topicsStats (
   bundle varchar(255) NOT NULL,
   persistent varchar(36) NOT NULL,
   topic varchar(255) NOT NULL,
-  producerCount INTEGER,
-  subscriptionCount INTEGER,
-  msgRateIn double,
-  msgThroughputIn double,
-  msgRateOut double,
-  msgThroughputOut double,
-  averageMsgSize double,
-  storageSize double,
-  timestamp integer
+  producer_count INTEGER,
+  subscription_count INTEGER,
+  msg_rate_in double,
+  msg_throughput_in double,
+  msg_rate_out double,
+  msg_throughput_out double,
+  average_msg_size double,
+  storage_size double,
+  time_stamp integer
 );
 
-CREATE TABLE IF NOT EXISTS publishersStats (
-  publisherStatsId  INTEGER PRIMARY KEY AUTOINCREMENT,
-  producerId INTEGER,
-  topicStatsId INTEGER NOT NULL,
-  producerName varchar(255) NOT NULL,
-  msgRateIn double,
-  msgThroughputIn double,
-  averageMsgSize double,
+CREATE TABLE IF NOT EXISTS publishers_stats (
+  publisher_stats_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+  producer_id INTEGER,
+  topic_stats_id INTEGER NOT NULL,
+  producer_name varchar(255) NOT NULL,
+  msg_rate_in double,
+  msg_throughput_in double,
+  average_msg_size double,
   address varchar(255),
-  connectedSince varchar(128),
-  clientVersion varchar(36),
+  connected_since varchar(128),
+  client_version varchar(36),
   metadata text,
-  timestamp integer,
-  CONSTRAINT FK_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
+  time_stamp integer,
+  CONSTRAINT FK_publishers_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
 );
 
-CREATE TABLE IF NOT EXISTS replicationsStats (
-  replicationStatsId INTEGER PRIMARY KEY AUTOINCREMENT,
-  topicStatsId INTEGER NOT NULL,
+CREATE TABLE IF NOT EXISTS replications_stats (
+  replication_stats_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  topic_stats_id INTEGER NOT NULL,
   cluster varchar(255) NOT NULL,
   connected false,
-  msgRateIn double,
-  msgRateOut double,
-  msgRateExpired double,
-  msgThroughputIn double,
-  msgThroughputOut double,
-  msgRateRedeliver double,
-  replicationBacklog INTEGER,
-  replicationDelayInSeconds integer,
-  inboundConnection varchar(255),
-  inboundConnectedSince varchar(255),
-  outboundConnection varchar(255),
-  outboundConnectedSince varchar(255),
-  timestamp integer,
-  CONSTRAINT FK_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
+  msg_rate_in double,
+  msg_rate_out double,
+  msg_rate_expired double,
+  msg_throughput_in double,
+  msg_throughput_out double,
+  msg_rate_redeliver double,
+  replication_backlog INTEGER,
+  replication_delay_in_seconds integer,
+  inbound_connection varchar(255),
+  inbound_connected_since varchar(255),
+  outbound_connection varchar(255),
+  outbound_connected_since varchar(255),
+  time_stamp integer,
+  CONSTRAINT FK_replications_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
 );
 
-CREATE TABLE IF NOT EXISTS subscriptionsStats (
-  subscriptionStatsId INTEGER PRIMARY KEY AUTOINCREMENT,
-  topicStatsId INTEGER NOT NULL,
+CREATE TABLE IF NOT EXISTS subscriptions_stats (
+  subscription_stats_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  topic_stats_id INTEGER NOT NULL,
   subscription varchar(255) NULL,
-  msgBacklog integer,
-  msgRateExpired double,
-  msgRateOut double,
-  msgThroughputOut double,
-  msgRateRedeliver double,
-  numberOfEntriesSinceFirstNotAckedMessage integer,
-  totalNonContiguousDeletedMessagesRange integer,
-  subscriptionType varchar(16),
-  blockedSubscriptionOnUnackedMsgs false,
-  timestamp integer,
-  UNIQUE (topicStatsId, subscription),
-  CONSTRAINT FK_topic_stats_id FOREIGN KEY (topicStatsId) References topicsStats(topicStatsId)
+  msg_backlog integer,
+  msg_rate_expired double,
+  msg_rate_out double,
+  msg_throughput_out double,
+  msg_rate_redeliver double,
+  number_of_entries_since_first_not_acked_message integer,
+  total_non_contiguous_deleted_messages_range integer,
+  subscription_type varchar(16),
+  blocked_subscription_on_unacked_msgs false,
+  time_stamp integer,
+  UNIQUE (topic_stats_id, subscription),
+  CONSTRAINT FK_subscriptions_stats_topic_stats_id FOREIGN KEY (topic_stats_id) References topics_stats(topic_stats_id)
 );
 
-CREATE TABLE IF NOT EXISTS consumersStats (
-  consumerStatsId INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS consumers_stats (
+  consumer_stats_id INTEGER PRIMARY KEY AUTOINCREMENT,
   consumer varchar(255) NOT NULL,
-  topicStatsId INTEGER NOT NUll,
-  replicationStatsId integer,
-  subscriptionStatsId integer,
+  topic_stats_id INTEGER NOT NUll,
+  replication_stats_id integer,
+  subscription_stats_id integer,
   address varchar(255),
-  availablePermits integer,
-  connectedSince varchar(255),
-  msgRateOut double,
-  msgThroughputOut double,
-  msgRateRedeliver double,
-  clientVersion varchar(36),
-  timestamp integer,
+  available_permits integer,
+  connected_since varchar(255),
+  msg_rate_out double,
+  msg_throughput_out double,
+  msg_rate_redeliver double,
+  client_version varchar(36),
+  time_stamp integer,
   metadata text
 );

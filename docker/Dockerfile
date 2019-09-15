@@ -35,16 +35,13 @@ RUN apk update
 
 RUN apk add nginx \
   && apk add supervisor \
-  && apk add mysql \
-  && apk add mysql-client \
+  && apk add postgresql \
   && rm  -rf /tmp/* \
   && rm /var/cache/apk/*
 
 RUN mkdir -p /run/nginx
 
 WORKDIR /pulsar-manager
-
-COPY docker/my.cnf /etc/
 
 COPY build/libs/*.jar pulsar-manager.jar
 

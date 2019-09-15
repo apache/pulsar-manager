@@ -26,21 +26,17 @@ java -jar ./build/libs/pulsar-manager.jar --redirect.host=http://localhost --red
 
 ### Use custom databases
 
-If you have a large amount of data, you can use a custom database. The following is an example of MySQL.   
+If you have a large amount of data, you can use a custom database. The following is an example of PostgreSQL.   
 
-1. Initialize database and table structures using [file](https://github.com/streamnative/pulsar-manager/tree/master/src/main/resources/META-INF/sql/mysql-schema.sql).
+1. Initialize database and table structures using [file](https://github.com/streamnative/pulsar-manager/tree/master/src/main/resources/META-INF/sql/postgresql-schema.sql).
 
-2. Modify the [configuration file](https://github.com/streamnative/pulsar-manager/blob/master/src/main/resources/application.properties) and add MySQL configuration
+2. Modify the [configuration file](https://github.com/streamnative/pulsar-manager/blob/master/src/main/resources/application.properties) and add PostgreSQL configuration
 
 ```
-spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.datasource.url=jdbc:mysql://ip:port/pulsar_manager?useSSL=false
-spring.datasource.username=username
-spring.datasource.password=password
-spring.datasource.max-idle=10
-spring.datasource.max-wait=10000
-spring.datasource.min-idle=5
-spring.datasource.initial-size=5
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/pulsar_manager
+spring.datasource.username=postgres
+spring.datasource.password=postgres
 ```
 
 3. Compile to generate a new executable jar package

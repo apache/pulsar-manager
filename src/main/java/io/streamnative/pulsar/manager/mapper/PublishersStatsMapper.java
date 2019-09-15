@@ -20,19 +20,21 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface PublishersStatsMapper {
 
-    @Insert("INSERT INTO publishersStats(producerId,topicStatsId,producerName,msgRateIn," +
-            "msgThroughputIn,averageMsgSize,address,connectedSince,clientVersion,metadata,timestamp) " +
+    @Insert("INSERT INTO publishers_stats(producer_id,topic_stats_id,producer_name,msg_rate_in," +
+            "msg_throughput_in,average_msg_size,address,connected_since,client_version,metadata,time_stamp) " +
             "VALUES(#{producerId},#{topicStatsId},#{producerName},#{msgRateIn},#{msgThroughputIn}," +
             "#{averageMsgSize},#{address},#{connectedSince},#{clientVersion},#{metadata},#{timestamp})")
-    @Options(useGeneratedKeys=true, keyProperty="publisherStatsId", keyColumn="publisherStatsId")
+    @Options(useGeneratedKeys=true, keyProperty="publisherStatsId", keyColumn="publisher_stats_id")
     void save(PublisherStatsEntity publisherStatsEntity);
 
-    @Select("SELECT publisherStatsId,producerId,topicStatsId,producerName,msgRateIn,msgThroughputIn,averageMsgSize," +
-            "address,connectedSince,clientVersion,metadata,timestamp From publishersStats " +
-            "WHERE topicStatsId=#{topicStatsId} and timestamp=#{timestamp}")
+    @Select("SELECT publisher_stats_id as publisherStatsId,producer_id as producerId,topic_stats_id as topicStatsId," +
+            "producer_name as producerName,msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn," +
+            "average_msg_size as averageMsgSize,address as address,connected_since as connectedSince," +
+            "client_version as clientVersion,metadata as metadata,time_stamp as timestamp From publishers_stats " +
+            "WHERE topic_stats_id=#{topicStatsId} and time_stamp=#{timestamp}")
     Page<PublisherStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                   @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM publishersStats WHERE #{nowTime} - #{timeInterval} >= timestamp")
+    @Delete("DELETE FROM publishers_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
     void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
 }

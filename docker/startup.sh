@@ -1,20 +1,25 @@
 #!/bin/sh
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 
-if [ -d /app/mysql ]; then
-  echo "[i] MySQL directory already present, skipping creation"
-else
-  echo "[i] MySQL data directory not found, creating initial DBs"
-
-  mysql_install_db --user=root > /dev/null
-  mkdir -p /app/mysql
-
-  if [ ! -d "/run/mysqld" ]; then
-    mkdir -p /run/mysqld
-  fi
-
-  /usr/bin/mysqld --user=root --bootstrap --verbose=0 < /pulsar-manager/init_db.sql
-fi
-
-mysqld_safe &
-
+initdb -D /data/postgresql
+pg_ctl -D /data/postgresql start
+createdb
+psql -f /pulsar-manager/init_db.sql
 
