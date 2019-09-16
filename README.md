@@ -1,6 +1,7 @@
 # Apache Pulsar manager
 
 Apache Pulsar manager is a web-based GUI management tool for managing and monitoring Pulsar.
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager?ref=badge_shield)
 
 ## Feature
 
@@ -29,8 +30,6 @@ The puslar-manager supports multiple environment configurations and can manage m
 ### Manage tenants
 
 ![pulsar-manager-tenants](docs/img/pulsar-manager-tenants.gif)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager?ref=badge_shield)
-
 
 ### Manage namespaces
 
