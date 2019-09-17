@@ -89,6 +89,6 @@ public interface TopicsStatsMapper {
             @Param("topicList") List<String> topicList,
             @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM topics_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM topics_stats WHERE time_stamp < #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

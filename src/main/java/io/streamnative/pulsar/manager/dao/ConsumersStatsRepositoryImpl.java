@@ -61,7 +61,7 @@ public class ConsumersStatsRepositoryImpl implements ConsumersStatsRepository {
     }
 
     public void remove(long timestamp, long timeInterval) {
-        consumerStatsMapper.delete(timestamp, timeInterval);
+        consumerStatsMapper.delete(timestamp - timeInterval);
     }
 
 }

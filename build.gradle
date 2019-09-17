@@ -21,6 +21,7 @@ plugins {
 repositories {
     maven { url 'http://maven.aliyun.com/nexus/content/groups/public' }
     jcenter()
+    mavenCentral()
 }
 
 configurations {
@@ -64,6 +65,7 @@ dependencies {
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: springBootVersion
     compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: springMybatisVersion
     compile group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
+    compile group: 'org.herddb', name: 'herddb-jdbc', version: herddbVersion
     compile group: 'javax.validation', name: 'validation-api', version: javaxValidationVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt', version: jsonWebTokenVersion
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: sqliteVersion

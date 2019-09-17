@@ -35,6 +35,6 @@ public interface PublishersStatsMapper {
     Page<PublisherStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                   @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM publishers_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM publishers_stats WHERE time_stamp < #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

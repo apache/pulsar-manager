@@ -56,6 +56,6 @@ public interface ConsumerStatsMapper {
     Page<ConsumerStatsEntity> findByReplicationStatsId(@Param("replicationStatsId") long replicationStatsId,
                                                        @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM consumers_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM consumers_stats WHERE time_stamp < #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

@@ -23,11 +23,11 @@ import io.streamnative.pulsar.manager.entity.PublishersStatsRepository;
 import io.streamnative.pulsar.manager.entity.ReplicationsStatsRepository;
 import io.streamnative.pulsar.manager.entity.SubscriptionStatsEntity;
 import io.streamnative.pulsar.manager.entity.SubscriptionsStatsRepository;
-import io.streamnative.pulsar.manager.profiles.SqliteDBTestProfile;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
 import io.streamnative.pulsar.manager.entity.ReplicationStatsEntity;
 import io.streamnative.pulsar.manager.entity.TopicStatsEntity;
 import io.streamnative.pulsar.manager.entity.TopicsStatsRepository;
+import io.streamnative.pulsar.manager.profiles.HerdDBTestProfile;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,12 +46,12 @@ import java.util.Optional;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.management.*", "javax.net.ssl.*"})
+@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
 @PrepareForTest(HttpUtil.class)
 @SpringBootTest(
         classes = {
                 PulsarManagerApplication.class,
-                SqliteDBTestProfile.class
+                HerdDBTestProfile.class
         }
 )
 @ActiveProfiles("test")

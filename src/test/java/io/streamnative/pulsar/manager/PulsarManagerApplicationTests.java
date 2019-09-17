@@ -13,7 +13,7 @@
  */
 package io.streamnative.pulsar.manager;
 
-import io.streamnative.pulsar.manager.profiles.SqliteDBTestProfile;
+import io.streamnative.pulsar.manager.profiles.HerdDBTestProfile;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(
     classes = {
         PulsarManagerApplication.class,
-        SqliteDBTestProfile.class
+        HerdDBTestProfile.class
     }
 )
 @ActiveProfiles("test")

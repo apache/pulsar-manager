@@ -40,6 +40,6 @@ public interface SubscriptionsStatsMapper {
     Page<SubscriptionStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                      @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM subscriptions_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM subscriptions_stats WHERE time_stamp < #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }
