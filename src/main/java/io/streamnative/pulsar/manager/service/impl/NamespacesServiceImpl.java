@@ -82,10 +82,10 @@ public class NamespacesServiceImpl implements NamespacesService {
             double msgThroughputOut = 0;
             TopicStatsEntity topicStats = topicStatsEntity.get();
             Page<TopicStatsEntity> topicCountPage = topicsStatsRepository.findByNamespace(
-                    1, 1, env, tenant, namespace, topicStats.getTimestamp());
+                    1, 1, env, tenant, namespace, topicStats.getTime_stamp());
             topicCountPage.count(true);
             Page<TopicStatsEntity> topicStatsEntities = topicsStatsRepository.findByNamespace(
-                    1, (int) topicCountPage.getTotal(), env, tenant, namespace, topicStats.getTimestamp());
+                    1, (int) topicCountPage.getTotal(), env, tenant, namespace, topicStats.getTime_stamp());
             for (TopicStatsEntity statsEntity : topicStatsEntities.getResult()) {
                 msgRateIn += statsEntity.getMsgRateIn();
                 msgRateOut += statsEntity.getMsgRateOut();

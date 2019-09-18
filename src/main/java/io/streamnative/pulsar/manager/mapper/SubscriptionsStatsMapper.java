@@ -35,7 +35,7 @@ public interface SubscriptionsStatsMapper {
             "msg_rate_out as msgRateOut,msg_throughput_out as msgThroughputOut,msg_rate_redeliver as msgRateRedeliver," +
             "number_of_entries_since_first_not_acked_message as numberOfEntriesSinceFirstNotAckedMessage," +
             "total_non_contiguous_deleted_messages_range as totalNonContiguousDeletedMessagesRange," +
-            "subscription_type as subscriptionType,time_stamp as timestamp FROM subscriptions_stats " +
+            "subscription_type as subscriptionType,time_stamp  FROM subscriptions_stats " +
             "where topic_stats_id=#{topicStatsId} and time_stamp=#{timestamp}")
     Page<SubscriptionStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                      @Param("timestamp") long timestamp);

@@ -30,7 +30,7 @@ public interface PublishersStatsMapper {
     @Select("SELECT publisher_stats_id as publisherStatsId,producer_id as producerId,topic_stats_id as topicStatsId," +
             "producer_name as producerName,msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn," +
             "average_msg_size as averageMsgSize,address as address,connected_since as connectedSince," +
-            "client_version as clientVersion,metadata as metadata,time_stamp as timestamp From publishers_stats " +
+            "client_version as clientVersion,metadata as metadata,time_stamp  From publishers_stats " +
             "WHERE topic_stats_id=#{topicStatsId} and time_stamp=#{timestamp}")
     Page<PublisherStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                   @Param("timestamp") long timestamp);

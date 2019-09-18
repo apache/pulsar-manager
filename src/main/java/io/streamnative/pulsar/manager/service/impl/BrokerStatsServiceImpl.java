@@ -168,7 +168,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                             topicStatsEntity.setStorageSize(Double.parseDouble(df.format(topicStats.getStorageSize())));
                             topicStatsEntity.setSubscriptionCount(topicStats.getSubscriptions().size());
                             topicStatsEntity.setProducerCount(topicStats.getPublishers().size());
-                            topicStatsEntity.setTimestamp(unixTime);
+                            topicStatsEntity.setTime_stamp(unixTime);
                             long topicStatsId = topicsStatsRepository.save(topicStatsEntity);
                             if (topicStats.getSubscriptions() != null) {
                                 topicStats.getSubscriptions().forEach((subscription, subscriptionStats) -> {
@@ -186,7 +186,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                     subscriptionStatsEntity.setSubscriptionType(String.valueOf(subscriptionStats.getType()));
                                     subscriptionStatsEntity.setMsgRateExpired(Double.parseDouble(df.format(subscriptionStats.getMsgRateExpired())));
                                     subscriptionStatsEntity.setReplicated(subscriptionStats.isReplicated());
-                                    subscriptionStatsEntity.setTimestamp(unixTime);
+                                    subscriptionStatsEntity.setTime_stamp(unixTime);
                                     long subscriptionStatsId = subscriptionsStatsRepository.save(subscriptionStatsEntity);
                                     if (subscriptionStats.getConsumers() != null) {
                                         subscriptionStats.getConsumers().forEach((consumerStats) -> {
@@ -203,7 +203,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                             consumerStatsEntity.setConnectedSince(consumerStats.getConnectedSince());
                                             consumerStatsEntity.setClientVersion(consumerStats.getClientVersion());
                                             consumerStatsEntity.setMetadata(gson.toJson(consumerStats.getMetadata()));
-                                            consumerStatsEntity.setTimestamp(unixTime);
+                                            consumerStatsEntity.setTime_stamp(unixTime);
                                             consumersStatsRepository.save(consumerStatsEntity);
                                         });
                                     }
@@ -222,7 +222,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                     publisherStatsEntity.setConnectedSince(producer.getConnectedSince());
                                     publisherStatsEntity.setClientVersion(producer.getClientVersion());
                                     publisherStatsEntity.setMetadata(gson.toJson(producer.getMetadata()));
-                                    publisherStatsEntity.setTimestamp(unixTime);
+                                    publisherStatsEntity.setTime_stamp(unixTime);
                                     publishersStatsRepository.save(publisherStatsEntity);
                                 });
                             }
@@ -243,7 +243,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                                     replicationStatsEntity.setInboundConnectedSince(replicatorStats.getInboundConnectedSince());
                                     replicationStatsEntity.setOutboundConnection(replicatorStats.getOutboundConnection());
                                     replicationStatsEntity.setOutboundConnectedSince(replicatorStats.getOutboundConnectedSince());
-                                    replicationStatsEntity.setTimestamp(unixTime);
+                                    replicationStatsEntity.setTime_stamp(unixTime);
                                     replicationsStatsRepository.save(replicationStatsEntity);
                                 });
                             }

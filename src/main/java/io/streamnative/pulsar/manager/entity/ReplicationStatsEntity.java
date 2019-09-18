@@ -39,5 +39,9 @@ public class ReplicationStatsEntity {
     private String inboundConnectedSince;
     private String outboundConnection;
     private String outboundConnectedSince;
-    private long timestamp;
+    private long time_stamp;
+
+    public long getTimestamp() {
+        return time_stamp;
+    }
 }

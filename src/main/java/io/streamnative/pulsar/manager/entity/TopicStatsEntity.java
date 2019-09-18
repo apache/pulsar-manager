@@ -74,7 +74,11 @@ public class TopicStatsEntity {
     private double msgThroughputOut;
     private double averageMsgSize;
     private double storageSize;
-    private long timestamp;
+    private long time_stamp;
+
+    public long getTimestamp() {
+        return time_stamp;
+    }
 
 
     public TopicStatsSummary getSummary() {

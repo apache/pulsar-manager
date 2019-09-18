@@ -106,10 +106,10 @@ public class TopicsServiceImpl implements TopicsService {
         if (topicStatsEntity.isPresent()) {
             TopicStatsEntity topicStats = topicStatsEntity.get();
             Page<TopicStatsEntity> topicCountPage = topicsStatsRepository.findByMultiTopic(
-                    1, 1, env, tenant, namespace, persistent, topicList, topicStats.getTimestamp());
+                    1, 1, env, tenant, namespace, persistent, topicList, topicStats.getTime_stamp());
             topicCountPage.count(true);
             Page<TopicStatsEntity> topicStatsEntities = topicsStatsRepository.findByMultiTopic(
-                    0, (int) topicCountPage.getTotal(), env, tenant, namespace, persistent, topicList, topicStats.getTimestamp());
+                    0, (int) topicCountPage.getTotal(), env, tenant, namespace, persistent, topicList, topicStats.getTime_stamp());
             topicStatsEntities.getResult().forEach((t) -> {
                 tempTopicsMap.computeIfAbsent(t.getTopic(), (ignored) -> new HashMap<>())
                     .put(t.getCluster(), t);
