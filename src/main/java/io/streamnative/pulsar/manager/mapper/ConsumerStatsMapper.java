@@ -33,7 +33,7 @@ public interface ConsumerStatsMapper {
             "replication_stats_id as replicationStatsId,subscription_stats_id as subscriptionStatsId,address as address," +
             "available_permits as availablePermits,connected_since as connectedSince,msg_rate_out as msgRateOut," +
             "msg_throughput_out as msgThroughputOut,msg_rate_redeliver as msgRateRedeliver," +
-            "client_version as clientVersion,time_stamp as timestamp,metadata as metadata FROM consumers_stats " +
+            "client_version as clientVersion,time_stamp ,metadata as metadata FROM consumers_stats " +
             "where topic_stats_id=#{topicStatsId} and time_stamp=#{timestamp}")
     Page<ConsumerStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                  @Param("timestamp") long timestamp);
@@ -42,7 +42,7 @@ public interface ConsumerStatsMapper {
             "replication_stats_id as replicationStatsId,subscription_stats_id as subscriptionStatsId,address as address," +
             "available_permits as availablePermits,connected_since as connectedSince,msg_rate_out as msgRateOut," +
             "msg_throughput_out as msgThroughputOut,msg_rate_redeliver as msgRateRedeliver," +
-            "client_version as clientVersion,time_stamp as timestamp,metadata as metadata FROM consumers_stats " +
+            "client_version as clientVersion,time_stamp ,metadata as metadata FROM consumers_stats " +
             "where subscription_stats_id=#{subscriptionStatsId} and time_stamp=#{timestamp}")
     Page<ConsumerStatsEntity> findBySubscriptionStatsId(@Param("subscriptionStatsId") long subscriptionStatsId,
                                                         @Param("timestamp") long timestamp);
@@ -51,11 +51,11 @@ public interface ConsumerStatsMapper {
             "replication_stats_id as replicationStatsId,subscription_stats_id as subscriptionStatsId,address as address," +
             "available_permits as availablePermits,connected_since as connectedSince,msg_rate_out as msgRateOut," +
             "msg_throughput_out as msgThroughputOut,msg_rate_redeliver as msgRateRedeliver," +
-            "client_version as clientVersion,time_stamp as timestamp,metadata as metadata FROM consumers_stats " +
+            "client_version as clientVersion,time_stamp ,metadata as metadata FROM consumers_stats " +
             "where replication_stats_id=#{replicationStatsId} and time_stamp=#{timestamp}")
     Page<ConsumerStatsEntity> findByReplicationStatsId(@Param("replicationStatsId") long replicationStatsId,
                                                        @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM consumers_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM consumers_stats WHERE time_stamp < #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

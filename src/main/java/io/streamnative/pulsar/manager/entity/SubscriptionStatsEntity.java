@@ -37,5 +37,9 @@ public class SubscriptionStatsEntity {
     private String activeConsumerName;
     private double msgRateExpired;
     private boolean isReplicated;
-    private long timestamp;
+    private long time_stamp;
+
+    public long getTimestamp() {
+        return time_stamp;
+    }
 }

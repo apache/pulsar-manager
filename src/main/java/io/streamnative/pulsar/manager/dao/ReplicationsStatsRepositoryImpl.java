@@ -45,6 +45,6 @@ public class ReplicationsStatsRepositoryImpl implements ReplicationsStatsReposit
     }
 
     public void remove(long timestamp, long timeInterval) {
-        replicationsStatsMapper.delete(timestamp, timeInterval);
+        replicationsStatsMapper.delete(timestamp - timeInterval);
     }
 }

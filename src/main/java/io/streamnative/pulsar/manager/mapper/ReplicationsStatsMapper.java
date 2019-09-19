@@ -36,11 +36,11 @@ public interface ReplicationsStatsMapper {
             "replication_backlog as replicationBacklog,replication_delay_in_seconds as replicationDelayInSeconds," +
             "inbound_connection as inboundConnection,inbound_connected_since as inboundConnectedSince," +
             "outbound_connection as outboundConnection,outbound_connected_since as outboundConnectedSince," +
-            "time_stamp as timestamp,msg_rate_expired as msgRateExpired FROM replications_stats " +
+            "time_stamp ,msg_rate_expired as msgRateExpired FROM replications_stats " +
             "where topic_stats_id=#{topicStatsId} and time_stamp=#{timestamp}")
     Page<ReplicationStatsEntity> findByTopicStatsId(@Param("topicStatsId") long topicStatsId,
                                                     @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM replications_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM replications_stats WHERE time_stamp < #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

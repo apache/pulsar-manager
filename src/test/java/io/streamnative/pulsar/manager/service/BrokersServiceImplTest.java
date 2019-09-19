@@ -16,7 +16,7 @@ package io.streamnative.pulsar.manager.service;
 import com.google.common.collect.Maps;
 import io.streamnative.pulsar.manager.PulsarManagerApplication;
 import io.streamnative.pulsar.manager.entity.EnvironmentEntity;
-import io.streamnative.pulsar.manager.profiles.SqliteDBTestProfile;
+import io.streamnative.pulsar.manager.profiles.HerdDBTestProfile;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
 import java.util.Map;
 import org.junit.Assert;
@@ -34,12 +34,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.management.*", "javax.net.ssl.*"})
+@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
 @PrepareForTest(HttpUtil.class)
 @SpringBootTest(
     classes = {
         PulsarManagerApplication.class,
-        SqliteDBTestProfile.class
+        HerdDBTestProfile.class
     }
 )
 @ActiveProfiles("test")

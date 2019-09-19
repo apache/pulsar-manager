@@ -87,7 +87,7 @@ The pulsar-manager can monitor topics and subscriptions.
             
         * `REDIRECT_PORT`: the port of the front-end server.
 
-        * `DRIVER_CLASS_NAME`: the dirver class name of MySQL.
+        * `DRIVER_CLASS_NAME`: the driver class name of MySQL.
 
         * `URL`: the url of MySQL jdbc, example: jdbc:mysql://localhost:3306/pulsar_manager?useSSL=false
 
@@ -137,6 +137,25 @@ The pulsar-manager can monitor topics and subscriptions.
    * Password: `pulsar`  
    * Pulsar manager website: http://localhost:9527/
 
+### Default Test database HerdDB
+
+#### Introduction
+
+Pulsar Manager bundles JDBC Drivers for [HerdDB](https://github.com/diennea/herddb).
+The default confguration starts and embedded in-memory only HerdDB database.
+
+HerdDB can be used in production, you just have to use the  correct JDBC URL.
+Follow the instructions in [application.properties](https://github.com/streamnative/pulsar-manager/blob/master/src/main/resources/application.properties) to switch the connection to a standalone HerdDB service or cluster.
+
+The JDBC URL will look like this:
+jdbc:herddb:server:localhost:7000
+
+In cluster mode HerdDB uses Apache BookKeeper and Apache ZooKeeper to store data and metadata, you can share your ZooKeeper cluster and the Bookies bundled with Pulsar.
+
+The JDBC URL will look like this:
+jdbc:herddb:zookeeper:localhost:2181/herddb
+
+In order to start and setup an HerdDB database follow the instructions on the [HerdDB documentation](https://github.com/diennea/herddb/wiki).
 
 ## Back end
 

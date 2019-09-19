@@ -17,7 +17,7 @@ import com.github.pagehelper.Page;
 import io.streamnative.pulsar.manager.PulsarManagerApplication;
 import io.streamnative.pulsar.manager.entity.EnvironmentEntity;
 import io.streamnative.pulsar.manager.entity.EnvironmentsRepository;
-import io.streamnative.pulsar.manager.profiles.SqliteDBTestProfile;
+import io.streamnative.pulsar.manager.profiles.HerdDBTestProfile;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +32,7 @@ import java.util.Optional;
 @SpringBootTest(
     classes = {
         PulsarManagerApplication.class,
-        SqliteDBTestProfile.class
+        HerdDBTestProfile.class
     }
 )
 @ActiveProfiles("test")

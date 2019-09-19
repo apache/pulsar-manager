@@ -36,8 +36,8 @@ public interface TopicsStatsMapper {
             "topic as topic,producer_count as producerCount,subscription_count as subscriptionCount," +
             "msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn,msg_rate_out as msgRateOut," +
             "msg_throughput_out as msgThroughputOut,average_msg_size as averageMsgSize,storage_size as storageSize," +
-            "time_stamp as timestamp FROM topics_stats " +
-            "ORDER BY timestamp DESC limit 1 ")
+            "time_stamp  FROM topics_stats " +
+            "ORDER BY time_stamp DESC limit 1 ")
     TopicStatsEntity findMaxTime();
 
     @Select("SELECT topic_stats_id as topicStatsId,environment as environment,cluster as cluster,broker as broker," +
@@ -45,7 +45,7 @@ public interface TopicsStatsMapper {
             "topic as topic,producer_count as producerCount,subscription_count as subscriptionCount," +
             "msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn,msg_rate_out as msgRateOut," +
             "msg_throughput_out as msgThroughputOut,average_msg_size as averageMsgSize,storage_size as storageSize," +
-            "time_stamp as timestamp FROM topics_stats " +
+            "time_stamp  FROM topics_stats " +
             "WHERE environment=#{environment} and cluster=#{cluster} and broker=#{broker} and time_stamp=#{timestamp}")
     Page<TopicStatsEntity> findByClusterBroker(
             @Param("environment") String environment,
@@ -58,7 +58,7 @@ public interface TopicsStatsMapper {
             "topic as topic,producer_count as producerCount,subscription_count as subscriptionCount," +
             "msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn,msg_rate_out as msgRateOut," +
             "msg_throughput_out as msgThroughputOut,average_msg_size as averageMsgSize,storage_size as storageSize," +
-            "time_stamp as timestamp FROM topics_stats " +
+            "time_stamp  FROM topics_stats " +
             "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} " +
             "and time_stamp=#{timestamp}")
     Page<TopicStatsEntity> findByNamespace(
@@ -76,10 +76,10 @@ public interface TopicsStatsMapper {
                 + "sum(msg_rate_out) as msgRateOut,"
                 + "sum(msg_throughput_out) as msgThroughputOut,"
                 + "avg(average_msg_size) as averageMsgSize,"
-                + "sum(storage_size) as storageSize, time_stamp as timestamp FROM topics_stats",
+                + "sum(storage_size) as storageSize, time_stamp  FROM topics_stats",
             "WHERE environment=#{environment} and tenant=#{tenant} and namespace=#{namespace} and time_stamp=#{timestamp} and " +
                     "topic IN <foreach collection='topicList' item='topic' open='(' separator=',' close=')'> #{topic} </foreach>" +
-            "GROUP BY environment, cluster, tenant, namespace, persistent, topic, timestamp" +
+            "GROUP BY environment, cluster, tenant, namespace, persistent, topic, time_stamp" +
             "</script>"})
     Page<TopicStatsEntity> findByMultiTopic(
             @Param("environment") String environment,
@@ -89,6 +89,6 @@ public interface TopicsStatsMapper {
             @Param("topicList") List<String> topicList,
             @Param("timestamp") long timestamp);
 
-    @Delete("DELETE FROM topics_stats WHERE #{nowTime} - #{timeInterval} >= time_stamp")
-    void delete(@Param("nowTime") long nowTime, @Param("timeInterval") long timeInterval);
+    @Delete("DELETE FROM topics_stats WHERE time_stamp < #{refTime}")
+    void delete(@Param("refTime") long refTime);
 }

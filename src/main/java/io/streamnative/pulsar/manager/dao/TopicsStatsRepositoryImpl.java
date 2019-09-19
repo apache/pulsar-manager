@@ -79,6 +79,6 @@ public class TopicsStatsRepositoryImpl implements TopicsStatsRepository {
     }
 
     public void remove(long timestamp, long timeInterval) {
-        topicsStatsMapper.delete(timestamp, timeInterval);
+        topicsStatsMapper.delete(timestamp - timeInterval);
     }
 }

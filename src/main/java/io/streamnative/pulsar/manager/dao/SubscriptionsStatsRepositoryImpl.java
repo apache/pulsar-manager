@@ -44,6 +44,6 @@ public class SubscriptionsStatsRepositoryImpl implements SubscriptionsStatsRepos
     }
 
     public void remove(long timestamp, long timeInterval) {
-        subscriptionsStatsMapper.delete(timestamp, timeInterval);
+        subscriptionsStatsMapper.delete(timestamp - timeInterval);
     }
 }

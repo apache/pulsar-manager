@@ -38,5 +38,9 @@ public class ConsumerStatsEntity {
     private String connectedSince;
     private String clientVersion;
     private String metadata;
-    private long timestamp;
+    private long time_stamp;
+
+    public long getTimestamp() {
+        return time_stamp;
+    }
 }

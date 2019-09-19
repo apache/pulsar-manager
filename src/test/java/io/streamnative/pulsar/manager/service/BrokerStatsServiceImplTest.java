@@ -23,11 +23,11 @@ import io.streamnative.pulsar.manager.entity.PublishersStatsRepository;
 import io.streamnative.pulsar.manager.entity.ReplicationsStatsRepository;
 import io.streamnative.pulsar.manager.entity.SubscriptionStatsEntity;
 import io.streamnative.pulsar.manager.entity.SubscriptionsStatsRepository;
-import io.streamnative.pulsar.manager.profiles.SqliteDBTestProfile;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
 import io.streamnative.pulsar.manager.entity.ReplicationStatsEntity;
 import io.streamnative.pulsar.manager.entity.TopicStatsEntity;
 import io.streamnative.pulsar.manager.entity.TopicsStatsRepository;
+import io.streamnative.pulsar.manager.profiles.HerdDBTestProfile;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,12 +46,12 @@ import java.util.Optional;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.management.*", "javax.net.ssl.*"})
+@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
 @PrepareForTest(HttpUtil.class)
 @SpringBootTest(
         classes = {
                 PulsarManagerApplication.class,
-                SqliteDBTestProfile.class
+                HerdDBTestProfile.class
         }
 )
 @ActiveProfiles("test")
@@ -243,27 +243,27 @@ public class BrokerStatsServiceImplTest {
         Optional<TopicStatsEntity> topicStatsEntity = topicsStatsRepository.findMaxTime();
         TopicStatsEntity topicStatsEntity1 = topicStatsEntity.get();
         Page<TopicStatsEntity> topicStatsEntityPage = topicsStatsRepository.findByClusterBroker(
-                1, 1, environment, cluster, "localhost:8080", topicStatsEntity1.getTimestamp());
+                1, 1, environment, cluster, "localhost:8080", topicStatsEntity1.getTime_stamp());
         topicStatsEntityPage.getResult().forEach((t) -> {
             checkTopicStatsResult(t);
         });
         Page<SubscriptionStatsEntity> subscriptionStatsEntities = subscriptionsStatsRepository.findByTopicStatsId(
-                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
+                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
         subscriptionStatsEntities.getResult().forEach((subscription) -> {
             checkSubscriptionStatsResult(subscription);
             Page<ConsumerStatsEntity> consumerStatsEntities = consumersStatsRepository.findBySubscriptionStatsId(
-                    1, 1, subscription.getSubscriptionStatsId(), subscription.getTimestamp());
+                    1, 1, subscription.getSubscriptionStatsId(), subscription.getTime_stamp());
             consumerStatsEntities.getResult().forEach((consumer) -> {
                 checkConsumerStatsResult(consumer);
             });
         });
         Page<PublisherStatsEntity> publisherStatsEntities = publishersStatsRepository.findByTopicStatsId(
-                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
+                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
         publisherStatsEntities.getResult().forEach((publisher) -> {
             checkPublisherStatsResult(publisher);
         });
         Page<ReplicationStatsEntity> replicationStatsEntities = replicationsStatsRepository.findByTopicStatsId(
-                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
+                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
         replicationStatsEntities.getResult().forEach((replication) -> {
             checkReplicationStatsResult(replication);
         });
@@ -280,13 +280,13 @@ public class BrokerStatsServiceImplTest {
         Assert.assertFalse(deleteTopicStatsEntity.isPresent());
 
         Page<SubscriptionStatsEntity> deleteSubscriptionStatsEntities = subscriptionsStatsRepository.findByTopicStatsId(
-                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
+                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
         Assert.assertEquals(deleteSubscriptionStatsEntities.getTotal(), 0);
         Page<PublisherStatsEntity> deletePublisherStatsEntities = publishersStatsRepository.findByTopicStatsId(
-                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
+                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
         Assert.assertEquals(deletePublisherStatsEntities.getTotal(), 0);
         Page<ReplicationStatsEntity> deleteReplicationStatsEntities = replicationsStatsRepository.findByTopicStatsId(
-                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTimestamp());
+                1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
         Assert.assertEquals(deleteReplicationStatsEntities.getTotal(), 0);
     }
 }
