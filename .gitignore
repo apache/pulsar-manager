@@ -44,3 +44,4 @@ build/
 *.db
 front-end/data/
 *.log
+dbdata
