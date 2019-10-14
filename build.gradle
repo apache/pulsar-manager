@@ -49,6 +49,7 @@ task licenseCheckNode(type: com.hierynomus.gradle.license.tasks.LicenseCheck) {
     source = fileTree(dir: "src").include("**/*")
 }
 
+// Add VERSION
 task incrementVersion<<{
     new File(projectDir, "VERSION").text = version
 }
