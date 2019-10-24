@@ -39,6 +39,9 @@ public class TopicsServiceImpl implements TopicsService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
     @Autowired
     private TopicsStatsRepository topicsStatsRepository;
 
@@ -192,6 +195,7 @@ public class TopicsServiceImpl implements TopicsService {
             String tenant, String namespace, String persistent, String requestHost) {
         List<Map<String, String>> topicsArray = new ArrayList<>();
         Map<String, String> header = Maps.newHashMap();
+        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         header.put("Content-Type", "application/json");
         String prefix = "/admin/v2/" + persistent + "/" + tenant + "/" + namespace;
         Gson gson = new Gson();

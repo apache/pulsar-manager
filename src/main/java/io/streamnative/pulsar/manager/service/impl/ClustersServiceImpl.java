@@ -35,6 +35,9 @@ public class ClustersServiceImpl implements ClustersService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
     @Autowired
     private BrokersService brokersService;
 
@@ -49,6 +52,7 @@ public class ClustersServiceImpl implements ClustersService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             String result = HttpUtil.doGet(envServiceUrl + "/admin/v2/clusters", header);
             List<String> clustersList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
             for (String cluster: clustersList) {

@@ -37,6 +37,9 @@ public class TenantsServiceImpl implements TenantsService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
     public Map<String, Object> getTenantsList(Integer pageNum, Integer pageSize, String requestHost) {
         Map<String, Object> tenantsMap = Maps.newHashMap();
         List<Map<String, Object>> tenantsArray = new ArrayList<>();
@@ -44,6 +47,7 @@ public class TenantsServiceImpl implements TenantsService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             String result = HttpUtil.doGet( requestHost + "/admin/v2/tenants", header);
             if (result != null) {
                 List<String> tenantsList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());

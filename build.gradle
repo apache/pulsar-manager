@@ -14,7 +14,7 @@
 
 buildscript {
   ext {
-    springBootVersion = '2.0.2.RELEASE'
+    springBootVersion = '2.2.0.RELEASE'
   }
   repositories {
     mavenCentral()
@@ -46,7 +46,7 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.8.1'
+    gradleVersion = '4.10.2'
 }
 
 apply from: 'gradle/license.gradle'
@@ -71,7 +71,7 @@ task incrementVersion<<{
 dependencyManagement {
   imports {
     mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
-    mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.SR2'
+    mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Greenwich.SR3'
   }
   applyMavenExclusions = false
 }
@@ -81,7 +81,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: springBootVersion
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.1.3.RELEASE'
     compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: springMybatisVersion
     compile group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
     compile group: 'org.herddb', name: 'herddb-jdbc', version: herddbVersion

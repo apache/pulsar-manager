@@ -61,6 +61,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     @Value("${backend.directRequestHost}")
     private String directRequestHost;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
     @Value("${clear.stats.interval}")
     private Long clearStatsInterval;
 
@@ -96,13 +99,14 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     }};
 
     public String forwarBrokerStatsMetrics(String broker, String requestHost) {
+        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
 
         broker = checkServiceUrl(broker, requestHost);
         return HttpUtil.doGet(broker + "/admin/v2/broker-stats/metrics", header);
     }
 
     public String forwardBrokerStatsTopics(String broker, String requestHost) {
-
+        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         broker = checkServiceUrl(broker, requestHost);
         return HttpUtil.doGet(broker + "/admin/v2/broker-stats/topics", header);
     }
@@ -134,6 +138,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     }
 
     public void collectStatsToDB(long unixTime, String env, String cluster, String serviceUrl) {
+        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         Map<String, Object> brokerObject = brokersService.getBrokersList(0, 0, cluster, serviceUrl);
         List<HashMap<String, Object>> brokerLists = (List<HashMap<String, Object>>) brokerObject.get("data");
         brokerLists.forEach((brokerMap) -> {

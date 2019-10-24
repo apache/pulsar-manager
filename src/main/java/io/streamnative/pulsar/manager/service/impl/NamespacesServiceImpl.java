@@ -34,6 +34,9 @@ public class NamespacesServiceImpl implements NamespacesService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
     @Autowired
     private TopicsStatsRepository topicsStatsRepository;
 
@@ -47,6 +50,7 @@ public class NamespacesServiceImpl implements NamespacesService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             String result = HttpUtil.doGet(requestHost + "/admin/v2/namespaces/" + tenant, header);
             if (result != null) {
                 List<String> namespacesList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());

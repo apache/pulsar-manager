@@ -45,3 +45,5 @@ build/
 front-end/data/
 *.log
 dbdata
+src/main/resources/local.properties
+

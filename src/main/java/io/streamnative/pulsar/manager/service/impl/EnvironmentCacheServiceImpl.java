@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.common.policies.data.ClusterData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +46,9 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
     @Autowired
     private EnvironmentsRepository environmentsRepository;
+
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
 
     private final Map<String, Map<String, ClusterData>> environments;
 
@@ -99,6 +103,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
     private Map<String, String> jsonHeader() {
         Map<String, String> header = Maps.newHashMap();
+        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         header.put("Content-Type", "application/json");
         return header;
     }

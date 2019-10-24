@@ -44,8 +44,12 @@ public class BookiesServiceImpl implements BookiesService {
     @Value("${bookie.enable}")
     private Boolean bookieEnable;
 
+    @Value("${backend.jwt.token}")
+    private static String pulsarJwtToken;
+
     private static final Map<String, String> header = new HashMap<String, String>(){{
         put("Content-Type","application/json");
+        put("Authorization", String.format("Bearer %s", pulsarJwtToken));
     }};
 
     private final Pattern pattern = Pattern.compile(" \\d+");;
@@ -57,6 +61,7 @@ public class BookiesServiceImpl implements BookiesService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             String rwBookieList = HttpUtil.doGet(
                     bookieHost + "/api/v1/bookie/list_bookies?type=rw&print_hostnames=true", header);
             Map<String, String> rwBookies = gson.fromJson(

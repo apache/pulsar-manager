@@ -31,6 +31,9 @@ public class BrokersServiceImpl implements BrokersService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
 
     public Map<String, Object> getBrokersList(Integer pageNum, Integer pageSize, String cluster, String requestHost) {
         Map<String, Object> brokersMap = Maps.newHashMap();
@@ -39,6 +42,7 @@ public class BrokersServiceImpl implements BrokersService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             String failureDomainsResult = HttpUtil.doGet(
                     requestHost + "/admin/v2/clusters/" + cluster + "/failureDomains", header);
             Map<String, Map<String, List<String>>> failureDomains = gson.fromJson(
