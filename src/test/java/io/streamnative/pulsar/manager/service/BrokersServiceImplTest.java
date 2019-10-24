@@ -19,6 +19,8 @@ import io.streamnative.pulsar.manager.entity.EnvironmentEntity;
 import io.streamnative.pulsar.manager.profiles.HerdDBTestProfile;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,7 +59,10 @@ public class BrokersServiceImplTest {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
-        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
+
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
                 .thenReturn("{\"test\":{\"brokers\":[\"tengdeMBP:8080\"]}}");
 

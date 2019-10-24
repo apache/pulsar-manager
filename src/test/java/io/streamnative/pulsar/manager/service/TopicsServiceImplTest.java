@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 import io.streamnative.pulsar.manager.PulsarManagerApplication;
 import io.streamnative.pulsar.manager.profiles.HerdDBTestProfile;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -70,7 +71,9 @@ public class TopicsServiceImplTest {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
-        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/persistent/public/default", header))
                 .thenReturn(topics);
         PowerMockito.when(HttpUtil.doGet(
@@ -92,7 +95,9 @@ public class TopicsServiceImplTest {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
-        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
                 .thenReturn("[\"standalone\"]");
 

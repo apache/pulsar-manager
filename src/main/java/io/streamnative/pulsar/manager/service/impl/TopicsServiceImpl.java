@@ -22,6 +22,7 @@ import io.streamnative.pulsar.manager.entity.TopicStatsEntity.TopicStatsSummary;
 import io.streamnative.pulsar.manager.entity.TopicsStatsRepository;
 import io.streamnative.pulsar.manager.service.TopicsService;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,7 +196,9 @@ public class TopicsServiceImpl implements TopicsService {
             String tenant, String namespace, String persistent, String requestHost) {
         List<Map<String, String>> topicsArray = new ArrayList<>();
         Map<String, String> header = Maps.newHashMap();
-        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
         header.put("Content-Type", "application/json");
         String prefix = "/admin/v2/" + persistent + "/" + tenant + "/" + namespace;
         Gson gson = new Gson();

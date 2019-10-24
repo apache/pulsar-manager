@@ -103,7 +103,9 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
     private Map<String, String> jsonHeader() {
         Map<String, String> header = Maps.newHashMap();
-        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
         header.put("Content-Type", "application/json");
         return header;
     }
