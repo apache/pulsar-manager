@@ -37,6 +37,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -59,6 +60,9 @@ public class BrokerStatsServiceImplTest {
 
     @Autowired
     private BrokerStatsService brokerStatsService;
+
+    @Value("${backend.jwt.token}")
+    private static String pulsarJwtToken;
 
     @Autowired
     private TopicsStatsRepository topicsStatsRepository;
@@ -217,6 +221,7 @@ public class BrokerStatsServiceImplTest {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
+        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
                 .thenReturn("[\"standalone\"]");
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone", header))
