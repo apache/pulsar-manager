@@ -20,6 +20,8 @@ import io.streamnative.pulsar.manager.service.BrokersService;
 import io.streamnative.pulsar.manager.service.ClustersService;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
 import java.util.function.Function;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.common.policies.data.ClusterData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +37,9 @@ public class ClustersServiceImpl implements ClustersService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
     @Autowired
     private BrokersService brokersService;
 
@@ -49,6 +54,9 @@ public class ClustersServiceImpl implements ClustersService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            if (StringUtils.isNotBlank(pulsarJwtToken)) {
+                header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+            }
             String result = HttpUtil.doGet(envServiceUrl + "/admin/v2/clusters", header);
             List<String> clustersList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
             for (String cluster: clustersList) {

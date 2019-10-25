@@ -18,6 +18,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import io.streamnative.pulsar.manager.service.BookiesService;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +45,12 @@ public class BookiesServiceImpl implements BookiesService {
     @Value("${bookie.enable}")
     private Boolean bookieEnable;
 
+    @Value("${backend.jwt.token}")
+    private static String pulsarJwtToken;
+
     private static final Map<String, String> header = new HashMap<String, String>(){{
         put("Content-Type","application/json");
+        put("Authorization", String.format("Bearer %s", pulsarJwtToken));
     }};
 
     private final Pattern pattern = Pattern.compile(" \\d+");;
@@ -57,6 +62,9 @@ public class BookiesServiceImpl implements BookiesService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            if (StringUtils.isNotBlank(pulsarJwtToken)) {
+                header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+            }
             String rwBookieList = HttpUtil.doGet(
                     bookieHost + "/api/v1/bookie/list_bookies?type=rw&print_hostnames=true", header);
             Map<String, String> rwBookies = gson.fromJson(

@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +41,8 @@ public class EnvironmentForward extends ZuulFilter {
 
     @Autowired
     private EnvironmentCacheService environmentCacheService;
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
 
     @Override
     public String filterType() {
@@ -89,12 +92,13 @@ public class EnvironmentForward extends ZuulFilter {
     private Object forwardRequest(RequestContext ctx, HttpServletRequest request, String serviceUrl) {
         ctx.put(REQUEST_URI_KEY, request.getRequestURI());
         try {
+            ctx.addZuulRequestHeader("Authorization", String.format("Bearer %s", pulsarJwtToken));
             ctx.setRouteHost(new URL(serviceUrl));
             log.info("Forward request to {} @ path {}",
-                serviceUrl, request.getRequestURI());
+                    serviceUrl, request.getRequestURI());
         } catch (MalformedURLException e) {
             log.error("Route forward to {} path {} error: {}",
-                serviceUrl, request.getRequestURI(), e.getMessage());
+                    serviceUrl, request.getRequestURI(), e.getMessage());
         }
         return null;
     }

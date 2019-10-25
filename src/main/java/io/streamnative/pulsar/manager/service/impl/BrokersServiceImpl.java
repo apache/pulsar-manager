@@ -18,6 +18,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import io.streamnative.pulsar.manager.service.BrokersService;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,9 @@ public class BrokersServiceImpl implements BrokersService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
 
     public Map<String, Object> getBrokersList(Integer pageNum, Integer pageSize, String cluster, String requestHost) {
         Map<String, Object> brokersMap = Maps.newHashMap();
@@ -39,6 +43,9 @@ public class BrokersServiceImpl implements BrokersService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            if (StringUtils.isNotBlank(pulsarJwtToken)) {
+                header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+            }
             String failureDomainsResult = HttpUtil.doGet(
                     requestHost + "/admin/v2/clusters/" + cluster + "/failureDomains", header);
             Map<String, Map<String, List<String>>> failureDomains = gson.fromJson(

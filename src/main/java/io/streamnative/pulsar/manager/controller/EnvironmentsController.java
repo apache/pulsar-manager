@@ -24,8 +24,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,6 +51,9 @@ public class EnvironmentsController {
 
     @Autowired
     private EnvironmentsRepository environmentsRepository;
+
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
 
     @Autowired
     private EnvironmentCacheService environmentCacheService;
@@ -102,6 +107,9 @@ public class EnvironmentsController {
         }
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
         String httpTestResult = HttpUtil.doGet(environmentEntity.getBroker() + "/metrics", header);
         if (httpTestResult == null) {
             result.put("error", "This environment is error. Please check it");
@@ -129,6 +137,9 @@ public class EnvironmentsController {
         }
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
         String httpTestResult = HttpUtil.doGet(environmentEntity.getBroker() + "/metrics", header);
         if (httpTestResult == null) {
             result.put("error", "This environment is error. Please check it");

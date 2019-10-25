@@ -22,6 +22,7 @@ import io.streamnative.pulsar.manager.entity.TopicsStatsRepository;
 import io.streamnative.pulsar.manager.service.NamespacesService;
 import io.streamnative.pulsar.manager.service.TopicsService;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,9 @@ public class NamespacesServiceImpl implements NamespacesService {
 
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
+
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
 
     @Autowired
     private TopicsStatsRepository topicsStatsRepository;
@@ -47,6 +51,9 @@ public class NamespacesServiceImpl implements NamespacesService {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
             header.put("Content-Type", "application/json");
+            if (StringUtils.isNotBlank(pulsarJwtToken)) {
+                header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+            }
             String result = HttpUtil.doGet(requestHost + "/admin/v2/namespaces/" + tenant, header);
             if (result != null) {
                 List<String> namespacesList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());

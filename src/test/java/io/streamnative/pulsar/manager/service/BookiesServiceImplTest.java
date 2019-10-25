@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 import io.streamnative.pulsar.manager.PulsarManagerApplication;
 import io.streamnative.pulsar.manager.profiles.HerdDBTestProfile;
 import io.streamnative.pulsar.manager.utils.HttpUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +27,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -50,11 +52,17 @@ public class BookiesServiceImplTest {
     @Autowired
     private BookiesService bookiesService;
 
+    @Value("${backend.jwt.token}")
+    private static String pulsarJwtToken;
+
     @Test
     public void bookiesServiceTest() {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
         PowerMockito.when(HttpUtil.doGet("http://localhost:8050/api/v1/bookie/list_bookies?type=rw&print_hostnames=true", header))
                 .thenReturn("{\"192.168.2.116:3181\" : \"192.168.2.116\"}");
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
