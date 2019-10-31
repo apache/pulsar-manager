@@ -16,7 +16,10 @@ package io.streamnative.pulsar.manager.zuul;
 import io.streamnative.pulsar.manager.service.EnvironmentCacheService;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import io.streamnative.pulsar.manager.service.JwtService;
+import io.streamnative.pulsar.manager.utils.PulsarManagerConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
@@ -38,6 +42,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class EnvironmentForward extends ZuulFilter {
 
     private static final Logger log = LoggerFactory.getLogger(EnvironmentForward.class);
+    @Autowired
+    private JwtService jwtService;
 
     @Autowired
     private EnvironmentCacheService environmentCacheService;
@@ -92,6 +98,19 @@ public class EnvironmentForward extends ZuulFilter {
     private Object forwardRequest(RequestContext ctx, HttpServletRequest request, String serviceUrl) {
         ctx.put(REQUEST_URI_KEY, request.getRequestURI());
         try {
+            Optional<String> subFromToken = jwtService.getSubFromToken(request.getHeader("token"));
+//            Read only users are not allowed to make any modification.
+            if (subFromToken.isPresent()) {
+                String role = subFromToken.get().split(PulsarManagerConstants.JWT_SUB_SEPARATOR)[1];
+                if (role.equalsIgnoreCase(PulsarManagerConstants.READONLY_ROLE_NAME)) {
+                    if (!request.getMethod().equalsIgnoreCase("GET")) {
+                        ctx.setSendZuulResponse(false);
+                        ctx.setResponseStatusCode(HttpStatus.FORBIDDEN_403);
+
+                    }
+                }
+            }
+
             ctx.addZuulRequestHeader("Authorization", String.format("Bearer %s", pulsarJwtToken));
             ctx.setRouteHost(new URL(serviceUrl));
             log.info("Forward request to {} @ path {}",

@@ -15,6 +15,7 @@ package io.streamnative.pulsar.manager.controller;
 
 import com.google.common.collect.Maps;
 import io.streamnative.pulsar.manager.service.JwtService;
+import io.streamnative.pulsar.manager.utils.PulsarManagerConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -50,6 +51,12 @@ public class LoginController {
     @Value("${pulsar-manager.password}")
     private String password;
 
+    @Value("${pulsar-manager.readonly-account}")
+    private String readOnlyAccount;
+
+    @Value("${pulsar-manager.readonly-password}")
+    private String readOnlyPassword;
+
     @Autowired
     private JwtService jwtService;
 
@@ -64,9 +71,12 @@ public class LoginController {
         String userAccount = body.get("username");
         String userPassword = body.get("password");
         Map<String, Object> result = Maps.newHashMap();
-        if (userAccount.equals(account) && userPassword.equals(password)) {
+        if (userAccount.equals(account) && userPassword.equals(password) || userAccount.equals(readOnlyAccount) && userPassword.equals(readOnlyPassword)) {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-            String token = jwtService.toToken(account + "-" + password);
+            String token = jwtService.toToken(account + PulsarManagerConstants.JWT_SUB_SEPARATOR + PulsarManagerConstants.READONLY_ROLE_NAME);
+            if (userAccount.equals(account)) {
+                token = jwtService.toToken(account + PulsarManagerConstants.JWT_SUB_SEPARATOR + PulsarManagerConstants.ADMIN_ROLE_NAME);
+            }
             result.put("login", "success");
             HttpHeaders headers = new HttpHeaders();
             headers.add("token", token);

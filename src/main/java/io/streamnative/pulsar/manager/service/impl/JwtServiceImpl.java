@@ -19,6 +19,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class JwtServiceImpl implements JwtService {
+    private static final Logger log = LoggerFactory.getLogger(JwtServiceImpl.class);
 
     private String secret;
     private int sessionTime;
@@ -58,12 +61,13 @@ public class JwtServiceImpl implements JwtService {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return Optional.ofNullable(claimsJws.getBody().getSubject());
         } catch (Exception e) {
+            log.warn("jwt token parsing failed" , e);
             return Optional.empty();
         }
     }
 
     private Date expireTimeFromNow() {
-        return new Date(System.currentTimeMillis() + sessionTime * 1000);
+        return new Date(System.currentTimeMillis() + sessionTime * 1000L);
     }
 
     @Override
