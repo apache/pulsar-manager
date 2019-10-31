@@ -63,7 +63,7 @@ The pulsar-manager can monitor topics and subscriptions.
 
 ### Manage Token
 
-![pulsar-manager-token](docs/img/pulsar-manager-topics-token.gif)
+![pulsar-manager-token](docs/img/pulsar-manager-token.gif)
 
 
 ## Prerequisites
