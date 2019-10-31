@@ -185,7 +185,7 @@
               :placeholder="$t('namespace.policy.selectRole')"
               multiple
               style="width:300px;"
-              @change="handleChangeOptions()">
+              @change="handleChangeOptions(tag)">
               <el-option
                 v-for="item in roleMapOptions[tag]"
                 :key="item.value"
@@ -1090,7 +1090,8 @@ export default {
       getPermissions(tenantNamespace).then(response => {
         if (!response.data) return
         for (var key in response.data) {
-          this.roleMap[key] = response.data.key
+          this.dynamicTags.push(key)
+          this.roleMap[key] = response.data[key]
           this.roleMapOptions[key] = this.roleOptions
         }
       })
@@ -1255,7 +1256,15 @@ export default {
       this.inputVisible = false
       this.inputValue = ''
     },
-    handleChangeOptions() {
+    handleChangeOptions(role) {
+      grantPermissions(this.tenantNamespace, role, this.roleMap[role]).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('namespace.notification.addRoleActionsSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+      })
       this.$forceUpdate()
     },
     revokeAllRole() {

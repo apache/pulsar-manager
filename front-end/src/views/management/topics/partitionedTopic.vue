@@ -201,7 +201,7 @@
               :placeholder="$t('topic.selectRoleMessage')"
               multiple
               style="width:300px;"
-              @change="handleChangeOptions()">
+              @change="handleChangeOptions(tag)">
               <el-option
                 v-for="item in roleMapOptions[tag]"
                 :key="item.value"
@@ -270,7 +270,10 @@ import {
   deletePartitionTopicOnCluster,
   expireMessagesAllSubscriptionsOnCluster,
   resetCursorByTimestampOnCluster,
-  clearBacklogOnCluster
+  clearBacklogOnCluster,
+  getPermissionsOnCluster,
+  grantPermissionsOnCluster,
+  revokePermissionsOnCluster
 } from '@/api/topics'
 import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
@@ -369,6 +372,7 @@ export default {
     this.getTopicsList()
     this.getReplicatedClusters()
     this.initTopicStats()
+    this.initPermissions()
   },
   methods: {
     getRemoteTenantsList() {
@@ -505,6 +509,16 @@ export default {
     getCurrentCluster() {
       return this.clusterForm.cluster || ''
     },
+    initPermissions() {
+      getPermissionsOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.tenantNamespaceTopic).then(response => {
+        if (!response.data) return
+        for (var key in response.data) {
+          this.dynamicTags.push(key)
+          this.roleMap[key] = response.data[key]
+          this.roleMapOptions[key] = this.roleOptions
+        }
+      })
+    },
     handleClick(tab, event) {
       this.currentTabName = tab.name
       this.$router.push({ query: {
@@ -514,6 +528,16 @@ export default {
     },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+      revokePermissionsOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.tenantNamespaceTopic, tag).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('namespace.notification.removeRoleSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        delete this.roleMap[tag]
+        delete this.roleMapOptions[tag]
+      })
     },
     showInput() {
       this.inputVisible = true
@@ -533,22 +557,30 @@ export default {
           this.inputValue = ''
           return
         }
-        // grantPermissions(this.currentNamespace, inputValue, this.roleMap[inputValue]).then(response => {
-        //   this.$notify({
-        //     title: 'success',
-        //     message: 'Add success',
-        //     type: 'success',
-        //     duration: 3000
-        //   })
-        //   this.dynamicTags.push(inputValue)
-        //   this.roleMap[inputValue] = []
-        //   this.roleMapOptions[inputValue] = this.roleOptions
-        // })
+        grantPermissionsOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.tenantNamespaceTopic, inputValue, this.roleMap[inputValue]).then(response => {
+          this.$notify({
+            title: 'success',
+            message: this.$i18n.t('namespace.notification.addRoleSuccess'),
+            type: 'success',
+            duration: 3000
+          })
+          this.dynamicTags.push(inputValue)
+          this.roleMap[inputValue] = []
+          this.roleMapOptions[inputValue] = this.roleOptions
+        })
       }
       this.inputVisible = false
       this.inputValue = ''
     },
-    handleChangeOptions() {
+    handleChangeOptions(role) {
+      grantPermissionsOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.tenantNamespaceTopic, role, this.roleMap[role]).then(response => {
+        this.$notify({
+          title: 'success',
+          message: 'Set permissions success',
+          type: 'success',
+          duration: 3000
+        })
+      })
       this.$forceUpdate()
     },
     handleDeletePartitionTopic() {
@@ -646,6 +678,12 @@ export default {
 </script>
 
 <style>
+.role-el-tag {
+  background-color: #fff !important;
+  border: none !important;
+  font-size: 16px !important;
+  color: black !important;
+}
 .split-line {
   background: #e6e9f3;
   border: none;

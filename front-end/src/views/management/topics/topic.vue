@@ -452,7 +452,7 @@
               multiple
               placeholder="Please Select Options"
               style="width:300px;"
-              @change="handleChangeOptions()">
+              @change="handleChangeOptions(tag)">
               <el-option
                 v-for="item in roleMapOptions[tag]"
                 :key="item.value"
@@ -511,7 +511,10 @@ import {
   compactionStatusOnCluster,
   offloadOnCluster,
   offloadStatusOnCluster,
-  deleteTopicOnCluster
+  deleteTopicOnCluster,
+  getPermissionsOnCluster,
+  grantPermissionsOnCluster,
+  revokePermissionsOnCluster
 } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import { formatBytes } from '@/utils/index'
@@ -654,6 +657,7 @@ export default {
       this.getOffloadStatus()
     }
     this.loaded = true
+    this.initPermissions()
   },
   methods: {
     onClusterChanged() {
@@ -896,8 +900,28 @@ export default {
         this.initTerminateAndSegments()
       })
     },
+    initPermissions() {
+      getPermissionsOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
+        if (!response.data) return
+        for (var key in response.data) {
+          this.dynamicTags.push(key)
+          this.roleMap[key] = response.data[key]
+          this.roleMapOptions[key] = this.roleOptions
+        }
+      })
+    },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+      revokePermissionsOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), tag).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('namespace.notification.removeRoleSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        delete this.roleMap[tag]
+        delete this.roleMapOptions[tag]
+      })
     },
     showInput() {
       this.inputVisible = true
@@ -917,22 +941,30 @@ export default {
           this.inputValue = ''
           return
         }
-        // grantPermissions(this.currentNamespace, inputValue, this.roleMap[inputValue]).then(response => {
-        //   this.$notify({
-        //     title: 'success',
-        //     message: 'Add success',
-        //     type: 'success',
-        //     duration: 3000
-        //   })
-        //   this.dynamicTags.push(inputValue)
-        //   this.roleMap[inputValue] = []
-        //   this.roleMapOptions[inputValue] = this.roleOptions
-        // })
+        grantPermissionsOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), inputValue, this.roleMap[inputValue]).then(response => {
+          this.$notify({
+            title: 'success',
+            message: this.$i18n.t('namespace.notification.addRoleSuccess'),
+            type: 'success',
+            duration: 3000
+          })
+          this.dynamicTags.push(inputValue)
+          this.roleMap[inputValue] = []
+          this.roleMapOptions[inputValue] = this.roleOptions
+        })
       }
       this.inputVisible = false
       this.inputValue = ''
     },
-    handleChangeOptions() {
+    handleChangeOptions(role) {
+      grantPermissionsOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), role, this.roleMap[role]).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('namespace.notification.addRoleActionsSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+      })
       this.$forceUpdate()
     },
     getFullTopic() {
@@ -984,6 +1016,12 @@ export default {
 </script>
 
 <style>
+.role-el-tag {
+  background-color: #fff !important;
+  border: none !important;
+  font-size: 16px !important;
+  color: black !important;
+}
 .split-line {
   background: #e6e9f3;
   border: none;

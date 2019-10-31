@@ -226,6 +226,13 @@ export const constantRouterMap = [
         name: 'Bookies',
         meta: { title: 'Bookies', noCache: true },
         hidden: true
+      },
+      {
+        path: '/tokens',
+        component: () => import('@/views/management/tokens/index'),
+        name: 'Tokens',
+        meta: { title: 'Tokens', noCache: true },
+        hidden: false
       }
     ]
   }

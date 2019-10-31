@@ -163,6 +163,40 @@ export function deletePartitionTopicOnCluster(cluster, persistent, tenantNamespa
   })
 }
 
+export function getPermissionsOnCluster(cluster, persistent, tenantNamespaceTopic) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/permissions`,
+    method: 'get'
+  })
+}
+
+export function grantPermissionsOnCluster(cluster, persistent, tenantNamespaceTopic, role, data) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/permissions/${role}`,
+    method: 'post',
+    data
+  })
+}
+
+export function revokePermissionsOnCluster(cluster, persistent, tenantNamespaceTopic, role) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/permissions/${role}`,
+    method: 'delete'
+  })
+}
+
 export function getPermissions(tenantNamespaceTopic) {
   return request({
     url: BASE_URL_V2 + `/persistent/${tenantNamespaceTopic}/permissions`,

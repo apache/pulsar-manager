@@ -11,27 +11,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.streamnative.pulsar.manager.service;
+package io.streamnative.pulsar.manager.entity;
 
-import io.jsonwebtoken.Claims;
-import org.springframework.stereotype.Service;
+import com.github.pagehelper.Page;
+import org.springframework.stereotype.Repository;
 
-import java.security.Key;
 import java.util.Optional;
 
-public interface JwtService {
+@Repository
+public interface BrokerTokensRepository {
 
-    String toToken(String id);
+    long save(BrokerTokenEntity brokerTokenEntity);
 
-    Optional<String> getSubFromToken(String token);
+    void update(BrokerTokenEntity brokerTokenEntity);
 
-    String createBrokerToken(String role, String expiryTime);
+    void remove(String role);
 
-    Claims validateBrokerToken(String token);
+    Optional<BrokerTokenEntity> findTokenByRole(String role);
 
-    void setToken(String key, String value);
-
-    String getToken(String key);
-
-    void removeToken(String key);
+    Page<BrokerTokenEntity> getBrokerTokensList(Integer pageNum, Integer pageSize);
 }

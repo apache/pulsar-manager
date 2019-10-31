@@ -44,6 +44,8 @@ build/
 *.db
 front-end/data/
 *.log
+*.gz
 dbdata
 src/main/resources/local.properties
 
+*.key
