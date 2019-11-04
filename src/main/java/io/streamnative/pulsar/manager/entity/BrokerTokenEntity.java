@@ -11,27 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.streamnative.pulsar.manager.service;
+package io.streamnative.pulsar.manager.entity;
 
-import io.jsonwebtoken.Claims;
-import org.springframework.stereotype.Service;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.security.Key;
-import java.util.Optional;
-
-public interface JwtService {
-
-    String toToken(String id);
-
-    Optional<String> getSubFromToken(String token);
-
-    String createBrokerToken(String role, String expiryTime);
-
-    Claims validateBrokerToken(String token);
-
-    void setToken(String key, String value);
-
-    String getToken(String key);
-
-    void removeToken(String key);
+/**
+ * Token entity for auth from client to broker.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+public class BrokerTokenEntity {
+    private long tokenId;
+    private String role;
+    private String description;
+    private String token;
 }

@@ -116,3 +116,11 @@ CREATE TABLE IF NOT EXISTS consumers_stats (
   time_stamp BIGINT,
   metadata text
 );
+
+CREATE TABLE IF NOT EXISTS tokens (
+  token_id BIGSERIAL PRIMARY KEY,
+  role varchar(256) NOT NULL,
+  description varchar(128),
+  token varchar(1024) NOT NUll,
+  UNIQUE (role)
+);

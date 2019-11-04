@@ -13,6 +13,7 @@ Apache Pulsar manager is a web-based GUI management tool for managing and monito
 * Brokers Management
 * Clusters Management
 * Dynamic environments with multiple changes
+* Support JWT Auth
 
 ## Feature preview
 
@@ -59,6 +60,10 @@ The puslar-manager supports multiple environment configurations and can manage m
 The pulsar-manager can monitor topics and subscriptions.
 
 ![pulsar-manager-topics-monitors](docs/img/pulsar-manager-topics-monitors.gif)
+
+### Manage token
+
+![pulsar-manager-token](docs/img/pulsar-manager-token.gif)
 
 
 ## Prerequisites

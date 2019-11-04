@@ -44,3 +44,35 @@ spring.datasource.password=postgres
 ```
 ./gradlew -x build -x test
 ```
+
+### Enable JWT Auth
+
+If you want to turn on JWT authentication, configure the following parameters:
+
+* backend.jwt.token  token for the superuser. You need to configure this parameter during cluster initialization.
+* jwt.broker.token.mode  Two modes of generating token, SECRET and PRIVATE.
+* jwt.broker.public.key Configure this option if you are using the PRIVATE mode.
+* jwt.broker.private.key Configure this option if you are using the PRIVATE mode.
+* jwt.broker.secret.key Configure this option if you are using the SECRET mode.
+
+For more information, see [Apache Pulsar](http://pulsar.apache.org/docs/en/security-token-admin/)
+
+* Method 1: Use command-line tool
+
+```
+java -jar ./build/libs/pulsar-manager.jar --redirect.host=http://localhost --redirect.port=9527 insert.stats.interval=600000 --backend.jwt.token=token --jwt.broker.token.mode=PRIVATE --jwt.broker.private.key=file:///path/broker-private.key --jwt.broker.public.key=file:///path/broker-public.key
+```
+
+* Method 2. Configure the application.properties file
+
+```
+backend.jwt.token=token
+
+jwt.broker.token.mode=PRIVATE
+jwt.broker.public.key=file:///path/broker-public.key
+jwt.broker.private.key=file:///path/broker-private.key
+
+or 
+jwt.broker.token.mode=SECRET
+jwt.broker.secret.key=file:///path/broker-secret.key
+```

@@ -116,3 +116,10 @@ CREATE TABLE IF NOT EXISTS consumers_stats (
   metadata text
 )ENGINE=InnoDB CHARACTER SET utf8;
 
+CREATE TABLE IF NOT EXISTS tokens (
+  token_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  role varchar(256) NOT NULL,
+  description varchar(128),
+  token varchar(1024),
+  UNIQUE (role)
+)ENGINE=InnoDB CHARACTER SET utf8;

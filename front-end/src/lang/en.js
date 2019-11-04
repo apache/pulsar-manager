@@ -484,6 +484,7 @@ export default {
       updateReplicatedClustersSuccess: 'Successfully update replicated clusters for this namespace!',
       updateSubscriptionAuthModeSuccess: 'Successfully update subscription authentication mode for this namespace!',
       addRoleSuccess: 'Successfully add a role for this namespace!',
+      addRoleActionsSuccess: 'Successfully add a role action for this namespace!',
       removeRoleSuccess: 'Successfully remove a role from this namespace!',
       updateSchemaAutoUpdateStrategySuccess: 'Successfully change schema auto-update strategy for this namespace!',
       enableSchemaValidationEnforcedSuccess: 'Successfully enable schema validation for this namespace!',
@@ -746,5 +747,18 @@ export default {
     deleteEnvSuccessNotification: 'Successfully delete an environment',
     updateEnvSuccessNotification: 'Successfully update an environment',
     manageEnvs: 'Manage Environments'
+  },
+  token: {
+    buttonNewToken: 'New Token',
+    colHeadingRole: 'Role',
+    colHeadingToken: 'Token',
+    colHeadingDesc: 'Description',
+    newTokenRolePlaceholder: 'Please input role name',
+    newTokenDialogCaption: 'New Token',
+    newTokenDescPlaceholder: 'Please input description for role',
+    newTokenRequiredMessage: 'Role is required',
+    addTokenSuccessNotification: 'Successfully add a token for role',
+    deleteTokenSuccessNotification: 'Successfully delete a token for role',
+    updateTokenSucccessNotification: 'Successfully update a token for role'
   }
 }

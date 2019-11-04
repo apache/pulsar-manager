@@ -111,3 +111,13 @@ CREATE TABLE IF NOT EXISTS consumers_stats (
   time_stamp integer,
   metadata text
 );
+
+CREATE TABLE IF NOT EXISTS tokens (
+  token_id integer PRIMARY KEY AUTOINCREMENT,
+  role varchar(256) NOT NULL,
+  description varchar(128),
+  token varchar(1024) NOT NULL,
+  UNIQUE (role)
+);
+
+
