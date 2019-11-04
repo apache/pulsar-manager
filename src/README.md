@@ -47,23 +47,23 @@ spring.datasource.password=postgres
 
 ### Enable JWT Auth
 
-There are two ways to enable JWT authentication
+If you want to turn on JWT authentication, configure the following parameters:
 
-* backend.jwt.token  Token for superuser, configuration during cluster initialization
-* jwt.broker.token.mode  Two Methods of Generating token, SECRET and PRIVATE
-* jwt.broker.public.key Configure this option if you are using the PRIVATE mode
-* jwt.broker.private.key Configure this option if you are using the PRIVATE mode
-* jwt.broker.secret.key Configure this option if you are using the SECRET mode
+* backend.jwt.token  token for the superuser. You need to configure this parameter during cluster initialization.
+* jwt.broker.token.mode  Two modes of generating token, SECRET and PRIVATE.
+* jwt.broker.public.key Configure this option if you are using the PRIVATE mode.
+* jwt.broker.private.key Configure this option if you are using the PRIVATE mode.
+* jwt.broker.secret.key Configure this option if you are using the SECRET mode.
 
-For more information, please refer to [Apache Pulsar](http://pulsar.apache.org/docs/en/security-token-admin/)
+For more information, see [Apache Pulsar](http://pulsar.apache.org/docs/en/security-token-admin/)
 
-1. Use command line
+* Method 1: Use command-line tool
 
 ```
 java -jar ./build/libs/pulsar-manager.jar --redirect.host=http://localhost --redirect.port=9527 insert.stats.interval=600000 --backend.jwt.token=token --jwt.broker.token.mode=PRIVATE --jwt.broker.private.key=file:///path/broker-private.key --jwt.broker.public.key=file:///path/broker-public.key
 ```
 
-2. Use configuration application.properties
+* Method 2. Configure the application.properties file
 
 ```
 backend.jwt.token=token

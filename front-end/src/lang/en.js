@@ -757,8 +757,8 @@ export default {
     newTokenDialogCaption: 'New Token',
     newTokenDescPlaceholder: 'Please input description for role',
     newTokenRequiredMessage: 'Role is required',
-    addTokenSuccessNotification: 'Successfully add an token for role',
-    deleteTokenSuccessNotification: 'Successfully delete an token for role',
-    updateTokenSucccessNotification: 'Successfully update an token for role'
+    addTokenSuccessNotification: 'Successfully add a token for role',
+    deleteTokenSuccessNotification: 'Successfully delete a token for role',
+    updateTokenSucccessNotification: 'Successfully update a token for role'
   }
 }
