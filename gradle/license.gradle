@@ -16,5 +16,6 @@ allprojects {
         mapping('gdsl', 'DOUBLESLASH_STYLE')
         mapping('javascript', 'JAVADOC_STYLE')
         mapping('scss', 'DOUBLESLASH_STYLE')
+        mapping('vue', 'XML_STYLE')
     }
 }
