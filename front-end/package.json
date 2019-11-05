@@ -1,6 +1,6 @@
 {
   "name": "pulsar-manager",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A tool for managing Apache Pulsar.",
   "author": "<eguangning@gmail.com>",
   "license": "Apache License 2.0",
