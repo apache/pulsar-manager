@@ -1,0 +1,22 @@
+sqlite-jdbc-3.21.0.1.jar
+
+This product includes the following softwares developed by David Crawshaw.
+See LICENSE.zentus file.
+
+And also, NestedVM (Apache License Version 2.0) is used inside sqlite-
+
+----------------------------------------------------------------------------------------------------
+
+Apache Pulsar
+Copyright 2017-2019 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+----------------------------------------------------------------------------------------------------
+
+Guava
+Copyright (C) 2010 The Guava Authors
+
+GSon
+Copyright 2008 Google Inc.
