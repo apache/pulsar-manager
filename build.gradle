@@ -50,8 +50,10 @@ task wrapper(type: Wrapper) {
 }
 
 apply from: 'gradle/license.gradle'
-apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
+
+mainClassName = 'org.apache.pulsar.manager.PulsarManagerApplication'
 
 task licenseFormatNode(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
     source = fileTree(dir: "src").include("**/*")
@@ -74,6 +76,18 @@ dependencyManagement {
     mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.SR2'
   }
   applyMavenExclusions = false
+}
+
+distTar {
+    archiveName "pulsar-manager.tar"
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
+    }
 }
 
 dependencies {
