@@ -222,8 +222,6 @@ The Apache Software License, Version 2.0
    - io.jsonwebtoken-jjwt-api-0.10.5.jar
    - io.jsonwebtoken-jjwt-impl-0.10.5.jar
    - io.jsonwebtoken-jjwt-jackson-0.10.5.jar
-* SQLite JDBC
-   - sqlite-jdbc-3.21.0.1.jar
 * Guava
    - com.google.guava-guava-21.0.jar
 * Gson 

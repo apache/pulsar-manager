@@ -6,15 +6,6 @@ The Apache Software Foundation (http://www.apache.org/).
 
 ----------------------------------------------------------------------------------------------------
 
-sqlite-jdbc-3.21.0.1.jar
-
-This product includes the following softwares developed by David Crawshaw.
-See LICENSE.zentus file.
-
-And also, NestedVM (Apache License Version 2.0) is used inside sqlite-
-
-----------------------------------------------------------------------------------------------------
-
 Guava
 Copyright (C) 2010 The Guava Authors
 
