@@ -50,8 +50,10 @@ task wrapper(type: Wrapper) {
 }
 
 apply from: 'gradle/license.gradle'
-apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
+
+mainClassName = 'org.apache.pulsar.manager.PulsarManagerApplication'
 
 task licenseFormatNode(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
     source = fileTree(dir: "src").include("**/*")
@@ -76,6 +78,18 @@ dependencyManagement {
   applyMavenExclusions = false
 }
 
+distTar {
+    archiveName "pulsar-manager.tar"
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
+    }
+}
+
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
@@ -89,7 +103,6 @@ dependencies {
     compile group: 'io.jsonwebtoken', name: 'jjwt-api', version: jsonWebTokenApiVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt-impl', version: jsonWebTokenImplVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: jsonWebTokenImplVersion
-    compile group: 'org.xerial', name: 'sqlite-jdbc', version: sqliteVersion
     compile group: 'com.github.pagehelper', name: 'pagehelper-spring-boot-starter', version: pageHelperVersion
     compile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
