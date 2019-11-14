@@ -43,7 +43,9 @@ RUN mkdir -p /run/nginx
 
 WORKDIR /pulsar-manager
 
-COPY build/libs/*.jar pulsar-manager.jar
+COPY build/distributions/pulsar-manager.tar .
+
+RUN tar -zxvf pulsar-manager.tar
 
 COPY docker/supervisord.conf /etc/
 
