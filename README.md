@@ -123,8 +123,9 @@ The pulsar-manager can monitor topics and subscriptions.
         ```
         cd pulsar-manager
         ./gradlew build -x test
-        unzip build/distributions/pulsar-manager.zip or tar -zxvf build/distributions/pulsar-manager.tar
-        ./build/distributions/pulsar-manager/bin/pulsar-manager
+        cd build/distributions
+        unzip pulsar-manager.zip or tar -zxvf pulsar-manager.tar
+        ./pulsar-manager/bin/pulsar-manager
         ```
 
         (3) Build and start the front end.
