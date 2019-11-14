@@ -7,7 +7,7 @@
 The pulsar-manager is tested with Chrome browser.
 
 ### Set cross domain
-Add [proxyTable](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/index.js).
+Add [proxyTable](https://github.com/apache/pulsar-manager/blob/master/front-end/config/index.js).
 For localhost debug
 ```bash
     proxyTable: {
@@ -28,7 +28,7 @@ For localhost debug
 
 ## Deploy production environment
 
-* Add the following parameters to the Nginx server configuration file [prod.env.js](https://github.com/streamnative/pulsar-manager/blob/master/front-end/config/prod.env.js).
+* Add the following parameters to the Nginx server configuration file [prod.env.js](https://github.com/apache/pulsar-manager/blob/master/front-end/config/prod.env.js).
 ```
 module.exports = {
   NODE_ENV: '"production"',
