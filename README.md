@@ -67,7 +67,7 @@ The pulsar-manager can monitor topics and subscriptions.
 
 
 ## Prerequisites
-* Java 8 or later
+* Java JDK 1.8
 * Node 10.15.3 or later
 * Npm 6.4.1 or later
 * Pulsar 2.4.0 or later
