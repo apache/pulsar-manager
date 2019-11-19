@@ -28,9 +28,9 @@ Pulsar manager backend is a supplement and improvement to Pulsar broker.
 
 If you have a large amount of data, you can use a custom database. The following is an example of PostgreSQL.   
 
-1. Initialize database and table structures using [file](https://github.com/streamnative/pulsar-manager/tree/master/src/main/resources/META-INF/sql/postgresql-schema.sql).
+1. Initialize database and table structures using [file](https://github.com/apache/pulsar-manager/tree/master/src/main/resources/META-INF/sql/postgresql-schema.sql).
 
-2. Modify the [configuration file](https://github.com/streamnative/pulsar-manager/blob/master/src/main/resources/application.properties) and add PostgreSQL configuration
+2. Modify the [configuration file](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/application.properties) and add PostgreSQL configuration
 
 ```
 spring.datasource.driver-class-name=org.postgresql.Driver

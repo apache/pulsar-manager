@@ -17,7 +17,7 @@ Node 10.15 | https://nodejs.org/en/
 
 ### Fork pulsar-manager repository
 
-Fork the [pulsar-manager](https://github.com/streamnative/pulsar-manager) repository to your GitHub repository.
+Fork the [pulsar-manager](https://github.com/apache/pulsar-manager) repository to your GitHub repository.
 
 ### Install pulsar-manager dependency 
 
@@ -62,14 +62,14 @@ Follow the instructions [here](https://howtodoinjava.com/automation/lombok-eclip
 1. Add a remote repository.
    
     ```bash
-    $ git remote add streamnative git@github.com:streamnative/pulsar-manager.git
+    $ git remote add apache git@github.com:apache/pulsar-manager.git
     ```
 
 2. Sync you local repository with the remote repository.
 
     ```bash
     $ git checkout master
-    $ git pull streamnative master
+    $ git pull apache master
     ```
 
 3. Create your PR and commit code changes.
