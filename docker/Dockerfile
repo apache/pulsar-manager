@@ -24,10 +24,10 @@ ARG VERSION
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="Apache Pulsar Manager" \
       org.label-schema.description="An Apache Pulsar Manager for management Pulsar clusters" \
-      org.label-schema.url="https://github.com/streamnative/pulsar-manager" \
+      org.label-schema.url="https://github.com/apache/pulsar-manager" \
       org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="https://github.com/streamnative/pulsar-manager" \
-      org.label-schema.vendor="StreamNative Limited" \
+      org.label-schema.vcs-url="https://github.com/apache/pulsar-manager" \
+      org.label-schema.vendor="Apache Software Foundation" \
       org.label-schema.version=$VERSION \
       org.label-schema.schema-version="1.0"
 
@@ -43,7 +43,9 @@ RUN mkdir -p /run/nginx
 
 WORKDIR /pulsar-manager
 
-COPY build/libs/*.jar pulsar-manager.jar
+COPY build/distributions/pulsar-manager.tar .
+
+RUN tar -zxvf pulsar-manager.tar
 
 COPY docker/supervisord.conf /etc/
 
