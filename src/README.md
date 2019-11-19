@@ -21,7 +21,7 @@ Pulsar manager backend is a supplement and improvement to Pulsar broker.
 ### How to set parameters when starting back-end services
 
 ```
-java -jar ./build/libs/pulsar-manager.jar --redirect.host=http://localhost --redirect.port=9527 insert.stats.interval=600000
+./build/distributions/pulsar-manager/bin/pulsar-manager --redirect.host=http://localhost --redirect.port=9527 insert.stats.interval=600000
 ```
 
 ### Use custom databases
@@ -60,7 +60,7 @@ For more information, see [Apache Pulsar](http://pulsar.apache.org/docs/en/secur
 * Method 1: Use command-line tool
 
 ```
-java -jar ./build/libs/pulsar-manager.jar --redirect.host=http://localhost --redirect.port=9527 insert.stats.interval=600000 --backend.jwt.token=token --jwt.broker.token.mode=PRIVATE --jwt.broker.private.key=file:///path/broker-private.key --jwt.broker.public.key=file:///path/broker-public.key
+./build/distributions/pulsar-manager/bin/pulsar-manager --redirect.host=http://localhost --redirect.port=9527 insert.stats.interval=600000 --backend.jwt.token=token --jwt.broker.token.mode=PRIVATE --jwt.broker.private.key=file:///path/broker-private.key --jwt.broker.public.key=file:///path/broker-public.key
 ```
 
 * Method 2. Configure the application.properties file

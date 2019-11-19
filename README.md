@@ -90,17 +90,17 @@ The pulsar-manager can monitor topics and subscriptions.
             
         * `REDIRECT_PORT`: the port of the front-end server.
 
-        * `DRIVER_CLASS_NAME`: the driver class name of MySQL.
+        * `DRIVER_CLASS_NAME`: the driver class name of PostgreSQL.
 
-        * `URL`: the url of MySQL jdbc, example: jdbc:mysql://localhost:3306/pulsar_manager?useSSL=false
+        * `URL`: the url of PostgreSQL jdbc, example: jdbc:postgresql://127.0.0.1:5432/pulsar_manager
 
-        * `USERNAME`: the username of MySQL
+        * `USERNAME`: the username of PostgreSQL
 
-        * `PASSWORD`: the password of MySQL
+        * `PASSWORD`: the password of PostgreSQL
 
         ```
         docker pull apache/pulsar-manager
-        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=com.mysql.jdbc.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar pulsar-manager /bin/sh
+        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar pulsar-manager /bin/sh
         ```
 
         This is an example:
@@ -121,7 +121,9 @@ The pulsar-manager can monitor topics and subscriptions.
         ```
         cd pulsar-manager
         ./gradlew build -x test
-        java -jar ./build/libs/pulsar-manager.jar
+        cd build/distributions
+        unzip pulsar-manager.zip or tar -zxvf pulsar-manager.tar
+        ./pulsar-manager/bin/pulsar-manager
         ```
 
         (3) Build and start the front end.
