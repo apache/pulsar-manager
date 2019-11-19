@@ -28,10 +28,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/streamnative/pulsar-manager.git"
+    "url": "git+https://github.com/apache/pulsar-manager.git"
   },
   "bugs": {
-    "url": "https://github.com/streamnative/pulsar-manager/issues"
+    "url": "https://github.com/apache/pulsar-manager/issues"
   },
   "dependencies": {
     "axios": "0.18.1",

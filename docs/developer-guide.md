@@ -20,8 +20,8 @@ The code structure of the backend is shown below.
 
 ![backend-code](img/pulsar-manager-backend-code.png)
 
-* The backend configuration file is [here](https://github.com/streamnative/pulsar-manager/blob/master/src/main/resources/application.properties).
-* The database schema is defined [here](https://github.com/streamnative/pulsar-manager/blob/master/src/main/resources/META-INF/sql/mysql-schema.sql)
+* The backend configuration file is [here](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/application.properties).
+* The database schema is defined [here](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/META-INF/sql/mysql-schema.sql)
 
 ### Add new RESTful API
 
@@ -74,7 +74,7 @@ In the following class you can add some description information, error response,
 ## Frontend
 
 The frontend is developed based on [vue-element-admi](https://panjiachen.github.io/vue-element-admin-site/guide/) and [Element](https://element.eleme.cn/#/en-US).
-The development of the frontend is [here](https://github.com/streamnative/pulsar-manager/tree/master/front-end/src/views/management).
+The development of the frontend is [here](https://github.com/apache/pulsar-manager/tree/master/front-end/src/views/management).
 
 ![frontend-code](img/frontend-code.png)
 
@@ -95,8 +95,8 @@ The RESTful interface is defined in the `api` folder.
 
 2. Add a new page.
 
-Add a new page [here](https://github.com/streamnative/pulsar-manager/tree/master/front-end/src/views/management). 
-For example, [this](https://github.com/streamnative/pulsar-manager/blob/master/front-end/src/views/management/tenants/index.vue) is a tenant page. )
+Add a new page [here](https://github.com/apache/pulsar-manager/tree/master/front-end/src/views/management). 
+For example, [this](https://github.com/apache/pulsar-manager/blob/master/front-end/src/views/management/tenants/index.vue) is a tenant page. )
 
 3. Localization
 

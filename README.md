@@ -1,7 +1,5 @@
 # Apache Pulsar manager
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager?ref=badge_shield)
-
 Apache Pulsar manager is a web-based GUI management tool for managing and monitoring Pulsar.
 
 ## Feature
@@ -67,7 +65,7 @@ The pulsar-manager can monitor topics and subscriptions.
 
 
 ## Prerequisites
-* Java 8 or later
+* Java JDK 1.8
 * Node 10.15.3 or later
 * Npm 6.4.1 or later
 * Pulsar 2.4.0 or later
@@ -101,7 +99,7 @@ The pulsar-manager can monitor topics and subscriptions.
         * `PASSWORD`: the password of MySQL
 
         ```
-        docker pull streamnative/pulsar-manager
+        docker pull apache/pulsar-manager
         docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=com.mysql.jdbc.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar pulsar-manager /bin/sh
         ```
 
@@ -116,7 +114,7 @@ The pulsar-manager can monitor topics and subscriptions.
         (1) Download the source code.
 
         ```
-        git clone https://github.com/streamnative/pulsar-manager
+        git clone https://github.com/apache/pulsar-manager
         ```
 
         (2) Build and start the backend.
@@ -150,7 +148,7 @@ Pulsar Manager bundles JDBC Drivers for [HerdDB](https://github.com/diennea/herd
 The default confguration starts and embedded in-memory only HerdDB database.
 
 HerdDB can be used in production, you just have to use the  correct JDBC URL.
-Follow the instructions in [application.properties](https://github.com/streamnative/pulsar-manager/blob/master/src/main/resources/application.properties) to switch the connection to a standalone HerdDB service or cluster.
+Follow the instructions in [application.properties](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/application.properties) to switch the connection to a standalone HerdDB service or cluster.
 
 The JDBC URL will look like this:
 jdbc:herddb:server:localhost:7000
@@ -164,14 +162,10 @@ In order to start and setup an HerdDB database follow the instructions on the [H
 
 ## Back end
 
-For more information about the back end, see [pulsar-manager-backend](https://github.com/streamnative/pulsar-manager/blob/master/src/README.md).
+For more information about the back end, see [pulsar-manager-backend](https://github.com/apache/pulsar-manager/blob/master/src/README.md).
 
 
 ## Front end
 
-For more information about the front end, see [pulsar-manager-frontend](https://github.com/streamnative/pulsar-manager/blob/master/front-end/README.md).
+For more information about the front end, see [pulsar-manager-frontend](https://github.com/apache/pulsar-manager/blob/master/front-end/README.md).
 
-
-
-## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fstreamnative%2Fpulsar-manager?ref=badge_large)
