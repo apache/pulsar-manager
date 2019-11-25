@@ -101,7 +101,7 @@ The pulsar-manager can monitor topics and subscriptions.
         * `LOG_LEVEL`: level of log.
 
         ```
-        docker pull apache/pulsar-manager
+        docker pull apachepulsar/pulsar-manager
         docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar -e LOG_LEVEL=DEBUG pulsar-manager /bin/sh
         ```
 
