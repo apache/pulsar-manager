@@ -102,12 +102,13 @@ The pulsar-manager can monitor topics and subscriptions.
 
         ```
         docker pull apachepulsar/pulsar-manager
-        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar -e LOG_LEVEL=DEBUG pulsar-manager /bin/sh
+        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar -e LOG_LEVEL=DEBUG apachepulsar/pulsar-manager /bin/sh
         ```
 
         This is an example:
         
         ```
+	docker pull apachepulsar/pulsar-manager:v0.1.0
         docker run -it -p 9527:9527 -e REDIRECT_HOST=http://192.168.0.104 -e REDIRECT_PORT=9527 -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc:postgresql://127.0.0.1:5432/pulsar_manager' -e USERNAME=pulsar -e PASSWORD=pulsar -e LOG_LEVEL=DEBUG -v $PWD:/data apachepulsar/pulsar-manager:v0.1.0 /bin/sh
         ```
 
