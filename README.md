@@ -92,21 +92,23 @@ The pulsar-manager can monitor topics and subscriptions.
 
         * `DRIVER_CLASS_NAME`: the driver class name of PostgreSQL.
 
-        * `URL`: the url of PostgreSQL jdbc, example: jdbc:postgresql://127.0.0.1:5432/pulsar_manager
+        * `URL`: the url of PostgreSQL jdbc, example: jdbc:postgresql://127.0.0.1:5432/pulsar_manager.
 
-        * `USERNAME`: the username of PostgreSQL
+        * `USERNAME`: the username of PostgreSQL.
 
-        * `PASSWORD`: the password of PostgreSQL
+        * `PASSWORD`: the password of PostgreSQL.
+
+        * `LOG_LEVEL`: level of log.
 
         ```
         docker pull apache/pulsar-manager
-        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar pulsar-manager /bin/sh
+        docker run -it -p 9527:9527 -e REDIRECT_HOST=front-end-ip -e REDIRECT_PORT=front-end-port -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc-url' -e USERNAME=root -e PASSWORD=pulsar -e LOG_LEVEL=DEBUG pulsar-manager /bin/sh
         ```
 
         This is an example:
         
         ```
-        docker run -it -p 9527:9527 -e REDIRECT_HOST=http://192.168.0.104 -e REDIRECT_PORT=9527 -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc:postgresql://127.0.0.1:5432/pulsar_manager' -e USERNAME=pulsar -e PASSWORD=pulsar -v $PWD:/data pulsar-manager:latest /bin/sh
+        docker run -it -p 9527:9527 -e REDIRECT_HOST=http://192.168.0.104 -e REDIRECT_PORT=9527 -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc:postgresql://127.0.0.1:5432/pulsar_manager' -e USERNAME=pulsar -e PASSWORD=pulsar -e LOG_LEVEL=DEBUG -v $PWD:/data apachepulsar/pulsar-manager:v0.1.0 /bin/sh
         ```
 
    * Build a local environment
