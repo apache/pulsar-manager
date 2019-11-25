@@ -113,3 +113,13 @@ CREATE TABLE IF NOT EXISTS tokens (
   description varchar(128),
   token varchar(1024)
 );
+
+CREATE TABLE IF NOT EXISTS users (
+  user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  token varchar(256) NOT NULL,
+  name varchar(256) NOT NULL,
+  description varchar(128),
+  email varchar(256),
+  phone_number varchar(48),
+  UNIQUE (name)
+);
