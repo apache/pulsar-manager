@@ -116,10 +116,13 @@ CREATE TABLE IF NOT EXISTS tokens (
 
 CREATE TABLE IF NOT EXISTS users (
   user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  token varchar(256) NOT NULL,
+  access_token varchar(256) NOT NULL,
   name varchar(256) NOT NULL,
   description varchar(128),
   email varchar(256),
   phone_number varchar(48),
+  location varchar(256),
+  company varchar(256),
+  expire LONG NOT NULL,
   UNIQUE (name)
 );

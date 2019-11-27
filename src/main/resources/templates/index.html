@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Pulsar Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+<div>
+    <p th:utext="${message}"></p>
+</div>
+</body>
+<script th:inline="javascript">
+    window.onload = function() {
+        var flag = [[${flag}]]
+        if (flag) {
+            var userInfo = [[${userInfo}]]
+            var targetOrigin = window.opener;
+            targetOrigin.postMessage(userInfo, 'http://' + window.location.host);
+            window.close();
+        }
+    }
+</script>
+</html>

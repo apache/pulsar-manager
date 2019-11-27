@@ -97,6 +97,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: springBootVersion
     compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: springMybatisVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
     compile group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
     compile group: 'org.herddb', name: 'herddb-jdbc', version: herddbVersion
     compile group: 'javax.validation', name: 'validation-api', version: javaxValidationVersion

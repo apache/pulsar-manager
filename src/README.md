@@ -76,3 +76,29 @@ or
 jwt.broker.token.mode=SECRET
 jwt.broker.secret.key=file:///path/broker-secret.key
 ```
+
+### Enable Github Login
+
+#### Third party login options
+
+```
+# default empty, current options github
+third.login.option=
+```
+
+#### Github login configuration
+
+```
+# The client ID you received from GitHub when you registered https://github.com/settings/applications/new.
+github.client.id=81b09201b6619a30c6de
+# The client secret you received from GitHub for your GitHub App.
+github.client.secret=f743f065d76cb90f0458c42af57158e0ef8319fe
+github.oauth.host=https://github.com/login/oauth/access_token
+github.user.info=https://api.github.com/user
+github.login.host=https://github.com/login/oauth/authorize
+github.redirect.host=http://localhost:9527
+
+# Expiration time of token for third party platform, unit second.
+# 60 * 60 * 24 * 7
+user.access.token.expire=604800
+```
