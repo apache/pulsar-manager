@@ -45,9 +45,17 @@ WORKDIR /pulsar-manager
 
 COPY build/distributions/pulsar-manager.tar .
 
-RUN tar -zxvf pulsar-manager.tar
+RUN tar -xf pulsar-manager.tar
+
+RUN rm -r pulsar-manager.tar
 
 COPY docker/supervisord.conf /etc/
+
+COPY docker/supervisord-token.conf /etc/
+
+COPY docker/supervisord-private-key.conf /etc/
+
+COPY docker/supervisord-secret-key.conf /etc/
 
 COPY docker/default.conf /etc/nginx/conf.d/
 
