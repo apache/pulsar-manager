@@ -126,3 +126,13 @@ CREATE TABLE IF NOT EXISTS users (
   expire LONG NOT NULL,
   UNIQUE (name)
 );
+
+CREATE TABLE IF NOT EXISTS roles (
+  role_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  role_name varchar(256) NOT NULL,
+  description varchar(128),
+  resource_type varchar(48),
+  resource_name varchar(48),
+  resource_verbs varchar(256),
+  UNIQUE (role_name)
+);

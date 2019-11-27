@@ -129,7 +129,16 @@ CREATE TABLE IF NOT EXISTS users (
   phone_number varchar(48),
   location varchar(256),
   company varchar(256),
-  expire integer NOT NUll,,
+  expire integer NOT NUll,
   UNIQUE (name)
+);
+CREATE TABLE IF NOT EXISTS roles (
+  role_id integer PRIMARY KEY AUTOINCREMENT,
+  role_name varchar(256) NOT NULL,
+  description varchar(128),
+  resource_type varchar(48),
+  resource_name varchar(48),
+  resource_verbs varchar(1024),
+  UNIQUE (role_name)
 );
 
