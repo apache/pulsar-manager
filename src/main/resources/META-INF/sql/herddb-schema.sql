@@ -133,6 +133,5 @@ CREATE TABLE IF NOT EXISTS roles (
   description varchar(128),
   resource_type varchar(48),
   resource_name varchar(48),
-  resource_verbs varchar(256),
-  UNIQUE (role_name)
+  resource_verbs varchar(256)
 );
