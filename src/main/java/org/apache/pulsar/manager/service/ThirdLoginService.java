@@ -23,7 +23,7 @@ public interface ThirdLoginService {
      * Obtaining an authentication token from a third-party platform.
      * @param parameters For a kv type map, different third-party platforms may need to pass different parameters,
      *                  which are passed according to the actual situation and analyzed in their implementation classes.
-     * @return Json format access token information
+     * @return String format access token information
      */
     String getAuthToken(Map<String, String> parameters);
 
@@ -31,7 +31,7 @@ public interface ThirdLoginService {
      * Acquiring user information according to an authentication token.
      * @param authenticationMap For a kv type map, different third-party platforms need different parameters,
      *                          which are passed through the map structure.
-     * @return Json format user information.
+     * @return UserInfoEntity
      */
     UserInfoEntity getUserInfo(Map<String, String> authenticationMap);
 }

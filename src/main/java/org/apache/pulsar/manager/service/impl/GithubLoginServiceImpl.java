@@ -38,7 +38,7 @@ public class GithubLoginServiceImpl implements ThirdLoginService {
      * @param parameters For get code to github.
      *          GitHub redirects back to local site with a temporary code in a code parameter as well as the state
      *          you provided in the previous step in a state parameter.The temporary code will expire after 10 minutes.
-     * @return For example: access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&token_type=bearer
+     * @return access_token of string type
      */
     public String getAuthToken(Map<String, String> parameters) {
         Map<String, String> header = Maps.newHashMap();
@@ -54,6 +54,7 @@ public class GithubLoginServiceImpl implements ThirdLoginService {
         body.put("code", parameters.get("code"));
         Gson gson = new Gson();
         try {
+            // result example: access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&token_type=bearer
             String result = HttpUtil.doPost(githubAuthHost, header, gson.toJson(body));
             GithubAuthEntity githubAuthEntity = gson.fromJson(result, GithubAuthEntity.class);
             log.info("Success get access token from github");
@@ -67,7 +68,7 @@ public class GithubLoginServiceImpl implements ThirdLoginService {
     /**
      * Get user information from github by access token.
      * @param authenticationMap Authentication mark requesting user information.
-     * @return User information.
+     * @return UserInfoEntity
      */
     public UserInfoEntity getUserInfo(Map<String, String> authenticationMap) {
         Map<String, String> header = Maps.newHashMap();
