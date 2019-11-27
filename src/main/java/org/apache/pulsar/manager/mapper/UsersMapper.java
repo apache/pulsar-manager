@@ -27,14 +27,14 @@ public interface UsersMapper {
     @Options(useGeneratedKeys=true, keyProperty="userId", keyColumn="user_id")
     Long save(UserInfoEntity userInfoEntity);
 
-    @Select("SELECT access_token AS accessToken, name, description, email, phone_number AS phoneNumber" +
-            ", location, company, expire " +
+    @Select("SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
+            "phone_number AS phoneNumber, location, company, expire " +
             "FROM users " +
             "WHERE name = #{name}")
     UserInfoEntity findByUserName(String name);
 
-    @Select("SELECT access_token AS accessToken, name, description, email, phone_number AS phoneNumber" +
-            ", location, company, expire " +
+    @Select("SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
+            "phone_number AS phoneNumber, location, company, expire " +
             "FROM users")
     Page<UserInfoEntity> findUsersList();
 
