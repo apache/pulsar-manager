@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS users (
   phone_number varchar(48),
   location varchar(256),
   company varchar(256),
-  expire integer NOT NUll,,
+  expire integer NOT NUll,
   UNIQUE (name)
 );
 
