@@ -18,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.service.ThirdPartyLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
  * Callback function of third party platform login.
  */
+@Slf4j
 @Controller
 @RequestMapping(value = "/pulsar-manager/third-party-login")
 @Api(description = "Calling the request below this class does not require authentication because " +
@@ -65,7 +70,7 @@ public class ThirdPartyLoginCallbackController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @RequestMapping(value = "/callback/github")
-    public String GithubCallbackIndex(Model model, @RequestParam() String code) {
+    public String githubCallbackIndex(Model model, @RequestParam() String code) {
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("code", code);
         String accessToken = thirdPartyLoginService.getAuthToken(parameters);
@@ -96,7 +101,13 @@ public class ThirdPartyLoginCallbackController {
         Map<String, Object> result = Maps.newHashMap();
         String url = githubLoginHost + "?client_id=" + githubClientId +
                 "&redirect_host=" + githubRedirectHost + "/pulsar-manager/third-party-login/callback/github";
-        result.put("url", url);
+        try {
+            result.put("url", URLEncoder.encode(url, StandardCharsets.UTF_8.toString()));
+            result.put("message", "success");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Url encoding failed, please check: [{}]", url);
+            result.put("message", "Url encoding failed, please check:: " + url);
+        }
         return ResponseEntity.ok(result);
     }
 }

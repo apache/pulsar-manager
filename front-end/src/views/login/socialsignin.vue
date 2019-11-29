@@ -31,7 +31,16 @@ export default {
     githubHandleClick(thirdpart) {
       getGithubLoginHost().then(response => {
         if (!response.data) return
-        openWindow(response.data.url, thirdpart, 540, 540)
+        if (response.data.message === 'success') {
+          openWindow(decodeURIComponent(response.data.url), thirdpart, 540, 540)
+        } else {
+          this.$notify({
+            title: 'failed',
+            message: response.data.message,
+            type: 'error',
+            duration: 3000
+          })
+        }
       })
     }
   }
