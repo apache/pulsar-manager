@@ -114,9 +114,9 @@ third.login.option=
 
 ```
 # The client ID you received from GitHub when you registered https://github.com/settings/applications/new.
-github.client.id=81b09201b6619a30c6de
+github.client.id=your-client-id
 # The client secret you received from GitHub for your GitHub App.
-github.client.secret=f743f065d76cb90f0458c42af57158e0ef8319fe
+github.client.secret=your-client-secret
 github.oauth.host=https://github.com/login/oauth/access_token
 github.user.info=https://api.github.com/user
 github.login.host=https://github.com/login/oauth/authorize
