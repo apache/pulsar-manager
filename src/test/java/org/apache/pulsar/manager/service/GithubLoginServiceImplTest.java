@@ -50,7 +50,7 @@ import java.util.Map;
 public class GithubLoginServiceImplTest {
 
     @Autowired
-    private ThirdLoginService thirdLoginService;
+    private ThirdPartyLoginService thirdPartyLoginService;
 
     @Value("${github.client.id}")
     private String githubClientId;
@@ -73,7 +73,7 @@ public class GithubLoginServiceImplTest {
         Map<String, String> parameters = Maps.newHashMap();
 
         // Test no code
-        String noCodeResult = thirdLoginService.getAuthToken(parameters);
+        String noCodeResult = thirdPartyLoginService.getAuthToken(parameters);
         Assert.assertNull(noCodeResult);
 
         // Test with code
@@ -89,7 +89,7 @@ public class GithubLoginServiceImplTest {
                     "\"scope\": \"repo,gist\"," +
                     "\"token_type\": \"bearer\"" +
                 "}");
-        String withCodeResult = thirdLoginService.getAuthToken(parameters);
+        String withCodeResult = thirdPartyLoginService.getAuthToken(parameters);
         Assert.assertEquals(withCodeResult, "e72e16c7e42f292c6912e7710c838347ae178b4a");
     }
 
@@ -97,7 +97,7 @@ public class GithubLoginServiceImplTest {
     public void getUserInfoTest() {
 
         Map<String, String> authenticationMap = Maps.newHashMap();
-        UserInfoEntity noTokenUserInfoEntity = thirdLoginService.getUserInfo(authenticationMap);
+        UserInfoEntity noTokenUserInfoEntity = thirdPartyLoginService.getUserInfo(authenticationMap);
 
         Assert.assertEquals(noTokenUserInfoEntity, null);
 
@@ -108,7 +108,7 @@ public class GithubLoginServiceImplTest {
         header.put("Authorization", "token test-user-token");
         PowerMockito.when(HttpUtil.doGet(githubUserInfo, header))
                 .thenReturn(null);
-        UserInfoEntity withTokenNullUserInfoEntity = thirdLoginService.getUserInfo(authenticationMap);
+        UserInfoEntity withTokenNullUserInfoEntity = thirdPartyLoginService.getUserInfo(authenticationMap);
         Assert.assertNull(withTokenNullUserInfoEntity);
         PowerMockito.when(HttpUtil.doGet(githubUserInfo, header))
                 .thenReturn("{\n" +
@@ -118,7 +118,7 @@ public class GithubLoginServiceImplTest {
                         "\t\"email\": \"test@apache.org\",\n" +
                         "\t\"bio\": \"this is description\"" +
                         "}");
-        UserInfoEntity withTokenUserInfoEntity = thirdLoginService.getUserInfo(authenticationMap);
+        UserInfoEntity withTokenUserInfoEntity = thirdPartyLoginService.getUserInfo(authenticationMap);
         Assert.assertEquals(withTokenUserInfoEntity.getEmail(), "test@apache.org");
         Assert.assertEquals(withTokenUserInfoEntity.getName(), "test1");
         Assert.assertEquals(withTokenUserInfoEntity.getCompany(), "bj");

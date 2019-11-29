@@ -26,7 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Data
 public class UserInfoEntity {
-    private Long userId;
+    private long userId;
     private String name;
     private String description;
     private String location;
@@ -34,5 +34,5 @@ public class UserInfoEntity {
     private String phoneNumber;
     private String email;
     private String accessToken;
-    private Long expire;
+    private long expire;
 }

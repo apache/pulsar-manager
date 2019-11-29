@@ -14,11 +14,12 @@
 package org.apache.pulsar.manager.controller;
 
 import com.google.common.collect.Maps;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
-import org.apache.pulsar.manager.service.ThirdLoginService;
+import org.apache.pulsar.manager.service.ThirdPartyLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +37,11 @@ import java.util.Map;
  * Callback function of third party platform login.
  */
 @Controller
-@RequestMapping(value = "/pulsar-manager/third-login")
+@RequestMapping(value = "/pulsar-manager/third-party-login")
+@Api(description = "Calling the request below this class does not require authentication because " +
+        "the user has not logged in yet.")
 @Validated
-public class ThirdLoginCallbackController {
+public class ThirdPartyLoginCallbackController {
 
     @Value("${github.client.id}")
     private String githubClientId;
@@ -50,9 +53,12 @@ public class ThirdLoginCallbackController {
     private String githubRedirectHost;
 
     @Autowired
-    private ThirdLoginService thirdLoginService;
+    private ThirdPartyLoginService thirdPartyLoginService;
 
-    @ApiOperation(value = "Github callback.")
+    @ApiOperation(value = "When use pass github authentication, Github platform will carry code parameter to call " +
+            "back this address actively. At this time, we can request token and get user information through " +
+            "this code." +
+            "Reference document: https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/")
     @ApiResponses({
             @ApiResponse(code = 200, message = "ok"),
             @ApiResponse(code = 404, message = "Not found"),
@@ -62,10 +68,10 @@ public class ThirdLoginCallbackController {
     public String GithubCallbackIndex(Model model, @RequestParam() String code) {
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("code", code);
-        String accessToken = thirdLoginService.getAuthToken(parameters);
+        String accessToken = thirdPartyLoginService.getAuthToken(parameters);
         Map<String, String> authenticationMap = Maps.newHashMap();
         authenticationMap.put("access_token", accessToken);
-        UserInfoEntity userInfoEntity = thirdLoginService.getUserInfo(authenticationMap);
+        UserInfoEntity userInfoEntity = thirdPartyLoginService.getUserInfo(authenticationMap);
         if (userInfoEntity == null) {
             model.addAttribute("messages", "Authentication failed, please check carefully");
             model.addAttribute("flag", false);
@@ -77,7 +83,9 @@ public class ThirdLoginCallbackController {
         return "index";
     }
 
-    @ApiOperation(value = "Github login address.")
+    @ApiOperation(value = "Github's third-party authorized login address, HTTP GET request, needs to carry " +
+            "client_id and redirect_host parameters. Parameter client_id and redirect_host needs to be applied " +
+            "from github platform https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "ok"),
             @ApiResponse(code = 404, message = "Not found"),
@@ -87,7 +95,7 @@ public class ThirdLoginCallbackController {
     public @ResponseBody ResponseEntity<Map<String, Object>> getGithubLoginUrl() {
         Map<String, Object> result = Maps.newHashMap();
         String url = githubLoginHost + "?client_id=" + githubClientId +
-                "&redirect_host=" + githubRedirectHost + "/pulsar-manager/third-login/callback/github";
+                "&redirect_host=" + githubRedirectHost + "/pulsar-manager/third-party-login/callback/github";
         result.put("url", url);
         return ResponseEntity.ok(result);
     }

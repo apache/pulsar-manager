@@ -26,7 +26,7 @@ public interface UsersRepository  {
      * @param userInfoEntity
      * @return user id
      */
-    Long save(UserInfoEntity userInfoEntity);
+    long save(UserInfoEntity userInfoEntity);
 
     /**
      * Get a user information by user name.

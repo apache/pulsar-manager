@@ -14,7 +14,12 @@
 package org.apache.pulsar.manager.mapper;
 
 import com.github.pagehelper.Page;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 
 @Mapper
@@ -25,7 +30,7 @@ public interface UsersMapper {
             "VALUES (#{accessToken}, #{name}, #{description}, #{email}, #{phoneNumber}" +
             ", #{location}, #{company}, #{expire})")
     @Options(useGeneratedKeys=true, keyProperty="userId", keyColumn="user_id")
-    Long save(UserInfoEntity userInfoEntity);
+    long save(UserInfoEntity userInfoEntity);
 
     @Select("SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
             "phone_number AS phoneNumber, location, company, expire " +
