@@ -14,6 +14,7 @@
 package org.apache.pulsar.manager.controller;
 
 import com.google.common.collect.Maps;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -37,6 +38,8 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping(value = "/pulsar-manager/third-party-login")
+@Api(description = "Calling the request below this class does not require authentication because " +
+        "the user has not logged in yet.")
 @Validated
 public class ThirdPartyLoginCallbackController {
 
@@ -52,7 +55,10 @@ public class ThirdPartyLoginCallbackController {
     @Autowired
     private ThirdPartyLoginService thirdPartyLoginService;
 
-    @ApiOperation(value = "Github callback.")
+    @ApiOperation(value = "When use pass github authentication, Github platform will carry code parameter to call " +
+            "back this address actively. At this time, we can request token and get user information through " +
+            "this code." +
+            "Reference document: https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/")
     @ApiResponses({
             @ApiResponse(code = 200, message = "ok"),
             @ApiResponse(code = 404, message = "Not found"),
@@ -77,7 +83,9 @@ public class ThirdPartyLoginCallbackController {
         return "index";
     }
 
-    @ApiOperation(value = "Github login address.")
+    @ApiOperation(value = "Github's third-party authorized login address, HTTP GET request, needs to carry " +
+            "client_id and redirect_host parameters. Parameter client_id and redirect_host needs to be applied " +
+            "from github platform https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "ok"),
             @ApiResponse(code = 404, message = "Not found"),
