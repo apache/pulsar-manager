@@ -34,14 +34,14 @@ public class RolesRepositoryImpl implements RolesRepository {
     }
 
     @Override
-    public Long save(RoleInfoEntity roleInfoEntity) {
+    public long save(RoleInfoEntity roleInfoEntity) {
         Long roleId = this.rolesMapper.save(roleInfoEntity);
         return roleId;
     }
 
     @Override
-    public Optional<RoleInfoEntity> findByRoleName(String name) {
-        return Optional.ofNullable(this.rolesMapper.findByRoleName(name));
+    public Optional<RoleInfoEntity> findByRoleName(String name, String roleSource) {
+        return Optional.ofNullable(this.rolesMapper.findByRoleName(name, roleSource));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class RolesRepositoryImpl implements RolesRepository {
     }
 
     @Override
-    public void delete(String name) {
-        this.rolesMapper.delete(name);
+    public void delete(String roleName, String roleSource) {
+        this.rolesMapper.delete(roleName, roleSource);
     }
 }

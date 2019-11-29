@@ -25,14 +25,15 @@ public interface RolesRepository {
      * @param roleInfoEntity
      * @return role id
      */
-    Long save(RoleInfoEntity roleInfoEntity);
+    long save(RoleInfoEntity roleInfoEntity);
 
     /**
-     * Get a role information by role name.
+     * Get a role information by role name. roleSource, and roleName uniquely locate a role.
      * @param roleName The role name
+     * @param roleSource The user who created the role
      * @return RoleInfoEntity
      */
-    Optional<RoleInfoEntity> findByRoleName(String roleName);
+    Optional<RoleInfoEntity> findByRoleName(String roleName, String roleSource);
 
 
     /**
@@ -51,7 +52,8 @@ public interface RolesRepository {
 
     /**
      * Delete a role by role name.
-     * @param name role name
+     * @param roleName role name
+     * @param roleSource The user who created the role
      */
-    void delete(String name);
+    void delete(String roleName, String roleSource);
 }

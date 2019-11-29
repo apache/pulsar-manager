@@ -18,6 +18,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
@@ -25,27 +26,27 @@ import org.apache.pulsar.manager.entity.RoleInfoEntity;
 @Mapper
 public interface RolesMapper {
 
-    @Insert("INSERT INTO roles (role_name, description, resource_type, resource_name, resource_verbs) " +
-            "VALUES (#{roleName}, #{description}, #{resourceType}, #{resourceName}, #{resourceVerbs})")
+    @Insert("INSERT INTO roles (role_name, description, resource_type, resource_name, resource_verbs, role_source, flag) " +
+            "VALUES (#{roleName}, #{description}, #{resourceType}, #{resourceName}, #{resourceVerbs}, #{roleSource}, #{flag})")
     @Options(useGeneratedKeys=true, keyProperty="roleId", keyColumn="role_id")
-    Long save(RoleInfoEntity roleInfoEntity);
+    long save(RoleInfoEntity roleInfoEntity);
 
     @Select("SELECT role_id AS roleId, role_name AS roleName, description, resource_type AS resourceType," +
-            "resource_name AS resourceName, resource_verbs AS resourceVerbs " +
+            "resource_name AS resourceName, resource_verbs AS resourceVerbs, role_source AS roleSource, flag " +
             "FROM roles " +
-            "WHERE role_name = #{roleName}")
-    RoleInfoEntity findByRoleName(String roleName);
+            "WHERE role_name = #{roleName} and role_source = #{roleSource}")
+    RoleInfoEntity findByRoleName(@Param("roleName") String roleName, @Param("roleSource") String roleSource);
 
     @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
-            "resource_name AS resourceName, resource_verbs AS resourceVerbs FROM roles")
+            "resource_name AS resourceName, resource_verbs AS resourceVerbs, role_source AS roleSource, flag FROM roles")
     Page<RoleInfoEntity> findRoleList();
 
     @Update("UPDATE roles " +
             "SET description = #{description}, resource_type = #{resourceType}," +
-            "resource_name = #{resourceName}, resource_verbs = #{resourceVerbs} " +
-            "WHERE role_name = #{roleName}")
+            "resource_name = #{resourceName}, resource_verbs = #{resourceVerbs}, flag=#{flag} " +
+            "WHERE role_name = #{roleName} and role_source = #{roleSource}")
     void update(RoleInfoEntity roleInfoEntity);
 
-    @Delete("DELETE FROM roles WHERE role_name=#{name}")
-    void delete(String name);
+    @Delete("DELETE FROM roles WHERE role_name=#{roleName} and role_source = #{roleSource} ")
+    void delete(@Param("roleName") String roleName, @Param("roleSource") String roleSource);
 }

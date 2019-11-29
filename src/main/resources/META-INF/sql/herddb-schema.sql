@@ -129,8 +129,10 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS roles (
   role_id BIGINT PRIMARY KEY AUTO_INCREMENT,
   role_name varchar(256) NOT NULL,
+  role_source varchar(256) NOT NULL,
   description varchar(128),
   resource_type varchar(48),
   resource_name varchar(48),
-  resource_verbs varchar(256)
+  resource_verbs varchar(256),
+  flag INT NOT NULL
 );

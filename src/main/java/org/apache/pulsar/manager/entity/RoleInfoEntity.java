@@ -28,10 +28,12 @@ import lombok.Setter;
 @Data
 public class RoleInfoEntity {
 
-    private Long roleId;
+    private long roleId;
     private String roleName;
+    private String roleSource;
     private String description;
     private String resourceType;
     private String resourceName;
     private String resourceVerbs;
+    private int flag;
 }
