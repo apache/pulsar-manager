@@ -136,7 +136,7 @@ export default {
     handleMessage(event) {
       const data = event.data
       if (data.hasOwnProperty('name') && data.hasOwnProperty('accessToken')) {
-        console.log(data)
+        // to do set token, track task https://github.com/apache/pulsar-manager/issues/14
       }
     },
     handleLogin() {
