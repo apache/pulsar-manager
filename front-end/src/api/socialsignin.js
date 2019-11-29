@@ -13,7 +13,7 @@
  */
 import request from '@/utils/request'
 
-const BASE_URL = '/pulsar-manager/third-login'
+const BASE_URL = '/pulsar-manager/third-party-login'
 
 export function getGithubLoginHost() {
   return request({

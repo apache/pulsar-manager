@@ -53,7 +53,7 @@ public class UsersRepositoryImplTest {
 
     private void validateUser(UserInfoEntity user) {
         Assert.assertEquals(user.getName(), "test-user");
-        Assert.assertEquals(user.getExpire().longValue(), 157900045678l);
+        Assert.assertEquals(user.getExpire(), 157900045678l);
         Assert.assertEquals(user.getPhoneNumber(), "1356789023456");
         Assert.assertEquals(user.getDescription(), "test-description");
         Assert.assertEquals(user.getLocation(), "bj");

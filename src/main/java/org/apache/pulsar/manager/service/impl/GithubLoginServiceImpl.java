@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.manager.entity.GithubAuthEntity;
 import org.apache.pulsar.manager.entity.GithubUserInfoEntity;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
-import org.apache.pulsar.manager.service.ThirdLoginService;
+import org.apache.pulsar.manager.service.ThirdPartyLoginService;
 import org.apache.pulsar.manager.utils.HttpUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class GithubLoginServiceImpl implements ThirdLoginService {
+public class GithubLoginServiceImpl implements ThirdPartyLoginService {
 
     @Value("${github.client.id}")
     private String githubClientId;
@@ -67,7 +67,7 @@ public class GithubLoginServiceImpl implements ThirdLoginService {
         body.put("code", parameters.get("code"));
         Gson gson = new Gson();
         try {
-            // result example: access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&token_type=bearer
+            // result example: access_token=your-token&token_type=bearer
             String result = HttpUtil.doPost(githubAuthHost, header, gson.toJson(body));
             GithubAuthEntity githubAuthEntity = gson.fromJson(result, GithubAuthEntity.class);
             log.info("Success get access token from github");

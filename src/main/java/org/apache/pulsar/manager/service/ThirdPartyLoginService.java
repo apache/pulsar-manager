@@ -17,7 +17,7 @@ import org.apache.pulsar.manager.entity.UserInfoEntity;
 
 import java.util.Map;
 
-public interface ThirdLoginService {
+public interface ThirdPartyLoginService {
 
     /**
      * Obtaining an authentication token from a third-party platform.
