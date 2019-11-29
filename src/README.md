@@ -107,7 +107,7 @@ docker run -it -p 9527:9527 -e REDIRECT_HOST=http://192.168.55.182 -e REDIRECT_P
 
 ```
 # default empty, current options github
-third.login.option=
+third.party.login.option=
 ```
 
 #### Github login configuration
