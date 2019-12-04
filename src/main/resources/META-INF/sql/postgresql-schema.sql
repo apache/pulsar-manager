@@ -123,3 +123,16 @@ CREATE TABLE IF NOT EXISTS tokens (
   token varchar(1024) NOT NUll,
   UNIQUE (role)
 );
+
+CREATE TABLE IF NOT EXISTS users (
+  user_id BIGSERIAL PRIMARY KEY AUTO_INCREMENT,
+  access_token varchar(256) NOT NULL,
+  name varchar(256) NOT NULL,
+  description varchar(128),
+  email varchar(256),
+  phone_number varchar(48),
+  location varchar(256),
+  company varchar(256),
+  expire BIGINT NOT NULL,
+  UNIQUE (name)
+);

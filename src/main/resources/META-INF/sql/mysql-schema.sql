@@ -123,3 +123,16 @@ CREATE TABLE IF NOT EXISTS tokens (
   token varchar(1024),
   UNIQUE (role)
 )ENGINE=InnoDB CHARACTER SET utf8;
+
+CREATE TABLE IF NOT EXISTS users (
+  user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  access_token varchar(256) NOT NULL,
+  name varchar(256) NOT NULL,
+  description varchar(128),
+  email varchar(256),
+  phone_number varchar(48),
+  location varchar(256),
+  company varchar(256),
+  expire LONG NOT NULL,
+  UNIQUE (name)
+)ENGINE=InnoDB CHARACTER SET utf8;

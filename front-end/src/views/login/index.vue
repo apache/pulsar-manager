@@ -53,6 +53,9 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ $t('login.logIn') }}</el-button>
+      <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
+        Or connect with
+      </el-button>
     </el-form>
 
     <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog" append-to-body>
@@ -119,12 +122,21 @@ export default {
   destroyed() {
     // window.removeEventListener('hashchange', this.afterQRScan)
   },
+  mounted() {
+    window.addEventListener('message', this.handleMessage)
+  },
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
       } else {
         this.passwordType = 'password'
+      }
+    },
+    handleMessage(event) {
+      const data = event.data
+      if (data.hasOwnProperty('name') && data.hasOwnProperty('accessToken')) {
+        // to do set token, track task https://github.com/apache/pulsar-manager/issues/14
       }
     },
     handleLogin() {
@@ -276,7 +288,12 @@ $light_gray:#eee;
   .thirdparty-button {
     position: absolute;
     right: 35px;
-    bottom: 28px;
+    bottom: 1px;
+  }
+  @media only screen and (max-width: 470px) {
+    .thirdparty-button {
+      display: none;
+    }
   }
 }
 </style>

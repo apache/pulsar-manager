@@ -101,3 +101,28 @@ export SECRET_KEY="file:///secret-key-path"
 docker run -it -p 9527:9527 -e REDIRECT_HOST=http://192.168.55.182 -e REDIRECT_PORT=9527 -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc:postgresql://127.0.0.1:5432/pulsar_manager' -e USERNAME=pulsar -e PASSWORD=pulsar -e LOG_LEVEL=DEBUG -e JWT_TOKEN=$JWT_TOKEN -e PRIVATE_KEY=$PRIVATE_KEY -e PUBLIC_KEY=$PUBLIC_KEY -v $PWD:/data -v $PWD/secret-key-path:/pulsar-manager/secret-key-path apachepulsar/pulsar-manager:v0.1.0 /bin/sh
 ```
 
+### Enable Github Login
+
+#### Third party login options
+
+```
+# default empty, current options github
+third.party.login.option=
+```
+
+#### Github login configuration
+
+```
+# The client ID you received from GitHub when you registered https://github.com/settings/applications/new.
+github.client.id=your-client-id
+# The client secret you received from GitHub for your GitHub App.
+github.client.secret=your-client-secret
+github.oauth.host=https://github.com/login/oauth/access_token
+github.user.info=https://api.github.com/user
+github.login.host=https://github.com/login/oauth/authorize
+github.redirect.host=http://localhost:9527
+
+# Expiration time of token for third party platform, unit second.
+# 60 * 60 * 24 * 7
+user.access.token.expire=604800
+```

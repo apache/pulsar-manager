@@ -17,6 +17,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
@@ -59,7 +60,23 @@ public class HttpUtil {
         return httpRequest(request, header);
     }
 
-    public static String doPut(String url, Map<String, String> header, String body) throws UnsupportedEncodingException {
+    /**
+     * HTTP post method.
+     * @param url Destination host
+     * @param header Header information
+     * @param body Body information
+     * @return HTTP response information
+     * @throws UnsupportedEncodingException
+     */
+    public static String doPost(String url, Map<String, String> header, String body)
+            throws UnsupportedEncodingException {
+        HttpPost request = new HttpPost(url);
+        request.setEntity(new StringEntity(body));
+        return httpRequest(request, header);
+    }
+
+    public static String doPut(String url, Map<String, String> header, String body)
+            throws UnsupportedEncodingException {
         HttpPut request = new HttpPut(url);
         request.setEntity(new StringEntity(body));
         return httpRequest(request, header);
