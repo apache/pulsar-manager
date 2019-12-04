@@ -91,7 +91,7 @@ public class TopicsServiceImplTest {
     }
 
     @Test
-    public void getTopicsStatsImpleTest() {
+    public void getTopicsStatsImplTest() {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");

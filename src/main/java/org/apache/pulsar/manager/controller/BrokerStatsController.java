@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Broker Stats route foward
+ * Broker Stats route forward.
  */
 @RequestMapping(value = "/pulsar-manager/admin/v2")
 @Api(description = "Support more flexible queries to brokerStats.")
@@ -56,7 +56,7 @@ public class BrokerStatsController {
     public ResponseEntity<String> getBrokerStatsMetrics(
             @RequestParam() String broker) {
         String requestHost = environmentCacheService.getServiceUrl(request);
-        String result = brokerStatsService.forwarBrokerStatsMetrics(broker, requestHost);
+        String result = brokerStatsService.forwardBrokerStatsMetrics(broker, requestHost);
         return ResponseEntity.ok(result);
     }
 
