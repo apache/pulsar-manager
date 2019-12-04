@@ -228,6 +228,13 @@ export const constantRouterMap = [
         hidden: true
       },
       {
+        path: '/users',
+        component: () => import('@/views/management/users/index'),
+        name: 'Users',
+        meta: { title: 'Users', noCache: true },
+        hidden: false
+      },
+      {
         path: '/roles',
         component: () => import('@/views/management/roles/index'),
         name: 'Roles',

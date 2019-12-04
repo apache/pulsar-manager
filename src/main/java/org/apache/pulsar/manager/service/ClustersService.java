@@ -13,6 +13,7 @@
  */
 package org.apache.pulsar.manager.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -21,4 +22,6 @@ public interface ClustersService {
                                         Integer pageSize,
                                         String requestHost,
                                         Function<String, String> serviceUrlProvider);
+
+    List<String> getClusterByAnyBroker(String requestHost);
 }

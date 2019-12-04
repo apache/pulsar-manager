@@ -35,7 +35,7 @@ public class RolesRepositoryImpl implements RolesRepository {
 
     @Override
     public long save(RoleInfoEntity roleInfoEntity) {
-        Long roleId = this.rolesMapper.save(roleInfoEntity);
+        long roleId = this.rolesMapper.save(roleInfoEntity);
         return roleId;
     }
 

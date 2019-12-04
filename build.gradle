@@ -101,6 +101,7 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
     compile group: 'org.herddb', name: 'herddb-jdbc', version: herddbVersion
     compile group: 'javax.validation', name: 'validation-api', version: javaxValidationVersion
+    compile group: 'org.hibernate', name: 'hibernate-validator', 'version': hibernateValidatorVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt-api', version: jsonWebTokenApiVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt-impl', version: jsonWebTokenImplVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: jsonWebTokenImplVersion
@@ -114,5 +115,6 @@ dependencies {
     compile group: 'org.powermock', name: 'powermock-api-mockito', version: apiMockitoVersion
     compile group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
     compile group: 'org.apache.pulsar', name: 'pulsar-broker', version: brokerVersion
+    compile group: 'commons-validator', name: 'commons-validator', version: commonsValidatorVersion
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 }

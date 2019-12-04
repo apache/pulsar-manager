@@ -13,6 +13,7 @@
  */
 import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { setName, removeName } from '@/utils/username'
 import { removeEnvironment } from '@/utils/environment'
 import { Message } from 'element-ui'
 
@@ -63,7 +64,7 @@ const user = {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
-          if (response.data.login.indexOf('error') >= 0) {
+          if (response.data.hasOwnProperty('error') && response.data.error.length >= 0) {
             Message({
               message: 'The username or password is incorrect',
               type: 'error',
@@ -73,6 +74,7 @@ const user = {
           }
           commit('SET_TOKEN', response.headers.token)
           setToken(response.headers.token)
+          setName(response.headers.username)
           resolve()
         }).catch(error => {
           reject(error)
@@ -106,6 +108,7 @@ const user = {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           removeToken()
+          removeName()
           removeEnvironment()
           resolve()
         }).catch(error => {
@@ -119,6 +122,7 @@ const user = {
       return new Promise(resolve => {
         commit('SET_TOKEN', '')
         removeToken()
+        removeName()
         removeEnvironment()
         resolve()
       })

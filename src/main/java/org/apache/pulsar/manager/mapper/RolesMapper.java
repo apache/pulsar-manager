@@ -26,24 +26,29 @@ import org.apache.pulsar.manager.entity.RoleInfoEntity;
 @Mapper
 public interface RolesMapper {
 
-    @Insert("INSERT INTO roles (role_name, description, resource_type, resource_name, resource_verbs, role_source, flag) " +
-            "VALUES (#{roleName}, #{description}, #{resourceType}, #{resourceName}, #{resourceVerbs}, #{roleSource}, #{flag})")
+    @Insert("INSERT INTO roles (role_name, description, resource_type, resource_name, resource_verbs," +
+            "resource_id, role_source, flag) " +
+            "VALUES (#{roleName}, #{description}, #{resourceType}, #{resourceName}, #{resourceVerbs}," +
+            "#{resourceId}, #{roleSource}, #{flag})")
     @Options(useGeneratedKeys=true, keyProperty="roleId", keyColumn="role_id")
     long save(RoleInfoEntity roleInfoEntity);
 
     @Select("SELECT role_id AS roleId, role_name AS roleName, description, resource_type AS resourceType," +
-            "resource_name AS resourceName, resource_verbs AS resourceVerbs, role_source AS roleSource, flag " +
+            "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
+            "role_source AS roleSource, flag " +
             "FROM roles " +
             "WHERE role_name = #{roleName} and role_source = #{roleSource}")
     RoleInfoEntity findByRoleName(@Param("roleName") String roleName, @Param("roleSource") String roleSource);
 
     @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
-            "resource_name AS resourceName, resource_verbs AS resourceVerbs, role_source AS roleSource, flag FROM roles")
+            "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
+            "role_source AS roleSource, flag FROM roles")
     Page<RoleInfoEntity> findRoleList();
 
     @Update("UPDATE roles " +
             "SET description = #{description}, resource_type = #{resourceType}," +
-            "resource_name = #{resourceName}, resource_verbs = #{resourceVerbs}, flag=#{flag} " +
+            "resource_name = #{resourceName}, resource_verbs = #{resourceVerbs}," +
+            "resource_id = #{resourceId}, flag=#{flag} " +
             "WHERE role_name = #{roleName} and role_source = #{roleSource}")
     void update(RoleInfoEntity roleInfoEntity);
 

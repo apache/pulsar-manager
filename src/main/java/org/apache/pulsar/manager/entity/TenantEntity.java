@@ -15,41 +15,29 @@ package org.apache.pulsar.manager.entity;
 
 
 import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-
 /**
- * Role information entity.
+ * Tenants entity
  */
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class RoleInfoEntity {
+public class TenantEntity {
 
-    private long roleId;
+    @SerializedName("tenant_id")
+    private long tenantId;
 
-    @SerializedName("role_name")
-    private String roleName;
+    private String tenant;
 
-    @SerializedName("role_source")
-    private String roleSource;
-    private String description;
-
-    @SerializedName("resource_type")
-    private String resourceType;
-
-    @SerializedName("resource_name")
-    private String resourceName;
-
-    @SerializedName("resource_id")
-    private long resourceId;
-
-    @SerializedName("resource_verbs")
-    private String resourceVerbs;
-    private int flag;
+    @SerializedName("admin_roles")
+    private String adminRoles;
+    @SerializedName("allowed_clusters")
+    private String allowedClusters;
 }

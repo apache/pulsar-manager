@@ -48,6 +48,7 @@ public class RolesRepositoryImplTest {
         roleInfoEntity.setResourceType("tenants");
         roleInfoEntity.setResourceName("tenants");
         roleInfoEntity.setResourceVerbs("admin");
+        roleInfoEntity.setResourceId(2);
         roleInfoEntity.setDescription("This is tenants permissions");
         roleInfoEntity.setFlag(0);
     }
@@ -58,6 +59,7 @@ public class RolesRepositoryImplTest {
         Assert.assertEquals(role.getResourceType(), "tenants");
         Assert.assertEquals(role.getResourceName(), "tenants");
         Assert.assertEquals(role.getResourceVerbs(), "admin");
+        Assert.assertEquals(role.getResourceId(), 2);
         Assert.assertEquals(role.getDescription(), "This is tenants permissions");
         Assert.assertEquals(role.getFlag(), 0);
     }

@@ -32,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
@@ -80,5 +81,19 @@ public class ClustersServiceImplTest {
                         "brokerServiceUrlTls=null, brokerServiceUrl=pulsar://tengdeMBP:6650}]");
         Assert.assertEquals(result.get("total"), 1);
         Assert.assertEquals(result.get("pageSize"), 1);
+    }
+
+    @Test
+    public void getClusterByAnyBroker() {
+        PowerMockito.mockStatic(HttpUtil.class);
+        Map<String, String> header = Maps.newHashMap();
+        header.put("Content-Type", "application/json");
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
+                .thenReturn("[\"standalone\"]");
+        List<String> clusterList = clustersService.getClusterByAnyBroker("http://localhost:8080");
+        Assert.assertEquals(clusterList.get(0), "standalone");
     }
 }

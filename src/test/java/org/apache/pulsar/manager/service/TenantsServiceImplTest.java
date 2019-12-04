@@ -14,6 +14,8 @@
 package org.apache.pulsar.manager.service;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.apache.pulsar.manager.utils.HttpUtil;
@@ -32,6 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -81,5 +84,28 @@ public class TenantsServiceImplTest {
         tenantMap.put("namespaces", 1);
         tenantsArray.add(tenantMap);
         Assert.assertEquals(objectMap.get("data"), tenantsArray);
+    }
+
+    @Test
+    public void createTenantTest() throws UnsupportedEncodingException {
+        PowerMockito.mockStatic(HttpUtil.class);
+        Map<String, String> header = Maps.newHashMap();
+        header.put("Content-Type", "application/json");
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
+        Map<String, Object> body = Maps.newHashMap();
+        String tenant = "test";
+        String role = "test-role";
+        String cluster = "test-cluster";
+        body.put("adminRoles", Sets.newHashSet(role));
+        // Get cluster from standalone, to do
+        body.put("allowedClusters", Sets.newHashSet(cluster));
+        Gson gson = new Gson();
+        PowerMockito.when(HttpUtil.doPut(
+                "http://localhost:8080/admin/v2/tenants/" + tenant, header, gson.toJson(body))).thenReturn("");
+        Map<String, String> createTenantResult =  tenantsService.createTenant(
+                tenant, role, cluster, "http://localhost:8080");
+        Assert.assertEquals(createTenantResult.get("message"), "Create tenant success");
     }
 }

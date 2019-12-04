@@ -14,11 +14,16 @@
 package org.apache.pulsar.manager.controller;
 
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.pulsar.manager.entity.UserInfoEntity;
+import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.JwtService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.pulsar.manager.service.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -34,15 +39,20 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * User login and logout rest api.
  */
+@Slf4j
 @RequestMapping(value = "/pulsar-manager")
 @Api(description = "Support user login and logout.")
 @Validated
 @RestController
 public class LoginController {
+
+    @Value("${user.management.enable}")
+    private boolean userManagementEnable;
 
     @Value("${pulsar-manager.account}")
     private String account;
@@ -52,6 +62,12 @@ public class LoginController {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private UsersRepository usersRepository;
+
+    @Autowired
+    private RolesService rolesService;
 
     @ApiOperation(value = "Login pulsar manager")
     @ApiResponses({
@@ -64,16 +80,41 @@ public class LoginController {
         String userAccount = body.get("username");
         String userPassword = body.get("password");
         Map<String, Object> result = Maps.newHashMap();
+        HttpHeaders headers = new HttpHeaders();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        if (userManagementEnable) {
+            Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(userAccount);
+            if (!userInfoEntityOptional.isPresent()) {
+                result.put("error", "The user is not exist");
+                return ResponseEntity.ok(result);
+            }
+            UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+            String password = DigestUtils.sha256Hex(userPassword);
+            if (!password.equals(userInfoEntity.getPassword())) {
+                result.put("error", "The user name or password not incorrect");
+                return ResponseEntity.ok(result);
+            }
+            String token = jwtService.toToken(userAccount + password + System.currentTimeMillis());
+            userInfoEntity.setAccessToken(token);
+            usersRepository.update(userInfoEntity);
+            result.put("login", "success");
+            headers.add("token", token);
+            headers.add("username", userAccount);
+            jwtService.setToken(request.getSession().getId(), token);
+            // Create default role and tenant
+            rolesService.createDefaultRoleAndTenant(userAccount);
+
+            return new ResponseEntity<>(result, headers, HttpStatus.OK);
+        }
         if (userAccount.equals(account) && userPassword.equals(password)) {
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String token = jwtService.toToken(account + "-" + password);
             result.put("login", "success");
-            HttpHeaders headers = new HttpHeaders();
             headers.add("token", token);
+            headers.add("username", userAccount);
             jwtService.setToken(request.getSession().getId(), token);
-            return new ResponseEntity(result, headers, HttpStatus.OK);
+            return new ResponseEntity<>(result, headers, HttpStatus.OK);
         }
-        result.put("login", "error");
+        result.put("error", "error");
         return ResponseEntity.ok(result);
     }
 
@@ -86,6 +127,18 @@ public class LoginController {
     public ResponseEntity<Map<String, Object>> logout() {
         Map<String, Object> result = Maps.newHashMap();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String username = request.getHeader("username");
+        if (userManagementEnable) {
+            usersRepository.findByUserName(username);
+            Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(username);
+            if (!userInfoEntityOptional.isPresent()) {
+                result.put("login", "The user is not exist");
+                return ResponseEntity.ok(result);
+            }
+            UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+            userInfoEntity.setAccessToken("");
+            usersRepository.update(userInfoEntity);
+        }
         result.put("logout", "success");
         jwtService.removeToken(request.getSession().getId());
         return ResponseEntity.ok(result);
