@@ -30,6 +30,8 @@ public interface TenantsRepository {
 
     Page<TenantEntity> findByMultiId(Integer pageNum, Integer pageSize, List<Long> tenantIdList);
 
+    List<TenantEntity> findByMultiId(List<Long> tenantIdList);
+
     void remove(String tenant);
 
 }

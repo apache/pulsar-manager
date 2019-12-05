@@ -16,10 +16,15 @@ package org.apache.pulsar.manager.service;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
 
 import java.util.Map;
+import java.util.Set;
 
 public interface RolesService {
 
     Map<String, String> validateRoleInfoEntity(RoleInfoEntity roleInfoEntity);
 
     void createDefaultRoleAndTenant(String tenant);
+
+    Set<String> getResourceByResourceType(long userId, String resourceType);
+
+    Set<String> getResourceVerbs(String resourceVerbs);
 }

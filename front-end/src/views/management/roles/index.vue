@@ -76,7 +76,11 @@
           <el-input :rows="2" v-model="form.description" placeholder="Please input role name"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='create'" label="Resource Type">
-          <el-select v-model="resourceTypeValue" placeholder="Please select resource type">
+          <el-select
+            v-model="form.resourceType"
+            placeholder="Please select resource type"
+            style="width:100%"
+            @change="handleChangeResourceType(form.resourceType)">
             <el-option
               v-for="item in resourceTypeListOptions"
               :key="item.value"
@@ -85,7 +89,7 @@
           </el-select>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='create'" label="Resource">
-          <el-select v-model="form.resource" placeholder="Please select resource">
+          <el-select v-model="form.resource" placeholder="Please select resource" style="width:100%">
             <el-option
               v-for="item in resourceListOptions"
               :key="item.value"
@@ -97,10 +101,10 @@
           <el-select
             v-model="form.resourceVerbs"
             multiple
-            collapse-tags
-            placeholder="Please select role verbs">
+            placeholder="Please select role verbs"
+            style="width:100%">
             <el-option
-              v-for="item in resourceVerbsOptions"
+              v-for="item in resourceVerbsListOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"/>
@@ -116,7 +120,7 @@
           <el-input :rows="2" v-model="form.description" placeholder="Please input role name"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" label="Resource Type">
-          <el-select v-model="resourceTypeValue" placeholder="Please select resource type">
+          <el-select v-model="resourceTypeValue" placeholder="Please select resource type" style="width:100%">
             <el-option
               v-for="item in resourceTypeListOptions"
               :key="item.value"
@@ -125,7 +129,7 @@
           </el-select>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" label="Resource">
-          <el-select v-model="form.resource" placeholder="Please select resource">
+          <el-select v-model="form.resource" placeholder="Please select resource" style="width:100%">
             <el-option
               v-for="item in resourceListOptions"
               :key="item.value"
@@ -133,14 +137,13 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Resource Verbs">
+        <el-form-item v-if="dialogStatus==='update'" label="Resource Verbs" style="width:100%">
           <el-select
             v-model="form.resourceVerbs"
             multiple
-            collapse-tags
             placeholder="Please select role verbs">
             <el-option
-              v-for="item in resourceVerbsOptions"
+              v-for="item in resourceVerbsListOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"/>
@@ -162,7 +165,7 @@
 </template>
 
 <script>
-import { fetchRoles, putRole, getResourceType } from '@/api/roles'
+import { fetchRoles, putRole, getResourceType, getResource, getResourceVerbs } from '@/api/roles'
 
 export default {
   name: 'RolesInfo',
@@ -199,7 +202,7 @@ export default {
       resource: '',
       resourceListOptions: [],
       resourceVerbs: '',
-      resourceVerbsOptions: [],
+      resourceVerbsListOptions: [],
       superUser: false,
       description: '',
       rules: {
@@ -314,6 +317,28 @@ export default {
         })
         this.dialogFormVisible = false
         this.getRoles()
+      })
+    },
+    handleChangeResourceType(resourceType) {
+      getResource(resourceType).then(response => {
+        if (!response.data) return
+        this.resourceListOptions = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.resourceListOptions.push({
+            'value': response.data.data[i],
+            'label': response.data.data[i]
+          })
+        }
+      })
+      getResourceVerbs(resourceType).then(response => {
+        if (!response.data) return
+        this.resourceVerbsListOptions = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.resourceVerbsListOptions.push({
+            'value': response.data.data[i],
+            'label': response.data.data[i]
+          })
+        }
       })
     }
   }

@@ -151,3 +151,11 @@ CREATE TABLE IF NOT EXISTS namespaces (
   tenant varchar(255) NOT NULL,
   namespace varchar(255) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS role_binding(
+  role_binding_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name varchar(256) NOT NULL,
+  description varchar(256),
+  role_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL
+);

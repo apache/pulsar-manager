@@ -20,16 +20,25 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.pulsar.manager.entity.NamespaceEntity;
+import org.apache.pulsar.manager.entity.NamespacesRepository;
+import org.apache.pulsar.manager.entity.RoleBindingEntity;
+import org.apache.pulsar.manager.entity.RoleBindingRepository;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
 import org.apache.pulsar.manager.entity.RolesRepository;
+import org.apache.pulsar.manager.entity.TenantEntity;
+import org.apache.pulsar.manager.entity.TenantsRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.utils.ResourceType;
+import org.apache.pulsar.manager.utils.ResourceVerbs;
+import org.assertj.core.util.Sets;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,8 +50,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Roles management controller.
@@ -60,6 +72,15 @@ public class RolesController {
 
     @Autowired
     private RolesService rolesService;
+
+    @Autowired
+    private TenantsRepository tenantsRepository;
+
+    @Autowired
+    private NamespacesRepository namespacesRepository;
+
+    @Autowired
+    private RoleBindingRepository roleBindingRepository;
 
     @ApiOperation(value = "Get the list of existing roles, support paging, the default is 10 per page")
     @ApiResponses({
@@ -185,6 +206,41 @@ public class RolesController {
         String username = request.getHeader("username");
         Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(username);
         result.put("resourceType", ResourceType.values());
+        return ResponseEntity.ok(result);
+    }
+
+    @ApiOperation(value = "Get resource list by user id")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "ok"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
+    @RequestMapping(value = "/role/resource/{resourceType}", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getResource(@PathVariable String resourceType) {
+        Map<String, Object> result = Maps.newHashMap();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String username = request.getHeader("username");
+        Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(username);
+        if (userInfoEntityOptional.isPresent()) {
+            UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+            Set<String> nameSet = rolesService.getResourceByResourceType(userInfoEntity.getUserId(), resourceType);
+            result.put("data", nameSet);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @ApiOperation(value = "Get resource verbs by resource type and resource name")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "ok"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
+    @RequestMapping(value = "/role/resourceVerbs/{resourceType}", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getResourceVerbs(
+            @PathVariable String resourceType) {
+        Map<String, Object> result = Maps.newHashMap();
+        Set<String> verbsSet = rolesService.getResourceVerbs(resourceType);
+        result.put("data", verbsSet);
         return ResponseEntity.ok(result);
     }
 }

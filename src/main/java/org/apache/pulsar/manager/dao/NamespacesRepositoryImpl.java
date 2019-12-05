@@ -61,6 +61,12 @@ public class NamespacesRepositoryImpl implements NamespacesRepository {
     }
 
     @Override
+    public List<NamespaceEntity> findByMultiId(List<Long> namespaceIdList) {
+        List<NamespaceEntity> namespacesEntities = namespacesMapper.findByMultiId(namespaceIdList);
+        return namespacesEntities;
+    }
+
+    @Override
     public Page<NamespaceEntity> getNamespacesList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         Page<NamespaceEntity> namespacesEntities = namespacesMapper.getNamespacesList();

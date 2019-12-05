@@ -32,6 +32,8 @@ public interface NamespacesRepository {
 
     Page<NamespaceEntity> findByMultiId(Integer pageNum, Integer pageSize, List<Long> tenantIdList);
 
+    List<NamespaceEntity> findByMultiId(List<Long> tenantIdList);
+
     Page<NamespaceEntity> getNamespacesList(Integer pageNum, Integer pageSize);
 
     Page<NamespaceEntity> findByTenant(Integer pageNum, Integer pageSize, String tenant);

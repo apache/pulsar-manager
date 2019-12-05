@@ -51,9 +51,15 @@ public class TenantsRepositoryImpl implements TenantsRepository {
     }
 
     @Override
+    public List<TenantEntity> findByMultiId(List<Long> tenantIdList) {
+        List<TenantEntity> tenantsEntities = tenantsMapper.findAllByMultiId(tenantIdList);
+        return tenantsEntities;
+    }
+
+    @Override
     public long save(TenantEntity tenantsEntity) {
-        long tenantId = tenantsMapper.insert(tenantsEntity);
-        return tenantId;
+        tenantsMapper.insert(tenantsEntity);
+        return tenantsEntity.getTenantId();
     }
 
 

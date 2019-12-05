@@ -27,6 +27,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
@@ -109,5 +111,22 @@ public class RolesRepositoryImplTest {
         Optional<RoleInfoEntity> deleteRoleInfo = rolesRepository.findByRoleName(
                 roleInfoEntity.getRoleName(), roleInfoEntity.getRoleSource());
         Assert.assertFalse(deleteRoleInfo.isPresent());
+    }
+
+    @Test
+    public void findMultiIdTest() {
+        RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
+        initRole(roleInfoEntity);
+
+        long roleId = rolesRepository.save(roleInfoEntity);
+        List<Long> roleIdList = new ArrayList<>();
+        roleIdList.add(roleId);
+        roleIdList.add(roleInfoEntity.getRoleId());
+        Page<RoleInfoEntity> roleInfoEntities = rolesRepository.findRolesMultiId(1, 2, roleIdList);
+        roleInfoEntities.count(true);
+        for (RoleInfoEntity infoEntity : roleInfoEntities.getResult()) {
+            validateRole(infoEntity);
+            rolesRepository.delete(infoEntity.getRoleName(), infoEntity.getRoleSource());
+        }
     }
 }
