@@ -15,7 +15,7 @@
 -->
 <template>
   <div class="app-container">
-    <el-button type="primary" icon="el-icon-plus" @click="handleCreateRole">Create a role</el-button>
+    <el-button type="primary" icon="el-icon-plus" @click="handleCreateRole">{{ $t('role.buttonNewRole') }}</el-button>
 
     <el-row :gutter="24">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px">
@@ -27,32 +27,32 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column label="Role Name" min-width="50px" align="center">
+          <el-table-column :label="$t('role.colRoleName')" min-width="50px" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="Role Description" align="center" min-width="100px">
+          <el-table-column :label="$t('role.colRoleDesc')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.description }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="Resource Type" align="center" min-width="100px">
+          <el-table-column :label="$t('role.colResourceType')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.resourceType }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="Resource Name" align="center" min-width="100px">
+          <el-table-column :label="$t('role.colResourceName')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.resourceName }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="Resource Verbs" align="center" min-width="100px">
+          <el-table-column :label="$t('role.colResourceVerbs')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.resourceVerbs }}</span>
             </template>
           </el-table-column>
-          <el-table-column v-if="superUser" label="Role Source" align="center" min-width="100px">
+          <el-table-column v-if="superUser" :label="$t('role.colRoleSource')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.roleSource }}</span>
             </template>
@@ -69,14 +69,14 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="form" :rules="rules" :model="form" label-position="top">
-        <el-form-item v-if="dialogStatus==='create'" label="Role Name" prop="name">
-          <el-input v-model="form.name" placeholder="Please input role name"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colRoleName')" prop="name">
+          <el-input v-model="form.name" :placeholder="$t('role.roleNamePlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="Resource Name">
-          <el-input :rows="2" v-model="form.description" placeholder="Please input role name"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colRoleDesc')">
+          <el-input :rows="2" v-model="form.description" :placeholder="$t('role.roleDescPlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="Resource Type">
-          <el-select v-model="resourceTypeValue" placeholder="Please select resource type">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResourceType')">
+          <el-select v-model="resourceTypeValue" :placeholder="$t('role.resourceTypePlaceHolder')">
             <el-option
               v-for="item in resourceTypeListOptions"
               :key="item.value"
@@ -84,8 +84,8 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="Resource">
-          <el-select v-model="form.resource" placeholder="Please select resource">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResource')">
+          <el-select v-model="form.resource" :placeholder="$t('role.resourcePlaceHolder')">
             <el-option
               v-for="item in resourceListOptions"
               :key="item.value"
@@ -93,12 +93,12 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="Resource Verbs">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResourceVerbs')">
           <el-select
             v-model="form.resourceVerbs"
+            :placeholder="$t('role.resourceVerbsPlaceHolder')"
             multiple
-            collapse-tags
-            placeholder="Please select role verbs">
+            collapse-tags>
             <el-option
               v-for="item in resourceVerbsOptions"
               :key="item.value"
@@ -106,17 +106,14 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="Role Description">
-          <el-input :rows="2" v-model="form.description" placeholder="Please input role description" type="textarea"/>
-        </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Role Name">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colRoleName')">
           <span>{{ form.name }} </span>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Resource Name">
-          <el-input :rows="2" v-model="form.description" placeholder="Please input role name"/>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colRoleDesc')">
+          <el-input :rows="2" v-model="form.description" :placeholder="$t('role.roleNamePlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Resource Type">
-          <el-select v-model="resourceTypeValue" placeholder="Please select resource type">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colResourceType')">
+          <el-select v-model="resourceTypeValue" :placeholder="$t('role.resourceTypePlaceHolder')">
             <el-option
               v-for="item in resourceTypeListOptions"
               :key="item.value"
@@ -124,8 +121,8 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Resource">
-          <el-select v-model="form.resource" placeholder="Please select resource">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colResource')">
+          <el-select v-model="form.resource" :placeholder="$t('role.resourcePlaceHolder')">
             <el-option
               v-for="item in resourceListOptions"
               :key="item.value"
@@ -133,12 +130,12 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Resource Verbs">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colResourceVerbs')">
           <el-select
             v-model="form.resourceVerbs"
+            :placeholder="$t('role.resourceVerbsPlaceHolder')"
             multiple
-            collapse-tags
-            placeholder="Please select role verbs">
+            collapse-tags>
             <el-option
               v-for="item in resourceVerbsOptions"
               :key="item.value"
@@ -146,8 +143,8 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="Role Description">
-          <el-input :rows="2" v-model="form.description" placeholder="Please input role description" type="textarea"/>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colResourceDesc')">
+          <el-input :rows="2" v-model="form.description" :placeholder="$t('role.roleDescPlaceHolder')" type="textarea"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='delete'">
           <h4>Delete Role {{ form.name }}</h4>
@@ -172,9 +169,9 @@ export default {
       roleTableKey: 0,
       roleListLoading: false,
       textMap: {
-        create: 'New Role',
-        delete: 'Delete Role',
-        update: 'Update Role'
+        create: this.$i18n.t('role.newRole'),
+        delete: this.$i18n.t('role.deleteRole'),
+        update: this.$i18n.t('role.updateRole')
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -203,7 +200,7 @@ export default {
       superUser: false,
       description: '',
       rules: {
-        name: [{ required: true, message: 'The name can not is empty', trigger: 'blur' }]
+        name: [{ required: true, message: this.$i18n.t('role.roleNameIsRequired'), trigger: 'blur' }]
       }
     }
   },
@@ -308,7 +305,7 @@ export default {
         }
         this.$notify({
           title: 'success',
-          message: 'Create role success',
+          message: this.$i18n.t('role.creatRoleNotification'),
           type: 'success',
           duration: 2000
         })

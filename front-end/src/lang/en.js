@@ -259,9 +259,6 @@ export default {
     isolationpolicies: 'ISOLATION POLICIES',
     storage: 'STORAGE'
   },
-  role: {
-    roleAlreadyExists: 'Role already exists'
-  },
   role_actions: {
     consume: 'consume',
     produce: 'produce',
@@ -760,5 +757,57 @@ export default {
     addTokenSuccessNotification: 'Successfully add a token for role',
     deleteTokenSuccessNotification: 'Successfully delete a token for role',
     updateTokenSucccessNotification: 'Successfully update a token for role'
+  },
+  user: {
+    buttonNewUser: 'New a user',
+    colUserName: 'User Name',
+    colUserDesc: 'User Description',
+    colUserEmail: 'User Email',
+    colUserPhone: 'User Phone Number',
+    colUserLocation: 'User Location',
+    colUserCompany: 'User Company',
+    colUserPassword: 'User Password',
+    colUserPasswordRepeat: 'Repeat User Password',
+    userNamePlaceHolder: 'Please input user name',
+    userDescPlaceHolder: 'Please input user description',
+    userEmailPlaceHolder: 'Please input user email',
+    userPhonePlaceHolder: 'Please input user phone number',
+    userLocationPlaceHolder: 'Please input user location',
+    userCompanyPlaceHolder: 'Please input user company',
+    userPasswordPlaceHolder: 'Please input user password',
+    newUser: 'New a user',
+    deleteUser: 'Delete a user',
+    updateUser: 'Update a user',
+    userNameIsRequired: 'The name can not is empty',
+    userEmailIsRequired: 'The email can not is empty',
+    userPasswordIsRequired: 'The password can not is empty',
+    passwordNotification: 'The passwords do not match',
+    creatUserNotification: 'Create a user success',
+    deleteUserNotification: 'Delete a user success',
+    updateUserNotification: 'Update a user success'
+  },
+  role: {
+    roleAlreadyExists: 'Role already exists',
+    buttonNewRole: 'New a Role',
+    colRoleName: 'Role Name',
+    colRoleDesc: 'Role Description',
+    colResourceType: 'Resource Type',
+    colResourceName: 'Resource Name',
+    colResourceVerbs: 'Resource Verbs',
+    colRoleSource: 'Role Source',
+    colResource: 'Resource',
+    roleNamePlaceHolder: 'Please input role name',
+    roleDescPlaceHolder: 'Please input role description',
+    resourceTypePlaceHolder: 'Please select resource type',
+    resourcePlaceHolder: 'Please select resource',
+    resourceVerbsPlaceHolder: 'Please select role verbs',
+    resourceDescPlaceHolder: 'Please input role description',
+    newRole: 'New a Role',
+    deleteRole: 'Delete a Role',
+    updateRole: 'Update a Role',
+    roleNameIsRequired: 'The name can not is empty',
+    creatRoleNotification: 'Create a role success',
+    deleteRoleNotification: 'Delete a role success',
+    updateRoleNotification: 'Update a role success'
   }
 }

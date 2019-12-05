@@ -15,7 +15,7 @@
 -->
 <template>
   <div class="app-container">
-    <el-button type="primary" icon="el-icon-plus" @click="handleCreateUser">Create a user</el-button>
+    <el-button type="primary" icon="el-icon-plus" @click="handleCreateUser">{{ $t('user.buttonNewUser') }}</el-button>
 
     <el-row :gutter="24">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px">
@@ -27,32 +27,32 @@
           fit
           highlight-current-row
           style="width: 100%;">
-          <el-table-column label="User Name" min-width="50px" align="center">
+          <el-table-column :label="$t('user.colUserName')" min-width="50px" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="User Description" align="center" min-width="100px">
+          <el-table-column :label="$t('user.colUserDesc')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.description }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="User Eamil" align="center" min-width="100px">
+          <el-table-column :label="$t('user.colUserEmail')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.email }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="User Phone Number" align="center" min-width="100px">
+          <el-table-column :label="$t('user.colUserPhone')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.phoneNumber }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="User Location" align="center" min-width="100px">
+          <el-table-column :label="$t('user.colUserLocation')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.location }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="User Company" align="center" min-width="100px">
+          <el-table-column :label="$t('usesr.colUserCompany')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.company }}</span>
             </template>
@@ -70,47 +70,47 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="form" :rules="rules" :model="form" label-position="top">
-        <el-form-item v-if="dialogStatus==='create'" label="User Name" prop="name">
-          <el-input v-model="form.name" placeholder="Please input user name"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('user.colUserName')" prop="name">
+          <el-input v-model="form.name" :placeholder="$t('user.userNamePlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="User Description">
-          <el-input :rows="2" v-model="form.description" placeholder="Please input user description" type="textarea"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('user.colUserDesc')">
+          <el-input :rows="2" v-model="form.description" :placeholder="$t('user.userDescPlaceHolder')" type="textarea"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="User Email" prop="email">
-          <el-input :rows="2" v-model="form.email" placeholder="Please input user email"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('user.colUserEmail')" prop="email">
+          <el-input :rows="2" v-model="form.email" :placeholder="$t('user.userEmailPlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="User Phone Number">
-          <el-input :rows="2" v-model="form.phoneNumber" placeholder="Please input user phone number"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('user.colUserPhone')">
+          <el-input :rows="2" v-model="form.phoneNumber" :placeholder="$t('user.userPhonePlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="User Location">
-          <el-input :rows="2" v-model="form.location" placeholder="Please input user location"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('user.colUserLocation')">
+          <el-input :rows="2" v-model="form.location" :placeholder="$t('user.userLocationPlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="User Company">
-          <el-input :rows="2" v-model="form.company" placeholder="Please input user company"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('user.colUserCompany')">
+          <el-input :rows="2" v-model="form.company" :placeholder="$t('user.userCompnayPlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="User Password" prop="password">
-          <el-input :rows="2" v-model="form.password" placeholder="Please input user password" type="password"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('uesr.colUserPassword')" prop="password">
+          <el-input :rows="2" v-model="form.password" :placeholder="$t('user.userPasswordPlaceHolder')" type="password"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" label="User Repeat Password" prop="repeatPassword">
-          <el-input :rows="2" v-model="form.repeatPassword" placeholder="Please input user password" type="password"/>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('user.colUserPasswordRepeat')" prop="repeatPassword">
+          <el-input :rows="2" v-model="form.repeatPassword" :placeholder="$t('user.userPasswordPlaceHolder')" type="password"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="User Name">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('user.colUserName')">
           <span>{{ form.name }}</span>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="User Description">
-          <el-input :rows="2" v-model="form.description" placeholder="Please input user description" type="textarea"/>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('user.colUserDesc')">
+          <el-input :rows="2" v-model="form.description" :placeholder="$t('user.userDescPlaceHolder')" type="textarea"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="User Email" prop="email">
-          <el-input :rows="2" v-model="form.email" placeholder="Please input user email"/>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('user.colUserEmail')" prop="email">
+          <el-input :rows="2" v-model="form.email" :placeholder="$t('user.userEamilPlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="User Phone Number">
-          <el-input :rows="2" v-model="form.phoneNumber" placeholder="Please input user phone number"/>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('user.colUserPhone')">
+          <el-input :rows="2" v-model="form.phoneNumber" :placeholder="$t('user.userPhonePlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="User Location">
-          <el-input :rows="2" v-model="form.location" placeholder="Please input user location"/>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('user.colUserLocation')">
+          <el-input :rows="2" v-model="form.location" :placeholder="$t('user.userLocationPlaceHolder')"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" label="User Company">
-          <el-input :rows="2" v-model="form.company" placeholder="Please input user company"/>
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('user.colUserCompany')">
+          <el-input :rows="2" v-model="form.company" :placeholder="$t('user.userCompnayPlaceHolder')"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='delete'">
           <h4>Delete User {{ form.name }}</h4>
@@ -139,9 +139,9 @@ export default {
       userTableKey: 0,
       userListLoading: false,
       textMap: {
-        create: 'New User',
-        delete: 'Delete User',
-        update: 'Update User'
+        create: this.$i18n.t('user.newUser'),
+        delete: this.$i18n.t('user.deleteUser'),
+        update: this.$i18n.t('user.updateUser')
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -167,10 +167,10 @@ export default {
       },
       description: '',
       rules: {
-        name: [{ required: true, message: 'The name can not is empty', trigger: 'blur' }],
-        email: [{ required: true, message: 'The email can not is empty', trigger: 'blur' }],
-        password: [{ required: true, message: 'The password can not is empty', trigger: 'blur' }],
-        repeatPassword: [{ required: true, message: 'The password can not is empty', trigger: 'blur' }]
+        name: [{ required: true, message: this.$i18n.t('user.userNameIsRequired'), trigger: 'blur' }],
+        email: [{ required: true, message: this.$i18n.t('user.userEmailIsRequired'), trigger: 'blur' }],
+        password: [{ required: true, message: this.$i18n.t('user.userPasswordIsRequired'), trigger: 'blur' }],
+        repeatPassword: [{ required: true, message: this.$i18n.t('user.userPasswordIsRequired'), trigger: 'blur' }]
       },
       total: 0,
       listQuery: {
@@ -262,7 +262,7 @@ export default {
       if (this.form.password !== this.form.repeatPassword) {
         this.$notify({
           title: 'error',
-          message: 'The passwords do not match',
+          message: this.$i18n.t('uesr.passwordNotification'),
           type: 'error',
           duration: 2000
         })
@@ -281,7 +281,7 @@ export default {
         }
         this.$notify({
           title: 'success',
-          message: 'Create a user success',
+          message: this.$i18n.t('user.creatUserNotification'),
           type: 'success',
           duration: 2000
         })
@@ -312,7 +312,7 @@ export default {
         }
         this.$notify({
           title: 'success',
-          message: 'Delete a user success',
+          message: this.$i18n.t('user.deleteUserNotification'),
           type: 'success',
           duration: 2000
         })
@@ -343,7 +343,7 @@ export default {
         }
         this.$notify({
           title: 'success',
-          message: 'Update a user success',
+          message: this.$i18n.t('user.updateUserNotification'),
           type: 'success',
           duration: 2000
         })
