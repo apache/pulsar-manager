@@ -49,7 +49,7 @@ public class TopicsServiceImpl implements TopicsService {
     public static final String PARTITIONED_TOPIC_SUFFIX = "-partition-";
 
 
-    private boolean isPartitonedTopic(List<String> topics, String topic) {
+    private boolean isPartitionedTopic(List<String> topics, String topic) {
         if (topic.contains(PARTITIONED_TOPIC_SUFFIX)) {
             String[] t = topic.split(PARTITIONED_TOPIC_SUFFIX);
             if (topics != null && topics.contains(t[0])) {
@@ -202,13 +202,13 @@ public class TopicsServiceImpl implements TopicsService {
         header.put("Content-Type", "application/json");
         String prefix = "/admin/v2/" + persistent + "/" + tenant + "/" + namespace;
         Gson gson = new Gson();
-        String partitonedUrl = requestHost + prefix + "/partitioned";
-        String partitonedTopic = HttpUtil.doGet(partitonedUrl, header);
+        String partitionedUrl = requestHost + prefix + "/partitioned";
+        String partitionedTopic = HttpUtil.doGet(partitionedUrl, header);
         List<String> partitionedTopicsList = Arrays.asList();
         Map<String, List<String>> partitionedMap = Maps.newHashMap();
-        if (partitonedTopic != null) {
+        if (partitionedTopic != null) {
             partitionedTopicsList = gson.fromJson(
-                    partitonedTopic, new TypeToken<List<String>>(){}.getType());
+                    partitionedTopic, new TypeToken<List<String>>(){}.getType());
             for (String p : partitionedTopicsList) {
                 if (p.startsWith(persistent)) {
                     partitionedMap.put(this.getTopicName(p), new ArrayList<>());
@@ -225,7 +225,7 @@ public class TopicsServiceImpl implements TopicsService {
                 if (topic.startsWith(persistent)) {
                     String topicName = this.getTopicName(topic);
                     Map<String, String> topicEntity = Maps.newHashMap();
-                    if (isPartitonedTopic(partitionedTopicsList, topic)) {
+                    if (isPartitionedTopic(partitionedTopicsList, topic)) {
                         String[] name = topicName.split(PARTITIONED_TOPIC_SUFFIX);
                         partitionedMap.get(name[0]).add(topicName);
                     } else {

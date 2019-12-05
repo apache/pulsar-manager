@@ -161,4 +161,3 @@ CREATE TABLE IF NOT EXISTS namespaces (
   namespace varchar(255) NOT NULL,
   UNIQUE(tenant, namespace)
 );
-

@@ -31,7 +31,7 @@ public interface RolesRepository {
     /**
      * Get a role information by role name. roleSource, and roleName uniquely locate a role
      * @param roleName The role name
-     * @param roleSource The user who created the role
+     * @param roleSource The tenant who created the role
      * @return RoleInfoEntity
      */
     Optional<RoleInfoEntity> findByRoleName(String roleName, String roleSource);
@@ -70,7 +70,7 @@ public interface RolesRepository {
     /**
      * Delete a role by role name
      * @param roleName role name
-     * @param roleSource The user who created the role
+     * @param roleSource The tenant who created the role
      */
     void delete(String roleName, String roleSource);
 }

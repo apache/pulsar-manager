@@ -18,9 +18,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 /**
- * Pulsar Manager platform entity.
+ * User information entity.
  */
 @Getter
 @Setter
@@ -28,15 +27,12 @@ import lombok.Setter;
 @Data
 public class UserInfoEntity {
     private long userId;
-
     private String name;
     private String password;
-
     private String description;
     private String location;
     private String company;
     private String phoneNumber;
-
     private String email;
     private String accessToken;
     private long expire;

@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Environments for dynamic change connecton broker.
+ * Environments for dynamic change connection broker.
  */
 @RequestMapping(value = "/pulsar-manager")
 @Api(description = "Support change environments")

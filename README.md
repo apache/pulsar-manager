@@ -108,7 +108,7 @@ The pulsar-manager can monitor topics and subscriptions.
         This is an example:
         
         ```
-	docker pull apachepulsar/pulsar-manager:v0.1.0
+	    docker pull apachepulsar/pulsar-manager:v0.1.0
         docker run -it -p 9527:9527 -e REDIRECT_HOST=http://192.168.0.104 -e REDIRECT_PORT=9527 -e DRIVER_CLASS_NAME=org.postgresql.Driver -e URL='jdbc:postgresql://127.0.0.1:5432/pulsar_manager' -e USERNAME=pulsar -e PASSWORD=pulsar -e LOG_LEVEL=DEBUG -v $PWD:/data apachepulsar/pulsar-manager:v0.1.0 /bin/sh
         ```
 
@@ -121,6 +121,7 @@ The pulsar-manager can monitor topics and subscriptions.
         ```
 
         (2) Build and start the backend.
+        
         ```
         cd pulsar-manager
         ./gradlew build -x test
@@ -150,7 +151,7 @@ The pulsar-manager can monitor topics and subscriptions.
 #### Introduction
 
 Pulsar Manager bundles JDBC Drivers for [HerdDB](https://github.com/diennea/herddb).
-The default confguration starts and embedded in-memory only HerdDB database.
+The default configuration starts and embedded in-memory only HerdDB database.
 
 HerdDB can be used in production, you just have to use the  correct JDBC URL.
 Follow the instructions in [application.properties](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/application.properties) to switch the connection to a standalone HerdDB service or cluster.

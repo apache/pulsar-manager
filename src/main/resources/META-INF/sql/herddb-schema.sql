@@ -159,3 +159,4 @@ CREATE TABLE IF NOT EXISTS role_binding(
   role_id BIGINT NOT NULL,
   user_id BIGINT NOT NULL
 );
+
