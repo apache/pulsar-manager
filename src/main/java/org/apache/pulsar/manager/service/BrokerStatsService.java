@@ -15,7 +15,7 @@ package org.apache.pulsar.manager.service;
 
 public interface BrokerStatsService {
 
-    String forwarBrokerStatsMetrics(String broker, String requestHost);
+    String forwardBrokerStatsMetrics(String broker, String requestHost);
 
     String forwardBrokerStatsTopics(String broker, String requestHost);
 

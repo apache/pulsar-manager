@@ -100,7 +100,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         put("Content-Type","application/json");
     }};
 
-    public String forwarBrokerStatsMetrics(String broker, String requestHost) {
+    public String forwardBrokerStatsMetrics(String broker, String requestHost) {
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
             header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         }

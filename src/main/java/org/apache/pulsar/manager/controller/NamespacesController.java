@@ -36,7 +36,7 @@ import javax.validation.constraints.Size;
 import java.util.Map;
 
 /**
- * Namespace Controller class
+ * Namespace Controller class.
  */
 @RequestMapping(value = "/pulsar-manager/admin/v2")
 @Api(description = "Support more flexible queries to namespaces.")
