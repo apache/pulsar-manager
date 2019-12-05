@@ -66,7 +66,7 @@ public class RolesServiceImpl implements RolesService {
         for (String verb : resourceVerbs) {
             if (!EnumUtils.isValidEnum(ResourceVerbs.class, verb)) {
                 validateResult.put("error",
-                        "Verb " + verb + "does not belong to this class, Optional (admin, produce, consume, function)");
+                        "Verb " + verb + "does not belong to this class, Optional (ADMIN, PRODUCE, CONSUME, FUNCTION)");
                 return validateResult;
             }
         }
