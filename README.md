@@ -151,7 +151,7 @@ The pulsar-manager can monitor topics and subscriptions.
 #### Introduction
 
 Pulsar Manager bundles JDBC Drivers for [HerdDB](https://github.com/diennea/herddb).
-The default confguration starts and embedded in-memory only HerdDB database.
+The default configuration starts and embedded in-memory only HerdDB database.
 
 HerdDB can be used in production, you just have to use the  correct JDBC URL.
 Follow the instructions in [application.properties](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/application.properties) to switch the connection to a standalone HerdDB service or cluster.

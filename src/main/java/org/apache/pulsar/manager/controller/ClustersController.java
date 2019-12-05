@@ -34,7 +34,7 @@ import javax.validation.constraints.Min;
 import java.util.Map;
 
 /**
- * Cluster rest api
+ * Cluster rest api.
  */
 @RestController
 @RequestMapping(value = "/pulsar-manager/admin/v2")

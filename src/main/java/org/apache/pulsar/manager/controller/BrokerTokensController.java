@@ -81,7 +81,7 @@ public class BrokerTokensController {
         }
         String token = jwtService.createBrokerToken(brokerTokenEntity.getRole(), null);
         if (token == null) {
-            result.put("error", "Token gennerate failed");
+            result.put("error", "Token generate failed");
             return ResponseEntity.ok(result);
         }
         brokerTokenEntity.setToken(token);
