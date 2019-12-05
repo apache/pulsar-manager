@@ -39,8 +39,7 @@ public class PublishersStatsRepositoryImpl implements PublishersStatsRepository 
     public Page<PublisherStatsEntity> findByTopicStatsId(Integer pageNum, Integer pageSize,
                                                   long topicStatsId, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<PublisherStatsEntity> publisherStatsEntities = publishersStatsMapper.findByTopicStatsId(topicStatsId, timestamp);
-        return publisherStatsEntities;
+        return publishersStatsMapper.findByTopicStatsId(topicStatsId, timestamp);
     }
 
     public void remove(long timestamp, long timeInterval) {

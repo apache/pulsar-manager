@@ -74,8 +74,7 @@ public class TopicsController {
             @Size(min = 1, max = 255)
             @PathVariable String namespace) {
         String requestHost = environmentCacheService.getServiceUrl(request);
-        Map<String, Object> result = topicsService.getTopicsList(pageNum, pageSize, tenant, namespace, requestHost);
-        return result;
+        return topicsService.getTopicsList(pageNum, pageSize, tenant, namespace, requestHost);
     }
 
     @ApiOperation(value = "Query topic stats info by tenant and namespace")
@@ -101,10 +100,9 @@ public class TopicsController {
             @PathVariable String namespace) {
         String env = request.getHeader("environment");
         String serviceUrl = environmentCacheService.getServiceUrl(request);
-        Map<String, Object> result = topicsService.getTopicStats(
+        return topicsService.getTopicStats(
             pageNum, pageSize,
             tenant, namespace,
             env, serviceUrl);
-        return result;
     }
 }

@@ -39,8 +39,7 @@ public class SubscriptionsStatsRepositoryImpl implements SubscriptionsStatsRepos
     public Page<SubscriptionStatsEntity> findByTopicStatsId(Integer pageNum, Integer pageSize,
                                                      long topicStatsId, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<SubscriptionStatsEntity> subscriptionStatsEntities = subscriptionsStatsMapper.findByTopicStatsId(topicStatsId, timestamp);
-        return subscriptionStatsEntities;
+        return subscriptionsStatsMapper.findByTopicStatsId(topicStatsId, timestamp);
     }
 
     public void remove(long timestamp, long timeInterval) {
