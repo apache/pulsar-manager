@@ -38,11 +38,14 @@ import java.util.Optional;
 @RestController
 public class BrokerTokensController {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final BrokerTokensRepository brokerTokensRepository;
 
     @Autowired
-    private BrokerTokensRepository brokerTokensRepository;
+    public BrokerTokensController(JwtService jwtService, BrokerTokensRepository brokerTokensRepository) {
+        this.jwtService = jwtService;
+        this.brokerTokensRepository = brokerTokensRepository;
+    }
 
     @ApiOperation(value = "Get the list of existing broker tokens, support paging, the default is 10 per page")
     @ApiResponses({

@@ -32,11 +32,14 @@ import java.util.Optional;
 @Component
 public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final EnvironmentsRepository environmentsRepository;
 
     @Autowired
-    private EnvironmentsRepository environmentsRepository;
+    public AdminHandlerInterceptor(JwtService jwtService, EnvironmentsRepository environmentsRepository) {
+        this.jwtService = jwtService;
+        this.environmentsRepository = environmentsRepository;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

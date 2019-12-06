@@ -38,11 +38,16 @@ public class NamespacesServiceImpl implements NamespacesService {
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
 
-    @Autowired
-    private TopicsStatsRepository topicsStatsRepository;
+    private final TopicsStatsRepository topicsStatsRepository;
+    private final TopicsService topicsService;
 
     @Autowired
-    private TopicsService topicsService;
+    public NamespacesServiceImpl(
+            TopicsStatsRepository topicsStatsRepository,
+            TopicsService topicsService) {
+        this.topicsStatsRepository = topicsStatsRepository;
+        this.topicsService = topicsService;
+    }
 
     public Map<String, Object> getNamespaceList(Integer pageNum, Integer pageSize, String tenant, String requestHost) {
         Map<String, Object> namespacesMap = Maps.newHashMap();

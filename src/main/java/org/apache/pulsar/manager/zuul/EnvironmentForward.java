@@ -39,10 +39,15 @@ public class EnvironmentForward extends ZuulFilter {
 
     private static final Logger log = LoggerFactory.getLogger(EnvironmentForward.class);
 
-    @Autowired
-    private EnvironmentCacheService environmentCacheService;
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
+
+    private final EnvironmentCacheService environmentCacheService;
+
+    @Autowired
+    public EnvironmentForward(EnvironmentCacheService environmentCacheService) {
+        this.environmentCacheService = environmentCacheService;
+    }
 
     @Override
     public String filterType() {

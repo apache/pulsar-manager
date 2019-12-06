@@ -44,15 +44,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
-    @Autowired
-    private EnvironmentsRepository environmentsRepository;
-
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
 
+    private final EnvironmentsRepository environmentsRepository;
     private final Map<String, Map<String, ClusterData>> environments;
 
-    public EnvironmentCacheServiceImpl() {
+    @Autowired
+    public EnvironmentCacheServiceImpl(EnvironmentsRepository environmentsRepository) {
+        this.environmentsRepository = environmentsRepository;
         this.environments = new ConcurrentHashMap<>();
     }
 

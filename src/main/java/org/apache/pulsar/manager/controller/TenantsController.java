@@ -42,14 +42,19 @@ import java.util.Map;
 @Validated
 public class TenantsController {
 
-    @Autowired
-    private TenantsService tenantsService;
+    private final TenantsService tenantsService;
+    private final EnvironmentCacheService environmentCacheService;
+    private final HttpServletRequest request;
 
     @Autowired
-    private EnvironmentCacheService environmentCacheService;
-
-    @Autowired
-    private HttpServletRequest request;
+    public TenantsController(
+            TenantsService tenantsService,
+            EnvironmentCacheService environmentCacheService,
+            HttpServletRequest request) {
+        this.tenantsService = tenantsService;
+        this.environmentCacheService = environmentCacheService;
+        this.request = request;
+    }
 
     @ApiOperation(value = "Get the list of existing tenants, support paging, the default is 10 per page")
     @ApiResponses({

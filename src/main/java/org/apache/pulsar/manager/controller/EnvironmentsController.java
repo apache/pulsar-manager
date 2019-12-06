@@ -49,14 +49,19 @@ import java.util.Optional;
 @RestController
 public class EnvironmentsController {
 
-    @Autowired
-    private EnvironmentsRepository environmentsRepository;
-
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
 
+    private final EnvironmentsRepository environmentsRepository;
+    private final EnvironmentCacheService environmentCacheService;
+
     @Autowired
-    private EnvironmentCacheService environmentCacheService;
+    public EnvironmentsController(
+            EnvironmentsRepository environmentsRepository,
+            EnvironmentCacheService environmentCacheService) {
+        this.environmentsRepository = environmentsRepository;
+        this.environmentCacheService = environmentCacheService;
+    }
 
     @ApiOperation(value = "Get the list of existing environments, support paging, the default is 10 per page")
     @ApiResponses({

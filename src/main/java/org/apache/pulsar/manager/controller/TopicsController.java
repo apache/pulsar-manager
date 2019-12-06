@@ -43,14 +43,19 @@ import java.util.Map;
 @RestController
 public class TopicsController {
 
-    @Autowired
-    private TopicsService topicsService;
+    private final TopicsService topicsService;
+    private final EnvironmentCacheService environmentCacheService;
+    private final HttpServletRequest request;
 
     @Autowired
-    private EnvironmentCacheService environmentCacheService;
-
-    @Autowired
-    private HttpServletRequest request;
+    public TopicsController(
+            TopicsService topicsService,
+            EnvironmentCacheService environmentCacheService,
+            HttpServletRequest request) {
+        this.topicsService = topicsService;
+        this.environmentCacheService = environmentCacheService;
+        this.request = request;
+    }
 
     @ApiOperation(value = "Query topic info by tenant and namespace")
     @ApiResponses({
