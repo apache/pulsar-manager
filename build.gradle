@@ -92,9 +92,7 @@ jar {
 
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
-    compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: springBootVersion
     compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: springMybatisVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
@@ -105,14 +103,16 @@ dependencies {
     compile group: 'io.jsonwebtoken', name: 'jjwt-impl', version: jsonWebTokenImplVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: jsonWebTokenImplVersion
     compile group: 'com.github.pagehelper', name: 'pagehelper-spring-boot-starter', version: pageHelperVersion
-    compile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
     compile group: 'com.google.code.gson', name: 'gson', version: gsonVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-common', version: pulsarVersion
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggeruiVersion
-    compile group: 'org.powermock', name: 'powermock-api-mockito', version: apiMockitoVersion
-    compile group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
     compile group: 'org.apache.pulsar', name: 'pulsar-broker', version: brokerVersion
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+    compileOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito', version: apiMockitoVersion
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
 }
