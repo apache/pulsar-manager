@@ -48,9 +48,7 @@ public class TopicsStatsRepositoryImpl implements TopicsStatsRepository {
                                                       String broker,
                                                       long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<TopicStatsEntity> topicStatsEntities =
-            topicsStatsMapper.findByClusterBroker(environment, cluster, broker, timestamp);
-        return topicStatsEntities;
+        return topicsStatsMapper.findByClusterBroker(environment, cluster, broker, timestamp);
     }
 
     public Page<TopicStatsEntity> findByNamespace(Integer pageNum,
@@ -60,9 +58,7 @@ public class TopicsStatsRepositoryImpl implements TopicsStatsRepository {
                                                   String namespace,
                                                   long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<TopicStatsEntity> topicStatsEntities =
-            topicsStatsMapper.findByNamespace(environment, tenant, namespace, timestamp);
-        return topicStatsEntities;
+        return topicsStatsMapper.findByNamespace(environment, tenant, namespace, timestamp);
     }
 
     public Page<TopicStatsEntity> findByMultiTopic(Integer pageNum,
@@ -73,9 +69,7 @@ public class TopicsStatsRepositoryImpl implements TopicsStatsRepository {
                                                    String persistent,
                                                    List<String> topicList, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<TopicStatsEntity> topicStatsEntities = topicsStatsMapper.findByMultiTopic(
-                environment, tenant, namespace, persistent, topicList, timestamp);
-        return topicStatsEntities;
+        return topicsStatsMapper.findByMultiTopic(environment, tenant, namespace, persistent, topicList, timestamp);
     }
 
     public void remove(long timestamp, long timeInterval) {

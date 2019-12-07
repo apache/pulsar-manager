@@ -104,8 +104,7 @@ public class JwtServiceImpl implements JwtService {
     private Key decodeBySecretKey() {
         try {
             byte[] encodedKey = AuthTokenUtils.readKeyFromUrl(jwtBrokerSecretKey);
-            Key signingKey = AuthTokenUtils.decodeSecretKey(encodedKey);
-            return signingKey;
+            return AuthTokenUtils.decodeSecretKey(encodedKey);
         } catch (IOException e) {
             log.error("Decode failed by secrete key, error: {}", e.getMessage());
             return null;
@@ -132,16 +131,14 @@ public class JwtServiceImpl implements JwtService {
                     .toMillis(RelativeTimeUtil.parseRelativeTimeInSeconds(expiryTime));
             optExpiryTime = Optional.of(new Date(System.currentTimeMillis() + relativeTimeMillis));
         }
-        String token = AuthTokenUtils.createToken(signingKey, role, optExpiryTime);
-        return token;
+        return AuthTokenUtils.createToken(signingKey, role, optExpiryTime);
     }
 
     private Key decodeByPrivateKey() {
         try {
             byte[] encodedKey = AuthTokenUtils.readKeyFromUrl(jwtBrokerPrivateKey);
             SignatureAlgorithm algorithm = SignatureAlgorithm.RS256;
-            Key signingKey = AuthTokenUtils.decodePrivateKey(encodedKey, algorithm);
-            return signingKey;
+            return AuthTokenUtils.decodePrivateKey(encodedKey, algorithm);
         } catch (IOException e) {
             log.error("Decode failed by private key, error: {}", e.getMessage());
             return null;

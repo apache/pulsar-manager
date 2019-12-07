@@ -288,7 +288,6 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
 
     private String[] parseTopic(String topic) {
         String tntPath = topic.split("://")[1];
-        String[] topicPath = tntPath.split("/");
-        return topicPath;
+        return tntPath.split("/");
     }
 }
