@@ -798,6 +798,7 @@ export default {
     colResource: 'Resource',
     roleNamePlaceHolder: 'Please input role name',
     roleDescPlaceHolder: 'Please input role description',
+    resourceNamePlaceHolder: 'Please select resource name',
     resourceTypePlaceHolder: 'Please select resource type',
     resourcePlaceHolder: 'Please select resource',
     resourceVerbsPlaceHolder: 'Please select role verbs',

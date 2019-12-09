@@ -47,6 +47,11 @@ public interface RolesMapper {
             "role_source AS roleSource, flag FROM roles")
     Page<RoleInfoEntity> findRoleList();
 
+    @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
+            "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
+            "role_source AS roleSource, flag FROM roles WHERE role_source=#{roleSource}")
+    List<RoleInfoEntity> findRoleListByRoleSource(String roleSource);
+
     @Select({"<script>",
             "SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
                     "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +

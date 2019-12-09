@@ -37,6 +37,11 @@ public class TenantsRepositoryImpl implements TenantsRepository {
     }
 
     @Override
+    public Optional<TenantEntity> findByTenantId(long tenantId) {
+        return Optional.ofNullable(tenantsMapper.findByTenantId(tenantId));
+    }
+
+    @Override
     public Page<TenantEntity> getTenantsList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         Page<TenantEntity> tenantsEntities = tenantsMapper.getTenantsList();

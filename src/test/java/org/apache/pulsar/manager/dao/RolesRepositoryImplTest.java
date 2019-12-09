@@ -46,7 +46,7 @@ public class RolesRepositoryImplTest {
 
     private void initRole(RoleInfoEntity roleInfoEntity) {
         roleInfoEntity.setRoleName("test-role-name");
-        roleInfoEntity.setRoleSource("admin");
+        roleInfoEntity.setRoleSource("test-tenant");
         roleInfoEntity.setResourceType("tenants");
         roleInfoEntity.setResourceName("tenants");
         roleInfoEntity.setResourceVerbs("admin");
@@ -57,7 +57,7 @@ public class RolesRepositoryImplTest {
 
     private void validateRole(RoleInfoEntity role) {
         Assert.assertEquals(role.getRoleName(), "test-role-name");
-        Assert.assertEquals(role.getRoleSource(), "admin");
+        Assert.assertEquals(role.getRoleSource(), "test-tenant");
         Assert.assertEquals(role.getResourceType(), "tenants");
         Assert.assertEquals(role.getResourceName(), "tenants");
         Assert.assertEquals(role.getResourceVerbs(), "admin");
@@ -76,6 +76,20 @@ public class RolesRepositoryImplTest {
         Page<RoleInfoEntity> rolesList = rolesRepository.findRolesList(1, 10);
         rolesList.count(true);
         rolesList.getResult().forEach((role) -> {
+            validateRole(role);
+            rolesRepository.delete(role.getRoleName(), role.getRoleSource());
+        });
+    }
+
+    @Test
+    public void findRolesListByRoleSourceTest() {
+        RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
+        initRole(roleInfoEntity);
+
+        rolesRepository.save(roleInfoEntity);
+
+        List<RoleInfoEntity> rolesList = rolesRepository.findRolesListByRoleSource("test-tenant");
+        rolesList.forEach((role) -> {
             validateRole(role);
             rolesRepository.delete(role.getRoleName(), role.getRoleSource());
         });

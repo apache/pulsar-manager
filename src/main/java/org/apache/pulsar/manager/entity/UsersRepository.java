@@ -16,6 +16,7 @@ package org.apache.pulsar.manager.entity;
 import com.github.pagehelper.Page;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -35,6 +36,19 @@ public interface UsersRepository  {
      */
     Optional<UserInfoEntity> findByUserName(String name);
 
+    /**
+     * Get a user information by user id.
+     * @param userId The user id
+     * @return UserInfoEntity
+     */
+    Optional<UserInfoEntity> findByUserId(long userId);
+
+    /**
+     * Get a user information by user access token.
+     * @param accessToken The user token
+     * @return UserInfoEntity
+     */
+    Optional<UserInfoEntity> findByAccessToken(String accessToken);
 
     /**
      * Get user list, support paging.
@@ -43,6 +57,13 @@ public interface UsersRepository  {
      * @return A list of UserInfoEntity.
      */
     Page<UserInfoEntity> findUsersList(Integer pageNum, Integer pageSize);
+
+    /**
+     * Get user list
+     * @param userIdList A list of user id
+     * @return A list of UserInfoEntity.
+     */
+    List<UserInfoEntity> findUsersListByMultiUserId(List<Long> userIdList);
 
     /**
      * Update a user information.

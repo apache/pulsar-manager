@@ -40,6 +40,10 @@ public interface TenantsMapper {
     TenantEntity findByName(String tenant);
 
     @Select("SELECT tenant, tenant_id as tenantId, admin_roles as adminRoles,allowed_clusters as allowedClusters " +
+            "FROM tenants WHERE tenant_id = #{tenantId}")
+    TenantEntity findByTenantId(long tenantId);
+
+    @Select("SELECT tenant, tenant_id as tenantId, admin_roles as adminRoles,allowed_clusters as allowedClusters " +
             "FROM tenants")
     Page<TenantEntity> getTenantsList();
 

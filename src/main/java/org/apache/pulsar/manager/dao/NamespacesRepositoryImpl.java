@@ -40,6 +40,11 @@ public class NamespacesRepositoryImpl implements NamespacesRepository {
     }
 
     @Override
+    public Optional<NamespaceEntity> findByNamespaceId(long namespaceId) {
+        return Optional.ofNullable(namespacesMapper.findByNamespaceId(namespaceId));
+    }
+
+    @Override
     public Page<NamespaceEntity> findByTenantOrNamespace(Integer pageNum, Integer pageSize, String tenantOrNamespace) {
         PageHelper.startPage(pageNum, pageSize);
         Page<NamespaceEntity> namespacesEntities = namespacesMapper.findByTenantOrNamespace(tenantOrNamespace);
@@ -78,6 +83,12 @@ public class NamespacesRepositoryImpl implements NamespacesRepository {
     public Page<NamespaceEntity> findByTenant(Integer pageNum, Integer pageSize, String tenant) {
         PageHelper.startPage(pageNum, pageSize);
         Page<NamespaceEntity> namespacesEntities = namespacesMapper.findByTenant(tenant);
+        return namespacesEntities;
+    }
+
+    @Override
+    public List<NamespaceEntity> findByTenant(String tenant) {
+        Page<NamespaceEntity> namespacesEntities = namespacesMapper.findAllByTenant(tenant);
         return namespacesEntities;
     }
 

@@ -242,6 +242,13 @@ export const constantRouterMap = [
         hidden: false
       },
       {
+        path: '/roleBinding',
+        component: () => import('@/views/management/roleBinding/index'),
+        name: 'RoleBinding',
+        meta: { title: 'RoleBinding', noCache: true },
+        hidden: false
+      },
+      {
         path: '/tokens',
         component: () => import('@/views/management/tokens/index'),
         name: 'Tokens',

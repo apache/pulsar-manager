@@ -52,6 +52,11 @@ public class RolesRepositoryImpl implements RolesRepository {
     }
 
     @Override
+    public List<RoleInfoEntity> findRolesListByRoleSource(String roleSource) {
+        return this.rolesMapper.findRoleListByRoleSource(roleSource);
+    }
+
+    @Override
     public Page<RoleInfoEntity> findRolesMultiId(Integer pageNum, Integer pageSize, List<Long> idList) {
         PageHelper.startPage(pageNum, pageSize);
         return this.rolesMapper.findByMultiId(idList);

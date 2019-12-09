@@ -43,6 +43,10 @@ public interface NamespacesMapper {
             "FROM namespaces WHERE namespace=#{namespace}")
     Page<NamespaceEntity> findByNamespace(String namespace);
 
+    @Select("SELECT tenant,namespace,namespace_id as namespaceId " +
+            "FROM namespaces WHERE namespace_id=#{namespaceId}")
+    NamespaceEntity findByNamespaceId(long namespaceId);
+
     @Select({"<script>",
             "SELECT tenant, namespace, namespace_id as namespaceId FROM namespaces ",
             "WHERE namespace_id IN <foreach collection='namespaceIdList' item='namespaceId' open='(' separator=',' close=')'> #{namespaceId} </foreach>" +
@@ -50,7 +54,7 @@ public interface NamespacesMapper {
     Page<NamespaceEntity> findByMultiId(@Param("namespaceIdList") List<Long> namespaceIdList);
 
     @Select({"<script>",
-            "SELECT tenant, namespace, namespace_id as namespaceId FROM namespaces ",
+            "SELECT tenant, namespace, namespace_id as namespaceId FROM namespaces",
             "WHERE namespace_id IN <foreach collection='namespaceIdList' item='namespaceId' open='(' separator=',' close=')'> #{namespaceId} </foreach>" +
                     "</script>"})
     List<NamespaceEntity> findAllByMultiId(@Param("namespaceIdList") List<Long> namespaceIdList);
@@ -59,6 +63,9 @@ public interface NamespacesMapper {
             "FROM namespaces WHERE tenant=#{tenant}")
     Page<NamespaceEntity> findByTenant(String tenant);
 
+    @Select("SELECT tenant,namespace,namespace_id as namespaceId " +
+            "FROM namespaces WHERE tenant=#{tenant}")
+    Page<NamespaceEntity> findAllByTenant(String tenant);
 
     @Select("SELECT tenant,namespace,namespace_id as namespaceId FROM namespaces")
     Page<NamespaceEntity> getNamespacesList();

@@ -100,6 +100,7 @@ public class LoginController {
             result.put("login", "success");
             headers.add("token", token);
             headers.add("username", userAccount);
+            headers.add("tenant", userAccount);
             jwtService.setToken(request.getSession().getId(), token);
             // Create default role and tenant
             rolesService.createDefaultRoleAndTenant(userAccount);
@@ -111,6 +112,7 @@ public class LoginController {
             result.put("login", "success");
             headers.add("token", token);
             headers.add("username", userAccount);
+            headers.add("tenant", userAccount);
             jwtService.setToken(request.getSession().getId(), token);
             return new ResponseEntity<>(result, headers, HttpStatus.OK);
         }

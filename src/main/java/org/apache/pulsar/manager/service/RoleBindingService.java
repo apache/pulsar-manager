@@ -13,18 +13,16 @@
  */
 package org.apache.pulsar.manager.service;
 
-import org.apache.pulsar.manager.entity.RoleInfoEntity;
+import org.apache.pulsar.manager.entity.RoleBindingEntity;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-public interface RolesService {
+public interface RoleBindingService {
 
-    Map<String, String> validateRoleInfoEntity(RoleInfoEntity roleInfoEntity);
+    Map<String, String> validateCurrentUser(String token, RoleBindingEntity roleBindingEntity);
 
-    void createDefaultRoleAndTenant(String tenant);
+    Map<String, Object> validateCreateRoleBinding(String token, String tenant, String roleName, String userName);
 
-    Set<String> getResourceVerbs(String resourceVerbs);
-
-    Map<String, String> validateCurrentTenant(String token, String tenant);
+    List<Map<String, Object>> getRoleBindingList(String token, String tenant);
 }

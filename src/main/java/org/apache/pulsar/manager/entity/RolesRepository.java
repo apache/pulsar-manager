@@ -46,6 +46,13 @@ public interface RolesRepository {
     Page<RoleInfoEntity> findRolesList(Integer pageNum, Integer pageSize);
 
     /**
+     * Get role list.
+     * @param roleSource Role source, name of tenant
+     * @return A list of RoleInfoEntity.
+     */
+    List<RoleInfoEntity> findRolesListByRoleSource(String roleSource);
+
+    /**
      * Get role list, support paging.
      * @param pageNum Get the data on which page.
      * @param pageSize The number of data per page
