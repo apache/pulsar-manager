@@ -36,7 +36,8 @@ public class UsersRepositoryImpl implements UsersRepository {
 
     @Override
     public long save(UserInfoEntity userInfoEntity) {
-        return this.usersMapper.save(userInfoEntity);
+        this.usersMapper.save(userInfoEntity);
+        return userInfoEntity.getUserId();
     }
 
     @Override

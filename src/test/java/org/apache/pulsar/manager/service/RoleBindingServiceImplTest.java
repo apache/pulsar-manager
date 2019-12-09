@@ -197,26 +197,27 @@ public class RoleBindingServiceImplTest {
         rolesRepository.delete("test-no-binding-role", "test-no-binding-tenant");
         rolesRepository.delete("test-no-binding-role", "test-tenant");
         tenantsRepository.remove("test-tenant");
+        tenantsRepository.remove("test-no-binding-tenant");
         usersRepository.delete("test-user");
     }
 
     @Test
     public void getRoleBindingList() {
         UserInfoEntity userInfoEntity = new UserInfoEntity();
-        userInfoEntity.setName("test-user");
-        userInfoEntity.setAccessToken("test-access-token");
+        userInfoEntity.setName("test-user-binding");
+        userInfoEntity.setAccessToken("test-access-token-binding");
         long userId = usersRepository.save(userInfoEntity);
 
         RoleBindingEntity roleBindingEntity = new RoleBindingEntity();
 
         TenantEntity tenantEntity = new TenantEntity();
-        tenantEntity.setTenant("test-tenant");
+        tenantEntity.setTenant("test-tenant-binding");
         tenantEntity.setAdminRoles("test-admin-roles");
         tenantEntity.setAllowedClusters("test-allowed-clusters");
         long tenantId = tenantsRepository.save(tenantEntity);
         RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
-        roleInfoEntity.setRoleName("test-role");
-        roleInfoEntity.setRoleSource("test-tenant");
+        roleInfoEntity.setRoleName("test-role-binding");
+        roleInfoEntity.setRoleSource("test-tenant-binding");
         roleInfoEntity.setResourceId(tenantId);
         roleInfoEntity.setFlag(1);
         roleInfoEntity.setResourceName("test-tenant-resource");
@@ -230,19 +231,19 @@ public class RoleBindingServiceImplTest {
         roleBindingRepository.save(roleBindingEntity);
 
         List<Map<String, Object>> roleBindingMap = roleBindingService.getRoleBindingList(
-                "test-access-token", "test-tenant");
+                "test-access-token-binding", "test-tenant-binding");
         for (Map<String, Object> stringObjectMap : roleBindingMap) {
             Assert.assertEquals(stringObjectMap.get("name"), "test-role-binding");
             Assert.assertEquals(stringObjectMap.get("userId"), userId);
-            Assert.assertEquals(stringObjectMap.get("userName"), "test-user");
+            Assert.assertEquals(stringObjectMap.get("userName"), "test-user-binding");
             Assert.assertEquals(stringObjectMap.get("roleId"), roleId);
-            Assert.assertEquals(stringObjectMap.get("roleName"), "test-role");
+            Assert.assertEquals(stringObjectMap.get("roleName"), "test-role-binding");
             Assert.assertEquals(stringObjectMap.get("description"), "test-role-binding-description");
         }
 
         roleBindingRepository.delete(roleId, userId);
-        rolesRepository.delete("test-role", "test-tenant");
-        tenantsRepository.remove("test-tenant");
-        usersRepository.delete("test-user");
+        rolesRepository.delete("test-role-binding", "test-tenant-binding");
+        tenantsRepository.remove("test-tenant-binding");
+        usersRepository.delete("test-user-binding");
     }
 }

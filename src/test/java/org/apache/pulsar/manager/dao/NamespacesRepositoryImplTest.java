@@ -169,16 +169,18 @@ public class NamespacesRepositoryImplTest {
                 namespacesEntity.getTenant(), namespacesEntity.getNamespace());
         Assert.assertEquals(namespacesEntityOptional.get().getTenant(), "test-namespace-public");
         Assert.assertEquals(namespacesEntityOptional.get().getNamespace(), "test-namespace-default");
+        namespacesRepository.remove(namespacesEntity.getTenant(), namespacesEntity.getNamespace());
     }
 
     @Test
-    public void findByNamespaceId() {
+    public void findByNamespaceIdTest() {
         NamespaceEntity namespacesEntity = new NamespaceEntity();
         initNamespaceEntity(namespacesEntity);
         long namespaceId = namespacesRepository.save(namespacesEntity);
         Optional<NamespaceEntity> namespacesEntityOptional = namespacesRepository.findByNamespaceId(namespaceId);
         Assert.assertEquals(namespacesEntityOptional.get().getTenant(), "test-namespace-public");
         Assert.assertEquals(namespacesEntityOptional.get().getNamespace(), "test-namespace-default");
+        namespacesRepository.remove(namespacesEntity.getTenant(), namespacesEntity.getNamespace());
     }
 
     @Test
