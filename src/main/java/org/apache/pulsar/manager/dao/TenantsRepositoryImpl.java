@@ -52,8 +52,8 @@ public class TenantsRepositoryImpl implements TenantsRepository {
 
     @Override
     public long save(TenantEntity tenantsEntity) {
-        long tenantId = tenantsMapper.insert(tenantsEntity);
-        return tenantId;
+        tenantsMapper.insert(tenantsEntity);
+        return tenantsEntity.getTenantId();
     }
 
 
