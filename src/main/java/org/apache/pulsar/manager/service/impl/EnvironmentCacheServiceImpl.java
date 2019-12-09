@@ -73,8 +73,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
             // if there is no cluster is specified, forward the request to environment service url
             Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
             EnvironmentEntity environmentEntity = environmentEntityOptional.get();
-            String directRequestHost = environmentEntity.getBroker();
-            return directRequestHost;
+            return environmentEntity.getBroker();
         } else {
             return getServiceUrl(environment, cluster, 0);
         }

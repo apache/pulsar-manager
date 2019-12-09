@@ -99,6 +99,7 @@ public class NamespacesRepositoryImpl implements NamespacesRepository {
 
     @Override
     public long save(NamespaceEntity namespacesEntity) {
-        return namespacesMapper.insert(namespacesEntity);
+        namespacesMapper.insert(namespacesEntity);
+        return namespacesEntity.getNamespaceId();
     }
 }

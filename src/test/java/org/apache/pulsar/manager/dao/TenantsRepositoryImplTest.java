@@ -69,16 +69,14 @@ public class TenantsRepositoryImplTest {
 
     @Test
     public void findByMultiIdTest() {
+        List<Long> idList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             TenantEntity tenantEntity = new TenantEntity();
             tenantEntity.setTenant("test" + i);
             tenantEntity.setAdminRoles("test" + i);
             tenantEntity.setAllowedClusters("test-cluster");
-            tenantsRepository.save(tenantEntity);
-        }
-        List<Long> idList = new ArrayList<>();
-        for (long i = 0; i < 10; i++) {
-            idList.add(i + 1);
+            Long tenantId = tenantsRepository.save(tenantEntity);
+            idList.add(tenantId);
         }
         Page<TenantEntity> tenantEntityPage = tenantsRepository.findByMultiId(1, 10, idList);
         tenantEntityPage.count(true);
@@ -107,6 +105,7 @@ public class TenantsRepositoryImplTest {
         Assert.assertEquals(getTenantEntity.getTenant(), "test");
         Assert.assertEquals(getTenantEntity.getAdminRoles(), "test-role");
         Assert.assertEquals(getTenantEntity.getAllowedClusters(), "test-cluster");
+        tenantsRepository.remove("test");
     }
 
     @Test

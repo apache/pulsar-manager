@@ -31,7 +31,7 @@ public interface NamespacesMapper {
     @Options(useGeneratedKeys=true, keyProperty="namespaceId", keyColumn="namespace_id")
     long insert(NamespaceEntity namespacesEntity);
 
-    @Select("SELECT tenant,namespace, namespace_id as namespaceId,  " +
+    @Select("SELECT tenant,namespace, namespace_id as namespaceId  " +
             "FROM namespaces WHERE tenant=#{tenant} and namespace=#{namespace}")
     NamespaceEntity findByTenantNamespace(@Param("tenant") String tenant, @Param("namespace") String namespace);
 
