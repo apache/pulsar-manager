@@ -39,9 +39,7 @@ public class ReplicationsStatsRepositoryImpl implements ReplicationsStatsReposit
     public Page<ReplicationStatsEntity> findByTopicStatsId(Integer pageNum, Integer pageSize,
                                                     long topicStatsId, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<ReplicationStatsEntity> replicationStatsEntities = replicationsStatsMapper.findByTopicStatsId(
-                topicStatsId, timestamp);
-        return replicationStatsEntities;
+        return replicationsStatsMapper.findByTopicStatsId(topicStatsId, timestamp);
     }
 
     public void remove(long timestamp, long timeInterval) {

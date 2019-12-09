@@ -40,24 +40,19 @@ public class ConsumersStatsRepositoryImpl implements ConsumersStatsRepository {
     public Page<ConsumerStatsEntity> findByTopicStatsId(Integer pageNum, Integer pageSize,
                                                  long topicStatsId, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<ConsumerStatsEntity> consumerStatsEntities = consumerStatsMapper.findByTopicStatsId(
-                topicStatsId, timestamp);
-        return consumerStatsEntities;
+        return consumerStatsMapper.findByTopicStatsId(topicStatsId, timestamp);
     }
 
     public Page<ConsumerStatsEntity> findBySubscriptionStatsId(Integer pageNum, Integer pageSize,
                                                                long subscriptionStatsId, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<ConsumerStatsEntity> consumerStatsEntities = consumerStatsMapper.findBySubscriptionStatsId(subscriptionStatsId, timestamp);
-        return consumerStatsEntities;
+        return consumerStatsMapper.findBySubscriptionStatsId(subscriptionStatsId, timestamp);
     }
 
     public Page<ConsumerStatsEntity> findByReplicationStatsId(Integer pageNum, Integer pageSize,
                                                               long replicationStatsId, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
-        Page<ConsumerStatsEntity> consumerStatsEntities = consumerStatsMapper.findByReplicationStatsId(
-                replicationStatsId, timestamp);
-        return consumerStatsEntities;
+        return consumerStatsMapper.findByReplicationStatsId(replicationStatsId, timestamp);
     }
 
     public void remove(long timestamp, long timeInterval) {
