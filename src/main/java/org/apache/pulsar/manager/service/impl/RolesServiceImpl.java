@@ -15,6 +15,7 @@ package org.apache.pulsar.manager.service.impl;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
@@ -35,14 +36,9 @@ import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.service.TenantsService;
 import org.apache.pulsar.manager.utils.ResourceType;
 import org.apache.pulsar.manager.utils.ResourceVerbs;
-import org.assertj.core.util.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;

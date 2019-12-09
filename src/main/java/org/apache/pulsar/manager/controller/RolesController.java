@@ -15,6 +15,7 @@ package org.apache.pulsar.manager.controller;
 
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -25,7 +26,6 @@ import org.apache.pulsar.manager.entity.RoleInfoEntity;
 import org.apache.pulsar.manager.entity.RolesRepository;
 import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.utils.ResourceType;
-import org.assertj.core.util.Sets;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
