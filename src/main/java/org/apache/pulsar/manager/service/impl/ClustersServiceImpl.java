@@ -40,8 +40,12 @@ public class ClustersServiceImpl implements ClustersService {
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
 
+    private final BrokersService brokersService;
+
     @Autowired
-    private BrokersService brokersService;
+    public ClustersServiceImpl(BrokersService brokersService) {
+        this.brokersService = brokersService;
+    }
 
 
     public Map<String, Object> getClustersList(Integer pageNum,

@@ -38,14 +38,19 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class BrokerStatsController {
 
-    @Autowired
-    private BrokerStatsService brokerStatsService;
+    private final BrokerStatsService brokerStatsService;
+    private final EnvironmentCacheService environmentCacheService;
+    private final HttpServletRequest request;
 
     @Autowired
-    private EnvironmentCacheService environmentCacheService;
-
-    @Autowired
-    private HttpServletRequest request;
+    public BrokerStatsController(
+            BrokerStatsService brokerStatsService,
+            EnvironmentCacheService environmentCacheService,
+            HttpServletRequest request) {
+        this.brokerStatsService = brokerStatsService;
+        this.environmentCacheService = environmentCacheService;
+        this.request = request;
+    }
 
     @ApiOperation(value = "Get the broker stats metrics")
     @ApiResponses({

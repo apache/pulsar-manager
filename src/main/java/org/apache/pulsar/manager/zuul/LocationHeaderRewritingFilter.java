@@ -39,9 +39,6 @@ public class LocationHeaderRewritingFilter extends ZuulFilter {
 
     private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
-    @Autowired
-    private RouteLocator routeLocator;
-
     @Value("${redirect.host}")
     private String host;
 
@@ -50,6 +47,14 @@ public class LocationHeaderRewritingFilter extends ZuulFilter {
 
     @Value("${redirect.scheme}")
     private String scheme;
+
+    private final RouteLocator routeLocator;
+
+    @Autowired
+    public LocationHeaderRewritingFilter(RouteLocator routeLocator) {
+        this.routeLocator = routeLocator;
+    }
+
     @Override
     public String filterType() {
         return POST_TYPE;
