@@ -55,7 +55,7 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
         String saveToken = jwtService.getToken(request.getSession().getId());
         Map<String, Object> map = Maps.newHashMap();
         Gson gson = new Gson();
-        if (token == null && !token.equals(saveToken)) {
+        if (token == null || !token.equals(saveToken)) {
             map.put("message", "Please login.");
             response.setStatus(401);
             response.getWriter().append(gson.toJson(map));

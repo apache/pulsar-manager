@@ -46,9 +46,19 @@ public class RolesRepositoryImpl implements RolesRepository {
     }
 
     @Override
+    public Optional<RoleInfoEntity> findByRoleFlag(int flag) {
+        return Optional.ofNullable(this.rolesMapper.findByRoleFlag(flag));
+    }
+
+    @Override
     public Page<RoleInfoEntity> findRolesList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         return this.rolesMapper.findRoleList();
+    }
+
+    @Override
+    public List<RoleInfoEntity> findAllRolesList() {
+        return this.rolesMapper.findAllRoleList();
     }
 
     @Override

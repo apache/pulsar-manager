@@ -16,6 +16,10 @@ package org.apache.pulsar.manager.controller;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.pulsar.manager.entity.RoleBindingEntity;
+import org.apache.pulsar.manager.entity.RoleBindingRepository;
+import org.apache.pulsar.manager.entity.RoleInfoEntity;
+import org.apache.pulsar.manager.entity.RolesRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.JwtService;
@@ -38,6 +42,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -68,6 +74,12 @@ public class LoginController {
 
     @Autowired
     private RolesService rolesService;
+
+    @Autowired
+    private RolesRepository rolesRepository;
+
+    @Autowired
+    private RoleBindingRepository roleBindingRepository;
 
     @ApiOperation(value = "Login pulsar manager")
     @ApiResponses({
@@ -101,7 +113,24 @@ public class LoginController {
             headers.add("token", token);
             headers.add("username", userAccount);
             headers.add("tenant", userAccount);
+            headers.add("type", "common");
             jwtService.setToken(request.getSession().getId(), token);
+            List<RoleBindingEntity> roleBindingEntities = roleBindingRepository.
+                    findByUserId(userInfoEntity.getUserId());
+            List<Long> roleIdList = new ArrayList<>();
+            for (RoleBindingEntity roleBindingEntity : roleBindingEntities) {
+                roleIdList.add(roleBindingEntity.getRoleId());
+            }
+            if (!roleIdList.isEmpty()) {
+                List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
+                for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
+                    if (roleInfoEntity.getFlag() == 0) {
+                        // Super users can access all types
+                        headers.add("type", "super");
+                        return new ResponseEntity<>(result, headers, HttpStatus.OK);
+                    }
+                }
+            }
             // Create default role and tenant
             rolesService.createDefaultRoleAndTenant(userAccount);
 

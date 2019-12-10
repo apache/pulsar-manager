@@ -27,4 +27,6 @@ public interface RolesService {
     Set<String> getResourceVerbs(String resourceVerbs);
 
     Map<String, String> validateCurrentTenant(String token, String tenant);
+
+    boolean isSuperUser(String token);
 }

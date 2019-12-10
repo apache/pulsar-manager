@@ -67,6 +67,11 @@ public interface RoleBindingRepository {
     Page<RoleBindingEntity> getRoleBindingList(Integer pageNum, Integer pageSize);
 
     /**
+     * Get all role binding list.
+     * @return A list of RoleBindingEntity
+     */
+    List<RoleBindingEntity> findAllRoleBindingList();
+    /**
      * Update a role binding information
      * @param roleBindingEntity RoleInfoEntity
      */

@@ -250,4 +250,23 @@ public class RolesServiceImpl implements RolesService {
         return result;
     }
 
+    public boolean isSuperUser(String token) {
+        Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(token);
+        if (!userInfoEntityOptional.isPresent()) {
+            return false;
+        }
+        UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+        List<RoleBindingEntity> roleBindingEntities = roleBindingRepository.findByUserId(userInfoEntity.getUserId());
+        List<Long> roleIdList = new ArrayList<>();
+        for (RoleBindingEntity roleBindingEntity : roleBindingEntities) {
+            roleIdList.add(roleBindingEntity.getRoleId());
+        }
+        List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
+        for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
+            if (roleInfoEntity.getFlag() == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

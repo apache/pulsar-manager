@@ -84,6 +84,12 @@ public class RolesController {
         String token = request.getHeader("token");
         Map<String, Object> result = Maps.newHashMap();
         String tenant = request.getHeader("tenant");
+        if (rolesService.isSuperUser(token)) {
+            List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesList();
+            result.put("total", roleInfoEntities.size());
+            result.put("data", roleInfoEntities);
+            return ResponseEntity.ok(result);
+        }
         Map<String, String> validateResult = rolesService.validateCurrentTenant(token, tenant);
         if (validateResult.get("error") != null) {
             result.put("error", validateResult.get("error"));

@@ -36,6 +36,13 @@ public interface RolesRepository {
      */
     Optional<RoleInfoEntity> findByRoleName(String roleName, String roleSource);
 
+    /**
+     * Get a role information by role flag
+     * @param flag The role flag
+     * @return RoleInfoEntity
+     */
+    Optional<RoleInfoEntity> findByRoleFlag(int flag);
+
 
     /**
      * Get role list, support paging.
@@ -44,6 +51,12 @@ public interface RolesRepository {
      * @return A list of RoleInfoEntity.
      */
     Page<RoleInfoEntity> findRolesList(Integer pageNum, Integer pageSize);
+
+    /**
+     * Get all role list
+     * @return A list of RoleInfoEntity.
+     */
+    List<RoleInfoEntity> findAllRolesList();
 
     /**
      * Get role list.
@@ -62,7 +75,7 @@ public interface RolesRepository {
     Page<RoleInfoEntity> findRolesMultiId(Integer pageNum, Integer pageSize, List<Long> idList);
 
     /**
-     * Get all role list by role id, support paging.
+     * Get all role list by role id
      * @param idList a list of role id
      * @return A list of RoleInfoEntity.
      */
