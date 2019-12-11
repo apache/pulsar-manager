@@ -11,17 +11,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.pulsar.manager.service;
+package org.apache.pulsar.manager.entity;
 
-import org.springframework.stereotype.Service;
+import com.google.gson.annotations.SerializedName;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Map;
+@Getter
+@Setter
+@NoArgsConstructor
+@Data
+public class NamespaceEntity {
 
-@Service
-public interface TenantsService {
+    @SerializedName("namespace_id")
+    private long namespaceId;
 
-    Map<String, Object> getTenantsList(
-            Integer pageNum, Integer pageSize, String requestHost);
-
-    Map<String, String> createTenant(String tenant, String role, String cluster, String requestHost);
+    private String tenant;
+    private String namespace;
 }

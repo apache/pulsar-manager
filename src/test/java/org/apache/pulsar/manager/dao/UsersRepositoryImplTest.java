@@ -14,6 +14,7 @@
 package org.apache.pulsar.manager.dao;
 
 import com.github.pagehelper.Page;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
@@ -49,9 +50,10 @@ public class UsersRepositoryImplTest {
         userInfoEntity.setName("test-user");
         userInfoEntity.setExpire(157900045678l);
         userInfoEntity.setPhoneNumber("1356789023456");
+        userInfoEntity.setPassword(DigestUtils.sha256Hex("hello-world"));
     }
 
-    private void validateUser(UserInfoEntity user) {
+    private void validateUser(UserInfoEntity user, boolean list) {
         Assert.assertEquals(user.getName(), "test-user");
         Assert.assertEquals(user.getExpire(), 157900045678l);
         Assert.assertEquals(user.getPhoneNumber(), "1356789023456");
@@ -59,6 +61,9 @@ public class UsersRepositoryImplTest {
         Assert.assertEquals(user.getLocation(), "bj");
         Assert.assertEquals(user.getEmail(), "test@apache.org");
         Assert.assertEquals(user.getAccessToken(), "test-access-token");
+        if (!list) {
+            Assert.assertEquals(user.getPassword(), DigestUtils.sha256Hex("hello-world"));
+        }
     }
 
     @Test
@@ -71,7 +76,7 @@ public class UsersRepositoryImplTest {
         Page<UserInfoEntity> userInfoEntities = usersRepository.findUsersList(1, 10);
         userInfoEntities.count(true);
         userInfoEntities.getResult().forEach((user) -> {
-            validateUser(user);
+            validateUser(user, true);
             usersRepository.delete(user.getName());
         });
     }
@@ -83,7 +88,7 @@ public class UsersRepositoryImplTest {
         usersRepository.save(userInfoEntity);
         Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(userInfoEntity.getName());
         UserInfoEntity getUserInfoEntity = userInfoEntityOptional.get();
-        validateUser(getUserInfoEntity);
+        validateUser(getUserInfoEntity, false);
         userInfoEntity.setPhoneNumber("1356789023456");
         userInfoEntity.setEmail("test2@apache.org");
         usersRepository.update(userInfoEntity);

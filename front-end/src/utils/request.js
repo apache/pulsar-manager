@@ -16,6 +16,7 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import { getName } from '@/utils/username'
 import { getEnvironment } from '@/utils/environment'
 import router from '../router'
 
@@ -32,6 +33,7 @@ service.interceptors.request.use(
     if (store.getters.token) {
       config.headers['token'] = getToken()
     }
+    config.headers['username'] = getName()
     config.headers['environment'] = getEnvironment()
     return config
   },

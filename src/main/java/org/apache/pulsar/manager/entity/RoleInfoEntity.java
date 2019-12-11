@@ -13,27 +13,43 @@
  */
 package org.apache.pulsar.manager.entity;
 
+
+import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+
 /**
- * User information entity.
+ * Role information entity.
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @Data
-public class UserInfoEntity {
-    private long userId;
-    private String name;
-    private String password;
+public class RoleInfoEntity {
+
+    private long roleId;
+
+    @SerializedName("role_name")
+    private String roleName;
+
+    @SerializedName("role_source")
+    private String roleSource;
     private String description;
-    private String location;
-    private String company;
-    private String phoneNumber;
-    private String email;
-    private String accessToken;
-    private long expire;
+
+    @SerializedName("resource_type")
+    private String resourceType;
+
+    @SerializedName("resource_name")
+    private String resourceName;
+
+    @SerializedName("resource_id")
+    private long resourceId;
+
+    @SerializedName("resource_verbs")
+    private String resourceVerbs;
+    private int flag;
 }

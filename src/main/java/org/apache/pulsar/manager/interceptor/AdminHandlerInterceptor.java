@@ -15,8 +15,11 @@ package org.apache.pulsar.manager.interceptor;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
+import org.apache.pulsar.manager.entity.UserInfoEntity;
+import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -41,14 +44,37 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
         this.environmentsRepository = environmentsRepository;
     }
 
+    @Autowired
+    private UsersRepository usersRepository;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("token");
         String saveToken = jwtService.getToken(request.getSession().getId());
-        if (token == null || !token.equals(saveToken)) {
-            Map<String, Object> map = Maps.newHashMap();
+        Map<String, Object> map = Maps.newHashMap();
+        Gson gson = new Gson();
+        if (saveToken == null ) {
+            // Get token from database
+            String username = request.getHeader("username");
+            Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(username);
+            if (!userInfoEntityOptional.isPresent()) {
+                map.put("message", "Please login.");
+                response.setStatus(401);
+                response.getWriter().append(gson.toJson(map));
+                return false;
+            }
+            UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+            if (StringUtils.isBlank(userInfoEntity.getAccessToken())) {
+                map.put("message", "The user token no find, please login");
+                response.setStatus(401);
+                response.getWriter().append(gson.toJson(map));
+                return false;
+            }
+            jwtService.setToken(request.getSession().getId(), userInfoEntity.getAccessToken());
+            saveToken = jwtService.getToken(request.getSession().getId());
+        }
+        if (token == null && !token.equals(saveToken)) {
             map.put("message", "Please login.");
-            Gson gson = new Gson();
             response.setStatus(401);
             response.getWriter().append(gson.toJson(map));
             return false;
@@ -56,9 +82,7 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
         String environment = request.getHeader("environment");
         Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
         if (!request.getRequestURI().startsWith("/pulsar-manager/environments") && !environmentEntityOptional.isPresent()) {
-            Map<String, Object> map = Maps.newHashMap();
             map.put("message", "Currently there is no active environment, please set one");
-            Gson gson = new Gson();
             response.setStatus(400);
             response.getWriter().append(gson.toJson(map));
             return false;

@@ -11,17 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.pulsar.manager.service;
+package org.apache.pulsar.manager.utils;
 
-import org.springframework.stereotype.Service;
-
-import java.util.Map;
-
-@Service
-public interface TenantsService {
-
-    Map<String, Object> getTenantsList(
-            Integer pageNum, Integer pageSize, String requestHost);
-
-    Map<String, String> createTenant(String tenant, String role, String cluster, String requestHost);
+/**
+ * Type of resource, references https://github.com/apache/pulsar/wiki/PIP-49%3A-Permission-levels-and-inheritance
+ */
+public enum ResourceType {
+    ALL,
+    CLUSTERS,
+    BROKERS,
+    NS_ISOLATION_POLICY,
+    FAILURE_DOMAIN,
+    TENANTS,
+    NAMESPACES,
+    TOPICS,
+    FUNCTIONS,
+    SOURCES,
+    SINKS,
+    SCHEMAS,
+    ROLES,
+    ROLE_BINDING
 }

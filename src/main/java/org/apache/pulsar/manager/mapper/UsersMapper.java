@@ -26,14 +26,14 @@ import org.apache.pulsar.manager.entity.UserInfoEntity;
 public interface UsersMapper {
 
     @Insert("INSERT INTO users (access_token, name, description, email, phone_number" +
-            ", location, company, expire)" +
+            ", location, company, expire, password)" +
             "VALUES (#{accessToken}, #{name}, #{description}, #{email}, #{phoneNumber}" +
-            ", #{location}, #{company}, #{expire})")
+            ", #{location}, #{company}, #{expire}, #{password})")
     @Options(useGeneratedKeys=true, keyProperty="userId", keyColumn="user_id")
     long save(UserInfoEntity userInfoEntity);
 
     @Select("SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
-            "phone_number AS phoneNumber, location, company, expire " +
+            "phone_number AS phoneNumber, location, company, expire, password " +
             "FROM users " +
             "WHERE name = #{name}")
     UserInfoEntity findByUserName(String name);
@@ -45,8 +45,8 @@ public interface UsersMapper {
 
     @Update("UPDATE users " +
             "SET access_token = #{accessToken}, description = #{description}, email = #{email}," +
-            "phone_number = #{phoneNumber}, location = #{location}, company = #{company}, expire=#{expire} " +
-            "WHERE name = #{name}")
+            "phone_number = #{phoneNumber}, location = #{location}, company = #{company}, expire=#{expire}," +
+            "password=#{password} WHERE name = #{name}")
     void update(UserInfoEntity userInfoEntity);
 
     @Delete("DELETE FROM users WHERE name=#{name}")

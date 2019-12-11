@@ -14,6 +14,7 @@
 package org.apache.pulsar.manager.service.impl;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import org.apache.pulsar.manager.service.TenantsService;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +82,28 @@ public class TenantsServiceImpl implements TenantsService {
            // to do query from local database
         }
         return tenantsMap;
+    }
+
+    public Map<String, String> createTenant(String tenant, String role, String cluster, String requestHost) {
+        Map<String, String> header = Maps.newHashMap();
+        header.put("Content-Type", "application/json");
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
+        Map<String, Object> body = Maps.newHashMap();
+        body.put("adminRoles", Sets.newHashSet(role));
+        // Get cluster from standalone, to do
+        body.put("allowedClusters", Sets.newHashSet(cluster));
+        Gson gson = new Gson();
+        Map<String, String> result = Maps.newHashMap();
+        try {
+            HttpUtil.doPut( requestHost + "/admin/v2/tenants/" + tenant, header, gson.toJson(body));
+            result.put("message", "Create tenant success");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Init tenant failed for user: {}", tenant);
+            result.put("error", "Create tenant failed");
+        }
+        return result;
     }
 
 }

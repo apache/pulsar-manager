@@ -87,4 +87,16 @@ public class ClustersServiceImpl implements ClustersService {
         }
         return clustersMap;
     }
+
+    public List<String> getClusterByAnyBroker(String requestHost) {
+        Gson gson = new Gson();
+        Map<String, String> header = Maps.newHashMap();
+        header.put("Content-Type", "application/json");
+        if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
+        String result = HttpUtil.doGet(requestHost + "/admin/v2/clusters", header);
+        List<String> clustersList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
+        return clustersList;
+    }
 }

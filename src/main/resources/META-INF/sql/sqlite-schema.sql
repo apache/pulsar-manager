@@ -130,6 +130,34 @@ CREATE TABLE IF NOT EXISTS users (
   location varchar(256),
   company varchar(256),
   expire integer NOT NUll,
+  password varchar(256),
   UNIQUE (name)
 );
 
+CREATE TABLE IF NOT EXISTS roles (
+  role_id integer PRIMARY KEY AUTOINCREMENT,
+  role_name varchar(256) NOT NULL,
+  role_source varchar(256) NOT NULL,
+  description varchar(128),
+  resource_id integer NOT NULL,
+  resource_type varchar(48) NOT NULL,
+  resource_name varchar(48) NOT NULL,
+  resource_verbs varchar(256) NOT NULL,
+  flag INT NOT NULL,
+  UNIQUE(role_name, role_source)
+);
+
+CREATE TABLE IF NOT EXISTS tenants (
+  tenant_id integer PRIMARY KEY AUTOINCREMENT,
+  tenant varchar(255) NOT NULL,
+  admin_roles varchar(255),
+  allowed_clusters varchar(255),
+  UNIQUE(tenant)
+);
+
+CREATE TABLE IF NOT EXISTS namespaces (
+  namespace_id integer PRIMARY KEY AUTOINCREMENT,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL,
+  UNIQUE(tenant, namespace)
+);

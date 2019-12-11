@@ -13,27 +13,31 @@
  */
 package org.apache.pulsar.manager.entity;
 
+
+import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * User information entity.
+ * Tenants entity
  */
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class UserInfoEntity {
-    private long userId;
-    private String name;
-    private String password;
-    private String description;
-    private String location;
-    private String company;
-    private String phoneNumber;
-    private String email;
-    private String accessToken;
-    private long expire;
+public class TenantEntity {
+
+    @SerializedName("tenant_id")
+    private long tenantId;
+
+    private String tenant;
+
+    @SerializedName("admin_roles")
+    private String adminRoles;
+    @SerializedName("allowed_clusters")
+    private String allowedClusters;
 }

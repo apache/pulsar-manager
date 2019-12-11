@@ -13,15 +13,13 @@
  */
 package org.apache.pulsar.manager.service;
 
-import org.springframework.stereotype.Service;
+import org.apache.pulsar.manager.entity.RoleInfoEntity;
 
 import java.util.Map;
 
-@Service
-public interface TenantsService {
+public interface RolesService {
 
-    Map<String, Object> getTenantsList(
-            Integer pageNum, Integer pageSize, String requestHost);
+    Map<String, String> validateRoleInfoEntity(RoleInfoEntity roleInfoEntity);
 
-    Map<String, String> createTenant(String tenant, String role, String cluster, String requestHost);
+    void createDefaultRoleAndTenant(String tenant);
 }

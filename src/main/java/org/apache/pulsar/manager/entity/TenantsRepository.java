@@ -11,17 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.pulsar.manager.service;
+package org.apache.pulsar.manager.entity;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Optional;
 
-import java.util.Map;
+import com.github.pagehelper.Page;
+import org.springframework.stereotype.Repository;
 
-@Service
-public interface TenantsService {
+@Repository
+public interface TenantsRepository {
 
-    Map<String, Object> getTenantsList(
-            Integer pageNum, Integer pageSize, String requestHost);
+    long save(TenantEntity tenantsEntity);
 
-    Map<String, String> createTenant(String tenant, String role, String cluster, String requestHost);
+    Optional<TenantEntity> findByName(String tenant);
+
+    Page<TenantEntity> getTenantsList(Integer pageNum, Integer pageSize);
+
+    Page<TenantEntity> findByMultiId(Integer pageNum, Integer pageSize, List<Long> tenantIdList);
+
+    void remove(String tenant);
+
 }
+
