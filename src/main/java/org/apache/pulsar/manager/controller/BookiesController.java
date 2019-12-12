@@ -34,8 +34,12 @@ import java.util.Map;
 @Validated
 public class BookiesController {
 
+    private final BookiesService bookiesService;
+
     @Autowired
-    private BookiesService bookiesService;
+    public BookiesController(BookiesService bookiesService) {
+        this.bookiesService = bookiesService;
+    }
 
     @ApiOperation(value = "Get the list of existing bookies, support paging, the default is 10 per page")
     @ApiResponses({

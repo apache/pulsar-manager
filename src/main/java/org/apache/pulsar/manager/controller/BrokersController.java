@@ -43,14 +43,19 @@ import java.util.Map;
 @RestController
 public class BrokersController {
 
-    @Autowired
-    private BrokersService brokersService;
+    private final BrokersService brokersService;
+    private final HttpServletRequest request;
+    private final EnvironmentCacheService environmentCacheService;
 
     @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
-    private EnvironmentCacheService environmentCacheService;
+    public BrokersController(
+            BrokersService brokersService,
+            HttpServletRequest request,
+            EnvironmentCacheService environmentCacheService) {
+        this.brokersService = brokersService;
+        this.request = request;
+        this.environmentCacheService = environmentCacheService;
+    }
 
     @ApiOperation(value = "Get the list of existing brokers, support paging, the default is 10 per page")
     @ApiResponses({

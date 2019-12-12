@@ -44,14 +44,19 @@ import java.util.Map;
 @RestController
 public class NamespacesController {
 
-    @Autowired
-    private NamespacesService namespacesService;
+    private final NamespacesService namespacesService;
+    private final EnvironmentCacheService environmentCacheService;
+    private final HttpServletRequest request;
 
     @Autowired
-    private EnvironmentCacheService environmentCacheService;
-
-    @Autowired
-    private HttpServletRequest request;
+    public NamespacesController(
+            NamespacesService namespacesService,
+            EnvironmentCacheService environmentCacheService,
+            HttpServletRequest request) {
+        this.namespacesService = namespacesService;
+        this.environmentCacheService = environmentCacheService;
+        this.request = request;
+    }
 
     @ApiOperation(value = "Query list by the name of tenant or namespace, support paging, the default is 10 per page")
     @ApiResponses({

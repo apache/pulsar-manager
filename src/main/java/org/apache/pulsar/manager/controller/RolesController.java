@@ -148,7 +148,6 @@ public class RolesController {
     })
     @RequestMapping(value = "/roles/role", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateRole(@RequestBody RoleInfoEntity roleInfoEntity) {
-
         Map<String, Object> result = Maps.newHashMap();
         HttpServletRequest request = ((ServletRequestAttributes)
                 RequestContextHolder.getRequestAttributes()).getRequest();

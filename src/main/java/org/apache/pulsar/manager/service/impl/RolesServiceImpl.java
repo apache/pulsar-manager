@@ -124,7 +124,6 @@ public class RolesServiceImpl implements RolesService {
                 return validateResult;
             }
         }
-
         Set<String> resourceVerbs = new HashSet<>(
                 Arrays.asList(roleInfoEntity.getResourceVerbs().split(VERBS_SEPARATOR)));
         for (String verb : resourceVerbs) {
@@ -249,5 +248,4 @@ public class RolesServiceImpl implements RolesService {
         result.put("message", "Validate tenant success");
         return result;
     }
-
 }

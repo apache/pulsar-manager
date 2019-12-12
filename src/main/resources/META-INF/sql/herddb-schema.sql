@@ -152,6 +152,31 @@ CREATE TABLE IF NOT EXISTS namespaces (
   namespace varchar(255) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS roles (
+  role_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  role_name varchar(256) NOT NULL,
+  role_source varchar(256) NOT NULL,
+  description varchar(128),
+  resource_id BIGINT NOT NULL,
+  resource_type varchar(48) NOT NULL,
+  resource_name varchar(48) NOT NULL,
+  resource_verbs varchar(256) NOT NULL,
+  flag INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tenants (
+  tenant_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  tenant varchar(255) NOT NULL,
+  admin_roles varchar(255),
+  allowed_clusters varchar(255)
+);
+
+CREATE TABLE IF NOT EXISTS namespaces (
+  namespace_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS role_binding(
   role_binding_id BIGINT PRIMARY KEY AUTO_INCREMENT,
   name varchar(256) NOT NULL,

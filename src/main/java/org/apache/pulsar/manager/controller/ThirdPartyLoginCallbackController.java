@@ -57,8 +57,12 @@ public class ThirdPartyLoginCallbackController {
     @Value("${github.redirect.host}")
     private String githubRedirectHost;
 
+    private final ThirdPartyLoginService thirdPartyLoginService;
+
     @Autowired
-    private ThirdPartyLoginService thirdPartyLoginService;
+    public ThirdPartyLoginCallbackController(ThirdPartyLoginService thirdPartyLoginService) {
+        this.thirdPartyLoginService = thirdPartyLoginService;
+    }
 
     @ApiOperation(value = "When use pass github authentication, Github platform will carry code parameter to call " +
             "back this address actively. At this time, we can request token and get user information through " +

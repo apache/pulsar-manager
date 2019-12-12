@@ -60,8 +60,12 @@ public class LoginController {
     @Value("${pulsar-manager.password}")
     private String password;
 
+    private final JwtService jwtService;
+
     @Autowired
-    private JwtService jwtService;
+    public LoginController(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @Autowired
     private UsersRepository usersRepository;

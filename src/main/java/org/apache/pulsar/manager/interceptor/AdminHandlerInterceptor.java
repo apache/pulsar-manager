@@ -37,11 +37,14 @@ import java.util.Optional;
 @Component
 public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final EnvironmentsRepository environmentsRepository;
 
     @Autowired
-    private EnvironmentsRepository environmentsRepository;
+    public AdminHandlerInterceptor(JwtService jwtService, EnvironmentsRepository environmentsRepository) {
+        this.jwtService = jwtService;
+        this.environmentsRepository = environmentsRepository;
+    }
 
     @Autowired
     private UsersRepository usersRepository;
@@ -55,6 +58,26 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
         String saveToken = jwtService.getToken(request.getSession().getId());
         Map<String, Object> map = Maps.newHashMap();
         Gson gson = new Gson();
+        if (saveToken == null ) {
+            // Get token from database
+            String username = request.getHeader("username");
+            Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(username);
+            if (!userInfoEntityOptional.isPresent()) {
+                map.put("message", "Please login.");
+                response.setStatus(401);
+                response.getWriter().append(gson.toJson(map));
+                return false;
+            }
+            UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+            if (StringUtils.isBlank(userInfoEntity.getAccessToken())) {
+                map.put("message", "The user token no find, please login");
+                response.setStatus(401);
+                response.getWriter().append(gson.toJson(map));
+                return false;
+            }
+            jwtService.setToken(request.getSession().getId(), userInfoEntity.getAccessToken());
+            saveToken = jwtService.getToken(request.getSession().getId());
+        }
         if (token == null && !token.equals(saveToken)) {
             map.put("message", "Please login.");
             response.setStatus(401);
