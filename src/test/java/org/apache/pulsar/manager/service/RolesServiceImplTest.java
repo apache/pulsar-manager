@@ -14,8 +14,6 @@
 package org.apache.pulsar.manager.service;
 
 import org.apache.pulsar.manager.PulsarManagerApplication;
-import org.apache.pulsar.manager.entity.EnvironmentsRepository;
-<<<<<<< HEAD
 import org.apache.pulsar.manager.entity.NamespaceEntity;
 import org.apache.pulsar.manager.entity.NamespacesRepository;
 import org.apache.pulsar.manager.entity.RoleBindingEntity;
@@ -26,11 +24,6 @@ import org.apache.pulsar.manager.entity.TenantEntity;
 import org.apache.pulsar.manager.entity.TenantsRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
-=======
-import org.apache.pulsar.manager.entity.RoleInfoEntity;
-import org.apache.pulsar.manager.entity.RolesRepository;
-import org.apache.pulsar.manager.entity.TenantsRepository;
->>>>>>> master
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.apache.pulsar.manager.utils.HttpUtil;
 import org.apache.pulsar.manager.utils.ResourceType;
@@ -65,7 +58,6 @@ public class RolesServiceImplTest {
     @Autowired
     private RolesService rolesService;
 
-<<<<<<< HEAD
     @Autowired
     private UsersRepository usersRepository;
 
@@ -81,13 +73,10 @@ public class RolesServiceImplTest {
     @Autowired
     private NamespacesRepository namespacesRepository;
 
-=======
->>>>>>> master
     @Test
     public void validateRoleInfoEntityTest() {
         RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
 
-<<<<<<< HEAD
         Map<String, String> roleNameIsEmpty = rolesService.validateRoleInfoEntity(roleInfoEntity);
         Assert.assertEquals(roleNameIsEmpty.get("error"), "Role name cannot be empty");
 
@@ -135,8 +124,6 @@ public class RolesServiceImplTest {
         long namespaceId = namespacesRepository.save(namespaceEntity);
         roleInfoEntity.setResourceId(namespaceId);
 
-=======
->>>>>>> master
         roleInfoEntity.setResourceVerbs("xxxx");
         Map<String, String> stringMapVerbs = rolesService.validateRoleInfoEntity(roleInfoEntity);
         Assert.assertTrue(stringMapVerbs.get("error").startsWith("Verb"));
@@ -157,7 +144,6 @@ public class RolesServiceImplTest {
         Map<String, String> stringMapAll = rolesService.validateRoleInfoEntity(roleInfoEntity);
         Assert.assertEquals(stringMapAll.get("message"), "Role validate success");
     }
-<<<<<<< HEAD
 
     @Test
     public void validateCurrentTenantTest() {
@@ -200,6 +186,4 @@ public class RolesServiceImplTest {
                 "test-access-token", "test-tenant");
         Assert.assertEquals(currentTenantValidateSuccess.get("message"), "Validate tenant success");
     }
-=======
->>>>>>> master
 }
