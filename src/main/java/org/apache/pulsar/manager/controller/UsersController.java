@@ -15,6 +15,7 @@ package org.apache.pulsar.manager.controller;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -35,17 +36,24 @@ import org.apache.pulsar.manager.utils.ResourceType;
 import org.apache.pulsar.manager.utils.ResourceVerbs;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Users management controller.
@@ -55,6 +63,12 @@ import java.util.Optional;
 @Api(description = "Functions under this class are available to super user.")
 public class UsersController {
 
+    @Value("${user.management.enable}")
+    private boolean userManagementEnable;
+
+    @Value("${pulsar-manager.account}")
+    private String account;
+
     private final UsersRepository usersRepository;
 
     private final UsersService usersService;
@@ -63,16 +77,24 @@ public class UsersController {
 
     private final RoleBindingRepository roleBindingRepository;
 
+    private final RolesService rolesService;
+
+    private final HttpServletRequest request;
+
     @Autowired
     public UsersController(
             UsersRepository usersRepository,
             UsersService usersService,
             RolesRepository rolesRepository,
-            RoleBindingRepository roleBindingRepository) {
+            RoleBindingRepository roleBindingRepository,
+            RolesService rolesService,
+            HttpServletRequest request) {
         this.usersRepository = usersRepository;
         this.usersService = usersService;
         this.rolesRepository = rolesRepository;
         this.roleBindingRepository = roleBindingRepository;
+        this.rolesService = rolesService;
+        this.request = request;
     }
 
     @ApiOperation(value = "Get users list")
@@ -118,8 +140,16 @@ public class UsersController {
             result.put("error", "User already exist, please check");
             return ResponseEntity.ok(result);
         }
+
         userInfoEntity.setPassword(DigestUtils.sha256Hex(userInfoEntity.getPassword()));
         usersRepository.save(userInfoEntity);
+        // Create default role and tenant
+        Map<String, String> defaultRoleCreate = rolesService.createDefaultRoleAndTenant(
+                userInfoEntity.getName(), request.getHeader("environment"));
+        if (defaultRoleCreate.get("error") != null) {
+            result.put("error", defaultRoleCreate.get("error"));
+            return ResponseEntity.ok(result);
+        }
         result.put("message", "Create user success");
         return ResponseEntity.ok(result);
     }
@@ -170,6 +200,56 @@ public class UsersController {
         }
         usersRepository.delete(userInfoEntity.getName());
         result.put("message", "Delete a user success");
+        return ResponseEntity.ok(result);
+    }
+
+    @ApiOperation(value = "Get user info")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "ok"),
+            @ApiResponse(code = 404, message = "Not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
+    @RequestMapping(value = "/users/userInfo", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getUserInfo() {
+        Map<String, Object> result = Maps.newHashMap();
+        Set<String> roles  = Sets.newHashSet();
+        if (userManagementEnable) {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String token = request.getHeader("token");
+            Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(token);
+            if (!userInfoEntityOptional.isPresent()) {
+                result.put("error", "User is no exist");
+                return ResponseEntity.ok(result);
+            }
+            UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+            List<RoleBindingEntity> roleBindingEntities = roleBindingRepository.findByUserId(userInfoEntity.getUserId());
+            List<Long> roleIdList = new ArrayList<>();
+            for (RoleBindingEntity roleBindingEntity : roleBindingEntities) {
+                roleIdList.add(roleBindingEntity.getRoleId());
+            }
+            List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
+            for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
+                if (roleInfoEntity.getFlag() == 0) {
+                    result.put("message", "Get user info success");
+                    result.put("userName", userInfoEntity.getName());
+                    result.put("description", userInfoEntity.getDescription());
+                    roles.add("super");
+                    result.put("roles", roles);
+                    return ResponseEntity.ok(result);
+                }
+            }
+            result.put("message", "Get user info success");
+            result.put("userName", userInfoEntity.getName());
+            result.put("description", userInfoEntity.getDescription());
+            roles.add("admin");
+            result.put("roles", roles);
+            return ResponseEntity.ok(result);
+        }
+        result.put("message", "Get user info success");
+        result.put("description", "This is super account");
+        result.put("userName", account);
+        roles.add("super");
+        result.put("roles", roles);
         return ResponseEntity.ok(result);
     }
 

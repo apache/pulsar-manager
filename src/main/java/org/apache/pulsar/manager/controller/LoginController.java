@@ -113,7 +113,6 @@ public class LoginController {
             headers.add("token", token);
             headers.add("username", userAccount);
             headers.add("tenant", userAccount);
-            headers.add("type", "common");
             jwtService.setToken(request.getSession().getId(), token);
             List<RoleBindingEntity> roleBindingEntities = roleBindingRepository.
                     findByUserId(userInfoEntity.getUserId());
@@ -126,14 +125,11 @@ public class LoginController {
                 for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
                     if (roleInfoEntity.getFlag() == 0) {
                         // Super users can access all types
-                        headers.add("type", "super");
                         return new ResponseEntity<>(result, headers, HttpStatus.OK);
                     }
                 }
             }
-            // Create default role and tenant
-            rolesService.createDefaultRoleAndTenant(userAccount);
-
+            headers.add("role", "admin");
             return new ResponseEntity<>(result, headers, HttpStatus.OK);
         }
         if (userAccount.equals(account) && userPassword.equals(password)) {

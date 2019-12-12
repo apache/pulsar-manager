@@ -143,7 +143,8 @@ CREATE TABLE IF NOT EXISTS tenants (
   tenant_id BIGINT PRIMARY KEY AUTO_INCREMENT,
   tenant varchar(255) NOT NULL,
   admin_roles varchar(255),
-  allowed_clusters varchar(255)
+  allowed_clusters varchar(255),
+  environment_name varchar(255)
 );
 
 CREATE TABLE IF NOT EXISTS namespaces (

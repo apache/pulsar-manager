@@ -22,7 +22,7 @@ public interface RolesService {
 
     Map<String, String> validateRoleInfoEntity(RoleInfoEntity roleInfoEntity);
 
-    void createDefaultRoleAndTenant(String tenant);
+    Map<String, String> createDefaultRoleAndTenant(String tenant, String environment);
 
     Set<String> getResourceVerbs(String resourceVerbs);
 

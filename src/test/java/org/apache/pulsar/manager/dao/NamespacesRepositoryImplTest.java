@@ -81,7 +81,8 @@ public class NamespacesRepositoryImplTest {
 
     public void prepareTenant() {
         TenantEntity tenantsEntity = new TenantEntity(
-                1, "test-namespace-public",  "testrole", "testCluster");
+                1, "test-namespace-public",
+                "testrole", "testCluster", "test-environment");
         tenantsRepository.save(tenantsEntity);
     }
 

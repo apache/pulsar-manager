@@ -17,7 +17,16 @@ import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
+import org.apache.pulsar.manager.entity.RoleBindingEntity;
+import org.apache.pulsar.manager.entity.RoleBindingRepository;
+import org.apache.pulsar.manager.entity.RoleInfoEntity;
+import org.apache.pulsar.manager.entity.RolesRepository;
+import org.apache.pulsar.manager.entity.TenantEntity;
+import org.apache.pulsar.manager.entity.TenantsRepository;
+import org.apache.pulsar.manager.entity.UserInfoEntity;
+import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
+import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.utils.HttpUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +34,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pulsar.manager.utils.ResourceType;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +46,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -49,14 +62,43 @@ import java.util.Optional;
 @RestController
 public class EnvironmentsController {
 
-    @Autowired
-    private EnvironmentsRepository environmentsRepository;
-
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
 
-    @Autowired
-    private EnvironmentCacheService environmentCacheService;
+    private final EnvironmentsRepository environmentsRepository;
+
+    private final EnvironmentCacheService environmentCacheService;
+
+    private final UsersRepository usersRepository;
+
+    private final TenantsRepository tenantsRepository;
+
+    private final RolesRepository rolesRepository;
+
+    private final RoleBindingRepository roleBindingRepository;
+
+    private final RolesService rolesService;
+
+    private final HttpServletRequest request;
+
+    public EnvironmentsController(
+            HttpServletRequest request,
+            EnvironmentsRepository environmentsRepository,
+            EnvironmentCacheService environmentCacheService,
+            UsersRepository usersRepository,
+            TenantsRepository tenantsRepository,
+            RolesRepository rolesRepository,
+            RoleBindingRepository roleBindingRepository,
+            RolesService rolesService) {
+        this.environmentsRepository = environmentsRepository;
+        this.environmentCacheService = environmentCacheService;
+        this.request = request;
+        this.usersRepository = usersRepository;
+        this.tenantsRepository = tenantsRepository;
+        this.rolesRepository = rolesRepository;
+        this.roleBindingRepository = roleBindingRepository;
+        this.rolesService = rolesService;
+    }
 
     @ApiOperation(value = "Get the list of existing environments, support paging, the default is 10 per page")
     @ApiResponses({
@@ -73,10 +115,42 @@ public class EnvironmentsController {
             @RequestParam(name="page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
             Integer pageSize) {
-        Page<EnvironmentEntity> environmentEntityPage = environmentsRepository.getEnvironmentsList(pageNum, pageSize);
+        String token = request.getHeader("token");
         Map<String, Object> result = Maps.newHashMap();
-        result.put("total", environmentEntityPage.getTotal());
-        result.put("data", environmentEntityPage);
+        List<EnvironmentEntity> environmentEntities;
+        if (!rolesService.isSuperUser(token)) {
+            Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(token);
+            // There is no need to check whether the user exists again; the user must exist.
+            UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+            long userId = userInfoEntity.getUserId();
+            List<RoleBindingEntity> roleBindingInfoEntities = roleBindingRepository.findByUserId(userId);
+            List<Long> roleIdList = new ArrayList<>();
+            List<String> environmentList = new ArrayList<>();
+            for (RoleBindingEntity roleInfoEntity : roleBindingInfoEntities) {
+                roleIdList.add(roleInfoEntity.getRoleId());
+            }
+            if (!roleIdList.isEmpty()) {
+                List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
+                List<Long> tenantsIdList = new ArrayList<>();
+                for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
+                    if (roleInfoEntity.getResourceType().equals(ResourceType.TENANTS.name())) {
+                        tenantsIdList.add(roleInfoEntity.getResourceId());
+                    }
+                }
+                if (!tenantsIdList.isEmpty()) {
+                    List<TenantEntity> tenantEntities = tenantsRepository.findByMultiId(tenantsIdList);
+                    for (TenantEntity tenantEntity : tenantEntities) {
+                        environmentList.add(tenantEntity.getEnvironmentName());
+                    }
+                }
+            }
+            environmentEntities = environmentsRepository.getAllEnvironments(environmentList);
+        } else {
+            environmentEntities = environmentsRepository.getAllEnvironments();
+        }
+
+        result.put("total", environmentEntities.size());
+        result.put("data", environmentEntities);
         return ResponseEntity.ok(result);
     }
 

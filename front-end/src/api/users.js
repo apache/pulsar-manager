@@ -53,3 +53,10 @@ export function deleteUser(data) {
   })
 }
 
+export function getUserInfo() {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: SPRING_BASE_URL + '/users/userInfo',
+    method: 'get'
+  })
+}

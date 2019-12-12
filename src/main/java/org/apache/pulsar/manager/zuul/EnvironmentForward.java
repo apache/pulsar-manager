@@ -13,6 +13,7 @@
  */
 package org.apache.pulsar.manager.zuul;
 
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.pulsar.manager.entity.NamespaceEntity;
 import org.apache.pulsar.manager.entity.NamespacesRepository;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
@@ -73,6 +75,17 @@ public class EnvironmentForward extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String redirect = request.getParameter("redirect");
 
+        String requestUri = request.getRequestURI();
+        if (requestUri.startsWith("/admin/v2/namespaces")
+                || requestUri.startsWith("/admin/v2/persistent")
+                || requestUri.startsWith("/admin/v2/non-persistent")) {
+            Map<String, String> result = pulsarEvent.validateTenantPermission(
+                    requestUri, request.getHeader("token"));
+            if (result.get("error") != null) {
+                log.error("This operation does not have permission");
+                return null;
+            }
+        }
         if (redirect != null && redirect.equals("true")) {
             String redirectScheme = request.getParameter("redirect.scheme");
             String redirectHost = request.getParameter("redirect.host");
@@ -93,7 +106,6 @@ public class EnvironmentForward extends ZuulFilter {
             return null;
         }
         String serviceUrl = environmentCacheService.getServiceUrl(request);
-        System.out.println(serviceUrl);
         return forwardRequest(ctx, request, serviceUrl);
     }
 

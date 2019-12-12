@@ -21,10 +21,13 @@ import org.apache.pulsar.manager.entity.EnvironmentsRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.JwtService;
+import org.apache.pulsar.manager.service.PulsarEvent;
+import org.apache.pulsar.manager.service.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -46,8 +49,14 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private RolesService rolesService;
+
     @Value("${user.management.enable}")
     private boolean userManagementEnable;
+
+    @Autowired
+    private PulsarEvent pulsarEvent;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -78,13 +87,44 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
                 return false;
             }
         }
-        String environment = request.getHeader("environment");
-        Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
-        if (!request.getRequestURI().startsWith("/pulsar-manager/environments") && !environmentEntityOptional.isPresent()) {
-            map.put("message", "Currently there is no active environment, please set one");
-            response.setStatus(400);
-            response.getWriter().append(gson.toJson(map));
-            return false;
+        String requestUri = request.getRequestURI();
+        if (!requestUri.equals("/pulsar-manager/users/userInfo")) {
+            String environment = request.getHeader("environment");
+            Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
+            if (!request.getRequestURI().startsWith("/pulsar-manager/environments") && !environmentEntityOptional.isPresent()) {
+                map.put("message", "Currently there is no active environment, please set one");
+                response.setStatus(400);
+                response.getWriter().append(gson.toJson(map));
+                return false;
+            }
+        }
+        if (!rolesService.isSuperUser(token)) {
+            if (requestUri.startsWith("/admin/v2/clusters")
+                    || requestUri.startsWith("/admin/v2/brokers")) {
+                map.put("message", "This user no permissions for this resource");
+                response.setStatus(401);
+                response.getWriter().append(gson.toJson(map));
+                return false;
+            }
+            if (requestUri.startsWith("/admin/v2/tenants")) {
+                if (request.getMethod() != "GET") {
+                    map.put("message", "This user no permissions for this resource");
+                    response.setStatus(401);
+                    response.getWriter().append(gson.toJson(map));
+                    return false;
+                }
+            }
+            if (requestUri.startsWith("/pulsar-manager/admin/v2/namespaces")
+                    || requestUri.startsWith("/pulsar-manager/admin/v2/persistent")
+                    || requestUri.startsWith("/pulsar-manager/admin/v2/non-persistent")) {
+                Map<String, String> result = pulsarEvent.validateTenantPermission(requestUri, token);
+                if (result.get("error") != null) {
+                    map.put("message", result.get("error"));
+                    response.setStatus(401);
+                    response.getWriter().append(gson.toJson(map));
+                    return false;
+                }
+            }
         }
         return true;
     }

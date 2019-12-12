@@ -14,9 +14,11 @@
 package org.apache.pulsar.manager.service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 public interface PulsarEvent {
 
     void parsePulsarEvent(String path, HttpServletRequest httpRequest);
 
+    Map<String, String> validateTenantPermission(String path, String token);
 }

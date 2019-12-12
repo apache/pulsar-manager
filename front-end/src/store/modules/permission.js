@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 import { asyncRouterMap, constantRouterMap } from '@/router'
+import store from '@/store'
 
 /**
  * 通过meta.role判断是否与当前用户权限匹配
@@ -55,7 +56,12 @@ const permission = {
   mutations: {
     SET_ROUTERS: (state, routers) => {
       state.addRouters = routers
-      state.routers = constantRouterMap.concat(routers)
+      const roles = store.getters && store.getters.roles
+      if (roles.includes('super')) {
+        state.routers = constantRouterMap.concat(routers)
+      } else {
+        state.routers = filterAsyncRouter(constantRouterMap, roles)
+      }
     }
   },
   actions: {
@@ -63,7 +69,7 @@ const permission = {
       return new Promise(resolve => {
         const { roles } = data
         let accessedRouters
-        if (roles.includes('admin')) {
+        if (roles.includes('super')) {
           accessedRouters = asyncRouterMap
         } else {
           accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
