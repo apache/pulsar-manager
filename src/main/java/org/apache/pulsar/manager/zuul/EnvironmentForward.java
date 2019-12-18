@@ -76,13 +76,21 @@ public class EnvironmentForward extends ZuulFilter {
         String redirect = request.getParameter("redirect");
 
         String requestUri = request.getRequestURI();
-        if (requestUri.startsWith("/admin/v2/namespaces")
+        String token = request.getHeader("token");
+
+        if (!pulsarEvent.validateRoutePermission(requestUri, token)) {
+            ctx.setResponseBody("This operation does not have permission");
+            return null;
+        }
+        if (requestUri.startsWith("/admin/v2/tenants/")
+                || requestUri.startsWith("/admin/v2/namespaces")
                 || requestUri.startsWith("/admin/v2/persistent")
                 || requestUri.startsWith("/admin/v2/non-persistent")) {
             Map<String, String> result = pulsarEvent.validateTenantPermission(
-                    requestUri, request.getHeader("token"));
+                    requestUri, token);
             if (result.get("error") != null) {
                 log.error("This operation does not have permission");
+                ctx.setResponseBody(result.get("error"));
                 return null;
             }
         }

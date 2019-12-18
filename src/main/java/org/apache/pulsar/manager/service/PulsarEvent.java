@@ -21,4 +21,6 @@ public interface PulsarEvent {
     void parsePulsarEvent(String path, HttpServletRequest httpRequest);
 
     Map<String, String> validateTenantPermission(String path, String token);
+
+    boolean validateRoutePermission(String path, String token);
 }

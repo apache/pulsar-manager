@@ -158,6 +158,7 @@ export default {
     },
     getNamespacesList() {
       fetchNamespaces(this.postForm.tenant, this.listQuery).then(response => {
+        if (!response.data.data) return
         this.listNamespaces = []
         for (var i = 0; i < response.data.data.length; i++) {
           this.listNamespaces.push({

@@ -162,9 +162,14 @@ public class EnvironmentsController {
     @RequestMapping(value = "/environments/environment", method =  RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> addEnvironment(
             @RequestBody EnvironmentEntity environmentEntity) {
+        Map<String, Object> result = Maps.newHashMap();
+        String token = request.getHeader("token");
+        if (!rolesService.isSuperUser(token)) {
+            result.put("error", "User does not have permission to operate");
+            return ResponseEntity.ok(result);
+        }
         Optional<EnvironmentEntity> environmentEntityBrokerOptional = environmentsRepository
                 .findByBroker(environmentEntity.getBroker());
-        Map<String, Object> result = Maps.newHashMap();
         if (environmentEntityBrokerOptional.isPresent()) {
             result.put("error", "Broker is exist");
             return ResponseEntity.ok(result);
@@ -202,9 +207,14 @@ public class EnvironmentsController {
     })
     @RequestMapping(value = "/environments/environment", method =  RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateEnvironment(@RequestBody EnvironmentEntity environmentEntity) {
+        Map<String, Object> result = Maps.newHashMap();
+        String token = request.getHeader("token");
+        if (!rolesService.isSuperUser(token)) {
+            result.put("error", "User does not have permission to operate");
+            return ResponseEntity.ok(result);
+        }
         Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository
                 .findByName(environmentEntity.getName());
-        Map<String, Object> result = Maps.newHashMap();
         if (!environmentEntityOptional.isPresent()) {
             result.put("error", "Environment no exist");
             return ResponseEntity.ok(result);
@@ -232,9 +242,14 @@ public class EnvironmentsController {
     })
     @RequestMapping(value = "/environments/environment", method =  RequestMethod.DELETE)
     public ResponseEntity<Map<String, Object>> deleteEnvironment(@RequestBody EnvironmentEntity environmentEntity) {
+        Map<String, Object> result = Maps.newHashMap();
+        String token = request.getHeader("token");
+        if (!rolesService.isSuperUser(token)) {
+            result.put("error", "User does not have permission to operate");
+            return ResponseEntity.ok(result);
+        }
         Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository
                 .findByName(environmentEntity.getName());
-        Map<String, Object> result = Maps.newHashMap();
         if (!environmentEntityOptional.isPresent()) {
             result.put("error", "Environment no exist");
             return ResponseEntity.ok(result);

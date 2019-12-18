@@ -68,7 +68,17 @@ export const constantRouterMap = [
     path: '/401',
     component: () => import('@/views/errorPage/401'),
     hidden: true
-  },
+  }
+]
+
+export default new Router({
+  // mode: 'history', // require service support
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRouterMap
+})
+
+export const asyncRouterMap = [
+
   {
     path: '/environments',
     component: () => import('@/views/management/environments/index'),
@@ -84,7 +94,7 @@ export const constantRouterMap = [
     meta: {
       title: 'Dashboard',
       icon: 'dashboard',
-      roles: ['super', 'admin']
+      roles: ['super']
     },
     hidden: true,
     children: [
@@ -106,10 +116,11 @@ export const constantRouterMap = [
     path: '/management',
     component: Layout,
     name: 'Management',
-    redirect: 'management/tenants',
+    redirect: 'management/roles',
     meta: {
       title: 'Management',
-      icon: 'component'
+      icon: 'component',
+      roles: ['super', 'admin']
     },
     children: [
       {
@@ -190,11 +201,11 @@ export const constantRouterMap = [
       {
         path: 'admin/tenants/tenantInfo',
         component: () => import('@/views/management/admin/tenants/tenant'),
-        name: 'Tenant',
+        name: 'Tenant Admin',
         meta: {
           title: 'TenantInfo',
           noCache: true,
-          roles: ['admin']
+          roles: ['super', 'admin']
         }
       },
       {
@@ -222,7 +233,7 @@ export const constantRouterMap = [
         meta: {
           title: 'TopicInfo',
           noCache: true,
-          roles: ['super']
+          roles: ['super', 'admin']
         },
         hidden: true
       },
@@ -233,7 +244,7 @@ export const constantRouterMap = [
         meta: {
           title: 'ParititionTopicInfo',
           noCache: true,
-          roles: ['super']
+          roles: ['super', 'admin']
         },
         hidden: true
       },
@@ -244,7 +255,7 @@ export const constantRouterMap = [
         meta: {
           title: 'SubscriptionInfo',
           noCache: true,
-          roles: ['super']
+          roles: ['super', 'admin']
         },
         hidden: true
       },
@@ -265,7 +276,7 @@ export const constantRouterMap = [
         meta: {
           title: 'NamespacesInfo',
           noCache: true,
-          roles: ['super']
+          roles: ['super', 'admin']
         },
         hidden: true
       },
@@ -358,17 +369,7 @@ export const constantRouterMap = [
         hidden: false
       }
     ]
-  }
-]
-
-export default new Router({
-  // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRouterMap
-})
-
-export const asyncRouterMap = [
-
+  },
   {
     path: 'external-link',
     component: Layout,
@@ -379,6 +380,5 @@ export const asyncRouterMap = [
       }
     ]
   },
-
   { path: '*', redirect: '/404', hidden: true }
 ]
