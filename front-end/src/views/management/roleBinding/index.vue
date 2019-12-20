@@ -198,7 +198,6 @@ export default {
       this.dialogStatus = 'delete'
     },
     handleUpdateRole(row) {
-      console.log(row)
       this.form.name = row.name
       this.form.description = row.description
       this.form.roleName = row.roleName
