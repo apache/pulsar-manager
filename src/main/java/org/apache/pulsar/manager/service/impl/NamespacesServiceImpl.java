@@ -19,6 +19,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
 import org.apache.pulsar.manager.entity.TopicsStatsRepository;
+import org.apache.pulsar.manager.service.BrokerStatsService;
 import org.apache.pulsar.manager.service.NamespacesService;
 import org.apache.pulsar.manager.service.TopicsService;
 import org.apache.pulsar.manager.utils.HttpUtil;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
@@ -40,13 +42,19 @@ public class NamespacesServiceImpl implements NamespacesService {
 
     private final TopicsStatsRepository topicsStatsRepository;
     private final TopicsService topicsService;
+    private final HttpServletRequest request;
+    private final BrokerStatsService brokerStatsService;
 
     @Autowired
     public NamespacesServiceImpl(
             TopicsStatsRepository topicsStatsRepository,
-            TopicsService topicsService) {
+            TopicsService topicsService,
+            HttpServletRequest request,
+            BrokerStatsService brokerStatsService) {
         this.topicsStatsRepository = topicsStatsRepository;
         this.topicsService = topicsService;
+        this.request = request;
+        this.brokerStatsService = brokerStatsService;
     }
 
     public Map<String, Object> getNamespaceList(Integer pageNum, Integer pageSize, String tenant, String requestHost) {
@@ -62,6 +70,25 @@ public class NamespacesServiceImpl implements NamespacesService {
             String result = HttpUtil.doGet(requestHost + "/admin/v2/namespaces/" + tenant, header);
             if (result != null) {
                 List<String> namespacesList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
+                Optional<TopicStatsEntity> topicStatsEntityOptional = topicsStatsRepository.findMaxTime();
+                Map<String, TopicStatsEntity> topicStatsEntityMap = Maps.newHashMap();
+                if (topicStatsEntityOptional.isPresent()) {
+                    TopicStatsEntity topicStatsEntity = topicStatsEntityOptional.get();
+                    String environment = request.getHeader("environment");
+                    ArrayList<String> namespaceList = new ArrayList<>();
+                    namespaceList.add(topicStatsEntity.getNamespace());
+                    Page<TopicStatsEntity> namespaceCountPage = brokerStatsService.findByMultiNamespace(
+                            1, 1, environment, topicStatsEntity.getTenant(),
+                            namespaceList, topicStatsEntity.getTimestamp());
+                    namespaceCountPage.count(true);
+                    Page<TopicStatsEntity> namespaceAllCountPage = brokerStatsService.findByMultiNamespace(
+                            1, (int)namespaceCountPage.getTotal(), environment, topicStatsEntity.getTenant(),
+                            namespaceList, topicStatsEntity.getTimestamp());
+                    for (TopicStatsEntity statsEntity : namespaceAllCountPage) {
+                        topicStatsEntityMap.put(statsEntity.getNamespace(), statsEntity);
+                    }
+
+                }
                 for (String tenantNamespace : namespacesList) {
                     String namespace = tenantNamespace.split("/")[1];
                     Map<String, Object> topicsEntity = Maps.newHashMap();
@@ -69,6 +96,14 @@ public class NamespacesServiceImpl implements NamespacesService {
                             0, 0, tenant, namespace, requestHost);
                     topicsEntity.put("topics", topics.get("total"));
                     topicsEntity.put("namespace", namespace);
+                    if (topicStatsEntityMap.get(namespace) != null) {
+                        TopicStatsEntity topicStatsEntity = topicStatsEntityMap.get(namespace);
+                        topicsEntity.put("inMsg", topicStatsEntity.getMsgRateIn());
+                        topicsEntity.put("outMsg", topicStatsEntity.getMsgRateOut());
+                        topicsEntity.put("inBytes", topicStatsEntity.getMsgThroughputIn());
+                        topicsEntity.put("outBytes", topicStatsEntity.getMsgThroughputOut());
+                        topicsEntity.put("storageSize", topicStatsEntity.getStorageSize());
+                    }
                     namespacesArray.add(topicsEntity);
                 }
                 namespacesMap.put("isPage", false);

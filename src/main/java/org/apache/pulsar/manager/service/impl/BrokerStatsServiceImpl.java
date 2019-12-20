@@ -13,6 +13,7 @@
  */
 package org.apache.pulsar.manager.service.impl;
 
+import com.github.pagehelper.Page;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -291,5 +292,23 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     private String[] parseTopic(String topic) {
         String tntPath = topic.split("://")[1];
         return tntPath.split("/");
+    }
+
+    public Page<TopicStatsEntity> findByMultiTenant(Integer pageNum,
+                                                    Integer pageSize,
+                                                    String environment,
+                                                    List<String> tenantList,
+                                                    long timestamp) {
+        return topicsStatsRepository.findByMultiTenant(pageNum, pageSize, environment, tenantList, timestamp);
+    }
+
+    public Page<TopicStatsEntity> findByMultiNamespace(Integer pageNum,
+                                                       Integer pageSize,
+                                                       String environment,
+                                                       String tenant,
+                                                       List<String> namespaceList,
+                                                       long timestamp) {
+        return topicsStatsRepository.findByMultiNamespace(
+                pageNum, pageSize, environment, tenant, namespaceList, timestamp);
     }
 }
