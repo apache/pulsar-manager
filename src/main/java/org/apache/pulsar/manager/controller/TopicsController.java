@@ -13,6 +13,17 @@
  */
 package org.apache.pulsar.manager.controller;
 
+import com.google.common.collect.Maps;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.apache.pulsar.client.admin.PulsarAdmin;
+import org.apache.pulsar.client.admin.PulsarAdminBuilder;
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.client.api.AuthenticationFactory;
+import org.apache.pulsar.client.api.Message;
+import org.apache.pulsar.client.api.PulsarClientException;
+import org.apache.pulsar.client.impl.BatchMessageIdImpl;
+import org.apache.pulsar.client.impl.MessageIdImpl;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import org.apache.pulsar.manager.service.TopicsService;
 import io.swagger.annotations.Api;
@@ -22,6 +33,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +45,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +61,9 @@ public class TopicsController {
     private final TopicsService topicsService;
     private final EnvironmentCacheService environmentCacheService;
     private final HttpServletRequest request;
+
+    @Value("${backend.jwt.token}")
+    private String token;
 
     @Autowired
     public TopicsController(
@@ -109,5 +127,67 @@ public class TopicsController {
             pageNum, pageSize,
             tenant, namespace,
             env, serviceUrl);
+    }
+
+    @ApiOperation(value = "Peek messages from pulsar broker")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "ok"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
+    @RequestMapping(
+            value = "/{persistent}/{tenant}/{namespace}/{topic}/subscription/{subName}/{messagePosition}",
+            method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> peekMessages(
+            @PathVariable String persistent,
+            @PathVariable String tenant,
+            @PathVariable String namespace,
+            @PathVariable String topic,
+            @PathVariable String subName,
+            @PathVariable Integer messagePosition) {
+        String requestHost = environmentCacheService.getServiceUrl(request);
+        Map<String, Object> result = Maps.newHashMap();
+        PulsarAdmin pulsarAdmin = null;
+        // to do check permission for non super, waiting for https://github.com/apache/pulsar-manager/pull/238
+        try {
+            PulsarAdminBuilder pulsarAdminBuilder = PulsarAdmin.builder();
+            if (token != null && token.length() > 0) {
+                pulsarAdminBuilder.authentication(AuthenticationFactory.token(token));
+            }
+            pulsarAdmin = pulsarAdminBuilder.serviceHttpUrl(requestHost).build();
+            String topicFullPath = persistent + "://" + tenant + "/" + namespace + "/" + topic;
+            List<Message<byte[]>> messages = pulsarAdmin.topics().peekMessages(topicFullPath, subName, messagePosition);
+            List<Map<String, Object>> mapList = new ArrayList<>();
+            for (Message<byte[]> msg: messages) {
+                Map<String, Object> message = Maps.newHashMap();
+                if (msg.getMessageId() instanceof BatchMessageIdImpl) {
+                    BatchMessageIdImpl msgId = (BatchMessageIdImpl) msg.getMessageId();
+                    message.put("ledgerId", msgId.getLedgerId());
+                    message.put("entryId", msgId.getEntryId());
+                    message.put("batchIndex", msgId.getBatchIndex());
+                    message.put("batch", true);
+                } else {
+                    MessageIdImpl msgId = (MessageIdImpl) msg.getMessageId();
+                    message.put("batch", false);
+                    message.put("ledgerId", msgId.getLedgerId());
+                    message.put("entryId", msgId.getEntryId());
+                }
+                if (msg.getProperties().size() > 0) {
+                    msg.getProperties().forEach((k, v) -> {
+                        message.put(k, v);
+                    });
+                }
+                message.put("data", msg.getData());
+                mapList.add(message);
+            }
+            result.put("data", mapList);
+        } catch (PulsarClientException clientException) {
+            result.put("error", clientException.getMessage());
+        } catch (PulsarAdminException adminException) {
+            result.put("error", adminException.getMessage());
+        }
+        if (pulsarAdmin != null) {
+            pulsarAdmin.close();
+        }
+        return ResponseEntity.ok(result);
     }
 }

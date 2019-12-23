@@ -15,6 +15,8 @@ import request from '@/utils/request'
 
 const BASE_URL_V2 = '/admin/v2'
 
+const SPRING_BASE_URL = '/pulsar-manager/admin/v2'
+
 export function fetchSubscriptions(persistent, tenantNamespaceTopic) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscriptions`,
@@ -33,5 +35,16 @@ export function deleteSubscription(tenant, namespace, topic, subscription) {
   return request({
     url: BASE_URL_V2 + `/persistent/${tenant}/${namespace}/${topic}/subscription/${subscription}`,
     method: 'delete'
+  })
+}
+
+export function peekMessagesOnCluster(cluster, persistent, tenantNamespaceTopic, subName, messagePosition) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: SPRING_BASE_URL + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/${messagePosition}`,
+    method: 'GET'
   })
 }

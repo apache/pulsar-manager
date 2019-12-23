@@ -114,6 +114,9 @@
                       <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=reset'" class="link-type">
                         <el-dropdown-item command="reset">{{ $t('topic.subscription.reset') }}</el-dropdown-item>
                       </router-link>
+                      <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=peek'" class="link-type">
+                        <el-dropdown-item command="peek">{{ $t('topic.subscription.peek') }}</el-dropdown-item>
+                      </router-link>
                     </el-dropdown-menu>
                   </el-dropdown>
                   <el-dropdown v-else @command="handleAllSub">
