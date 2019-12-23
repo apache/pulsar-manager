@@ -557,7 +557,19 @@ export default {
       storage: 'STORAGE',
       storageSize: 'Storage Size',
       entries: 'Entries',
-      segments: 'Segments'
+      segments: 'Segments',
+      peek: 'PEEK',
+      peekMessages: 'messages',
+      entryId: 'Entry Id',
+      message: 'Message',
+      messageGreaterThanZero: 'Messages should greater than 0',
+      peekMessageError: 'Peek messages error, please check',
+      messageSkipSuccess: 'Messages skip success',
+      expireMessageSuccess: 'Messages expire success',
+      clearMessageSuccess: 'Clear messages success',
+      minutesNotLessThanZero: 'Minutes cannot be less than 0',
+      resetCursorSuccess: 'Reset cursor success',
+      messageIdNotLessThanZero: 'Message Id cannot be less than 0'
     },
     segment: {
       label: 'Segment',
