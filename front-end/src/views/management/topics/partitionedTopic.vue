@@ -136,7 +136,7 @@
                         {{ $t('topic.subscription.clear') }}
                       </el-dropdown-item>
                       <el-dropdown-item :command="{'action': 'unsub', 'subscription': scope.row.subscription }">
-                        UNSUB
+                        {{ $t('topic.subscription.unsub') }}
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>

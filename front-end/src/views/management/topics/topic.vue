@@ -326,7 +326,7 @@
                       <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=reset'" class="link-type">
                         <el-dropdown-item command="reset">{{ $t('topic.subscription.reset') }}</el-dropdown-item>
                       </router-link>
-                      <el-dropdown-item command="unsub">UNSUB</el-dropdown-item>
+                      <el-dropdown-item command="unsub">{{ $t('topic.subscription.unsub') }}</el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </template>
