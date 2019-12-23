@@ -269,7 +269,7 @@
           type="success"
           style="margin-bottom: 15px"
           @click="handleCreateSub">
-          New Sub
+          {{ $t('topic.subscription.newSub') }}
         </el-button>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
