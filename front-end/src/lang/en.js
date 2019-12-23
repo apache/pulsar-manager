@@ -557,7 +557,13 @@ export default {
       storage: 'STORAGE',
       storageSize: 'Storage Size',
       entries: 'Entries',
-      segments: 'Segments'
+      segments: 'Segments',
+      sub: 'NEW SUB',
+      unsub: 'UNSUB',
+      subNotification: 'Please input correct sub name',
+      createSubSuccess: 'Create subscription success',
+      deleteSubSuccess: 'Delete subscription success',
+      deleteSubConfirm: 'Do you want delete this subscription?'
     },
     segment: {
       label: 'Segment',
