@@ -564,11 +564,11 @@ export default {
       message: 'Message',
       messageGreaterThanZero: 'Messages should greater than 0',
       peekMessageError: 'Peek messages error, please check',
-      messageSkipSuccess: 'Messages skip success',
-      expireMessageSuccess: 'Messages expire success',
-      clearMessageSuccess: 'Clear messages success',
+      messageSkipSuccess: 'Messages skip successfully',
+      expireMessageSuccess: 'Messages expire successfully',
+      clearMessageSuccess: 'Clear messages successfully',
       minutesNotLessThanZero: 'Minutes cannot be less than 0',
-      resetCursorSuccess: 'Reset cursor success',
+      resetCursorSuccess: 'Reset cursor successfully',
       messageIdNotLessThanZero: 'Message Id cannot be less than 0'
     },
     segment: {
