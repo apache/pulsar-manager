@@ -59,6 +59,31 @@
                   </router-link>
                 </template>
               </el-table-column>
+              <el-table-column :label="$t('common.inMsg')" align="center">
+                <template slot-scope="scope">
+                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ scope.row.inMsg }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('common.outMsg')" align="center">
+                <template slot-scope="scope">
+                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ scope.row.outMsg }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('common.inBytes')" align="center">
+                <template slot-scope="scope">
+                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ scope.row.inBytes }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('common.outBytes')" align="center">
+                <template slot-scope="scope">
+                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ scope.row.outBytes }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('common.storageSize')" align="center">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.storageSize }}</span>
+                </template>
+              </el-table-column>
               <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                   <router-link :to="'/management/namespaces/' + scope.row.tenant +'/' + scope.row.namespace + '/namespace'">
@@ -159,6 +184,8 @@ import {
   deleteNamespace
 } from '@/api/namespaces'
 import { validateEmpty } from '@/utils/validate'
+import { formatBytes } from '@/utils/index'
+import { numberFormatter } from '@/filters/index'
 
 const defaultForm = {
   tenant: ''
@@ -326,11 +353,24 @@ export default {
       fetchNamespaces(this.postForm.tenant, this.listQuery).then(response => {
         this.listNamespaces = []
         for (var i = 0; i < response.data.data.length; i++) {
-          this.listNamespaces.push({
+          const data = {
             'tenant': this.postForm.tenant,
             'namespace': response.data.data[i].namespace,
-            'topics': response.data.data[i].topics
-          })
+            'topics': response.data.data[i].topics,
+            'inMsg': numberFormatter(0, 2),
+            'outMsg': numberFormatter(0, 2),
+            'inBytes': formatBytes(0),
+            'outBytes': formatBytes(0),
+            'storageSize': formatBytes(0, 0)
+          }
+          if (response.data.data[i].hasOwnProperty('inMsg')) {
+            data['inMsg'] = numberFormatter(response.data.data[i]['inMsg'], 2)
+            data['outMsg'] = numberFormatter(response.data.data[i]['outMsg'], 2)
+            data['inBytes'] = numberFormatter(response.data.data[i]['inBytes'])
+            data['outBytes'] = numberFormatter(response.data.data[i]['outBytes'])
+            data['storageSize'] = numberFormatter(response.data.data[i]['storageSize'], 2)
+          }
+          this.listNamespaces.push(data)
         }
         this.total = this.listNamespaces.length
         // Just to simulate the time of the request
