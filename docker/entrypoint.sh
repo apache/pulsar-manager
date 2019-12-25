@@ -51,6 +51,10 @@ elif [[ -n "$JWT_TOKEN" ]]
 then
   echo "Enable JWT auth."
   supervisord -c /etc/supervisord-token.conf -n
+elif [[ -n "$SPRING_CONFIGURATION_FILE" ]]
+then
+  echo "Start Pulsar Manager by specifying a configuration file."
+  supervisord -c /etc/supervisord-configuration-file.conf -n
 else
   echo "Start servie no enable JWT."
   supervisord -c /etc/supervisord.conf -n

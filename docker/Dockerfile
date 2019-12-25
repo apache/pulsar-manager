@@ -57,6 +57,8 @@ COPY docker/supervisord-private-key.conf /etc/
 
 COPY docker/supervisord-secret-key.conf /etc/
 
+COPY docker/supervisord-configuration-file.conf /etc/
+
 COPY docker/default.conf /etc/nginx/conf.d/
 
 COPY docker/startup.sh /pulsar-manager/
