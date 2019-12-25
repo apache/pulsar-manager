@@ -75,6 +75,8 @@ service.interceptors.response.use(
         })
         return
       }
+    } else if (error.response.data.hasOwnProperty('reason')) {
+      message = error.response.data.reason
     } else {
       message = error.response.data
       if (message.indexOf('Trying to subscribe with incompatible') >= 0) {
