@@ -76,13 +76,18 @@ public class NamespacesServiceImpl implements NamespacesService {
                     TopicStatsEntity topicStatsEntity = topicStatsEntityOptional.get();
                     String environment = request.getHeader("environment");
                     ArrayList<String> namespaceList = new ArrayList<>();
-                    namespaceList.add(topicStatsEntity.getNamespace());
+                    for (String namespace : namespacesList) {
+                        String[] path = namespace.split("/");
+                        if (path.length > 1) {
+                            namespaceList.add(path[1]);
+                        }
+                    }
                     Page<TopicStatsEntity> namespaceCountPage = brokerStatsService.findByMultiNamespace(
-                            1, 1, environment, topicStatsEntity.getTenant(),
+                            1, 1, environment, tenant,
                             namespaceList, topicStatsEntity.getTimestamp());
                     namespaceCountPage.count(true);
                     Page<TopicStatsEntity> namespaceAllCountPage = brokerStatsService.findByMultiNamespace(
-                            1, (int)namespaceCountPage.getTotal(), environment, topicStatsEntity.getTenant(),
+                            1, (int)namespaceCountPage.getTotal(), environment, tenant,
                             namespaceList, topicStatsEntity.getTimestamp());
                     for (TopicStatsEntity statsEntity : namespaceAllCountPage) {
                         topicStatsEntityMap.put(statsEntity.getNamespace(), statsEntity);
