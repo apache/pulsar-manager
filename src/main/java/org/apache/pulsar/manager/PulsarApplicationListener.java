@@ -78,7 +78,9 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
                     environmentsRepository.save(environmentEntity);
                     log.info("The default environment set successful");
                 } else {
-                    log.error("Please check if the network is not working");
+                    log.error("The default environment configuration is incorrect, please check " +
+                            "configuration environment.default.name and environment.default.broker");
+                    System.exit(-1);
                 }
             } else {
                 log.warn("The default environment already exists.");
