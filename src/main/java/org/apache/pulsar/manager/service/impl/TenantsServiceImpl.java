@@ -83,7 +83,7 @@ public class TenantsServiceImpl implements TenantsService {
                     Page<TopicStatsEntity> tenantAllCountPage = brokerStatsService.findByMultiTenant(1,
                             (int)tenantCountPage.getTotal(), environment, tenantsList, topicStatsEntity.getTimestamp());
                     for (TopicStatsEntity statsEntity : tenantAllCountPage) {
-                        topicStatsEntityMap.put(topicStatsEntity.getTenant(), statsEntity);
+                        topicStatsEntityMap.put(statsEntity.getTenant(), statsEntity);
                     }
                 }
                 for (String tenant : tenantsList) {
