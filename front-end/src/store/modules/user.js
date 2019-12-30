@@ -16,6 +16,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import { setName, removeName } from '@/utils/username'
 import { removeEnvironment } from '@/utils/environment'
 import { Message } from 'element-ui'
+import { setTenant, removeTenant } from '../../utils/tenant'
 
 const user = {
   state: {
@@ -75,6 +76,7 @@ const user = {
           commit('SET_TOKEN', response.headers.token)
           setToken(response.headers.token)
           setName(response.headers.username)
+          setTenant(response.headers.tenant)
           resolve()
         }).catch(error => {
           reject(error)
@@ -109,6 +111,7 @@ const user = {
           commit('SET_ROLES', [])
           removeToken()
           removeName()
+          removeTenant()
           removeEnvironment()
           resolve()
         }).catch(error => {
@@ -123,6 +126,7 @@ const user = {
         commit('SET_TOKEN', '')
         removeToken()
         removeName()
+        removeTenant()
         removeEnvironment()
         resolve()
       })

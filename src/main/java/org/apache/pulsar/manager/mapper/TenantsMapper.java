@@ -40,6 +40,10 @@ public interface TenantsMapper {
     TenantEntity findByName(String tenant);
 
     @Select("SELECT tenant, tenant_id as tenantId, admin_roles as adminRoles,allowed_clusters as allowedClusters " +
+            "FROM tenants WHERE tenant_id = #{tenantId}")
+    TenantEntity findByTenantId(long tenantId);
+
+    @Select("SELECT tenant, tenant_id as tenantId, admin_roles as adminRoles,allowed_clusters as allowedClusters " +
             "FROM tenants")
     Page<TenantEntity> getTenantsList();
 
@@ -49,6 +53,13 @@ public interface TenantsMapper {
             "WHERE tenant_id IN <foreach collection='tenantIdList' item='tenantId' open='(' separator=',' close=')'> #{tenantId} </foreach>" +
                     "</script>"})
     Page<TenantEntity> findByMultiId(@Param("tenantIdList") List<Long> tenantIdList);
+
+    @Select({"<script>",
+            "SELECT tenant, tenant_id as tenantId, admin_roles as adminRoles,allowed_clusters as allowedClusters" +
+                    " FROM tenants ",
+            "WHERE tenant_id IN <foreach collection='tenantIdList' item='tenantId' open='(' separator=',' close=')'> #{tenantId} </foreach>" +
+                    "</script>"})
+    List<TenantEntity> findAllByMultiId(@Param("tenantIdList") List<Long> tenantIdList);
 
     @Delete("DELETE FROM tenants WHERE tenant = #{tenant}")
     void delete(String tenant);

@@ -15,58 +15,37 @@ import request from '@/utils/request'
 
 const SPRING_BASE_URL = '/pulsar-manager'
 
-export function fetchRoles(query) {
+export function fetchRoleBinding(query) {
   return request({
-    url: SPRING_BASE_URL + '/roles',
+    url: SPRING_BASE_URL + '/role-binding',
     method: 'get',
     params: { query }
   })
 }
 
-export function putRole(data) {
+export function putRoleBinding(roleName, userName, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
-    url: SPRING_BASE_URL + '/roles/role',
+    url: SPRING_BASE_URL + `/role-binding/${roleName}/${userName}`,
     method: 'put',
     data
   })
 }
 
-export function updateRole(data) {
+export function updateRoleBinding(roleName, userName, data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
-    url: SPRING_BASE_URL + '/roles/role',
+    url: SPRING_BASE_URL + `/role-binding/${roleName}/${userName}`,
     method: 'post',
     data
   })
 }
 
-export function deleteRole(data) {
+export function deleteRoleBinding(data) {
   return request({
     headers: { 'Content-Type': 'application/json' },
-    url: SPRING_BASE_URL + '/roles/role',
+    url: SPRING_BASE_URL + '/role-binding',
     method: 'delete',
     data
-  })
-}
-
-export function getResourceType() {
-  return request({
-    url: SPRING_BASE_URL + '/role/resourceType',
-    method: 'get'
-  })
-}
-
-export function getResource(resourceType) {
-  return request({
-    url: SPRING_BASE_URL + `/role/resource/${resourceType}`,
-    method: 'get'
-  })
-}
-
-export function getResourceVerbs(resourceType) {
-  return request({
-    url: SPRING_BASE_URL + `/role/resourceVerbs/${resourceType}`,
-    method: 'get'
   })
 }

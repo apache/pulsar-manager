@@ -13,10 +13,13 @@
  */
 package org.apache.pulsar.manager.zuul;
 
+import org.apache.pulsar.manager.entity.NamespaceEntity;
+import org.apache.pulsar.manager.entity.NamespacesRepository;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pulsar.manager.service.PulsarEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +42,18 @@ public class EnvironmentForward extends ZuulFilter {
 
     private static final Logger log = LoggerFactory.getLogger(EnvironmentForward.class);
 
+    private final PulsarEvent pulsarEvent;
+
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
 
     private final EnvironmentCacheService environmentCacheService;
 
     @Autowired
-    public EnvironmentForward(EnvironmentCacheService environmentCacheService) {
+    public EnvironmentForward(
+            EnvironmentCacheService environmentCacheService, PulsarEvent pulsarEvent) {
         this.environmentCacheService = environmentCacheService;
+        this.pulsarEvent = pulsarEvent;
     }
 
     @Override
@@ -91,6 +98,7 @@ public class EnvironmentForward extends ZuulFilter {
             return null;
         }
         String serviceUrl = environmentCacheService.getServiceUrl(request);
+        System.out.println(serviceUrl);
         return forwardRequest(ctx, request, serviceUrl);
     }
 
@@ -99,6 +107,7 @@ public class EnvironmentForward extends ZuulFilter {
         try {
             ctx.addZuulRequestHeader("Authorization", String.format("Bearer %s", pulsarJwtToken));
             ctx.setRouteHost(new URL(serviceUrl));
+            pulsarEvent.parsePulsarEvent(request.getRequestURI(), request);
             log.info("Forward request to {} @ path {}",
                     serviceUrl, request.getRequestURI());
         } catch (MalformedURLException e) {

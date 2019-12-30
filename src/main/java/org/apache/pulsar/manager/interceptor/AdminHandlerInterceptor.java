@@ -22,6 +22,7 @@ import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
@@ -29,6 +30,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.Optional;
 
@@ -46,6 +48,9 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Value("${user.management.enable}")
+    private boolean userManagementEnable;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -78,6 +83,23 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
             response.setStatus(401);
             response.getWriter().append(gson.toJson(map));
             return false;
+        }
+        if (userManagementEnable) {
+            Optional<UserInfoEntity> optionalUserInfoEntity = usersRepository.findByAccessToken(token);
+            if (!optionalUserInfoEntity.isPresent()) {
+                map.put("message", "Please login.");
+                response.setStatus(401);
+                response.getWriter().append(gson.toJson(map));
+                return false;
+            }
+            String username = request.getHeader("username");
+            UserInfoEntity userInfoEntity = optionalUserInfoEntity.get();
+            if (!userInfoEntity.getName().equals(username)) {
+                map.put("message", "Please login.");
+                response.setStatus(401);
+                response.getWriter().append(gson.toJson(map));
+                return false;
+            }
         }
         String environment = request.getHeader("environment");
         Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);

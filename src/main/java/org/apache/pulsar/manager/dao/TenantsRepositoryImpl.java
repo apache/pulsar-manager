@@ -37,6 +37,11 @@ public class TenantsRepositoryImpl implements TenantsRepository {
     }
 
     @Override
+    public Optional<TenantEntity> findByTenantId(long tenantId) {
+        return Optional.ofNullable(tenantsMapper.findByTenantId(tenantId));
+    }
+
+    @Override
     public Page<TenantEntity> getTenantsList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         Page<TenantEntity> tenantsEntities = tenantsMapper.getTenantsList();
@@ -47,6 +52,12 @@ public class TenantsRepositoryImpl implements TenantsRepository {
     public Page<TenantEntity> findByMultiId(Integer pageNum, Integer pageSize, List<Long> tenantIdList) {
         PageHelper.startPage(pageNum, pageSize);
         Page<TenantEntity> tenantsEntities = tenantsMapper.findByMultiId(tenantIdList);
+        return tenantsEntities;
+    }
+
+    @Override
+    public List<TenantEntity> findByMultiId(List<Long> tenantIdList) {
+        List<TenantEntity> tenantsEntities = tenantsMapper.findAllByMultiId(tenantIdList);
         return tenantsEntities;
     }
 

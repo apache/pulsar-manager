@@ -21,6 +21,7 @@ import org.apache.pulsar.manager.mapper.RolesMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -48,6 +49,22 @@ public class RolesRepositoryImpl implements RolesRepository {
     public Page<RoleInfoEntity> findRolesList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         return this.rolesMapper.findRoleList();
+    }
+
+    @Override
+    public List<RoleInfoEntity> findRolesListByRoleSource(String roleSource) {
+        return this.rolesMapper.findRoleListByRoleSource(roleSource);
+    }
+
+    @Override
+    public Page<RoleInfoEntity> findRolesMultiId(Integer pageNum, Integer pageSize, List<Long> idList) {
+        PageHelper.startPage(pageNum, pageSize);
+        return this.rolesMapper.findByMultiId(idList);
+    }
+
+    @Override
+    public List<RoleInfoEntity> findAllRolesByMultiId(List<Long> idList) {
+        return this.rolesMapper.findAllByMultiId(idList);
     }
 
     @Override

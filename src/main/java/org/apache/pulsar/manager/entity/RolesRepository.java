@@ -16,6 +16,7 @@ package org.apache.pulsar.manager.entity;
 import com.github.pagehelper.Page;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,7 +29,7 @@ public interface RolesRepository {
     long save(RoleInfoEntity roleInfoEntity);
 
     /**
-     * Get a role information by role name. roleSource, and roleName uniquely locate a role.
+     * Get a role information by role name. roleSource, and roleName uniquely locate a role
      * @param roleName The role name
      * @param roleSource The tenant who created the role
      * @return RoleInfoEntity
@@ -38,20 +39,43 @@ public interface RolesRepository {
 
     /**
      * Get role list, support paging.
-     * @param pageNum Get the data on which page.
+     * @param pageNum Get the data on which page
      * @param pageSize The number of data per page
      * @return A list of RoleInfoEntity.
      */
     Page<RoleInfoEntity> findRolesList(Integer pageNum, Integer pageSize);
 
     /**
-     * Update a role information.
+     * Get role list.
+     * @param roleSource Role source, name of tenant
+     * @return A list of RoleInfoEntity.
+     */
+    List<RoleInfoEntity> findRolesListByRoleSource(String roleSource);
+
+    /**
+     * Get role list, support paging.
+     * @param pageNum Get the data on which page.
+     * @param pageSize The number of data per page
+     * @param idList a list of role id
+     * @return A list of RoleInfoEntity.
+     */
+    Page<RoleInfoEntity> findRolesMultiId(Integer pageNum, Integer pageSize, List<Long> idList);
+
+    /**
+     * Get all role list by role id, support paging.
+     * @param idList a list of role id
+     * @return A list of RoleInfoEntity.
+     */
+    List<RoleInfoEntity> findAllRolesByMultiId(List<Long> idList);
+
+    /**
+     * Update a role information
      * @param roleInfoEntity RoleInfoEntity
      */
     void update(RoleInfoEntity roleInfoEntity);
 
     /**
-     * Delete a role by role name.
+     * Delete a role by role name
      * @param roleName role name
      * @param roleSource The tenant who created the role
      */

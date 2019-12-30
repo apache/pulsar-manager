@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,20 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.pulsar.manager.service;
+import Cookies from 'js-cookie'
 
-import org.apache.pulsar.manager.entity.RoleInfoEntity;
+const tenant = 'tenant'
 
-import java.util.Map;
-import java.util.Set;
+export function getTenant() {
+  return Cookies.get(tenant)
+}
 
-public interface RolesService {
+export function setTenant(name) {
+  return Cookies.set(tenant, name)
+}
 
-    Map<String, String> validateRoleInfoEntity(RoleInfoEntity roleInfoEntity);
-
-    void createDefaultRoleAndTenant(String tenant);
-
-    Set<String> getResourceVerbs(String resourceVerbs);
-
-    Map<String, String> validateCurrentTenant(String token, String tenant);
+export function removeTenant() {
+  return Cookies.remove(tenant)
 }

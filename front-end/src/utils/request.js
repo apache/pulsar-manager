@@ -18,6 +18,7 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 import { getName } from '@/utils/username'
 import { getEnvironment } from '@/utils/environment'
+import { getTenant } from '@/utils/tenant'
 import router from '../router'
 
 // create an axios instance
@@ -34,6 +35,7 @@ service.interceptors.request.use(
       config.headers['token'] = getToken()
     }
     config.headers['username'] = getName()
+    config.headers['tenant'] = getTenant()
     config.headers['environment'] = getEnvironment()
     return config
   },

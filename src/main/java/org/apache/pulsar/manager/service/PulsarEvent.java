@@ -13,18 +13,10 @@
  */
 package org.apache.pulsar.manager.service;
 
-import org.apache.pulsar.manager.entity.RoleInfoEntity;
+import javax.servlet.http.HttpServletRequest;
 
-import java.util.Map;
-import java.util.Set;
+public interface PulsarEvent {
 
-public interface RolesService {
+    void parsePulsarEvent(String path, HttpServletRequest httpRequest);
 
-    Map<String, String> validateRoleInfoEntity(RoleInfoEntity roleInfoEntity);
-
-    void createDefaultRoleAndTenant(String tenant);
-
-    Set<String> getResourceVerbs(String resourceVerbs);
-
-    Map<String, String> validateCurrentTenant(String token, String tenant);
 }

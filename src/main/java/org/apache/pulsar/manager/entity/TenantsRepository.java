@@ -26,9 +26,13 @@ public interface TenantsRepository {
 
     Optional<TenantEntity> findByName(String tenant);
 
+    Optional<TenantEntity> findByTenantId(long tenantId);
+
     Page<TenantEntity> getTenantsList(Integer pageNum, Integer pageSize);
 
     Page<TenantEntity> findByMultiId(Integer pageNum, Integer pageSize, List<Long> tenantIdList);
+
+    List<TenantEntity> findByMultiId(List<Long> tenantIdList);
 
     void remove(String tenant);
 

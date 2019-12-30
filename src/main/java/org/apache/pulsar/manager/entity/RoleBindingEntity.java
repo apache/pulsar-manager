@@ -13,42 +13,31 @@
  */
 package org.apache.pulsar.manager.entity;
 
-
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 /**
- * Role information entity.
+ * Role binding information entity.
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @Data
-public class RoleInfoEntity {
+public class RoleBindingEntity {
 
-    private long roleId;
+    @SerializedName("role_binding_id")
+    private long roleBindingId;
 
-    @SerializedName("role_name")
-    private String roleName;
+    private String name;
 
-    @SerializedName("role_source")
-    private String roleSource;
     private String description;
 
-    @SerializedName("resource_type")
-    private String resourceType;
+    @SerializedName("user_id")
+    private long userId;
 
-    @SerializedName("resource_name")
-    private String resourceName;
-
-    @SerializedName("resource_id")
-    private long resourceId;
-
-    @SerializedName("resource_verbs")
-    private String resourceVerbs;
-    private int flag;
+    @SerializedName("role_id")
+    private long roleId;
 }
