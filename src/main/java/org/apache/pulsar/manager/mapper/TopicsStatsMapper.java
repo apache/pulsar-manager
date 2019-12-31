@@ -89,6 +89,46 @@ public interface TopicsStatsMapper {
             @Param("topicList") List<String> topicList,
             @Param("timestamp") long timestamp);
 
+    @Select({"<script>",
+            "SELECT environment, tenant,"
+                    + "sum(producer_count) as producerCount,"
+                    + "sum(subscription_count) as subscriptionCount,"
+                    + "sum(msg_rate_in) as msgRateIn,"
+                    + "sum(msg_throughput_in) as msgThroughputIn,"
+                    + "sum(msg_rate_out) as msgRateOut,"
+                    + "sum(msg_throughput_out) as msgThroughputOut,"
+                    + "avg(average_msg_size) as averageMsgSize,"
+                    + "sum(storage_size) as storageSize, time_stamp  FROM topics_stats",
+            "WHERE environment=#{environment} and time_stamp=#{timestamp} and " +
+                    "tenant IN <foreach collection='tenantList' item='tenant' open='(' separator=',' close=')'> #{tenant} </foreach>" +
+                    "GROUP BY environment, tenant, time_stamp" +
+                    "</script>"})
+    Page<TopicStatsEntity> findByMultiTenant(
+            @Param("environment") String environment,
+            @Param("tenantList") List<String> tenantList,
+            @Param("timestamp") long timestamp);
+
+
+    @Select({"<script>",
+            "SELECT environment, tenant, namespace,"
+                    + "sum(producer_count) as producerCount,"
+                    + "sum(subscription_count) as subscriptionCount,"
+                    + "sum(msg_rate_in) as msgRateIn,"
+                    + "sum(msg_throughput_in) as msgThroughputIn,"
+                    + "sum(msg_rate_out) as msgRateOut,"
+                    + "sum(msg_throughput_out) as msgThroughputOut,"
+                    + "avg(average_msg_size) as averageMsgSize,"
+                    + "sum(storage_size) as storageSize, time_stamp  FROM topics_stats",
+            "WHERE environment=#{environment} and tenant=#{tenant} and time_stamp=#{timestamp} and " +
+                    "namespace IN <foreach collection='namespaceList' item='namespace' open='(' separator=',' close=')'> #{namespace} </foreach>" +
+                    "GROUP BY environment, tenant, namespace, time_stamp" +
+                    "</script>"})
+    Page<TopicStatsEntity> findByMultiNamespace(
+            @Param("environment") String environment,
+            @Param("tenant") String tenant,
+            @Param("namespaceList") List<String> namespaceList,
+            @Param("timestamp") long timestamp);
+
     @Delete("DELETE FROM topics_stats WHERE time_stamp < #{refTime}")
     void delete(@Param("refTime") long refTime);
 }

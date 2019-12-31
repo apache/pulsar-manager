@@ -27,7 +27,6 @@ import org.apache.pulsar.manager.entity.RolesRepository;
 import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.utils.ResourceType;
 import org.hibernate.validator.constraints.Range;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -158,7 +157,6 @@ public class RolesController {
     })
     @RequestMapping(value = "/roles/role", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateRole(@RequestBody RoleInfoEntity roleInfoEntity) {
-
         Map<String, Object> result = Maps.newHashMap();
         String token = request.getHeader("token");
         String tenant = request.getHeader("tenant");

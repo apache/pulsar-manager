@@ -235,7 +235,6 @@ export default {
     } else {
       this.superUser = false
     }
-    console.log(this.superUser)
     this.getRoles()
     this.getResourceType()
   },

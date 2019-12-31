@@ -27,7 +27,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.pulsar.manager.service.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -66,14 +65,15 @@ public class LoginController {
     @Value("${pulsar-manager.password}")
     private String password;
 
+    private final JwtService jwtService;
+
     @Autowired
-    private JwtService jwtService;
+    public LoginController(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @Autowired
     private UsersRepository usersRepository;
-
-    @Autowired
-    private RolesService rolesService;
 
     @Autowired
     private RolesRepository rolesRepository;

@@ -13,6 +13,7 @@
  */
 package org.apache.pulsar.manager.service.impl;
 
+import com.github.pagehelper.Page;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -59,7 +60,6 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
 
     private static final Logger log = LoggerFactory.getLogger(BrokerStatsServiceImpl.class);
 
-
     @Value("${backend.directRequestHost}")
     private String directRequestHost;
 
@@ -69,36 +69,39 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     @Value("${clear.stats.interval}")
     private Long clearStatsInterval;
 
-    @Autowired
-    private EnvironmentsRepository environmentsRepository;
-
-    @Autowired
-    private ClustersService clustersService;
-
-    @Autowired
-    private BrokersService brokersService;
-
-    @Autowired
-    private TopicsStatsRepository topicsStatsRepository;
-
-    @Autowired
-    private SubscriptionsStatsRepository subscriptionsStatsRepository;
-
-    @Autowired
-    private PublishersStatsRepository publishersStatsRepository;
-
-    @Autowired
-    private ReplicationsStatsRepository replicationsStatsRepository;
-
-    @Autowired
-    private ConsumersStatsRepository consumersStatsRepository;
-
-    @Autowired
-    private EnvironmentCacheService environmentCache;
+    private final EnvironmentsRepository environmentsRepository;
+    private final ClustersService clustersService;
+    private final BrokersService brokersService;
+    private final TopicsStatsRepository topicsStatsRepository;
+    private final SubscriptionsStatsRepository subscriptionsStatsRepository;
+    private final PublishersStatsRepository publishersStatsRepository;
+    private final ReplicationsStatsRepository replicationsStatsRepository;
+    private final ConsumersStatsRepository consumersStatsRepository;
 
     private static final Map<String, String> header = new HashMap<String, String>(){{
         put("Content-Type","application/json");
     }};
+
+    @Autowired
+    public BrokerStatsServiceImpl(
+            EnvironmentsRepository environmentsRepository,
+            ClustersService clustersService,
+            BrokersService brokersService,
+            TopicsStatsRepository topicsStatsRepository,
+            SubscriptionsStatsRepository subscriptionsStatsRepository,
+            PublishersStatsRepository publishersStatsRepository,
+            ReplicationsStatsRepository replicationsStatsRepository,
+            ConsumersStatsRepository consumersStatsRepository,
+            EnvironmentCacheService environmentCache) {
+        this.environmentsRepository = environmentsRepository;
+        this.clustersService = clustersService;
+        this.brokersService = brokersService;
+        this.topicsStatsRepository = topicsStatsRepository;
+        this.subscriptionsStatsRepository = subscriptionsStatsRepository;
+        this.publishersStatsRepository = publishersStatsRepository;
+        this.replicationsStatsRepository = replicationsStatsRepository;
+        this.consumersStatsRepository = consumersStatsRepository;
+    }
 
     public String forwardBrokerStatsMetrics(String broker, String requestHost) {
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
@@ -289,5 +292,23 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     private String[] parseTopic(String topic) {
         String tntPath = topic.split("://")[1];
         return tntPath.split("/");
+    }
+
+    public Page<TopicStatsEntity> findByMultiTenant(Integer pageNum,
+                                                    Integer pageSize,
+                                                    String environment,
+                                                    List<String> tenantList,
+                                                    long timestamp) {
+        return topicsStatsRepository.findByMultiTenant(pageNum, pageSize, environment, tenantList, timestamp);
+    }
+
+    public Page<TopicStatsEntity> findByMultiNamespace(Integer pageNum,
+                                                       Integer pageSize,
+                                                       String environment,
+                                                       String tenant,
+                                                       List<String> namespaceList,
+                                                       long timestamp) {
+        return topicsStatsRepository.findByMultiNamespace(
+                pageNum, pageSize, environment, tenant, namespaceList, timestamp);
     }
 }

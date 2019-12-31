@@ -13,7 +13,6 @@
  */
 package org.apache.pulsar.manager.controller;
 
-import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;

@@ -13,6 +13,11 @@
  */
 package org.apache.pulsar.manager.service;
 
+import com.github.pagehelper.Page;
+import org.apache.pulsar.manager.entity.TopicStatsEntity;
+
+import java.util.List;
+
 public interface BrokerStatsService {
 
     String forwardBrokerStatsMetrics(String broker, String requestHost);
@@ -22,4 +27,18 @@ public interface BrokerStatsService {
     void collectStatsToDB(long unixTime, String environment, String cluster, String serviceUrl);
 
     void clearStats(long nowTime, long timeInterval);
+
+    Page<TopicStatsEntity> findByMultiTenant(Integer pageNum,
+                                             Integer pageSize,
+                                             String environment,
+                                             List<String> tenantList,
+                                             long timestamp);
+
+    Page<TopicStatsEntity> findByMultiNamespace(Integer pageNum,
+                                                Integer pageSize,
+                                                String environment,
+                                                String tenant,
+                                                List<String> namespaceList,
+                                                long timestamp);
+
 }

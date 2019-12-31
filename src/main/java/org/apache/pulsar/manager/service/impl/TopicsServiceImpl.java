@@ -34,8 +34,7 @@ import java.util.*;
 @Service
 public class TopicsServiceImpl implements TopicsService {
 
-    private static final Logger log = LoggerFactory.getLogger(TopicsServiceImpl.class);
-
+    public static final String PARTITIONED_TOPIC_SUFFIX = "-partition-";
 
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
@@ -43,11 +42,12 @@ public class TopicsServiceImpl implements TopicsService {
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
 
+    private final TopicsStatsRepository topicsStatsRepository;
+
     @Autowired
-    private TopicsStatsRepository topicsStatsRepository;
-
-    public static final String PARTITIONED_TOPIC_SUFFIX = "-partition-";
-
+    public TopicsServiceImpl(TopicsStatsRepository topicsStatsRepository) {
+        this.topicsStatsRepository = topicsStatsRepository;
+    }
 
     private boolean isPartitionedTopic(List<String> topics, String topic) {
         if (topic.contains(PARTITIONED_TOPIC_SUFFIX)) {

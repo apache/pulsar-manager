@@ -140,7 +140,6 @@ public class RoleBindingServiceImpl implements RoleBindingService {
         });
         return userRoleInfo;
     }
-
     public List<Map<String, Object>> getAllRoleBindingList() {
         List<RoleBindingEntity> roleBindingEntityList = roleBindingRepository.findAllRoleBindingList();
         List<Long> roleIdList = new ArrayList<>();

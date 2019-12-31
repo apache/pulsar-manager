@@ -13,7 +13,6 @@
  */
 package org.apache.pulsar.manager.service.impl;
 
-import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
@@ -124,7 +123,6 @@ public class RolesServiceImpl implements RolesService {
                 return validateResult;
             }
         }
-
         Set<String> resourceVerbs = new HashSet<>(
                 Arrays.asList(roleInfoEntity.getResourceVerbs().split(VERBS_SEPARATOR)));
         for (String verb : resourceVerbs) {
@@ -249,7 +247,6 @@ public class RolesServiceImpl implements RolesService {
         result.put("message", "Validate tenant success");
         return result;
     }
-
     public boolean isSuperUser(String token) {
         Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(token);
         if (!userInfoEntityOptional.isPresent()) {

@@ -165,3 +165,11 @@ CREATE TABLE IF NOT EXISTS namespaces (
   namespace varchar(255) NOT NULL,
   UNIQUE(tenant, namespace)
 )ENGINE=InnoDB CHARACTER SET utf8;
+
+CREATE TABLE IF NOT EXISTS role_binding(
+  role_binding_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name varchar(256) NOT NULL,
+  description varchar(256),
+  role_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL
+)ENGINE=InnoDB CHARACTER SET utf8;

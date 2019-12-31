@@ -71,6 +71,7 @@ public interface RoleBindingRepository {
      * @return A list of RoleBindingEntity
      */
     List<RoleBindingEntity> findAllRoleBindingList();
+
     /**
      * Update a role binding information
      * @param roleBindingEntity RoleInfoEntity

@@ -45,14 +45,19 @@ import java.util.Map;
 @Validated
 public class ClustersController {
 
-    @Autowired
-    private ClustersService clusterService;
+    private final ClustersService clusterService;
+    private final EnvironmentCacheService environmentCacheService;
+    private final HttpServletRequest request;
 
     @Autowired
-    private EnvironmentCacheService environmentCacheService;
-
-    @Autowired
-    private HttpServletRequest request;
+    public ClustersController(
+            ClustersService clusterService,
+            EnvironmentCacheService environmentCacheService,
+            HttpServletRequest request) {
+        this.clusterService = clusterService;
+        this.environmentCacheService = environmentCacheService;
+        this.request = request;
+    }
 
     @Autowired
     private RolesService rolesService;

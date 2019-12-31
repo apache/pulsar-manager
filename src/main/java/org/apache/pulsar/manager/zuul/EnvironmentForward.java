@@ -13,9 +13,6 @@
  */
 package org.apache.pulsar.manager.zuul;
 
-import net.bytebuddy.implementation.bytecode.Throw;
-import org.apache.pulsar.manager.entity.NamespaceEntity;
-import org.apache.pulsar.manager.entity.NamespacesRepository;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -44,14 +41,19 @@ public class EnvironmentForward extends ZuulFilter {
 
     private static final Logger log = LoggerFactory.getLogger(EnvironmentForward.class);
 
-    @Autowired
-    private EnvironmentCacheService environmentCacheService;
-
-    @Autowired
-    private PulsarEvent pulsarEvent;
-
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
+
+    private final EnvironmentCacheService environmentCacheService;
+
+    private final PulsarEvent pulsarEvent;
+
+    @Autowired
+    public EnvironmentForward(
+            EnvironmentCacheService environmentCacheService, PulsarEvent pulsarEvent) {
+        this.environmentCacheService = environmentCacheService;
+        this.pulsarEvent = pulsarEvent;
+    }
 
     @Override
     public String filterType() {
@@ -114,6 +116,7 @@ public class EnvironmentForward extends ZuulFilter {
             return null;
         }
         String serviceUrl = environmentCacheService.getServiceUrl(request);
+        System.out.println(serviceUrl);
         return forwardRequest(ctx, request, serviceUrl);
     }
 

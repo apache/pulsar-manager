@@ -14,7 +14,6 @@
 package org.apache.pulsar.manager.service;
 
 import org.apache.pulsar.manager.PulsarManagerApplication;
-import org.apache.pulsar.manager.entity.EnvironmentsRepository;
 import org.apache.pulsar.manager.entity.NamespaceEntity;
 import org.apache.pulsar.manager.entity.NamespacesRepository;
 import org.apache.pulsar.manager.entity.RoleBindingEntity;

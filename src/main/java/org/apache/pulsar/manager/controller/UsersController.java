@@ -140,7 +140,6 @@ public class UsersController {
             result.put("error", "User already exist, please check");
             return ResponseEntity.ok(result);
         }
-
         userInfoEntity.setPassword(DigestUtils.sha256Hex(userInfoEntity.getPassword()));
         usersRepository.save(userInfoEntity);
         // Create default role and tenant
