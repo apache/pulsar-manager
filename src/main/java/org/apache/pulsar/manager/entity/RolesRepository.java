@@ -52,15 +52,12 @@ public interface RolesRepository {
     Page<RoleInfoEntity> findRolesList(Integer pageNum, Integer pageSize);
 
     /**
-<<<<<<< HEAD
      * Get all role list
      * @return A list of RoleInfoEntity.
      */
     List<RoleInfoEntity> findAllRolesList();
 
     /**
-=======
->>>>>>> master
      * Get role list.
      * @param roleSource Role source, name of tenant
      * @return A list of RoleInfoEntity.
@@ -77,11 +74,7 @@ public interface RolesRepository {
     Page<RoleInfoEntity> findRolesMultiId(Integer pageNum, Integer pageSize, List<Long> idList);
 
     /**
-<<<<<<< HEAD
      * Get all role list by role id
-=======
-     * Get all role list by role id, support paging.
->>>>>>> master
      * @param idList a list of role id
      * @return A list of RoleInfoEntity.
      */
