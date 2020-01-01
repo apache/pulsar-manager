@@ -39,11 +39,11 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
 
     private final EnvironmentsRepository environmentsRepository;
 
-    @Value("${environment.default.name}")
-    private String environmentDefaultName;
+    @Value("${default.environment.name}")
+    private String defaultEnvironmentName;
 
-    @Value("${environment.default.broker}")
-    private String environmentDefaultBroker;
+    @Value("${default.environment.service_url}")
+    private String defaultEnvironmentServiceUrl;
 
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
@@ -59,34 +59,37 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
                 .getEnvironmentsList(1, 1);
         if (environmentEntities.getResult().size() <= 0) {
             Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository
-                    .findByName(environmentDefaultName);
-            if (environmentDefaultName != null
-                    && environmentDefaultBroker != null
-                    && environmentDefaultName.length() > 0
-                    && environmentDefaultBroker.length() > 0
+                    .findByName(defaultEnvironmentName);
+            if (defaultEnvironmentName != null
+                    && defaultEnvironmentServiceUrl != null
+                    && defaultEnvironmentName.length() > 0
+                    && defaultEnvironmentServiceUrl.length() > 0
                     && !environmentEntityOptional.isPresent()) {
                 Map<String, String> header = Maps.newHashMap();
                 header.put("Content-Type", "application/json");
                 if (StringUtils.isNotBlank(pulsarJwtToken)) {
                     header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
                 }
-                String httpTestResult = HttpUtil.doGet(environmentDefaultBroker + "/metrics", header);
+                String httpTestResult = HttpUtil.doGet(defaultEnvironmentServiceUrl + "/metrics", header);
                 if (httpTestResult != null) {
                     EnvironmentEntity environmentEntity = new EnvironmentEntity();
-                    environmentEntity.setBroker(environmentDefaultBroker);
-                    environmentEntity.setName(environmentDefaultName);
+                    environmentEntity.setBroker(defaultEnvironmentServiceUrl);
+                    environmentEntity.setName(defaultEnvironmentName);
                     environmentsRepository.save(environmentEntity);
-                    log.info("The default environment set successful");
+                    log.info("Successfully added a default environment: name = {}, service_url = {}.",
+                            defaultEnvironmentName, defaultEnvironmentServiceUrl);
                 } else {
-                    log.error("The default environment configuration is incorrect, please check " +
-                            "configuration environment.default.name and environment.default.broker");
+                    log.error("Unable to connect default environment {} via {}, " +
+                            "please check if `environment.default.name` " +
+                            "and `environment.default.broker` are set correctly, " +
+                            "environmentDefaultName, environmentDefaultBroker",
+                            defaultEnvironmentName, defaultEnvironmentServiceUrl);
                     System.exit(-1);
                 }
             } else {
                 log.warn("The default environment already exists.");
             }
         }
-        log.info("The environment already exists.");
+        log.debug("Environments already exist.");
     }
-
 }
