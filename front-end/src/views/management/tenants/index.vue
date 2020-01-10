@@ -26,7 +26,7 @@
         <el-table
           v-loading="listLoading"
           :key="tableKey"
-          :data="list"
+          :data="currentList"
           border
           fit
           highlight-current-row
@@ -104,6 +104,16 @@
         </el-table>
       </el-col>
     </el-row>
+    <el-row>
+      <el-pagination
+        :current-page.sync="currentPage"
+        :page-size="pageSize"
+        :total="list.length"
+        background
+        layout="total, prev, pager, next"
+        @current-change="handleCurrentChange"
+      />
+    </el-row>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="form" :rules="rules" :model="form" label-position="top">
@@ -166,7 +176,10 @@ export default {
       postForm: Object.assign({}, defaultForm),
       clusterListOptions: [],
       tableKey: 0,
-      list: null,
+      currentPage: 0,
+      pageSize: 10,
+      list: [],
+      currentList: [],
       localList: [],
       searchList: [],
       total: 0,
@@ -249,12 +262,21 @@ export default {
           this.listQuery.page = response.data.pageNum
           this.listQuery.limit = response.data.pageSize
           this.list = this.localList.slice((this.listQuery.page - 1) * this.listQuery.limit, this.listQuery.limit * this.listQuery.page)
+          this.pageInit()
           // this.localPaging()
           // Just to simulate the time of the request
           setTimeout(() => {
             this.listLoading = false
           }, 1.5 * 1000)
         })
+      }
+    },
+    pageInit() {
+      this.currentPage = 0
+      if (this.list.length <= this.pageSize) {
+        this.currentList = this.list
+      } else {
+        this.currentList = this.list.slice(0, this.currentPage + this.pageSize)
       }
     },
     localPaging() {
@@ -381,6 +403,11 @@ export default {
       }
       this.inputVisible = false
       this.inputValue = ''
+    },
+    handleCurrentChange() {
+      var startList = (this.currentPage - 1) * this.pageSize
+      var endList = this.currentPage * this.pageSize
+      this.currentList = this.list.slice(startList, endList)
     }
   }
 }
