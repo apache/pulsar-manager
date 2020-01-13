@@ -57,7 +57,13 @@
               <span>{{ scope.row.roleSource }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
+          <el-table-column v-if="superUser" :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
+            <template slot-scope="scope">
+              <el-button type="primary" size="mini" @click="handleUpdateRole(scope.row)">{{ $t('table.edit') }}</el-button>
+              <el-button size="mini" type="danger" @click="handleDeleteRole(scope.row)">{{ $t('table.delete') }}</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column v-if="superUser === false" :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button :disabled="scope.row.resourceType=='TENANTS'" type="primary" size="mini" @click="handleUpdateRole(scope.row)">{{ $t('table.edit') }}</el-button>
               <el-button :disabled="scope.row.resourceType=='TENANTS'" size="mini" type="danger" @click="handleDeleteRole(scope.row)">{{ $t('table.delete') }}</el-button>
@@ -83,7 +89,7 @@
             v-model="form.resourceType"
             :placeholder="$t('role.resourceTypePlaceHolder')"
             style="width:100%"
-            @change="handleChangeResourceType(form.resourceType)">
+            @change="handleChangeResourceType(form)">
             <el-option
               v-for="item in resourceTypeListOptions"
               :key="item.value"
@@ -172,6 +178,7 @@ import {
   updateRole,
   deleteRole
 } from '@/api/roles'
+import store from '@/store'
 
 export default {
   name: 'RolesInfo',
@@ -222,6 +229,12 @@ export default {
     }
   },
   created() {
+    const roles = store.getters && store.getters.roles
+    if (roles.includes('super')) {
+      this.superUser = true
+    } else {
+      this.superUser = false
+    }
     this.getRoles()
     this.getResourceType()
   },

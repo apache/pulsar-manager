@@ -13,20 +13,7 @@
  */
 package org.apache.pulsar.manager.service;
 
-import org.apache.pulsar.manager.entity.RoleInfoEntity;
+public interface PermissionsService {
 
-import java.util.Map;
-import java.util.Set;
-
-public interface RolesService {
-
-    Map<String, String> validateRoleInfoEntity(RoleInfoEntity roleInfoEntity);
-
-    Map<String, String> createDefaultRoleAndTenant(String tenant, String environment);
-
-    Set<String> getResourceVerbs(String resourceVerbs);
-
-    Map<String, String> validateCurrentTenant(String token, String tenant);
-
-    boolean isSuperUser(String token);
+    boolean hasPermissions(String path);
 }

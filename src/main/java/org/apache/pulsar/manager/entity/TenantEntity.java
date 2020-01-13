@@ -40,4 +40,7 @@ public class TenantEntity {
     private String adminRoles;
     @SerializedName("allowed_clusters")
     private String allowedClusters;
+
+    @SerializedName("environment_name")
+    private String environmentName;
 }

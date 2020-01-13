@@ -32,6 +32,8 @@ public interface EnvironmentsRepository {
 
     List<EnvironmentEntity> getAllEnvironments();
 
+    List<EnvironmentEntity> getAllEnvironments(List<String> envonmentNameList);
+
     void remove(String name);
 
     void update(EnvironmentEntity environmentEntity);

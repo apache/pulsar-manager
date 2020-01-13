@@ -58,6 +58,10 @@ public interface RoleBindingMapper {
             "FROM role_binding")
     Page<RoleBindingEntity> findRoleBindinglist();
 
+    @Select("SELECT name, role_binding_id as roleBindingId, description, user_id as userId, role_id as roleId " +
+            "FROM role_binding")
+    List<RoleBindingEntity> findAllRoleBindinglist();
+
     @Update("UPDATE role_binding " +
             "SET description = #{description}, name = #{name}, role_id=#{roleId}, user_id=#{userId} " +
             "Where role_binding_id=#{roleBindingId}")

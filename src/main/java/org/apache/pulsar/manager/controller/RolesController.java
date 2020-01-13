@@ -27,7 +27,6 @@ import org.apache.pulsar.manager.entity.RolesRepository;
 import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.utils.ResourceType;
 import org.hibernate.validator.constraints.Range;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,8 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
@@ -54,14 +51,24 @@ import java.util.Set;
 @Validated
 public class RolesController {
 
-    @Autowired
-    private RolesRepository rolesRepository;
+    private final RolesRepository rolesRepository;
 
-    @Autowired
-    private RolesService rolesService;
+    private final RolesService rolesService;
 
-    @Autowired
-    private NamespacesRepository namespacesRepository;
+    private final NamespacesRepository namespacesRepository;
+
+    private final HttpServletRequest request;
+
+    public RolesController(
+            RolesRepository rolesRepository,
+            RolesService rolesService,
+            NamespacesRepository namespacesRepository,
+            HttpServletRequest request) {
+        this.rolesRepository = rolesRepository;
+        this.rolesService = rolesService;
+        this.namespacesRepository = namespacesRepository;
+        this.request = request;
+    }
 
     @ApiOperation(value = "Get the list of existing roles, support paging, the default is 10 per page")
     @ApiResponses({
@@ -79,11 +86,15 @@ public class RolesController {
             @RequestParam(name = "page_size", defaultValue = "10")
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
                     Integer pageSize) {
-        HttpServletRequest request = ((ServletRequestAttributes)
-                RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getHeader("token");
         Map<String, Object> result = Maps.newHashMap();
         String tenant = request.getHeader("tenant");
+        if (rolesService.isSuperUser(token)) {
+            List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesList();
+            result.put("total", roleInfoEntities.size());
+            result.put("data", roleInfoEntities);
+            return ResponseEntity.ok(result);
+        }
         Map<String, String> validateResult = rolesService.validateCurrentTenant(token, tenant);
         if (validateResult.get("error") != null) {
             result.put("error", validateResult.get("error"));
@@ -105,8 +116,6 @@ public class RolesController {
     @RequestMapping(value = "/roles/role", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> addRole(
             @RequestBody RoleInfoEntity roleInfoEntity) {
-        HttpServletRequest request = ((ServletRequestAttributes)
-                RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getHeader("token");
         Map<String, Object> result = Maps.newHashMap();
         String tenant = request.getHeader("tenant");
@@ -149,8 +158,6 @@ public class RolesController {
     @RequestMapping(value = "/roles/role", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateRole(@RequestBody RoleInfoEntity roleInfoEntity) {
         Map<String, Object> result = Maps.newHashMap();
-        HttpServletRequest request = ((ServletRequestAttributes)
-                RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getHeader("token");
         String tenant = request.getHeader("tenant");
         Map<String, String> validateResult = rolesService.validateCurrentTenant(token, tenant);
@@ -192,8 +199,6 @@ public class RolesController {
     @RequestMapping(value = "/roles/role", method = RequestMethod.DELETE)
     public ResponseEntity<Map<String, Object>> deleteRole(@RequestBody RoleInfoEntity roleInfoEntity) {
         Map<String, Object> result = Maps.newHashMap();
-        HttpServletRequest request = ((ServletRequestAttributes)
-                RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getHeader("token");
         String tenant = request.getHeader("tenant");
         Map<String, String> validateResult = rolesService.validateCurrentTenant(token, tenant);
@@ -240,8 +245,6 @@ public class RolesController {
     @RequestMapping(value = "/role/resource/{resourceType}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getResource(@PathVariable String resourceType) {
         Map<String, Object> result = Maps.newHashMap();
-        HttpServletRequest request = ((ServletRequestAttributes)
-                RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getHeader("token");
         String tenant = request.getHeader("tenant");
         Map<String, String> validateResult = rolesService.validateCurrentTenant(token, tenant);

@@ -34,6 +34,12 @@ public interface EnvironmentsMapper {
     @Select("SELECT name,broker FROM environments")
     Page<EnvironmentEntity> findEnvironmentsList();
 
+    @Select({"<script>",
+            "SELECT name,broker FROM environments",
+            "WHERE name IN <foreach collection='nameList' item='name' open='(' separator=',' close=')'> #{name} </foreach>" +
+                    "</script>"})
+    Page<EnvironmentEntity> findEnvironmentsListByMultiName(@Param("nameList") List<String> nameList);
+
     @Select("SELECT name,broker FROM environments")
     List<EnvironmentEntity> getAllEnvironments();
 

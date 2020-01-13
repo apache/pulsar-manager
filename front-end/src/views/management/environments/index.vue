@@ -15,7 +15,7 @@
 -->
 <template>
   <div class="app-container">
-    <el-button type="primary" icon="el-icon-plus" @click="handleCreateEnvironment">{{ $t('env.buttonNewEnv') }}</el-button>
+    <el-button v-if="superUser" type="primary" icon="el-icon-plus" @click="handleCreateEnvironment">{{ $t('env.buttonNewEnv') }}</el-button>
 
     <el-row :gutter="24">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px">
@@ -39,7 +39,7 @@
               <span>{{ scope.row.broker }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
+          <el-table-column v-if="superUser" :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button type="primary" size="mini" @click="handleUpdateEnvironment(scope.row)">{{ $t('table.edit') }}</el-button>
               <el-button size="mini" type="danger" @click="handleDeleteEnvironment(scope.row)">{{ $t('table.delete') }}</el-button>
@@ -78,6 +78,7 @@
 <script>
 import { putEnvironment, fetchEnvironments, deleteEnvironment, updateEnvironment } from '@/api/environments'
 import { setEnvironment } from '@/utils/environment'
+import store from '@/store'
 
 export default {
   name: 'EnvironmentInfo',
@@ -101,6 +102,8 @@ export default {
         'name': '',
         'broker': ''
       },
+      superUser: false,
+      roles: [],
       rules: {
         environment: [{ required: true, message: this.$i18n.t('env.envNameIsRequired'), trigger: 'blur' }],
         broker: [{ required: true, message: this.$i18n.t('env.serviceUrlIsRequired'), trigger: 'blur' }]
@@ -109,6 +112,12 @@ export default {
   },
   created() {
     this.getEnvironments()
+    this.roles = store.getters && store.getters.roles
+    if (this.roles.includes('super')) {
+      this.superUser = true
+    } else {
+      this.superUser = false
+    }
   },
   methods: {
     getEnvironments() {
@@ -238,7 +247,11 @@ export default {
     },
     handleSetEnvironment(environment) {
       setEnvironment(environment)
-      this.$router.push({ path: '/management/tenants' })
+      if (this.roles.includes('super')) {
+        this.$router.push({ path: '/management/tenants' })
+      } else {
+        this.$router.push({ path: '/management/admin/tenants/tenantInfo' })
+      }
     }
   }
 }

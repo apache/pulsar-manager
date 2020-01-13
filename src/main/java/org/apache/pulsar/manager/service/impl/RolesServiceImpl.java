@@ -13,7 +13,6 @@
  */
 package org.apache.pulsar.manager.service.impl;
 
-import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
@@ -152,8 +151,9 @@ public class RolesServiceImpl implements RolesService {
         return validateResult;
     }
 
-    public void createDefaultRoleAndTenant(String tenant) {
+    public Map<String, String> createDefaultRoleAndTenant(String tenant, String environment) {
         Optional<RoleInfoEntity> roleInfoEntityOptional = rolesRepository.findByRoleName(tenant, tenant);
+        Map<String, String> result = Maps.newHashMap();
         if (!roleInfoEntityOptional.isPresent()) {
             // Create role, create default tenant for user
             RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
@@ -163,38 +163,37 @@ public class RolesServiceImpl implements RolesService {
             roleInfoEntity.setResourceName(tenant);
             roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
             roleInfoEntity.setFlag(1);
-            try {
-                Page<EnvironmentEntity> environmentListPage =
-                        environmentsRepository.getEnvironmentsList(1, 1);
-                EnvironmentEntity environmentEntity = environmentListPage.get(0);
-                String broker = environmentEntity.getBroker();
-                List<String> clusterList = clustersService.getClusterByAnyBroker(broker);
-                tenantsService.createTenant(tenant, tenant, clusterList.get(0), broker);
-
-                // Cache default tenant
-                TenantEntity tenantEntity = new TenantEntity();
-                tenantEntity.setTenant(tenant);
-                tenantEntity.setAdminRoles(tenant);
-                tenantEntity.setAllowedClusters(clusterList.get(0));
-                long tenantId = tenantsRepository.save(tenantEntity);
-                roleInfoEntity.setResourceId(tenantId);
-                long roleId = rolesRepository.save(roleInfoEntity);
-                RoleBindingEntity roleBindingEntity = new RoleBindingEntity();
-                roleBindingEntity.setName(tenant);
-                roleBindingEntity.setDescription("This init binding for tenant");
-                roleBindingEntity.setRoleId(roleId);
-                Optional<UserInfoEntity> userInfoEntity = usersRepository.findByUserName(tenant);
-                roleBindingEntity.setUserId(userInfoEntity.get().getUserId());
-                roleBindingRepository.save(roleBindingEntity);
-            } catch (Exception e) {
-                /**
-                 * TO DO
-                 * Send a notification to the administrator so that the administrator can complete subsequent
-                 * operations without blocking user login.
-                 */
-                log.error("Create tenant failed: {}", e.getCause());
+            Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
+            EnvironmentEntity environmentEntity = environmentEntityOptional.get();
+            if (!environmentEntityOptional.isPresent()) {
+                result.put("error", "Environment is no exist");
+                return result;
             }
+            String broker = environmentEntity.getBroker();
+            List<String> clusterList = clustersService.getClusterByAnyBroker(broker);
+            tenantsService.createTenant(tenant, tenant, clusterList.get(0), broker);
+
+            // Cache default tenant
+            TenantEntity tenantEntity = new TenantEntity();
+            tenantEntity.setTenant(tenant);
+            tenantEntity.setAdminRoles(tenant);
+            tenantEntity.setEnvironmentName(environment);
+            tenantEntity.setAllowedClusters(clusterList.get(0));
+            long tenantId = tenantsRepository.save(tenantEntity);
+            roleInfoEntity.setResourceId(tenantId);
+            long roleId = rolesRepository.save(roleInfoEntity);
+            RoleBindingEntity roleBindingEntity = new RoleBindingEntity();
+            roleBindingEntity.setName(tenant);
+            roleBindingEntity.setDescription("This init binding for tenant");
+            roleBindingEntity.setRoleId(roleId);
+            Optional<UserInfoEntity> userInfoEntity = usersRepository.findByUserName(tenant);
+            roleBindingEntity.setUserId(userInfoEntity.get().getUserId());
+            roleBindingRepository.save(roleBindingEntity);
+            result.put("message", "Create default success");
+            return result;
         }
+        result.put("error", "Role is exist");
+        return result;
     }
 
     public Set<String> getResourceVerbs(String resourceType) {
@@ -247,5 +246,24 @@ public class RolesServiceImpl implements RolesService {
         }
         result.put("message", "Validate tenant success");
         return result;
+    }
+    public boolean isSuperUser(String token) {
+        Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(token);
+        if (!userInfoEntityOptional.isPresent()) {
+            return false;
+        }
+        UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
+        List<RoleBindingEntity> roleBindingEntities = roleBindingRepository.findByUserId(userInfoEntity.getUserId());
+        List<Long> roleIdList = new ArrayList<>();
+        for (RoleBindingEntity roleBindingEntity : roleBindingEntities) {
+            roleIdList.add(roleBindingEntity.getRoleId());
+        }
+        List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
+        for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
+            if (roleInfoEntity.getFlag() == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

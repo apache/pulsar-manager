@@ -25,4 +25,6 @@ public interface RoleBindingService {
     Map<String, Object> validateCreateRoleBinding(String token, String tenant, String roleName, String userName);
 
     List<Map<String, Object>> getRoleBindingList(String token, String tenant);
+
+    List<Map<String, Object>> getAllRoleBindingList();
 }

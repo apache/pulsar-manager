@@ -63,6 +63,11 @@ public class RoleBindingRepositoryImpl implements RoleBindingRepository {
     }
 
     @Override
+    public List<RoleBindingEntity> findAllRoleBindingList() {
+        return this.roleBindingMapper.findAllRoleBindinglist();
+    }
+
+    @Override
     public List<RoleBindingEntity> findByMultiRoleId(List<Long> roleIdList) {
         return this.roleBindingMapper.findByMultiRoleId(roleIdList);
     }

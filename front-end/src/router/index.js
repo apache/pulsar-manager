@@ -68,11 +68,24 @@ export const constantRouterMap = [
     path: '/401',
     component: () => import('@/views/errorPage/401'),
     hidden: true
-  },
+  }
+]
+
+export default new Router({
+  // mode: 'history', // require service support
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRouterMap
+})
+
+export const asyncRouterMap = [
+
   {
     path: '/environments',
     component: () => import('@/views/management/environments/index'),
-    hidden: true
+    hidden: true,
+    meta: {
+      roles: ['super', 'admin']
+    }
   },
   {
     path: '',
@@ -80,7 +93,8 @@ export const constantRouterMap = [
     redirect: 'management/tenants',
     meta: {
       title: 'Dashboard',
-      icon: 'dashboard'
+      icon: 'dashboard',
+      roles: ['super']
     },
     hidden: true,
     children: [
@@ -102,171 +116,260 @@ export const constantRouterMap = [
     path: '/management',
     component: Layout,
     name: 'Management',
-    redirect: 'management/tenants',
+    redirect: 'management/roles',
     meta: {
       title: 'Management',
-      icon: 'component'
+      icon: 'component',
+      roles: ['super', 'admin']
     },
     children: [
       {
         path: 'clusters',
         component: () => import('@/views/management/clusters/index'),
         name: 'Clusters',
-        meta: { title: 'Clusters', noCache: true }
+        meta: {
+          title: 'Clusters',
+          noCache: true,
+          roles: ['super']
+        }
       },
       {
         path: 'clusters/:cluster/cluster',
         component: () => import('@/views/management/clusters/cluster'),
         name: 'ClusterInfo',
-        meta: { title: 'ClusterInfo', noCache: true },
+        meta: {
+          title: 'ClusterInfo',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: 'clusters/:cluster/:failureDomainName/failureDomainName',
         component: () => import('@/views/management/clusters/failureDomain'),
         name: 'FailureDomainInfo',
-        meta: { title: 'FailureDomainInfo', noCache: true },
+        meta: {
+          title: 'FailureDomainInfo',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: 'clusters/:cluster/:namespaceIsolation/namespaceIsolationPolicy',
         component: () => import('@/views/management/namespaceIsolations/namespaceIsolationPolicy'),
         name: 'NamespaceIsolationPolicy',
-        meta: { title: 'NamespaceIsolationPolicy', noCache: true },
+        meta: {
+          title: 'NamespaceIsolationPolicy',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: 'brokers/:cluster/:broker/broker',
         component: () => import('@/views/management/brokers/broker'),
         name: 'BrokerInfo',
-        meta: { title: 'BrokerInfo', noCache: true },
+        meta: {
+          title: 'BrokerInfo',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: 'tenants',
         component: () => import('@/views/management/tenants/index'),
         name: 'Tenants',
-        meta: { title: 'Tenants', noCache: true }
+        meta: {
+          title: 'Tenants',
+          noCache: true,
+          roles: ['super']
+        }
       },
       {
         path: 'tenants/tenantInfo/:tenant',
         component: () => import('@/views/management/tenants/tenant'),
         name: 'Tenant',
-        meta: { title: 'TenantInfo', noCache: true },
+        meta: {
+          title: 'TenantInfo',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
+      },
+      {
+        path: 'admin/tenants/tenantInfo',
+        component: () => import('@/views/management/admin/tenants/tenant'),
+        name: 'Tenant Admin',
+        meta: {
+          title: 'TenantInfo',
+          noCache: true,
+          roles: ['super', 'admin']
+        }
       },
       {
         path: 'tenants/tenantInfo/public?tab=namespaces',
         name: 'Namespaces',
-        meta: { title: 'Namespaces', noCache: true }
+        meta: {
+          title: 'Namespaces',
+          noCache: true,
+          roles: ['super']
+        }
       },
       {
         path: 'namespaces/public/default/namespace?tab=topics',
         name: 'Topics',
-        meta: { title: 'Topics', noCache: true }
+        meta: {
+          title: 'Topics',
+          noCache: true,
+          roles: ['super']
+        }
       },
       {
         path: 'topics/:persistent/:tenant/:namespace/:topic/topic',
         component: () => import('@/views/management/topics/topic'),
         name: 'TopicInfo',
-        meta: { title: 'TopicInfo', noCache: true },
+        meta: {
+          title: 'TopicInfo',
+          noCache: true,
+          roles: ['super', 'admin']
+        },
         hidden: true
       },
       {
         path: 'topics/:persistent/:tenant/:namespace/:topic/partitionedTopic',
         component: () => import('@/views/management/topics/partitionedTopic'),
         name: 'ParititionTopicInfo',
-        meta: { title: 'ParititionTopicInfo', noCache: true },
+        meta: {
+          title: 'ParititionTopicInfo',
+          noCache: true,
+          roles: ['super', 'admin']
+        },
         hidden: true
       },
       {
         path: 'subscriptions/:persistent/:tenant/:namespace/:topic/:subscription/subscription',
         component: () => import('@/views/management/subscriptions/subscription'),
         name: 'SubscriptionInfo',
-        meta: { title: 'SubscriptionInfo', noCache: true },
+        meta: {
+          title: 'SubscriptionInfo',
+          noCache: true,
+          roles: ['super', 'admin']
+        },
         hidden: true
       },
       {
         path: 'namespaces/:tenant',
         name: 'NamespacesTenant',
-        meta: { title: 'Namespaces', noCache: true },
+        meta: {
+          title: 'Namespaces',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: 'namespaces/:tenant/:namespace/namespace',
         component: () => import('@/views/management/namespaces/namespace'),
         name: 'NamespacesInfo',
-        meta: { title: 'NamespacesInfo', noCache: true },
+        meta: {
+          title: 'NamespacesInfo',
+          noCache: true,
+          roles: ['super', 'admin']
+        },
         hidden: true
       },
       {
         path: 'functions',
         component: () => import('@/views/management/functions'),
         name: 'Functions',
-        meta: { title: 'Functions', noCache: true },
+        meta: {
+          title: 'Functions',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: 'sources',
         component: () => import('@/views/management/sources'),
         name: 'Sources',
-        meta: { title: 'Sources', noCache: true },
+        meta: {
+          title: 'Sources',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: 'sinks',
         component: () => import('@/views/management/sinks'),
         name: 'Sinks',
-        meta: { title: 'Sinks', noCache: true },
+        meta: {
+          title: 'Sinks',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: 'bookies',
         component: () => import('@/views/management/bookies'),
         name: 'Bookies',
-        meta: { title: 'Bookies', noCache: true },
+        meta: {
+          title: 'Bookies',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: true
       },
       {
         path: '/users',
         component: () => import('@/views/management/users/index'),
         name: 'Users',
-        meta: { title: 'Users', noCache: true },
+        meta: {
+          title: 'Users',
+          noCache: true,
+          roles: ['super']
+        },
         hidden: false
       },
       {
         path: '/roles',
         component: () => import('@/views/management/roles/index'),
         name: 'Roles',
-        meta: { title: 'Roles', noCache: true },
+        meta: {
+          title: 'Roles',
+          noCache: true,
+          roles: ['super', 'admin']
+        },
         hidden: false
       },
       {
         path: '/roleBinding',
         component: () => import('@/views/management/roleBinding/index'),
         name: 'RoleBinding',
-        meta: { title: 'RoleBinding', noCache: true },
+        meta: {
+          title: 'RoleBinding',
+          noCache: true,
+          roles: ['super', 'admin']
+        },
         hidden: false
       },
       {
         path: '/tokens',
         component: () => import('@/views/management/tokens/index'),
         name: 'Tokens',
-        meta: { title: 'Tokens', noCache: true },
+        meta: {
+          title: 'Tokens',
+          noCache: true,
+          roles: ['super', 'admin']
+        },
         hidden: false
       }
     ]
-  }
-]
-
-export default new Router({
-  // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRouterMap
-})
-
-export const asyncRouterMap = [
-
+  },
   {
     path: 'external-link',
     component: Layout,
@@ -277,6 +380,5 @@ export const asyncRouterMap = [
       }
     ]
   },
-
   { path: '*', redirect: '/404', hidden: true }
 ]

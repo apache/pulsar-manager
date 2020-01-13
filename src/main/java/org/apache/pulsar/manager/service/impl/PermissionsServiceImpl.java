@@ -11,22 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.pulsar.manager.service;
+package org.apache.pulsar.manager.service.impl;
 
-import org.apache.pulsar.manager.entity.RoleInfoEntity;
+import org.apache.pulsar.manager.service.PermissionsService;
 
-import java.util.Map;
-import java.util.Set;
+public class PermissionsServiceImpl implements PermissionsService {
 
-public interface RolesService {
+    public boolean hasPermissions(String path) {
+        return false;
+    }
 
-    Map<String, String> validateRoleInfoEntity(RoleInfoEntity roleInfoEntity);
-
-    Map<String, String> createDefaultRoleAndTenant(String tenant, String environment);
-
-    Set<String> getResourceVerbs(String resourceVerbs);
-
-    Map<String, String> validateCurrentTenant(String token, String tenant);
-
-    boolean isSuperUser(String token);
 }

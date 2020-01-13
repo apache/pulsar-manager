@@ -29,6 +29,7 @@ public class WebAppConfigurer implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(adminHandlerInterceptor).addPathPatterns("/**")
                 .excludePathPatterns("/pulsar-manager/login")
+                .excludePathPatterns("/pulsar-manager/users/superuser")
                 .excludePathPatterns("/pulsar-manager/third-party-login/**");
     }
 }

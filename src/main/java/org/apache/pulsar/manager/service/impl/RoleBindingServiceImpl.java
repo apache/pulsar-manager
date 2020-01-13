@@ -140,4 +140,38 @@ public class RoleBindingServiceImpl implements RoleBindingService {
         });
         return userRoleInfo;
     }
+    public List<Map<String, Object>> getAllRoleBindingList() {
+        List<RoleBindingEntity> roleBindingEntityList = roleBindingRepository.findAllRoleBindingList();
+        List<Long> roleIdList = new ArrayList<>();
+        List<Long> userIdList = new ArrayList<>();
+        roleBindingEntityList.forEach((roleBinding) -> {
+            roleIdList.add(roleBinding.getRoleId());
+            userIdList.add(roleBinding.getUserId());
+        });
+        List<UserInfoEntity> userInfoEntities = usersRepository.findUsersListByMultiUserId(userIdList);
+        Map<Long, UserInfoEntity> userInfoEntityMap = Maps.newHashMap();
+        userInfoEntities.forEach((u) -> {
+            userInfoEntityMap.put(u.getUserId(), u);
+        });
+        List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
+        Map<Long, RoleInfoEntity> roleInfoEntityMap = Maps.newHashMap();
+        roleInfoEntities.forEach((r) -> {
+            roleInfoEntityMap.put(r.getRoleId(), r);
+        });
+        List<Map<String, Object>> userRoleInfo = new ArrayList<>();
+        roleBindingEntityList.forEach((binding) -> {
+            RoleInfoEntity roleInfoEntity = roleInfoEntityMap.get(binding.getRoleId());
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("name", binding.getName());
+            map.put("description", binding.getDescription());
+            map.put("userId", binding.getUserId());
+            if (userInfoEntityMap.get(binding.getUserId()) != null) {
+                map.put("userName", userInfoEntityMap.get(binding.getUserId()).getName());
+            }
+            map.put("roleId", binding.getRoleId());
+            map.put("roleName", roleInfoEntity.getRoleName());
+            userRoleInfo.add(map);
+        });
+        return userRoleInfo;
+    }
 }

@@ -64,6 +64,11 @@ public class EnvironmentsRepositoryImpl implements EnvironmentsRepository {
     }
 
     @Override
+    public List<EnvironmentEntity> getAllEnvironments(List<String> envonmentNameList) {
+        return environmentsMapper.findEnvironmentsListByMultiName(envonmentNameList);
+    }
+
+    @Override
     public void remove(String name) {
         environmentsMapper.delete(name);
     }

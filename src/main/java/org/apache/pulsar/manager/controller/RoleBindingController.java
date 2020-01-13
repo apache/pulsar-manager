@@ -86,6 +86,12 @@ public class RoleBindingController {
                 RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getHeader("token");
         String tenant = request.getHeader("tenant");
+        if (rolesService.isSuperUser(token)) {
+            List<Map<String, Object>> roleBindingList = roleBindingService.getAllRoleBindingList();
+            result.put("total", roleBindingList.size());
+            result.put("data", roleBindingList);
+            return ResponseEntity.ok(result);
+        }
         Map<String, String> validateResult = rolesService.validateCurrentTenant(token, tenant);
         if (validateResult.get("error") != null) {
             result.put("error", validateResult.get("error"));
