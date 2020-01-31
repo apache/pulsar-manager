@@ -146,6 +146,9 @@ The pulsar-manager can monitor topics and subscriptions.
    * Password: `pulsar`  
    * Pulsar manager website: http://localhost:9527/
 
+4. Add Pulsar standalone environment.
+    You can choose any name you would like for the Environment Name. The default service URL is `http://host.docker.internal:8080`.
+
 ### Default Test database HerdDB
 
 #### Introduction
