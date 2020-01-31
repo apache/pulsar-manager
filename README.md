@@ -148,10 +148,12 @@ The pulsar-manager can monitor topics and subscriptions.
 
 4. Add Pulsar standalone environment.
     You can choose any name you would like for the Environment Name. The default Service URL is dependent on how you set up pulsar-manager and pulsar.
-    * With Docker:
+    * Pulsar standalone with pulsar-manager docker image:
     	Modify conf/standalone.conf to change `bindAddress=127.0.0.1`. Then, the Service URL is `http://host.docker.internal:8080`
-    * Local environment:
+    * Pulsar standalone with pulsar-manager docker image:
 	By default, `http://0.0.0.0:8080`
+    * Pulsar and pulsar-manager docker image:
+	???
 
 ### Default Test database HerdDB
 
