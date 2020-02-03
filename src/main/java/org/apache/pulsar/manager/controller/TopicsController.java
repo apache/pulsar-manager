@@ -63,8 +63,8 @@ public class TopicsController {
     @Value("${backend.jwt.token}")
     private String token;
 
-    @Value("{pulsar.peek.message}")
-    private Boolean peekMessage;
+    @Value("${pulsar.peek.message}")
+    private boolean peekMessage;
 
     @Autowired
     public TopicsController(
