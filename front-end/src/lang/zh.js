@@ -569,7 +569,14 @@ export default {
       clearMessageSuccess: 'Clear messages successfully',
       minutesNotLessThanZero: 'Minutes cannot be less than 0',
       resetCursorSuccess: 'Reset cursor successfully',
-      messageIdNotLessThanZero: 'Message Id cannot be less than 0'
+      messageIdNotLessThanZero: 'Message Id cannot be less than 0',
+      newSub: 'New Subscription',
+      sub: 'Subscribe',
+      unsub: 'Unsubscribe',
+      subNotification: 'Please input correct sub name',
+      createSubSuccess: 'Create subscription successfully',
+      deleteSubSuccess: 'Delete subscription successfully',
+      deleteSubConfirm: 'Do you want to delete this subscription?'
     },
     segment: {
       label: 'Segment',

@@ -21,6 +21,7 @@ import org.apache.pulsar.manager.mapper.UsersMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -35,7 +36,8 @@ public class UsersRepositoryImpl implements UsersRepository {
 
     @Override
     public long save(UserInfoEntity userInfoEntity) {
-        return this.usersMapper.save(userInfoEntity);
+        this.usersMapper.save(userInfoEntity);
+        return userInfoEntity.getUserId();
     }
 
     @Override
@@ -44,9 +46,24 @@ public class UsersRepositoryImpl implements UsersRepository {
     }
 
     @Override
+    public Optional<UserInfoEntity> findByUserId(long userId) {
+        return Optional.ofNullable(this.usersMapper.findByUserId(userId));
+    }
+
+    @Override
+    public Optional<UserInfoEntity> findByAccessToken(String accessToken) {
+        return Optional.ofNullable(this.usersMapper.findByAccessToken(accessToken));
+    }
+
+    @Override
     public Page<UserInfoEntity> findUsersList(Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         return this.usersMapper.findUsersList();
+    }
+
+    @Override
+    public List<UserInfoEntity> findUsersListByMultiUserId(List<Long> userIdList) {
+        return this.usersMapper.findUsersListByMultiUserId(userIdList);
     }
 
     @Override

@@ -11,11 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { loginByUsername, logout, getUserInfo } from '@/api/login'
+import { loginByUsername, logout } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { setName, removeName } from '@/utils/username'
 import { removeEnvironment } from '@/utils/environment'
 import { Message } from 'element-ui'
+import { setTenant, removeTenant } from '../../utils/tenant'
+import { getUserInfo } from '@/api/users'
 
 const user = {
   state: {
@@ -75,6 +77,7 @@ const user = {
           commit('SET_TOKEN', response.headers.token)
           setToken(response.headers.token)
           setName(response.headers.username)
+          setTenant(response.headers.tenant)
           resolve()
         }).catch(error => {
           reject(error)
@@ -85,19 +88,12 @@ const user = {
     // 获取用户信息
     GetUserInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        // const response = getUserInfo(state.token)
-        // const data = response.data
-
-        commit('SET_ROLES', ['admin'])
-        commit('SET_NAME', 'admin')
-        // commit('SET_AVATAR', 'data.avatar')
-        commit('SET_INTRODUCTION', 'Pulsar Manager')
-        const response = {
-          'data': {
-            'roles': ['admin']
-          }
-        }
-        resolve(response)
+        getUserInfo().then(response => {
+          commit('SET_ROLES', response.data.roles)
+          commit('SET_NAME', 'admin')
+          commit('SET_INTRODUCTION', 'Pulsar Manager')
+          resolve(response)
+        })
       })
     },
 
@@ -109,6 +105,7 @@ const user = {
           commit('SET_ROLES', [])
           removeToken()
           removeName()
+          removeTenant()
           removeEnvironment()
           resolve()
         }).catch(error => {
@@ -123,6 +120,7 @@ const user = {
         commit('SET_TOKEN', '')
         removeToken()
         removeName()
+        removeTenant()
         removeEnvironment()
         resolve()
       })
@@ -139,15 +137,15 @@ const user = {
       return new Promise(resolve => {
         commit('SET_TOKEN', role)
         setToken(role)
-        getUserInfo(role).then(response => {
-          const data = response.data
-          commit('SET_ROLES', data.roles)
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
-          commit('SET_INTRODUCTION', data.introduction)
-          dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单
-          resolve()
-        })
+        // getUserInfo(role).then(response => {
+        //   const data = response.data
+        //   commit('SET_ROLES', data.roles)
+        //   commit('SET_NAME', data.name)
+        //   commit('SET_AVATAR', data.avatar)
+        //   commit('SET_INTRODUCTION', data.introduction)
+        //   dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单
+        //   resolve()
+        // })
       })
     }
   }

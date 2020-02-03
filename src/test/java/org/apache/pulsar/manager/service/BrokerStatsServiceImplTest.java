@@ -43,6 +43,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 
@@ -296,5 +297,80 @@ public class BrokerStatsServiceImplTest {
         Page<ReplicationStatsEntity> deleteReplicationStatsEntities = replicationsStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
         Assert.assertEquals(deleteReplicationStatsEntities.getTotal(), 0);
+    }
+
+    @Test
+    public void findByMultiTenantOrMultiNamespace() {
+        PowerMockito.mockStatic(HttpUtil.class);
+        Map<String, String> header = Maps.newHashMap();
+        header.put("Content-Type", "application/json");
+        if (StringUtils.isNotBlank(pulsarJwtToken)){
+            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+        }
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
+                .thenReturn("[\"standalone\"]");
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone", header))
+                .thenReturn("{\n" +
+                        "\"serviceUrl\" : \"http://tengdeMBP:8080\",\n" +
+                        "\"brokerServiceUrl\" : \"pulsar://tengdeMBP:6650\"\n" +
+                        "}");
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
+                .thenReturn("[\"localhost:8080\"]");
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/broker-stats/topics", header))
+                .thenReturn(testData);
+        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
+                .thenReturn("{}");
+
+        String environment = "staging";
+        String cluster = "standalone";
+        String serviceUrl = "http://localhost:8080";
+        brokerStatsService.collectStatsToDB(
+                System.currentTimeMillis() / 1000,
+                environment,
+                cluster,
+                serviceUrl
+        );
+        Optional<TopicStatsEntity> topicStatsEntity = topicsStatsRepository.findMaxTime();
+        TopicStatsEntity topicStatsEntity1 = topicStatsEntity.get();
+        ArrayList<String> tenantList = new ArrayList<>();
+        tenantList.add(topicStatsEntity1.getTenant());
+        Page<TopicStatsEntity> tenantCountPage = brokerStatsService.findByMultiTenant(
+                1, 1, environment, tenantList, topicStatsEntity1.getTimestamp());
+        tenantCountPage.count(true);
+        Page<TopicStatsEntity> tenantAllCountPage = brokerStatsService.findByMultiTenant(
+                1, (int)tenantCountPage.getTotal(), environment, tenantList, topicStatsEntity1.getTimestamp());
+
+
+        tenantAllCountPage.getResult().forEach((result) -> {
+            Assert.assertEquals(result.getAverageMsgSize(), 0.0, 1);
+            Assert.assertEquals(result.getMsgRateIn(), 0.0, 1);
+            Assert.assertEquals(result.getMsgRateOut(), 0.0, 1);
+            Assert.assertEquals(result.getMsgThroughputIn(), 0.0, 1);
+            Assert.assertEquals(result.getMsgThroughputOut(), 0.0, 1);
+            Assert.assertEquals(result.getStorageSize(), 0, 0);
+        });
+
+        ArrayList<String> namespaceList = new ArrayList<>();
+        namespaceList.add(topicStatsEntity1.getNamespace());
+        Page<TopicStatsEntity> namespaceCountPage = brokerStatsService.findByMultiNamespace(
+                1, 1, environment, topicStatsEntity1.getTenant(),
+                namespaceList, topicStatsEntity1.getTimestamp());
+        namespaceCountPage.count(true);
+        Page<TopicStatsEntity> namespaceAllCountPage = brokerStatsService.findByMultiNamespace(
+                1, (int)namespaceCountPage.getTotal(), environment, topicStatsEntity1.getTenant(),
+                namespaceList, topicStatsEntity1.getTimestamp());
+
+
+        namespaceAllCountPage.getResult().forEach((result) -> {
+            Assert.assertEquals(result.getAverageMsgSize(), 0.0, 1);
+            Assert.assertEquals(result.getMsgRateIn(), 0.0, 1);
+            Assert.assertEquals(result.getMsgRateOut(), 0.0, 1);
+            Assert.assertEquals(result.getMsgThroughputIn(), 0.0, 1);
+            Assert.assertEquals(result.getMsgThroughputOut(), 0.0, 1);
+            Assert.assertEquals(result.getStorageSize(), 0, 0);
+        });
+
+        long unixTime = System.currentTimeMillis() / 1000L;
+        brokerStatsService.clearStats(unixTime, 0);
     }
 }

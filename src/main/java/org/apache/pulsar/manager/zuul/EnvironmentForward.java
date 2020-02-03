@@ -17,6 +17,7 @@ import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pulsar.manager.service.PulsarEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
@@ -44,9 +46,13 @@ public class EnvironmentForward extends ZuulFilter {
 
     private final EnvironmentCacheService environmentCacheService;
 
+    private final PulsarEvent pulsarEvent;
+
     @Autowired
-    public EnvironmentForward(EnvironmentCacheService environmentCacheService) {
+    public EnvironmentForward(
+            EnvironmentCacheService environmentCacheService, PulsarEvent pulsarEvent) {
         this.environmentCacheService = environmentCacheService;
+        this.pulsarEvent = pulsarEvent;
     }
 
     @Override
@@ -71,6 +77,25 @@ public class EnvironmentForward extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String redirect = request.getParameter("redirect");
 
+        String requestUri = request.getRequestURI();
+        String token = request.getHeader("token");
+
+        if (!pulsarEvent.validateRoutePermission(requestUri, token)) {
+            ctx.setResponseBody("This operation does not have permission");
+            return null;
+        }
+        if (requestUri.startsWith("/admin/v2/tenants/")
+                || requestUri.startsWith("/admin/v2/namespaces")
+                || requestUri.startsWith("/admin/v2/persistent")
+                || requestUri.startsWith("/admin/v2/non-persistent")) {
+            Map<String, String> result = pulsarEvent.validateTenantPermission(
+                    requestUri, token);
+            if (result.get("error") != null) {
+                log.error("This operation does not have permission");
+                ctx.setResponseBody(result.get("error"));
+                return null;
+            }
+        }
         if (redirect != null && redirect.equals("true")) {
             String redirectScheme = request.getParameter("redirect.scheme");
             String redirectHost = request.getParameter("redirect.host");
@@ -91,6 +116,7 @@ public class EnvironmentForward extends ZuulFilter {
             return null;
         }
         String serviceUrl = environmentCacheService.getServiceUrl(request);
+        System.out.println(serviceUrl);
         return forwardRequest(ctx, request, serviceUrl);
     }
 
@@ -99,6 +125,7 @@ public class EnvironmentForward extends ZuulFilter {
         try {
             ctx.addZuulRequestHeader("Authorization", String.format("Bearer %s", pulsarJwtToken));
             ctx.setRouteHost(new URL(serviceUrl));
+            pulsarEvent.parsePulsarEvent(request.getRequestURI(), request);
             log.info("Forward request to {} @ path {}",
                     serviceUrl, request.getRequestURI());
         } catch (MalformedURLException e) {

@@ -57,10 +57,16 @@
               <span>{{ scope.row.roleSource }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
+          <el-table-column v-if="superUser" :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button type="primary" size="mini" @click="handleUpdateRole(scope.row)">{{ $t('table.edit') }}</el-button>
               <el-button size="mini" type="danger" @click="handleDeleteRole(scope.row)">{{ $t('table.delete') }}</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column v-if="superUser === false" :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
+            <template slot-scope="scope">
+              <el-button :disabled="scope.row.resourceType=='TENANTS'" type="primary" size="mini" @click="handleUpdateRole(scope.row)">{{ $t('table.edit') }}</el-button>
+              <el-button :disabled="scope.row.resourceType=='TENANTS'" size="mini" type="danger" @click="handleDeleteRole(scope.row)">{{ $t('table.delete') }}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -73,10 +79,17 @@
           <el-input v-model="form.name" :placeholder="$t('role.roleNamePlaceHolder')"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colRoleDesc')">
-          <el-input :rows="2" v-model="form.description" :placeholder="$t('role.roleDescPlaceHolder')"/>
+          <el-input :rows="2" v-model="form.description" :placeholder="$t('role.roleDescPlaceHolder')" type="textarea"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResourceType')">
-          <el-select v-model="resourceTypeValue" :placeholder="$t('role.resourceTypePlaceHolder')">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResourceName')" prop="resourceName">
+          <el-input :rows="2" v-model="form.resourceName" :placeholder="$t('role.resourceNamePlaceHolder')"/>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResourceType')" prop="resourceType">
+          <el-select
+            v-model="form.resourceType"
+            :placeholder="$t('role.resourceTypePlaceHolder')"
+            style="width:100%"
+            @change="handleChangeResourceType(form)">
             <el-option
               v-for="item in resourceTypeListOptions"
               :key="item.value"
@@ -84,8 +97,8 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResource')">
-          <el-select v-model="form.resource" :placeholder="$t('role.resourcePlaceHolder')">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResource')" prop="resource">
+          <el-select v-model="form.resource" :placeholder="$t('role.resourcePlaceHolder')" style="width:100%">
             <el-option
               v-for="item in resourceListOptions"
               :key="item.value"
@@ -93,14 +106,14 @@
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResourceVerbs')">
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('role.colResourceVerbs')" prop="resourceVerbs">
           <el-select
             v-model="form.resourceVerbs"
             :placeholder="$t('role.resourceVerbsPlaceHolder')"
             multiple
-            collapse-tags>
+            style="width:100%">
             <el-option
-              v-for="item in resourceVerbsOptions"
+              v-for="item in resourceVerbsListOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"/>
@@ -109,11 +122,8 @@
         <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colRoleName')">
           <span>{{ form.name }} </span>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colRoleDesc')">
-          <el-input :rows="2" v-model="form.description" :placeholder="$t('role.roleNamePlaceHolder')"/>
-        </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colResourceType')">
-          <el-select v-model="resourceTypeValue" :placeholder="$t('role.resourceTypePlaceHolder')">
+          <el-select v-model="form.resourceType" :placeholder="$t('role.resourceTypePlaceHolder')" style="width:100%">
             <el-option
               v-for="item in resourceTypeListOptions"
               :key="item.value"
@@ -122,7 +132,7 @@
           </el-select>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colResource')">
-          <el-select v-model="form.resource" :placeholder="$t('role.resourcePlaceHolder')">
+          <el-select v-model="form.resource" :placeholder="$t('role.resourcePlaceHolder')" style="width:100%">
             <el-option
               v-for="item in resourceListOptions"
               :key="item.value"
@@ -135,15 +145,15 @@
             v-model="form.resourceVerbs"
             :placeholder="$t('role.resourceVerbsPlaceHolder')"
             multiple
-            collapse-tags>
+            style="width:100%">
             <el-option
-              v-for="item in resourceVerbsOptions"
+              v-for="item in resourceVerbsListOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"/>
           </el-select>
         </el-form-item>
-        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colResourceDesc')">
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('role.colRoleDesc')">
           <el-input :rows="2" v-model="form.description" :placeholder="$t('role.roleDescPlaceHolder')" type="textarea"/>
         </el-form-item>
         <el-form-item v-if="dialogStatus==='delete'">
@@ -159,7 +169,16 @@
 </template>
 
 <script>
-import { fetchRoles, putRole, getResourceType } from '@/api/roles'
+import {
+  fetchRoles,
+  putRole,
+  getResourceType,
+  getResource,
+  getResourceVerbs,
+  updateRole,
+  deleteRole
+} from '@/api/roles'
+import store from '@/store'
 
 export default {
   name: 'RolesInfo',
@@ -181,6 +200,7 @@ export default {
         resourceType: '',
         resourceName: '',
         resourceVerbs: [],
+        resource: '',
         roleSource: '',
         resourceId: ''
       },
@@ -196,15 +216,25 @@ export default {
       resource: '',
       resourceListOptions: [],
       resourceVerbs: '',
-      resourceVerbsOptions: [],
+      resourceVerbsListOptions: [],
       superUser: false,
       description: '',
       rules: {
-        name: [{ required: true, message: this.$i18n.t('role.roleNameIsRequired'), trigger: 'blur' }]
+        name: [{ required: true, message: this.$i18n.t('role.roleNameIsRequired'), trigger: 'blur' }],
+        resourceName: [{ required: true, message: 'Please input resource name', trigger: 'blur' }],
+        resourceType: [{ required: true, message: 'Please select resource name', trigger: 'blur' }],
+        resource: [{ required: true, message: 'Please select resource', trigger: 'blur' }],
+        resourceVerbs: [{ required: true, message: 'Please select resource verbs', trigger: 'blur' }]
       }
     }
   },
   created() {
+    const roles = store.getters && store.getters.roles
+    if (roles.includes('super')) {
+      this.superUser = true
+    } else {
+      this.superUser = false
+    }
     this.getRoles()
     this.getResourceType()
   },
@@ -228,6 +258,7 @@ export default {
           this.roleList.push({
             'name': response.data.data[i].roleName,
             'description': response.data.data[i].description,
+            'resource': response.data.data[i].resource,
             'resourceType': response.data.data[i].resourceType,
             'resourceName': response.data.data[i].resourceName,
             'resourceVerbs': response.data.data[i].resourceVerbs,
@@ -238,30 +269,32 @@ export default {
         }
       })
     },
+    getRoleByRoleName() {
+    },
     handleCreateRole() {
       this.form.name = ''
       this.form.description = ''
       this.form.resourceType = ''
       this.form.resourceName = ''
       this.form.resourceVerbs = ''
+      this.form.resource = ''
       this.dialogFormVisible = true
       this.dialogStatus = 'create'
     },
     handleDeleteRole(row) {
       this.temp.name = row.name
-      this.temp.description = row.description
-      this.temp.resourceType = row.resourceType
-      this.temp.resourceName = row.resourceName
-      this.temp.resourceVerbs = row.resourceVerbs
       this.dialogFormVisible = true
       this.dialogStatus = 'delete'
     },
     handleUpdateRole(row) {
       this.form.name = row.name
       this.form.description = row.description
+      this.form.resource = row.resource
+      this.form.resourceId = row.resourceId
       this.form.resourceType = row.resourceType
       this.form.resourceName = row.resourceName
-      this.form.resourceVerbs = row.resourceVerbs
+      this.form.resourceVerbs = row.resourceVerbs.split(',')
+      this.handleChangeResourceType(row)
       this.dialogFormVisible = true
       this.dialogStatus = 'update'
     },
@@ -287,8 +320,9 @@ export default {
         'roleName': this.form.name,
         'description': this.form.description,
         'resourceType': this.form.resourceType,
-        'resourceName': this.form.sourceName,
-        'resourceVerbs': this.form.resourceVerbs,
+        'resourceName': this.form.resourceName,
+        'resourceId': this.form.resource,
+        'resourceVerbs': this.form.resourceVerbs.join(','),
         'roleSource': 'placeholder'
       }
       this.resourceTypeListOptions = []
@@ -311,6 +345,87 @@ export default {
         })
         this.dialogFormVisible = false
         this.getRoles()
+      })
+    },
+    updateRole() {
+      const data = {
+        'roleName': this.form.name,
+        'description': this.form.description,
+        'resourceType': this.form.resourceType,
+        'resourceName': this.form.resourceName,
+        'resourceId': this.form.resourceId,
+        'resourceVerbs': this.form.resourceVerbs.join(','),
+        'roleSource': 'placeholder'
+      }
+      updateRole(data).then(response => {
+        if (!response.data) return
+        if (response.data.hasOwnProperty('error')) {
+          this.$notify({
+            title: 'error',
+            message: response.data.error,
+            type: 'error',
+            duration: 2000
+          })
+          return
+        }
+        this.$notify({
+          title: 'success',
+          message: 'Update role success',
+          type: 'success',
+          duration: 2000
+        })
+        this.dialogFormVisible = false
+        this.getRoles()
+      })
+    },
+    deleteRole() {
+      const data = {
+        'roleName': this.temp.name
+      }
+      deleteRole(data).then(response => {
+        if (!response.data) return
+        if (response.data.hasOwnProperty('error')) {
+          this.$notify({
+            title: 'error',
+            message: response.data.error,
+            type: 'error',
+            duration: 2000
+          })
+          return
+        }
+        this.$notify({
+          title: 'success',
+          message: 'Delete role success',
+          type: 'success',
+          duration: 2000
+        })
+        this.dialogFormVisible = false
+        this.getRoles()
+      })
+    },
+    handleChangeResourceType(row) {
+      getResource(row.resourceType).then(response => {
+        if (!response.data) return
+        this.resourceListOptions = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          if (row.resourceId === response.data.data[i].id) {
+            this.form.resource = response.data.data[i].name
+          }
+          this.resourceListOptions.push({
+            'value': response.data.data[i].id,
+            'label': response.data.data[i].name
+          })
+        }
+      })
+      getResourceVerbs(row.resourceType).then(response => {
+        if (!response.data) return
+        this.resourceVerbsListOptions = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.resourceVerbsListOptions.push({
+            'value': response.data.data[i],
+            'label': response.data.data[i]
+          })
+        }
       })
     }
   }

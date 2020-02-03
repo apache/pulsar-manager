@@ -14,10 +14,16 @@
 package org.apache.pulsar.manager.service;
 
 import org.apache.pulsar.manager.PulsarManagerApplication;
-import org.apache.pulsar.manager.entity.EnvironmentsRepository;
+import org.apache.pulsar.manager.entity.NamespaceEntity;
+import org.apache.pulsar.manager.entity.NamespacesRepository;
+import org.apache.pulsar.manager.entity.RoleBindingEntity;
+import org.apache.pulsar.manager.entity.RoleBindingRepository;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
 import org.apache.pulsar.manager.entity.RolesRepository;
+import org.apache.pulsar.manager.entity.TenantEntity;
 import org.apache.pulsar.manager.entity.TenantsRepository;
+import org.apache.pulsar.manager.entity.UserInfoEntity;
+import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.apache.pulsar.manager.utils.HttpUtil;
 import org.apache.pulsar.manager.utils.ResourceType;
@@ -52,9 +58,71 @@ public class RolesServiceImplTest {
     @Autowired
     private RolesService rolesService;
 
+    @Autowired
+    private UsersRepository usersRepository;
+
+    @Autowired
+    private TenantsRepository tenantsRepository;
+
+    @Autowired
+    private RolesRepository rolesRepository;
+
+    @Autowired
+    private RoleBindingRepository roleBindingRepository;
+
+    @Autowired
+    private NamespacesRepository namespacesRepository;
+
     @Test
     public void validateRoleInfoEntityTest() {
         RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
+
+        Map<String, String> roleNameIsEmpty = rolesService.validateRoleInfoEntity(roleInfoEntity);
+        Assert.assertEquals(roleNameIsEmpty.get("error"), "Role name cannot be empty");
+
+        roleInfoEntity.setRoleName("------");
+
+        Map<String, String> resourceNameIsEmpty = rolesService.validateRoleInfoEntity(roleInfoEntity);
+        Assert.assertEquals(resourceNameIsEmpty.get("error"), "Resource name cannot be empty");
+
+        roleInfoEntity.setResourceName("===========");
+
+        Map<String, String> roleNameIsIllegal = rolesService.validateRoleInfoEntity(roleInfoEntity);
+        Assert.assertEquals(roleNameIsIllegal.get("error"), "Role name is illegal");
+
+        roleInfoEntity.setRoleName("testRoleName");
+
+        Map<String, String> resourceNameIsIllegal = rolesService.validateRoleInfoEntity(roleInfoEntity);
+        Assert.assertEquals(resourceNameIsIllegal.get("error"), "Resource Name is illegal");
+
+        roleInfoEntity.setResourceName("testResourceName");
+
+        roleInfoEntity.setResourceType("test-resourceType");
+        Map<String, String> resourceTypeIsIllegal = rolesService.validateRoleInfoEntity(roleInfoEntity);
+        Assert.assertEquals(resourceTypeIsIllegal.get("error"), "Resource type is illegal");
+
+        roleInfoEntity.setResourceId(10);
+        roleInfoEntity.setResourceType(ResourceType.TENANTS.name());
+        Map<String, String> resourceNoExist = rolesService.validateRoleInfoEntity(roleInfoEntity);
+        Assert.assertEquals(resourceNoExist.get("error"), "Tenant no exist, please check");
+
+        TenantEntity tenantEntity = new TenantEntity();
+        tenantEntity.setTenant("test-tenant");
+        tenantEntity.setAdminRoles("test-admin-roles");
+        tenantEntity.setAllowedClusters("test-allowed-clusters");
+        long tenantId = tenantsRepository.save(tenantEntity);
+        roleInfoEntity.setResourceId(tenantId);
+
+        roleInfoEntity.setResourceId(20);
+        roleInfoEntity.setResourceType(ResourceType.NAMESPACES.name());
+        Map<String, String> namespaceNoExist = rolesService.validateRoleInfoEntity(roleInfoEntity);
+        Assert.assertEquals(namespaceNoExist.get("error"), "Namespace no exist, please check");
+
+        NamespaceEntity namespaceEntity = new NamespaceEntity();
+        namespaceEntity.setTenant("test-tenant");
+        namespaceEntity.setNamespace("test-namespace");
+        long namespaceId = namespacesRepository.save(namespaceEntity);
+        roleInfoEntity.setResourceId(namespaceId);
 
         roleInfoEntity.setResourceVerbs("xxxx");
         Map<String, String> stringMapVerbs = rolesService.validateRoleInfoEntity(roleInfoEntity);
@@ -75,5 +143,47 @@ public class RolesServiceImplTest {
         roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
         Map<String, String> stringMapAll = rolesService.validateRoleInfoEntity(roleInfoEntity);
         Assert.assertEquals(stringMapAll.get("message"), "Role validate success");
+    }
+
+    @Test
+    public void validateCurrentTenantTest() {
+        UserInfoEntity userInfoEntity = new UserInfoEntity();
+        userInfoEntity.setName("test-user");
+        userInfoEntity.setAccessToken("test-access-token");
+        long userId = usersRepository.save(userInfoEntity);
+
+        Map<String, String> currentTenantValidateUser = rolesService.validateCurrentTenant(
+                "test-error-access-token", "test-tenant");
+        Assert.assertEquals(currentTenantValidateUser.get("error"), "User no exist.");
+
+        TenantEntity tenantEntity = new TenantEntity();
+        tenantEntity.setTenant("test-tenant");
+        tenantEntity.setAdminRoles("test-admin-roles");
+        tenantEntity.setAllowedClusters("test-allowed-clusters");
+        long tenantId = tenantsRepository.save(tenantEntity);
+        RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
+        roleInfoEntity.setRoleName("test-role");
+        roleInfoEntity.setRoleSource("test-tenant");
+        roleInfoEntity.setResourceId(tenantId);
+        roleInfoEntity.setFlag(1);
+        roleInfoEntity.setResourceName("test-tenant-resource");
+        roleInfoEntity.setResourceType(ResourceType.TENANTS.name());
+        roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        long roleId = rolesRepository.save(roleInfoEntity);
+
+        RoleBindingEntity roleBindingEntity = new RoleBindingEntity();
+        roleBindingEntity.setDescription("This is role binding description");
+        roleBindingEntity.setUserId(userId);
+        roleBindingEntity.setRoleId(roleId);
+        roleBindingEntity.setName("test-role-binding");
+        roleBindingRepository.save(roleBindingEntity);
+
+        Map<String, String> currentTenantValidateErrorTenant = rolesService.validateCurrentTenant(
+                "test-access-token", "test-error-tenant");
+        Assert.assertEquals(currentTenantValidateErrorTenant.get("error"), "This user no include this tenant");
+
+        Map<String, String> currentTenantValidateSuccess = rolesService.validateCurrentTenant(
+                "test-access-token", "test-tenant");
+        Assert.assertEquals(currentTenantValidateSuccess.get("message"), "Validate tenant success");
     }
 }

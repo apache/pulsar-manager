@@ -56,6 +56,13 @@
           <el-table-column :label="$t('common.outBytes')" prop="outBytes"/>
         </el-table>
         <h4>{{ $t('topic.subscription.subscriptions') }}</h4>
+        <el-button
+          class="filter-item"
+          type="success"
+          style="margin-bottom: 15px"
+          @click="handleCreateSub">
+          New Sub
+        </el-button>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
@@ -130,6 +137,9 @@
                       </el-dropdown-item>
                       <el-dropdown-item :command="{'action': 'clear', 'subscription': scope.row.subscription }">
                         {{ $t('topic.subscription.clear') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item :command="{'action': 'unsub', 'subscription': scope.row.subscription }">
+                        {{ $t('topic.subscription.unsub') }}
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -271,6 +281,12 @@
             <span>{{ $t('topic.subscription.clearMessageConfirm') }}</span>
           </el-form-item>
         </el-form-item>
+        <el-form-item v-if="dialogStatus==='createSub'">
+          <el-input v-model="currentSubscription" placeholder="Please input sub name"/>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='unsub'">
+          <h4>{{ $t('topic.subscription.deleteSubConfirm') }}</h4>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleOptions()">{{ $t('table.confirm') }}</el-button>
           <el-button @click="dialogFormVisible=false">{{ $t('table.cancel') }}</el-button>
@@ -297,6 +313,7 @@ import { fetchTopicsByPulsarManager } from '@/api/topics'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import { formatBytes } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
+import { putSubscriptionOnCluster, deleteSubscriptionOnCluster } from '@/api/subscriptions'
 
 const defaultForm = {
   persistent: '',
@@ -350,7 +367,9 @@ export default {
         delete: this.$i18n.t('topic.deleteTopic'),
         expire: this.$i18n.t('topic.subscription.msgExpired'),
         clear: this.$i18n.t('topic.subscription.clearMessage'),
-        reset: this.$i18n.t('topic.subscription.resetByTime')
+        reset: this.$i18n.t('topic.subscription.resetByTime'),
+        createSub: this.$i18n.t('topic.subscription.sub'),
+        deleteSub: this.$i18n.t('topic.subscription.unsub')
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -417,6 +436,7 @@ export default {
     initTopicStats() {
       fetchPartitionTopicStats(this.postForm.persistent, this.tenantNamespaceTopic, true).then(response => {
         if (!response.data) return
+        this.partitionTopicStats = []
         this.partitionTopicStats.push({
           inMsg: numberFormatter(response.data.msgRateIn, 2),
           outMsg: numberFormatter(response.data.msgRateOut, 2),
@@ -425,22 +445,30 @@ export default {
         })
         var prefix = this.postForm.persistent + '://' + this.tenantNamespaceTopic
         var tempPartitionsList = Object.keys(response.data.partitions)
+        this.partitionsList = []
         for (var i = 0; i < tempPartitionsList.length; i++) {
           var key = prefix + '-partition-' + i
-          var partition = this.postForm.topic + '-partition-' + i
-          this.partitionsList.push({
-            'partition': partition,
-            'producers': response.data.partitions[key].publishers.length,
-            'subscriptions': Object.keys(response.data.partitions[key].subscriptions).length,
-            'inMsg': numberFormatter(response.data.partitions[key].msgRateIn, 2),
-            'outMsg': numberFormatter(response.data.partitions[key].msgRateOut, 2),
-            'inBytes': formatBytes(response.data.partitions[key].msgThroughputIn),
-            'outBytes': formatBytes(response.data.partitions[key].msgThroughputOut),
-            'storageSize': formatBytes(response.data.partitions[key].storageSize, 0),
-            'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + this.tenantNamespaceTopic + '-partition-' + i + '/topic'
-          })
+          if (response.data.partitions.hasOwnProperty(key)) {
+            var partition = this.postForm.topic + '-partition-' + i
+            var publishers = 0
+            if (response.data.partitions[key].hasOwnProperty('publishers')) {
+              publishers = response.data.partitions[key].publishers.length
+            }
+            this.partitionsList.push({
+              'partition': partition,
+              'producers': publishers,
+              'subscriptions': Object.keys(response.data.partitions[key].subscriptions).length,
+              'inMsg': numberFormatter(response.data.partitions[key].msgRateIn, 2),
+              'outMsg': numberFormatter(response.data.partitions[key].msgRateOut, 2),
+              'inBytes': formatBytes(response.data.partitions[key].msgThroughputIn),
+              'outBytes': formatBytes(response.data.partitions[key].msgThroughputOut),
+              'storageSize': formatBytes(response.data.partitions[key].storageSize, 0),
+              'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + this.tenantNamespaceTopic + '-partition-' + i + '/topic'
+            })
+          }
         }
         var index = 0
+        this.subscriptionsList = []
         for (var s in response.data.subscriptions) {
           index += 1
           var type = 'Exclusive'
@@ -633,6 +661,12 @@ export default {
             case 'clear':
               this.clearAllSubMessage()
               break
+            case 'createSub':
+              this.createSub()
+              break
+            case 'unsub':
+              this.deleteSub()
+              break
           }
         }
       })
@@ -689,6 +723,44 @@ export default {
         })
         this.dialogFormVisible = false
         this.getPartitionTopicInfo()
+      })
+    },
+    handleCreateSub() {
+      this.currentSubscription = ''
+      this.dialogStatus = 'createSub'
+      this.dialogFormVisible = true
+    },
+    createSub() {
+      if (this.currentSubscription.length <= 0) {
+        this.$notify({
+          title: 'error',
+          message: this.$i18n.t('topic.subscription.subNotification'),
+          type: 'error',
+          duration: 3000
+        })
+        return
+      }
+      putSubscriptionOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.tenantNamespaceTopic, this.currentSubscription).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.subscription.createSubSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.initTopicStats()
+        this.dialogFormVisible = false
+      })
+    },
+    deleteSub() {
+      deleteSubscriptionOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.tenantNamespaceTopic, this.currentSubscription).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.subscription.deleteSubSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.initTopicStats()
+        this.dialogFormVisible = false
       })
     }
   }

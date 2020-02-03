@@ -72,6 +72,25 @@ public class TopicsStatsRepositoryImpl implements TopicsStatsRepository {
         return topicsStatsMapper.findByMultiTopic(environment, tenant, namespace, persistent, topicList, timestamp);
     }
 
+    public Page<TopicStatsEntity> findByMultiTenant(Integer pageNum,
+                                             Integer pageSize,
+                                             String environment,
+                                             List<String> tenantList,
+                                             long timestamp) {
+        PageHelper.startPage(pageNum, pageSize);
+        return topicsStatsMapper.findByMultiTenant(environment, tenantList, timestamp);
+    }
+
+    public Page<TopicStatsEntity> findByMultiNamespace(Integer pageNum,
+                                                Integer pageSize,
+                                                String environment,
+                                                String tenant,
+                                                List<String> namespaceList,
+                                                long timestamp) {
+        PageHelper.startPage(pageNum, pageSize);
+        return topicsStatsMapper.findByMultiNamespace(environment, tenant, namespaceList, timestamp);
+    }
+
     public void remove(long timestamp, long timeInterval) {
         topicsStatsMapper.delete(timestamp - timeInterval);
     }

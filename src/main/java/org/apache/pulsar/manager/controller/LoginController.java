@@ -16,6 +16,10 @@ package org.apache.pulsar.manager.controller;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.pulsar.manager.entity.RoleBindingEntity;
+import org.apache.pulsar.manager.entity.RoleBindingRepository;
+import org.apache.pulsar.manager.entity.RoleInfoEntity;
+import org.apache.pulsar.manager.entity.RolesRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.JwtService;
@@ -23,7 +27,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.pulsar.manager.service.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -38,6 +41,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -71,7 +76,10 @@ public class LoginController {
     private UsersRepository usersRepository;
 
     @Autowired
-    private RolesService rolesService;
+    private RolesRepository rolesRepository;
+
+    @Autowired
+    private RoleBindingRepository roleBindingRepository;
 
     @ApiOperation(value = "Login pulsar manager")
     @ApiResponses({
@@ -104,10 +112,24 @@ public class LoginController {
             result.put("login", "success");
             headers.add("token", token);
             headers.add("username", userAccount);
+            headers.add("tenant", userAccount);
             jwtService.setToken(request.getSession().getId(), token);
-            // Create default role and tenant
-            rolesService.createDefaultRoleAndTenant(userAccount);
-
+            List<RoleBindingEntity> roleBindingEntities = roleBindingRepository.
+                    findByUserId(userInfoEntity.getUserId());
+            List<Long> roleIdList = new ArrayList<>();
+            for (RoleBindingEntity roleBindingEntity : roleBindingEntities) {
+                roleIdList.add(roleBindingEntity.getRoleId());
+            }
+            if (!roleIdList.isEmpty()) {
+                List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
+                for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
+                    if (roleInfoEntity.getFlag() == 0) {
+                        // Super users can access all types
+                        return new ResponseEntity<>(result, headers, HttpStatus.OK);
+                    }
+                }
+            }
+            headers.add("role", "admin");
             return new ResponseEntity<>(result, headers, HttpStatus.OK);
         }
         if (userAccount.equals(account) && userPassword.equals(password)) {
@@ -115,6 +137,7 @@ public class LoginController {
             result.put("login", "success");
             headers.add("token", token);
             headers.add("username", userAccount);
+            headers.add("tenant", userAccount);
             jwtService.setToken(request.getSession().getId(), token);
             return new ResponseEntity<>(result, headers, HttpStatus.OK);
         }

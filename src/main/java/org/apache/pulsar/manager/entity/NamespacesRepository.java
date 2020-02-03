@@ -26,15 +26,21 @@ public interface NamespacesRepository {
 
     Optional<NamespaceEntity> findByTenantNamespace(String tenant, String namespace);
 
+    Optional<NamespaceEntity> findByNamespaceId(long namespaceId);
+
     Page<NamespaceEntity> findByTenantOrNamespace(Integer pageNum, Integer pageSize, String tenantOrNamespace);
 
     Page<NamespaceEntity> findByNamespace(Integer pageNum, Integer pageSize, String namespace);
 
     Page<NamespaceEntity> findByMultiId(Integer pageNum, Integer pageSize, List<Long> tenantIdList);
 
+    List<NamespaceEntity> findByMultiId(List<Long> tenantIdList);
+
     Page<NamespaceEntity> getNamespacesList(Integer pageNum, Integer pageSize);
 
     Page<NamespaceEntity> findByTenant(Integer pageNum, Integer pageSize, String tenant);
+
+    List<NamespaceEntity> findByTenant(String tenant);
 
     void remove(String tenant, String namespace);
 

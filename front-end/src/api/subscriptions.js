@@ -31,9 +31,31 @@ export function putSubscription(tenant, namespace, topic, subscription) {
   })
 }
 
+export function putSubscriptionOnCluster(cluster, persistent, tenantNamespaceTopic, subscription) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subscription}`,
+    method: 'put'
+  })
+}
+
 export function deleteSubscription(tenant, namespace, topic, subscription) {
   return request({
     url: BASE_URL_V2 + `/persistent/${tenant}/${namespace}/${topic}/subscription/${subscription}`,
+    method: 'delete'
+  })
+}
+
+export function deleteSubscriptionOnCluster(cluster, persistent, tenantNamespaceTopic, subscription) {
+  return request({
+    headers: {
+      'Content-Type': 'application/json',
+      'x-pulsar-cluster': cluster
+    },
+    url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subscription}`,
     method: 'delete'
   })
 }
@@ -45,6 +67,7 @@ export function peekMessagesOnCluster(cluster, persistent, tenantNamespaceTopic,
       'x-pulsar-cluster': cluster
     },
     url: SPRING_BASE_URL + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/${messagePosition}`,
-    method: 'GET'
+    method: 'get'
   })
 }
+

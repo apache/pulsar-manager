@@ -18,9 +18,12 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
+
+import java.util.List;
 
 @Mapper
 public interface UsersMapper {
@@ -39,9 +42,31 @@ public interface UsersMapper {
     UserInfoEntity findByUserName(String name);
 
     @Select("SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
+            "phone_number AS phoneNumber, location, company, expire, password " +
+            "FROM users " +
+            "WHERE user_id = #{userId}")
+    UserInfoEntity findByUserId(long userId);
+
+    @Select("SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
+            "phone_number AS phoneNumber, location, company, expire " +
+            "FROM users " +
+            "WHERE access_token = #{accessToken}")
+    UserInfoEntity findByAccessToken(String accessToken);
+
+    @Select("SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
             "phone_number AS phoneNumber, location, company, expire " +
             "FROM users")
     Page<UserInfoEntity> findUsersList();
+
+
+    @Select({"<script>",
+            "SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
+                    "phone_number AS phoneNumber, location, company, expire " +
+                    "FROM users ",
+            "WHERE user_id IN <foreach collection='userIdList' item='userId' open='(' separator=',' close=')'> #{userId} </foreach>" +
+            "</script>"})
+    List<UserInfoEntity> findUsersListByMultiUserId(@Param("userIdList") List<Long> userIdList);
+
 
     @Update("UPDATE users " +
             "SET access_token = #{accessToken}, description = #{description}, email = #{email}," +

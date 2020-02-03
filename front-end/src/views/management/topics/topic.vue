@@ -264,6 +264,13 @@
           </el-col>
         </el-row>
         <h4>{{ $t('topic.subscription.subscriptions') }}</h4>
+        <el-button
+          class="filter-item"
+          type="success"
+          style="margin-bottom: 15px"
+          @click="handleCreateSub">
+          {{ $t('topic.subscription.newSub') }}
+        </el-button>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
             <el-table
@@ -304,7 +311,7 @@
               <el-table-column :label="$t('topic.subscription.backlog')" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.backlog }}</span>
-                  <el-dropdown>
+                  <el-dropdown @command="handleCommand(scope.row.subscription)">
                     <span class="el-dropdown-link"><i class="el-icon-more"/></span>
                     <el-dropdown-menu slot="dropdown">
                       <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=skip'" class="link-type">
@@ -322,6 +329,7 @@
                       <router-link :to="scope.row.subscriptionLink + '?topTab=backlogOperation&leftTab=peek'" class="link-type">
                         <el-dropdown-item command="peek">{{ $t('topic.subscription.peek') }}</el-dropdown-item>
                       </router-link>
+                      <el-dropdown-item command="unsub">{{ $t('topic.subscription.unsub') }}</el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </template>
@@ -505,8 +513,16 @@
         <el-form-item v-if="dialogStatus==='delete'">
           <h4>{{ $t('topic.deleteTopicMessage') }}</h4>
         </el-form-item>
+        <el-form-item v-if="dialogStatus==='createSub'">
+          <el-input v-model="subName" placeholder="Please input sub name"/>
+        </el-form-item>
+        <el-form-item v-if="dialogStatus==='deleteSub'">
+          <h4>{{ $t('topic.subscription.deleteSubConfirm') }}</h4>
+        </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="deleteTopic">{{ $t('table.confirm') }}</el-button>
+          <el-button v-if="dialogStatus==='delete'" type="primary" @click="deleteTopic">{{ $t('table.confirm') }}</el-button>
+          <el-button v-if="dialogStatus==='createSub'" type="primary" @click="createSub">{{ $t('table.confirm') }}</el-button>
+          <el-button v-if="dialogStatus==='deleteSub'" type="primary" @click="deleteSub">{{ $t('table.confirm') }}</el-button>
           <el-button @click="dialogFormVisible=false">{{ $t('table.cancel') }}</el-button>
         </el-form-item>
       </el-form>
@@ -537,6 +553,7 @@ import {
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import { formatBytes } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
+import { putSubscriptionOnCluster, deleteSubscriptionOnCluster } from '@/api/subscriptions'
 
 const defaultForm = {
   persistent: '',
@@ -615,8 +632,11 @@ export default {
       currentTabName: '',
       nonPersistent: false,
       textMap: {
-        delete: this.$i18n.t('topic.deleteTopic')
+        delete: this.$i18n.t('topic.deleteTopic'),
+        createSub: this.$i18n.t('topic.subscription.sub'),
+        deleteSub: this.$i18n.t('topic.subscription.unsub')
       },
+      subName: '',
       dialogFormVisible: false,
       dialogStatus: '',
       topicPartitions: {},
@@ -730,6 +750,7 @@ export default {
     initTopicStats() {
       fetchTopicStats(this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
+        this.topicStats = []
         this.topicStats.push({
           inMsg: numberFormatter(response.data.msgRateIn, 2),
           outMsg: numberFormatter(response.data.msgRateOut, 2),
@@ -747,6 +768,7 @@ export default {
             'since': response.data.publishers[i].connectedSince
           })
         }
+        this.subscriptionsList = []
         for (var s in response.data.subscriptions) {
           var type = ''
           if (response.data.subscriptions[s].hasOwnProperty('type')) {
@@ -1027,6 +1049,49 @@ export default {
           duration: 3000
         })
         this.$router.push({ path: '/management/namespaces/' + this.postForm.tenant + '/' + this.postForm.namespace + '/namespace?tab=topics' })
+      })
+    },
+    handleCreateSub() {
+      this.subName = ''
+      this.dialogStatus = 'createSub'
+      this.dialogFormVisible = true
+    },
+    createSub() {
+      if (this.subName.length <= 0) {
+        this.$notify({
+          title: 'error',
+          message: this.$i18n.t('topic.subscription.subNotification'),
+          type: 'error',
+          duration: 3000
+        })
+        return
+      }
+      putSubscriptionOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.subName).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.subscription.createSubSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.initTopicStats()
+        this.dialogFormVisible = false
+      })
+    },
+    handleCommand(subName) {
+      this.subName = subName
+      this.dialogStatus = 'deleteSub'
+      this.dialogFormVisible = true
+    },
+    deleteSub() {
+      deleteSubscriptionOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.subName).then(response => {
+        this.$notify({
+          title: 'success',
+          message: this.$i18n.t('topic.subscription.deleteSubSuccess'),
+          type: 'success',
+          duration: 3000
+        })
+        this.initTopicStats()
+        this.dialogFormVisible = false
       })
     }
   }

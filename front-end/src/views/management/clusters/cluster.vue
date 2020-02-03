@@ -286,12 +286,14 @@ import MdInput from '@/components/MDinput'
 import { validateEmpty, validateServiceUrl } from '@/utils/validate'
 import { formatBytes, getQueryObject } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
+import permission from '@/directive/permission/index.js'
 
 const defaultForm = {
   cluster: ''
 }
 export default {
   name: 'ClusterInfo',
+  directives: { permission },
   components: {
     Pagination,
     MdInput
@@ -358,7 +360,8 @@ export default {
       deleteClusterMessage: this.$i18n.t('cluster.deleteClusterMessage'),
       deleteFdMessage: this.$i18n.t('fd.deleteFdMessage'),
       deletePolicyMessage: this.$i18n.t('ip.deletePolicyMessage'),
-      currentActiveTab: ''
+      currentActiveTab: '',
+      key: 1
     }
   },
   created() {

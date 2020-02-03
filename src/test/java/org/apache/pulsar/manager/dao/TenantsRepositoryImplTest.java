@@ -50,6 +50,7 @@ public class TenantsRepositoryImplTest {
             tenantEntity.setTenant("test" + i);
             tenantEntity.setAdminRoles("test" + i);
             tenantEntity.setAllowedClusters("test-cluster");
+            tenantEntity.setEnvironmentName("test-environment");
             tenantsRepository.save(tenantEntity);
         }
         Page<TenantEntity> tenantsEntities = tenantsRepository.getTenantsList(1, 10);
@@ -61,6 +62,7 @@ public class TenantsRepositoryImplTest {
             TenantEntity tenantEntity = tenantsEntityList.get(i);
             Assert.assertEquals(tenantEntity.getTenant(), tenantEntity.getAdminRoles());
             Assert.assertEquals(tenantEntity.getAllowedClusters(), "test-cluster");
+            Assert.assertEquals(tenantEntity.getEnvironmentName(), "test-environment");
         }
         tenantsEntities.getResult().forEach((result) -> {
             tenantsRepository.remove(result.getTenant());
@@ -75,6 +77,7 @@ public class TenantsRepositoryImplTest {
             tenantEntity.setTenant("test" + i);
             tenantEntity.setAdminRoles("test" + i);
             tenantEntity.setAllowedClusters("test-cluster");
+            tenantEntity.setEnvironmentName("test-environment");
             Long tenantId = tenantsRepository.save(tenantEntity);
             idList.add(tenantId);
         }
@@ -87,6 +90,7 @@ public class TenantsRepositoryImplTest {
             TenantEntity tenantEntity = tenantsEntityList.get(i);
             Assert.assertEquals(tenantEntity.getTenant(), tenantEntity.getAdminRoles());
             Assert.assertEquals(tenantEntity.getAllowedClusters(), "test-cluster");
+            Assert.assertEquals(tenantEntity.getEnvironmentName(), "test-environment");
         }
         tenantEntityPage.getResult().forEach((result) -> {
             tenantsRepository.remove(result.getTenant());
@@ -99,12 +103,30 @@ public class TenantsRepositoryImplTest {
         tenantEntity.setTenant("test");
         tenantEntity.setAdminRoles("test-role");
         tenantEntity.setAllowedClusters("test-cluster");
+        tenantEntity.setEnvironmentName("test-environment");
         tenantsRepository.save(tenantEntity);
         Optional<TenantEntity> result = tenantsRepository.findByName("test");
         TenantEntity getTenantEntity = result.get();
         Assert.assertEquals(getTenantEntity.getTenant(), "test");
         Assert.assertEquals(getTenantEntity.getAdminRoles(), "test-role");
         Assert.assertEquals(getTenantEntity.getAllowedClusters(), "test-cluster");
+        Assert.assertEquals(getTenantEntity.getEnvironmentName(), "test-environment");
         tenantsRepository.remove("test");
+    }
+
+    @Test
+    public void findByTenantId() {
+        TenantEntity tenantEntity = new TenantEntity();
+        tenantEntity.setTenant("test");
+        tenantEntity.setAdminRoles("test-role");
+        tenantEntity.setAllowedClusters("test-cluster");
+        tenantEntity.setEnvironmentName("test-environment");
+        long tenantId = tenantsRepository.save(tenantEntity);
+        Optional<TenantEntity> result = tenantsRepository.findByTenantId(tenantId);
+        TenantEntity getTenantEntity = result.get();
+        Assert.assertEquals(getTenantEntity.getTenant(), "test");
+        Assert.assertEquals(getTenantEntity.getAdminRoles(), "test-role");
+        Assert.assertEquals(getTenantEntity.getAllowedClusters(), "test-cluster");
+        Assert.assertEquals(getTenantEntity.getEnvironmentName(), "test-environment");
     }
 }

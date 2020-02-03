@@ -102,4 +102,16 @@ public class UsersRepositoryImplTest {
         userInfoEntityOptional = usersRepository.findByUserName(userInfoEntity.getName());
         Assert.assertFalse(userInfoEntityOptional.isPresent());
     }
+
+    @Test
+    public void findUserByAccessTokenTest() {
+        UserInfoEntity userInfoEntity = new UserInfoEntity();
+        initUser(userInfoEntity);
+        usersRepository.save(userInfoEntity);
+        Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(
+                userInfoEntity.getAccessToken());
+        UserInfoEntity getUserInfoEntity = userInfoEntityOptional.get();
+        validateUser(getUserInfoEntity, true);
+        usersRepository.delete(userInfoEntity.getName());
+    }
 }

@@ -48,5 +48,18 @@ public interface TopicsStatsRepository {
                                             List<String> topicList,
                                             long timestamp);
 
+    Page<TopicStatsEntity> findByMultiTenant(Integer pageNum,
+                                            Integer pageSize,
+                                            String environment,
+                                            List<String> tenantList,
+                                            long timestamp);
+
+    Page<TopicStatsEntity> findByMultiNamespace(Integer pageNum,
+                                             Integer pageSize,
+                                             String environment,
+                                             String tenant,
+                                             List<String> namespaceList,
+                                             long timestamp);
+
     void remove(long timestamp, long timeInterval);
 }

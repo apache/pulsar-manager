@@ -18,7 +18,6 @@ import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
 import org.apache.pulsar.manager.entity.RolesRepository;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
-import org.apache.pulsar.manager.profiles.SqliteDBTestProfile;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +26,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
@@ -44,7 +45,7 @@ public class RolesRepositoryImplTest {
 
     private void initRole(RoleInfoEntity roleInfoEntity) {
         roleInfoEntity.setRoleName("test-role-name");
-        roleInfoEntity.setRoleSource("admin");
+        roleInfoEntity.setRoleSource("test-tenant");
         roleInfoEntity.setResourceType("tenants");
         roleInfoEntity.setResourceName("tenants");
         roleInfoEntity.setResourceVerbs("admin");
@@ -55,7 +56,7 @@ public class RolesRepositoryImplTest {
 
     private void validateRole(RoleInfoEntity role) {
         Assert.assertEquals(role.getRoleName(), "test-role-name");
-        Assert.assertEquals(role.getRoleSource(), "admin");
+        Assert.assertEquals(role.getRoleSource(), "test-tenant");
         Assert.assertEquals(role.getResourceType(), "tenants");
         Assert.assertEquals(role.getResourceName(), "tenants");
         Assert.assertEquals(role.getResourceVerbs(), "admin");
@@ -74,6 +75,20 @@ public class RolesRepositoryImplTest {
         Page<RoleInfoEntity> rolesList = rolesRepository.findRolesList(1, 10);
         rolesList.count(true);
         rolesList.getResult().forEach((role) -> {
+            validateRole(role);
+            rolesRepository.delete(role.getRoleName(), role.getRoleSource());
+        });
+    }
+
+    @Test
+    public void findRolesListByRoleSourceTest() {
+        RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
+        initRole(roleInfoEntity);
+
+        rolesRepository.save(roleInfoEntity);
+
+        List<RoleInfoEntity> rolesList = rolesRepository.findRolesListByRoleSource("test-tenant");
+        rolesList.forEach((role) -> {
             validateRole(role);
             rolesRepository.delete(role.getRoleName(), role.getRoleSource());
         });
@@ -109,5 +124,22 @@ public class RolesRepositoryImplTest {
         Optional<RoleInfoEntity> deleteRoleInfo = rolesRepository.findByRoleName(
                 roleInfoEntity.getRoleName(), roleInfoEntity.getRoleSource());
         Assert.assertFalse(deleteRoleInfo.isPresent());
+    }
+
+    @Test
+    public void findMultiIdTest() {
+        RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
+        initRole(roleInfoEntity);
+
+        long roleId = rolesRepository.save(roleInfoEntity);
+        List<Long> roleIdList = new ArrayList<>();
+        roleIdList.add(roleId);
+        roleIdList.add(roleInfoEntity.getRoleId());
+        Page<RoleInfoEntity> roleInfoEntities = rolesRepository.findRolesMultiId(1, 2, roleIdList);
+        roleInfoEntities.count(true);
+        for (RoleInfoEntity infoEntity : roleInfoEntities.getResult()) {
+            validateRole(infoEntity);
+            rolesRepository.delete(infoEntity.getRoleName(), infoEntity.getRoleSource());
+        }
     }
 }

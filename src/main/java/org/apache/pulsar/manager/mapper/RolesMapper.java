@@ -23,6 +23,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
 
+import java.util.List;
+
 @Mapper
 public interface RolesMapper {
 
@@ -40,10 +42,43 @@ public interface RolesMapper {
             "WHERE role_name = #{roleName} and role_source = #{roleSource}")
     RoleInfoEntity findByRoleName(@Param("roleName") String roleName, @Param("roleSource") String roleSource);
 
+    @Select("SELECT role_id AS roleId, role_name AS roleName, description, resource_type AS resourceType," +
+            "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
+            "role_source AS roleSource, flag " +
+            "FROM roles " +
+            "WHERE flag=#{flag} limit 1")
+    RoleInfoEntity findByRoleFlag(@Param("flag") int flag);
+
     @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
             "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
             "role_source AS roleSource, flag FROM roles")
     Page<RoleInfoEntity> findRoleList();
+
+    @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
+            "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
+            "role_source AS roleSource, flag FROM roles")
+    List<RoleInfoEntity> findAllRoleList();
+
+    @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
+            "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
+            "role_source AS roleSource, flag FROM roles WHERE role_source=#{roleSource}")
+    List<RoleInfoEntity> findRoleListByRoleSource(String roleSource);
+
+    @Select({"<script>",
+            "SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
+                    "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
+                    "role_source AS roleSource, flag FROM roles",
+            "WHERE role_id IN <foreach collection='roleIdList' item='roleId' open='(' separator=',' close=')'> #{roleId} </foreach>" +
+                    "</script>"})
+    Page<RoleInfoEntity> findByMultiId(@Param("roleIdList") List<Long> roleIdList);
+
+    @Select({"<script>",
+            "SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
+                    "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
+                    "role_source AS roleSource, flag FROM roles",
+            "WHERE role_id IN <foreach collection='roleIdList' item='roleId' open='(' separator=',' close=')'> #{roleId} </foreach>" +
+                    "</script>"})
+    List<RoleInfoEntity> findAllByMultiId(@Param("roleIdList") List<Long> roleIdList);
 
     @Update("UPDATE roles " +
             "SET description = #{description}, resource_type = #{resourceType}," +

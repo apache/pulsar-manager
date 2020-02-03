@@ -56,3 +56,17 @@ export function getResourceType() {
     method: 'get'
   })
 }
+
+export function getResource(resourceType) {
+  return request({
+    url: SPRING_BASE_URL + `/role/resource/${resourceType}`,
+    method: 'get'
+  })
+}
+
+export function getResourceVerbs(resourceType) {
+  return request({
+    url: SPRING_BASE_URL + `/role/resourceVerbs/${resourceType}`,
+    method: 'get'
+  })
+}
