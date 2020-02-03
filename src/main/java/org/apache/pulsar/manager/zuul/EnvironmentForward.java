@@ -18,6 +18,7 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.manager.service.PulsarEvent;
+import org.apache.pulsar.manager.service.RolesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,11 +49,14 @@ public class EnvironmentForward extends ZuulFilter {
 
     private final PulsarEvent pulsarEvent;
 
+    private final RolesService rolesService;
+
     @Autowired
     public EnvironmentForward(
-            EnvironmentCacheService environmentCacheService, PulsarEvent pulsarEvent) {
+            EnvironmentCacheService environmentCacheService, PulsarEvent pulsarEvent, RolesService rolesService) {
         this.environmentCacheService = environmentCacheService;
         this.pulsarEvent = pulsarEvent;
+        this.rolesService = rolesService;
     }
 
     @Override
@@ -80,20 +84,22 @@ public class EnvironmentForward extends ZuulFilter {
         String requestUri = request.getRequestURI();
         String token = request.getHeader("token");
 
-        if (!pulsarEvent.validateRoutePermission(requestUri, token)) {
-            ctx.setResponseBody("This operation does not have permission");
-            return null;
-        }
-        if (requestUri.startsWith("/admin/v2/tenants/")
-                || requestUri.startsWith("/admin/v2/namespaces")
-                || requestUri.startsWith("/admin/v2/persistent")
-                || requestUri.startsWith("/admin/v2/non-persistent")) {
-            Map<String, String> result = pulsarEvent.validateTenantPermission(
-                    requestUri, token);
-            if (result.get("error") != null) {
-                log.error("This operation does not have permission");
-                ctx.setResponseBody(result.get("error"));
+        if (!rolesService.isSuperUser(token)) {
+            if (!pulsarEvent.validateRoutePermission(requestUri, token)) {
+                ctx.setResponseBody("This operation does not have permission");
                 return null;
+            }
+            if (requestUri.startsWith("/admin/v2/tenants/")
+                    || requestUri.startsWith("/admin/v2/namespaces")
+                    || requestUri.startsWith("/admin/v2/persistent")
+                    || requestUri.startsWith("/admin/v2/non-persistent")) {
+                Map<String, String> result = pulsarEvent.validateTenantPermission(
+                        requestUri, token);
+                if (result.get("error") != null) {
+                    log.error("This operation does not have permission");
+                    ctx.setResponseBody(result.get("error"));
+                    return null;
+                }
             }
         }
         if (redirect != null && redirect.equals("true")) {
