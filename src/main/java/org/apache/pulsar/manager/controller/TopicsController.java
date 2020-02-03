@@ -63,6 +63,9 @@ public class TopicsController {
     @Value("${backend.jwt.token}")
     private String token;
 
+    @Value("{pulsar.peek.message}")
+    private Boolean peekMessage;
+
     @Autowired
     public TopicsController(
             TopicsService topicsService,
@@ -144,6 +147,11 @@ public class TopicsController {
             @PathVariable Integer messagePosition) {
         String requestHost = environmentCacheService.getServiceUrl(request);
         Map<String, Object> result = Maps.newHashMap();
+        if (!peekMessage) {
+            result.put("error", "If you want to support peek message," +
+                    "turn on option pulsar.peek.message in file application.properties");
+            return ResponseEntity.ok(result);
+        }
         PulsarAdmin pulsarAdmin = null;
         // to do check permission for non super, waiting for https://github.com/apache/pulsar-manager/pull/238
         try {
