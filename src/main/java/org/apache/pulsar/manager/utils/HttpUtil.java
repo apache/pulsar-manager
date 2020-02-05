@@ -178,9 +178,8 @@ public class HttpUtil {
                 request.abort();
             }
         } catch (Throwable cause) {
-            cause.printStackTrace();
-            log.error("https request execption: {}", cause.getCause());
-            log.error("http request exception:{}", cause.getMessage());
+            log.error("http request exception message: {}, http request error stack: {}",
+                    cause.getMessage(), cause.getCause());
         } finally {
             try{
                 if (response != null) {
