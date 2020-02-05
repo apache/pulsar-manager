@@ -140,7 +140,7 @@ The pulsar-manager can monitor topics and subscriptions.
 
 3. Access Pulsar manager website.
 
-If you use the container to build the environment, please log in directly using the the account and the password to log in to the Pulsar manager website as below.
+If you use the container to build the environment, please directly using the the account and the password to log in to the Pulsar manager website as below.
 
    * Account: `pulsar`  
    * Password: `pulsar`  
