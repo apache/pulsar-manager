@@ -140,17 +140,19 @@ The pulsar-manager can monitor topics and subscriptions.
 
 3. Access Pulsar manager website.
 
-    Use the account and the password to log in to the Pulsar manager website as below.  
-          
+If you use the container to build the environment, please log in directly using the the account and the password to log in to the Pulsar manager website as below.
+
    * Account: `pulsar`  
    * Password: `pulsar`  
-   * Pulsar manager website: http://localhost:9527/
    
-   3.1 Init super user
-   
-   ```$xslt
+if you use the latest code to deploy the environment yourself, please use the following command to initialize the superuser and password
+
+    ```$xslt
     curl -H "Content-Type: application/json" -X PUT http://localhost:7750/pulsar-manager/users/superuser -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
     ```
+
+   * Pulsar manager website: http://localhost:9527/
+
 
 ### Default Test database HerdDB
 

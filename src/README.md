@@ -60,6 +60,13 @@ tls.keystore.password=keystore-file-password
 tls.hostname.verifier=false
 ```
 
+| Name | Default |Description
+| ------- | ------- | ------- |
+| tls.enabled | false | If broker enable tls configuration, set to true, otherwise set to false |
+| tls.keystore | "" | Keystore file path, need to use tool keytool to convert pem file to b file |
+| tls.keystore.password | "" | Keystore file password |
+| tls.host.verifier | false | Turn on hostname check, default false to test |
+
 ### Enable JWT Auth
 
 If you want to turn on JWT authentication, configure the following parameters:
