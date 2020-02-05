@@ -45,6 +45,21 @@ spring.datasource.password=postgres
 ./gradlew -x build -x test
 ```
 
+### Enable Https forward
+
+First, please obtain the client certificate file according to this [document](http://pulsar.apache.org/docs/en/security-tls-transport/). We use the following command to generate the keystore file suitable for Spring Boot.
+
+```$xslt
+keytool -import -trustcacerts -keystore keystore-file -alias test-keystore -file certs/ca.cert.pem
+```
+
+```$xslt
+tls.enabled=false
+tls.keystore=keystore-file
+tls.keystore.password=keystore-file-password
+tls.hostname.verifier=false
+```
+
 ### Enable JWT Auth
 
 If you want to turn on JWT authentication, configure the following parameters:

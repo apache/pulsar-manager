@@ -145,6 +145,12 @@ The pulsar-manager can monitor topics and subscriptions.
    * Account: `pulsar`  
    * Password: `pulsar`  
    * Pulsar manager website: http://localhost:9527/
+   
+   3.1 Init super user
+   
+   ```$xslt
+    curl -H "Content-Type: application/json" -X PUT http://localhost:7750/pulsar-manager/users/superuser -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
+    ```
 
 ### Default Test database HerdDB
 
