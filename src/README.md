@@ -47,7 +47,7 @@ spring.datasource.password=postgres
 
 ### Enable Https forward
 
-First, please obtain the client certificate file according to this [document](http://pulsar.apache.org/docs/en/security-tls-transport/). We use the following command to generate the keystore file suitable for Spring Boot.
+First, please obtain the client certificate file according to this [document](http://pulsar.apache.org/docs/en/security-tls-transport/). We use the following command to generate the keystore file for Spring Boot.
 
 ```$xslt
 keytool -import -trustcacerts -keystore keystore-file -alias test-keystore -file certs/ca.cert.pem
