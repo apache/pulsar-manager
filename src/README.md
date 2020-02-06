@@ -47,11 +47,15 @@ spring.datasource.password=postgres
 
 ### Enable Https forward
 
-First, please obtain the client certificate file according to this [document](http://pulsar.apache.org/docs/en/security-tls-transport/). We use the following command to generate the keystore file for Spring Boot.
+First, please get the client certificate file for connecting to your Pulsar cluster. Please check out this [document](http://pulsar.apache.org/docs/en/security-tls-transport/) on how to create the client certificate file for Pulsar clients. Assume your client certificate is stored in `certs/ca.cert.pem`.
+
+Secondly, following the instructions below to generate a keystore file to be used by Pulsar Manager. Please replace `[/path/to/client/certs]` with the path to your client certificate file.
 
 ```$xslt
-keytool -import -trustcacerts -keystore keystore-file -alias test-keystore -file certs/ca.cert.pem
+keytool -import -trustcacerts -keystore keystore-file -alias test-keystore -file [/path/to/client/certs]
 ```
+
+Thirdly, configure Pulsar Manager to enable TLS by adding the following configuration settings.
 
 ```$xslt
 tls.enabled=false
@@ -59,6 +63,7 @@ tls.keystore=keystore-file
 tls.keystore.password=keystore-file-password
 tls.hostname.verifier=false
 ```
+
 
 | Name | Default |Description
 | ------- | ------- | ------- |
