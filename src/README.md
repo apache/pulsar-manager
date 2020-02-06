@@ -64,13 +64,26 @@ tls.keystore.password=keystore-file-password
 tls.hostname.verifier=false
 ```
 
-
 | Name | Default |Description
 | ------- | ------- | ------- |
 | tls.enabled | false | If broker enable tls configuration, set to true, otherwise set to false |
 | tls.keystore | "" | Keystore file path, need to use tool keytool to convert pem file to b file |
 | tls.keystore.password | "" | Keystore file password |
 | tls.hostname.verifier | false | Turn on hostname check, default false to test |
+
+### Enable peek message
+
+If you want to enable feature `peek-message`, please set the following option to true in file `application.properties`.
+
+```$xslt
+pulsar.peek.message=true
+```
+
+If your Pulsar cluster enable TLS, you also need to add the path of the ca certificate for option `tls.pulsar.admin.ca-certs` in file `application.properties`.
+
+```$xslt
+tls.pulsar.admin.ca-certs=ca-client-path
+```
 
 ### Enable JWT Auth
 
