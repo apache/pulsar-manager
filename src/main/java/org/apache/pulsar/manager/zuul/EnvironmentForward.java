@@ -102,6 +102,7 @@ public class EnvironmentForward extends ZuulFilter {
                 }
             }
         }
+
         if (redirect != null && redirect.equals("true")) {
             String redirectScheme = request.getParameter("redirect.scheme");
             String redirectHost = request.getParameter("redirect.host");

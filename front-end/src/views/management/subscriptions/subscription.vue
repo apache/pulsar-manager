@@ -102,38 +102,6 @@
       </el-tab-pane>
       <el-tab-pane :label="$t('topic.backlogOpeartion')" name="backlogOperation">
         <el-tabs v-model="leftActiveName" :tab-position="tabPosition" @tab-click="handleLeftTabClick">
-          <!-- <el-tab-pane label="INSPECT" name="inspect">
-            <el-form :inline="true" :model="form">
-              <el-button type="primary" @click="handlePeekMessages">Peek</el-button>
-              <el-form-item>
-                <el-input v-model="form.peekNumMessages" placeholder="messages"/>
-              </el-form-item>
-              <span>messages</span>
-            </el-form>
-            <el-row :gutter="24" style="margin-top:15px">
-              <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:30px;">
-                <el-table
-                  v-loading="inspectListLoading"
-                  :key="inspectTableKey"
-                  :data="inspectsList"
-                  border
-                  fit
-                  highlight-current-row
-                  style="width: 100%;">
-                  <el-table-column label="Message ID" min-width="10px" align="center">
-                    <template slot-scope="scope">
-                      <span>{{ scope.row.messageId }}</span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="data" min-width="30px" align="center">
-                    <template slot-scope="scope">
-                      <span>{{ scope.row.data }}</span>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </el-col>
-            </el-row>
-          </el-tab-pane> -->
           <el-tab-pane :label="$t('topic.subscription.skip')" name="skip">
             <el-form :inline="true" :model="form">
               <el-button type="primary" @click="handleSkipMessages">{{ $t('topic.subscription.skip') }}</el-button>
@@ -181,6 +149,43 @@
               </el-form-item>
             </el-form>
           </el-tab-pane>
+          <el-tab-pane label="INSPECT" name="peek">
+            <el-form :inline="true" :model="form">
+              <el-button type="primary" @click="handlePeekMessages">{{ $t('topic.subscription.peek') }}</el-button>
+              <el-form-item>
+                <el-input v-model="form.peekNumMessages" placeholder="messages"/>
+              </el-form-item>
+              <span>{{ $t('topic.subscription.peekMessages') }}</span>
+            </el-form>
+            <el-row :gutter="24" style="margin-top:15px">
+              <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:20px;margin-bottom:30px;">
+                <el-table
+                  v-loading="inspectListLoading"
+                  :key="inspectTableKey"
+                  :data="inspectsList"
+                  border
+                  fit
+                  highlight-current-row
+                  style="width: 100%;">
+                  <el-table-column :label="$t('topic.segment.ledgerId')" min-width="10px" align="center">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.ledgerId }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column :label="$t('topic.subscription.entryId')" min-width="10px" align="center">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.entryId }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column :label="$t('topic.subscription.message')" min-width="30px" align="center">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.data }}</span>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
         </el-tabs>
       </el-tab-pane>
     </el-tabs>
@@ -193,7 +198,6 @@ import { fetchNamespaces, getClusters } from '@/api/namespaces'
 import {
   fetchTopicsByPulsarManager,
   fetchTopicStats,
-  // peekMessages,
   skipOnCluster,
   expireMessageOnCluster,
   clearBacklogOnCluster,
@@ -201,7 +205,7 @@ import {
   resetCursorByTimestampOnCluster,
   resetCursorByPositionOnCluster
 } from '@/api/topics'
-import { fetchSubscriptions } from '@/api/subscriptions'
+import { fetchSubscriptions, peekMessagesOnCluster } from '@/api/subscriptions'
 import { formatBytes } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
 
@@ -457,28 +461,49 @@ export default {
     },
     getConsumers() {
     },
-    // To do, parse message
-    // handlePeekMessages() {
-    //   if (this.form.peekNumMessages <= 0) {
-    //     this.$notify({
-    //       title: 'error',
-    //       message: 'Messages should greater than 0',
-    //       type: 'error',
-    //       duration: 3000
-    //     })
-    //     return
-    //   }
-    //   peekMessages(this.postForm.persistent, this.tenantNamespaceTopic, this.postForm.subscription, this.form.peekNumMessages).then(response => {
-    //     if (!response.data) return
-    //     console.log(response)
-    //     console.log(response.data)
-    //   })
-    // },
+    handlePeekMessages() {
+      if (this.form.peekNumMessages <= 0) {
+        this.$notify({
+          title: 'error',
+          message: this.$i18n.t('topic.subscription.messageGreaterThanZero'),
+          type: 'error',
+          duration: 3000
+        })
+        return
+      }
+      peekMessagesOnCluster(
+        this.getCurrentCluster(),
+        this.postForm.persistent,
+        this.tenantNamespaceTopic,
+        this.postForm.subscription,
+        this.form.peekNumMessages).then(response => {
+        if (!response.data) return
+        if (!response.data.data) return
+        if (response.data.data.hasOwnProperty('error')) {
+          this.$notify({
+            title: 'error',
+            message: this.$i18n.t('topic.subscription.peekMessageError'),
+            type: 'error',
+            duration: 3000
+          })
+          return
+        }
+        this.inspectsList = []
+        for (var i = 0; i < response.data.data.length; i++) {
+          this.inspectsList.push({
+            'messageId': i,
+            'entryId': response.data.data[i].entryId,
+            'ledgerId': response.data.data[i].ledgerId,
+            'data': window.atob(response.data.data[i].data)
+          })
+        }
+      })
+    },
     handleSkipMessages() {
       if (this.form.skipNumMessages <= 0) {
         this.$notify({
           title: 'error',
-          message: 'Messages should greater than 0',
+          message: this.$i18n.t('topic.subscription.messageGreaterThanZero'),
           type: 'error',
           duration: 3000
         })
@@ -487,7 +512,7 @@ export default {
       skipOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, this.form.skipNumMessages).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Messages skip success',
+          message: this.$i18n.t('topic.subscription.messageSkipSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -497,7 +522,7 @@ export default {
       if (this.form.expireMessages <= 0) {
         this.$notify({
           title: 'error',
-          message: 'Messages should greater than 0',
+          message: this.$i18n.t('topic.subscription.messageGreaterThanZero'),
           type: 'error',
           duration: 3000
         })
@@ -506,7 +531,7 @@ export default {
       expireMessageOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, this.form.expireNumMessages).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Messages expire success',
+          message: this.$i18n.t('topic.subscription.expireMessageSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -516,7 +541,7 @@ export default {
       clearBacklogOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.postForm.subscription).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Clear messages success',
+          message: this.$i18n.t('topic.subscription.clearMessageSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -526,7 +551,7 @@ export default {
       if (parseInt(this.form.minutes) <= 0) {
         this.$notify({
           title: 'error',
-          message: 'Minutes cannot be less than 0',
+          message: this.$i18n.t('topic.subscription.minutesNotLessThanZero'),
           type: 'error',
           duration: 3000
         })
@@ -541,7 +566,7 @@ export default {
         this.postForm.subscription, timestamp).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Reset cursor success',
+          message: this.$i18n.t('topic.subscription.resetCursorSuccess'),
           type: 'success',
           duration: 3000
         })
@@ -551,7 +576,7 @@ export default {
       if (this.form.messagesId.length <= 0 && this.form.ledgerValue != null) {
         this.$notify({
           title: 'error',
-          message: 'Message Id cannot be less than 0',
+          message: this.$i18n.t('topic.subscription.messageIdNotLessThanZero'),
           type: 'error',
           duration: 3000
         })
@@ -564,7 +589,7 @@ export default {
       resetCursorByPositionOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), this.postForm.subscription, data).then(response => {
         this.$notify({
           title: 'success',
-          message: 'Reset cursor success',
+          message: this.$i18n.t('topic.subscription.resetCursorSuccess'),
           type: 'success',
           duration: 3000
         })

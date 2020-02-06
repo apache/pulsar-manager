@@ -52,7 +52,7 @@
               <span>{{ scope.row.location }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('usesr.colUserCompany')" align="center" min-width="100px">
+          <el-table-column :label="$t('user.colUserCompany')" align="center" min-width="100px">
             <template slot-scope="scope">
               <span>{{ scope.row.company }}</span>
             </template>
