@@ -478,6 +478,15 @@ export default {
         this.postForm.subscription,
         this.form.peekNumMessages).then(response => {
         if (!response.data) return
+        if (response.data.hasOwnProperty('error')) {
+          this.$notify({
+            title: 'error',
+            message: response.data.error,
+            type: 'error',
+            duration: 3000
+          })
+          return
+        }
         if (!response.data.data) return
         if (response.data.data.hasOwnProperty('error')) {
           this.$notify({

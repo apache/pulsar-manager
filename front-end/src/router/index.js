@@ -206,7 +206,8 @@ export const asyncRouterMap = [
           title: 'TenantInfo',
           noCache: true,
           roles: ['super', 'admin']
-        }
+        },
+        hidden: true
       },
       {
         path: 'tenants/tenantInfo/public?tab=namespaces',
@@ -333,7 +334,7 @@ export const asyncRouterMap = [
           noCache: true,
           roles: ['super']
         },
-        hidden: false
+        hidden: true
       },
       {
         path: '/roles',
@@ -344,7 +345,7 @@ export const asyncRouterMap = [
           noCache: true,
           roles: ['super', 'admin']
         },
-        hidden: false
+        hidden: true
       },
       {
         path: '/roleBinding',
@@ -355,7 +356,7 @@ export const asyncRouterMap = [
           noCache: true,
           roles: ['super', 'admin']
         },
-        hidden: false
+        hidden: true
       },
       {
         path: '/tokens',

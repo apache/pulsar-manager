@@ -66,6 +66,15 @@ public class TopicsController {
     @Value("${pulsar.peek.message}")
     private boolean peekMessage;
 
+    @Value("${tls.enabled}")
+    private boolean tlsEnabled;
+
+    @Value("${tls.hostname.verifier}")
+    private boolean tlsHostnameVerifier;
+
+    @Value("${tls.pulsar.admin.ca-certs}")
+    private String tlsPulsarAdminCaCerts;
+
     @Autowired
     public TopicsController(
             TopicsService topicsService,
@@ -156,6 +165,11 @@ public class TopicsController {
         // to do check permission for non super, waiting for https://github.com/apache/pulsar-manager/pull/238
         try {
             PulsarAdminBuilder pulsarAdminBuilder = PulsarAdmin.builder();
+            if (tlsEnabled) {
+                pulsarAdminBuilder
+                        .tlsTrustCertsFilePath(tlsPulsarAdminCaCerts)
+                        .enableTlsHostnameVerification(tlsHostnameVerifier);
+            }
             if (token != null && token.length() > 0) {
                 pulsarAdminBuilder.authentication(AuthenticationFactory.token(token));
             }
