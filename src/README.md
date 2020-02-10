@@ -45,6 +45,46 @@ spring.datasource.password=postgres
 ./gradlew -x build -x test
 ```
 
+### Enable Https forward
+
+First, please get the client certificate file for connecting to your Pulsar cluster. Please check out this [document](http://pulsar.apache.org/docs/en/security-tls-transport/) on how to create the client certificate file for Pulsar clients. Assume your client certificate is stored in `certs/ca.cert.pem`.
+
+Secondly, following the instructions below to generate a keystore file to be used by Pulsar Manager. Please replace `[/path/to/client/certs]` with the path to your client certificate file.
+
+```$xslt
+keytool -import -trustcacerts -keystore keystore-file -alias test-keystore -file [/path/to/client/certs]
+```
+
+Thirdly, configure Pulsar Manager to enable TLS by adding the following configuration settings.
+
+```$xslt
+tls.enabled=false
+tls.keystore=keystore-file
+tls.keystore.password=keystore-file-password
+tls.hostname.verifier=false
+```
+
+| Name | Default |Description
+| ------- | ------- | ------- |
+| tls.enabled | false | If broker enable tls configuration, set to true, otherwise set to false |
+| tls.keystore | "" | Keystore file path, need to use tool keytool to convert pem file to b file |
+| tls.keystore.password | "" | Keystore file password |
+| tls.hostname.verifier | false | Turn on hostname check, default false to test |
+
+### Enable peek message
+
+If you want to enable feature `peek-message`, please set the following option to true in file `application.properties`.
+
+```$xslt
+pulsar.peek.message=true
+```
+
+If your Pulsar cluster enable TLS, you also need to add the path of the ca certificate for option `tls.pulsar.admin.ca-certs` in file `application.properties`.
+
+```$xslt
+tls.pulsar.admin.ca-certs=ca-client-path
+```
+
 ### Enable JWT Auth
 
 If you want to turn on JWT authentication, configure the following parameters:

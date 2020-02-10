@@ -20,25 +20,48 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
  * http client class, to get info from pulsar broker
  */
+@Component
 public class HttpUtil {
+
+    private static boolean tlsEnabled;
+
+    private static String tlsKeystore;
+
+    private static String tlsKeystorePassword;
+
+    private static boolean tlsHostnameVerifier;
 
     private static final Logger log = LoggerFactory.getLogger(HttpUtil.class);
 
-    private static final CloseableHttpClient httpClient;
+    private static CloseableHttpClient httpClient;
 
     private static int CONNECTION_TIMEOUT = 28 * 1000;
 
@@ -46,13 +69,67 @@ public class HttpUtil {
 
     public static PoolingHttpClientConnectionManager cm = null;
 
-    static {
-        cm = new PoolingHttpClientConnectionManager();
-        cm.setDefaultMaxPerRoute(10);
-        cm.setMaxTotal(100);
-        RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT)
-                .setSocketTimeout(SO_TIMEOUT).build();
-        httpClient = HttpClients.custom().setConnectionManager(cm).setDefaultRequestConfig(config).build();
+    @Value("${tls.enabled}")
+    public void setTlsEnabled(boolean tlsEnabled) {
+        HttpUtil.tlsEnabled = tlsEnabled;
+    }
+
+    @Value("${tls.keystore}")
+    public void setTlsKeystore(String brokerKeystore) {
+        HttpUtil.tlsKeystore = brokerKeystore;
+    }
+
+    @Value("${tls.keystore.password}")
+    public void setTlsKeystorePassword(String brokerKeystorePassword) {
+        HttpUtil.tlsKeystorePassword = brokerKeystorePassword;
+    }
+
+    @Value("${tls.hostname.verifier}")
+    public void setTlsHostnameVerifier(boolean tlsHostnameVerifier) {
+        HttpUtil.tlsHostnameVerifier = tlsHostnameVerifier;
+    }
+
+    public static void initHttpClient() {
+        try {
+            if (tlsEnabled) {
+                Resource resource = new FileSystemResource(tlsKeystore);
+                File trustStoreFile = resource.getFile();
+                HostnameVerifier hostnameVerifier = (s, sslSession) -> {
+                    // Custom logic to verify host name, tlsHostnameVerifier is false for test
+                    if (!tlsHostnameVerifier) {
+                        return true;
+                    } else {
+                        HostnameVerifier hv= HttpsURLConnection.getDefaultHostnameVerifier();
+                        return hv.verify(s, sslSession);
+                    }
+                };
+
+                SSLContext sslcontext = SSLContexts.custom()
+                        .loadTrustMaterial(
+                                trustStoreFile,
+                                tlsKeystorePassword.toCharArray(),
+                                new TrustSelfSignedStrategy())
+                        .build();
+
+                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, hostnameVerifier);
+                cm = new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory>create()
+                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                        .register("https", sslsf)
+                        .build());
+            } else {
+                cm = new PoolingHttpClientConnectionManager();
+            }
+
+            cm.setDefaultMaxPerRoute(10);
+            cm.setMaxTotal(100);
+            RequestConfig config = RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT)
+                    .setSocketTimeout(SO_TIMEOUT).build();
+            httpClient = HttpClients.custom()
+                    .setConnectionManager(cm).setDefaultRequestConfig(config).build();
+
+        } catch (Exception e) {
+            log.error("Failed init http client error message: {}, error stack trace: {}", e.getMessage(), e.getCause());
+        }
     }
 
     public static String doGet(String url, Map<String, String> header){
@@ -88,6 +165,9 @@ public class HttpUtil {
             for (Map.Entry<String, String> entry: header.entrySet()) {
                 request.setHeader(entry.getKey(), entry.getValue());
             }
+            if (httpClient == null ) {
+                initHttpClient();
+            }
             response = httpClient.execute(request);
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -98,7 +178,8 @@ public class HttpUtil {
                 request.abort();
             }
         } catch (Throwable cause) {
-            log.error("http request exception:{}", cause.getMessage());
+            log.error("http request exception message: {}, http request error stack: {}",
+                    cause.getMessage(), cause.getCause());
         } finally {
             try{
                 if (response != null) {

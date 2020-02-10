@@ -123,7 +123,6 @@ public class EnvironmentForward extends ZuulFilter {
             return null;
         }
         String serviceUrl = environmentCacheService.getServiceUrl(request);
-        System.out.println(serviceUrl);
         return forwardRequest(ctx, request, serviceUrl);
     }
 
