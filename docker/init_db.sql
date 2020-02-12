@@ -11,7 +11,8 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 --
-alter user pulsar with password 'pulsar';
+
+ALTER USER pulsar WITH PASSWORD 'pulsar';
 CREATE DATABASE pulsar_manager OWNER pulsar;
 GRANT ALL PRIVILEGES ON DATABASE pulsar_manager to pulsar;
 
@@ -124,3 +125,54 @@ CREATE TABLE IF NOT EXISTS tokens (
   token varchar(1024) NOT NUll,
   UNIQUE (role)
 );
+
+CREATE TABLE IF NOT EXISTS users (
+  user_id BIGSERIAL PRIMARY KEY,
+  access_token varchar(256),
+  name varchar(256) NOT NULL,
+  description varchar(128),
+  email varchar(256),
+  phone_number varchar(48),
+  location varchar(256),
+  company varchar(256),
+  expire BIGINT,
+  password varchar(256),
+  UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS roles (
+  role_id BIGSERIAL PRIMARY KEY,
+  role_name varchar(256) NOT NULL,
+  role_source varchar(256) NOT NULL,
+  description varchar(128),
+  resource_id BIGINT NOT NULL,
+  resource_type varchar(48) NOT NULL,
+  resource_name varchar(48) NOT NULL,
+  resource_verbs varchar(256) NOT NULL,
+  flag INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tenants (
+  tenant_id BIGSERIAL PRIMARY KEY,
+  tenant varchar(255) NOT NULL,
+  admin_roles varchar(255),
+  allowed_clusters varchar(255),
+  environment_name varchar(255),
+  UNIQUE(tenant)
+);
+
+CREATE TABLE IF NOT EXISTS namespaces (
+  namespace_id BIGSERIAL PRIMARY KEY,
+  tenant varchar(255) NOT NULL,
+  namespace varchar(255) NOT NULL,
+  UNIQUE(tenant, namespace)
+);
+
+CREATE TABLE IF NOT EXISTS role_binding(
+  role_binding_id BIGSERIAL PRIMARY KEY,
+  name varchar(256) NOT NULL,
+  description varchar(256),
+  role_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL
+);
+
