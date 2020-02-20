@@ -14,13 +14,21 @@
 package org.apache.pulsar.manager.service;
 
 import com.google.common.collect.Maps;
+import org.apache.pulsar.client.admin.PulsarAdmin;
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.client.admin.Topics;
+import org.apache.pulsar.common.partition.PartitionedTopicMetadata;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
+import org.apache.pulsar.manager.service.impl.TopicsServiceImpl;
 import org.apache.pulsar.manager.utils.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -33,6 +41,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +58,18 @@ import java.util.Map;
 @ActiveProfiles("test")
 public class TopicsServiceImplTest {
 
+    @Mock
+    private PulsarAdminService pulsarAdminService;
+
+    @Mock
+    private PulsarAdmin pulsarAdmin;
+
+    @Mock
+    private Topics topics;
+
+    @InjectMocks
+    private TopicsServiceImpl topicsServiceImpl;
+
     @Autowired
     private TopicsService topicsService;
 
@@ -58,31 +79,27 @@ public class TopicsServiceImplTest {
     @Value("${backend.jwt.token}")
     private static String pulsarJwtToken;
 
-    private final String topics = "[" +
-            "\"persistent://public/default/test789\"," +
-            "\"persistent://public/default/test900-partition-0\"," +
-            "\"persistent://public/default/test900-partition-1\"," +
-            "\"persistent://public/default/test900-partition-2\"]";
-
-    private final String partitionedTopics = "[\"persistent://public/default/test900\"]";
-
     @Test
-    public void topicsServiceImplTest() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/persistent/public/default", header))
-                .thenReturn(topics);
-        PowerMockito.when(HttpUtil.doGet(
-                "http://localhost:8080/admin/v2/persistent/public/default/partitioned", header))
-                .thenReturn(partitionedTopics);
-        PowerMockito.when(HttpUtil.doGet(
-                "http://localhost:8080/admin/v2/persistent/public/default/test900/partitions", header))
-                .thenReturn("{\"partitions\":3}");
-        Map<String, Object> topicsMap = topicsService.getTopicsList(
+    public void topicsServiceImplTest() throws PulsarAdminException {
+        Mockito.when(pulsarAdminService.getPulsarAdmin("http://localhost:8080")).thenReturn(pulsarAdmin);
+        Mockito.when(pulsarAdmin.topics()).thenReturn(topics);
+        Mockito.when(topics.getList("public/default")).thenReturn(
+                Arrays.asList(
+                        "persistent://public/default/test789",
+                        "persistent://public/default/test900-partition-0",
+                        "persistent://public/default/test900-partition-1",
+                        "persistent://public/default/test900-partition-2"
+                )
+        );
+        Mockito.when(topics.getPartitionedTopicList("public/default")).thenReturn(
+                Arrays.asList(
+                        "persistent://public/default/test900"
+                )
+        );
+        Mockito.when(topics.getPartitionedTopicMetadata("persistent://public/default/test900")).thenReturn(
+                new PartitionedTopicMetadata(3)
+        );
+        Map<String, Object> topicsMap = topicsServiceImpl.getTopicsList(
                 1, 1, "public", "default", "http://localhost:8080");
         Assert.assertEquals(topicsMap.get("total"), 2);
         Assert.assertFalse((Boolean) topicsMap.get("isPage"));
