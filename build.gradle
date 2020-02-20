@@ -36,6 +36,9 @@ plugins {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        url "https://yahoo.bintray.com/maven"
+    }
 }
 
 configurations {
