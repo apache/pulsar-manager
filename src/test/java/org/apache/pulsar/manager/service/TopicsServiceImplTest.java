@@ -20,13 +20,11 @@ import org.apache.pulsar.client.admin.Topics;
 import org.apache.pulsar.common.partition.PartitionedTopicMetadata;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
-import org.apache.pulsar.manager.service.impl.TopicsServiceImpl;
 import org.apache.pulsar.manager.utils.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -37,6 +35,7 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -58,7 +57,7 @@ import java.util.Map;
 @ActiveProfiles("test")
 public class TopicsServiceImplTest {
 
-    @Mock
+    @MockBean
     private PulsarAdminService pulsarAdminService;
 
     @Mock
@@ -66,9 +65,6 @@ public class TopicsServiceImplTest {
 
     @Mock
     private Topics topics;
-
-    @InjectMocks
-    private TopicsServiceImpl topicsServiceImpl;
 
     @Autowired
     private TopicsService topicsService;
@@ -99,7 +95,7 @@ public class TopicsServiceImplTest {
         Mockito.when(topics.getPartitionedTopicMetadata("persistent://public/default/test900")).thenReturn(
                 new PartitionedTopicMetadata(3)
         );
-        Map<String, Object> topicsMap = topicsServiceImpl.getTopicsList(
+        Map<String, Object> topicsMap = topicsService.getTopicsList(
                 1, 1, "public", "default", "http://localhost:8080");
         Assert.assertEquals(topicsMap.get("total"), 2);
         Assert.assertFalse((Boolean) topicsMap.get("isPage"));

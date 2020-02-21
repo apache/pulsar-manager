@@ -14,6 +14,9 @@
 package org.apache.pulsar.manager.service;
 
 import com.google.common.collect.Maps;
+import org.apache.pulsar.client.admin.PulsarAdmin;
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.client.admin.Topics;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.apache.pulsar.manager.utils.HttpUtil;
@@ -21,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -29,9 +34,12 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
@@ -47,6 +55,15 @@ import java.util.Map;
 @ActiveProfiles("test")
 public class NamespacesServiceImplTest {
 
+    @MockBean
+    private PulsarAdminService pulsarAdminService;
+
+    @Mock
+    private PulsarAdmin pulsarAdmin;
+
+    @Mock
+    private Topics topics;
+
     @Autowired
     private NamespacesService namespacesService;
 
@@ -57,7 +74,7 @@ public class NamespacesServiceImplTest {
     private static String pulsarJwtToken;
 
     @Test
-    public void namespaceServiceImplTest() {
+    public void namespaceServiceImplTest() throws PulsarAdminException {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
         header.put("Content-Type", "application/json");
@@ -67,11 +84,16 @@ public class NamespacesServiceImplTest {
         PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/namespaces/public", header))
                 .thenReturn("[\"public/default\"]");
 
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/persistent/public/default", header))
-                .thenReturn("[\"persistent://public/default/test789\"]");
-        PowerMockito.when(HttpUtil.doGet(
-                "http://localhost:8080/admin/v2/persistent/public/default/partitioned", header))
-                .thenReturn("[]");
+        Mockito.when(pulsarAdminService.getPulsarAdmin("http://localhost:8080")).thenReturn(pulsarAdmin);
+        Mockito.when(pulsarAdmin.topics()).thenReturn(topics);
+        Mockito.when(topics.getList("public/default")).thenReturn(
+                Arrays.asList(
+                        "persistent://public/default/test789"
+                )
+        );
+        Mockito.when(topics.getPartitionedTopicList("public/default")).thenReturn(
+                new ArrayList<>()
+        );
         Map<String, Object> result = namespacesService.getNamespaceList(1, 1, "public", "http://localhost:8080");
         Assert.assertEquals(result.get("total"), 1);
         Assert.assertFalse((Boolean) result.get("isPage"));
