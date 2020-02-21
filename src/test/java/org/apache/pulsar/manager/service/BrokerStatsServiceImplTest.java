@@ -280,7 +280,7 @@ public class BrokerStatsServiceImplTest {
         brokerStatsService.clearStats(unixTime, 0);
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (Exception e) {
 
         }
