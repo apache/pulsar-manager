@@ -1,0 +1,20 @@
+name: Pulsar Manager Release Notes
+
+on:
+  push:
+    branches:
+      - master
+    path-ignores:
+      - 'docs/**'
+      - 'README.md'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: release note
+        uses: toolmantim/release-drafter@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
