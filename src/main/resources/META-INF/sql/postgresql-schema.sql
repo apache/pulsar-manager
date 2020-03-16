@@ -125,8 +125,8 @@ CREATE TABLE IF NOT EXISTS tokens (
 );
 
 CREATE TABLE IF NOT EXISTS users (
-  user_id BIGSERIAL PRIMARY KEY AUTO_INCREMENT,
-  access_token varchar(256) NOT NULL,
+  user_id BIGSERIAL PRIMARY KEY,
+  access_token varchar(256),
   name varchar(256) NOT NULL,
   description varchar(128),
   email varchar(256),
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS roles (
-  role_id BIGSERIAL PRIMARY KEY AUTO_INCREMENT,
+  role_id BIGSERIAL PRIMARY KEY,
   role_name varchar(256) NOT NULL,
   role_source varchar(256) NOT NULL,
   description varchar(128),
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS roles (
 );
 
 CREATE TABLE IF NOT EXISTS tenants (
-  tenant_id BIGSERIAL PRIMARY KEY AUTO_INCREMENT,
+  tenant_id BIGSERIAL PRIMARY KEY,
   tenant varchar(255) NOT NULL,
   admin_roles varchar(255),
   allowed_clusters varchar(255),
@@ -160,14 +160,14 @@ CREATE TABLE IF NOT EXISTS tenants (
 );
 
 CREATE TABLE IF NOT EXISTS namespaces (
-  namespace_id BIGSERIAL PRIMARY KEY AUTO_INCREMENT,
+  namespace_id BIGSERIAL PRIMARY KEY,
   tenant varchar(255) NOT NULL,
   namespace varchar(255) NOT NULL,
   UNIQUE(tenant, namespace)
 );
 
 CREATE TABLE IF NOT EXISTS role_binding(
-  role_binding_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  role_binding_id BIGSERIAL PRIMARY KEY,
   name varchar(256) NOT NULL,
   description varchar(256),
   role_id BIGINT NOT NULL,
