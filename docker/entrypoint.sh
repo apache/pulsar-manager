@@ -24,6 +24,7 @@ addgroup pulsar
 adduser --disabled-password --ingroup pulsar pulsar
 mkdir -p /run/postgresql
 chown -R pulsar:pulsar /run/postgresql/
+mkdir /data
 chown -R pulsar:pulsar /data
 chown pulsar:pulsar /pulsar-manager/init_db.sql
 chmod 750 /data
@@ -56,6 +57,6 @@ then
   echo "Start Pulsar Manager by specifying a configuration file."
   supervisord -c /etc/supervisord-configuration-file.conf -n
 else
-  echo "Start servie no enable JWT."
+  echo "Start service without enabling JWT."
   supervisord -c /etc/supervisord.conf -n
 fi
