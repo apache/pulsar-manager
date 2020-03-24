@@ -49,12 +49,10 @@ public class BookiesServiceImpl implements BookiesService {
     private static String pulsarJwtToken;
 
     private static final Map<String, String> header = new HashMap<String, String>(){{
-        put("Content-Type","application/json");
         put("Authorization", String.format("Bearer %s", pulsarJwtToken));
     }};
 
     private final Pattern pattern = Pattern.compile(" \\d+");;
-
     public Map<String, Object> getBookiesList(Integer pageNum, Integer pageSize, String cluster) {
         Map<String, Object> bookiesMap = Maps.newHashMap();
         List<Map<String, Object>> bookiesArray = new ArrayList<>();
