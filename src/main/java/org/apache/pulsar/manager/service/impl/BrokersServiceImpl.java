@@ -42,7 +42,6 @@ public class BrokersServiceImpl implements BrokersService {
         if (directRequestBroker) {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
-            header.put("Content-Type", "application/json");
             if (StringUtils.isNotBlank(pulsarJwtToken)) {
                 header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             }

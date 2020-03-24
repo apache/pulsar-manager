@@ -65,7 +65,6 @@ public class TenantsServiceImpl implements TenantsService {
         if (directRequestBroker) {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
-            header.put("Content-Type", "application/json");
             if (StringUtils.isNotBlank(pulsarJwtToken)) {
                 header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             }

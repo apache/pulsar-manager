@@ -184,7 +184,6 @@ public class EnvironmentsController {
             return ResponseEntity.ok(result);
         }
         Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
             header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         }
@@ -219,7 +218,6 @@ public class EnvironmentsController {
             return ResponseEntity.ok(result);
         }
         Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
             header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         }
