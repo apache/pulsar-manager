@@ -199,7 +199,6 @@ public class TopicsServiceImpl implements TopicsService {
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
             header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         }
-        header.put("Content-Type", "application/json");
         String prefix = "/admin/v2/" + persistent + "/" + tenant + "/" + namespace;
         Gson gson = new Gson();
         String partitionedUrl = requestHost + prefix + "/partitioned";

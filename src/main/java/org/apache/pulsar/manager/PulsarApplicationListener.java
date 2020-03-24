@@ -66,7 +66,6 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
                     && defaultEnvironmentServiceUrl.length() > 0
                     && !environmentEntityOptional.isPresent()) {
                 Map<String, String> header = Maps.newHashMap();
-                header.put("Content-Type", "application/json");
                 if (StringUtils.isNotBlank(pulsarJwtToken)) {
                     header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
                 }

@@ -105,7 +105,6 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
             header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         }
-        header.put("Content-Type", "application/json");
         return header;
     }
 

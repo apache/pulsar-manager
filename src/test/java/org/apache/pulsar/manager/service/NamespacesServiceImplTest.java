@@ -60,7 +60,6 @@ public class NamespacesServiceImplTest {
     public void namespaceServiceImplTest() {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
             header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         }
@@ -82,7 +81,6 @@ public class NamespacesServiceImplTest {
     public void getNamespaceStatsTest() {
         PowerMockito.mockStatic(HttpUtil.class);
         Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
             header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         }

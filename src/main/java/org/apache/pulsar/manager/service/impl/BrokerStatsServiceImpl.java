@@ -78,9 +78,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     private final ReplicationsStatsRepository replicationsStatsRepository;
     private final ConsumersStatsRepository consumersStatsRepository;
 
-    private static final Map<String, String> header = new HashMap<String, String>(){{
-        put("Content-Type","application/json");
-    }};
+    private static final Map<String, String> header = new HashMap<String, String>();
 
     @Autowired
     public BrokerStatsServiceImpl(

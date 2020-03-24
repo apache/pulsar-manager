@@ -57,7 +57,6 @@ public class ClustersServiceImpl implements ClustersService {
         if (directRequestBroker) {
             Gson gson = new Gson();
             Map<String, String> header = Maps.newHashMap();
-            header.put("Content-Type", "application/json");
             if (StringUtils.isNotBlank(pulsarJwtToken)) {
                 header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             }
@@ -91,7 +90,6 @@ public class ClustersServiceImpl implements ClustersService {
     public List<String> getClusterByAnyBroker(String requestHost) {
         Gson gson = new Gson();
         Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
         if (StringUtils.isNotBlank(pulsarJwtToken)) {
             header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
         }
