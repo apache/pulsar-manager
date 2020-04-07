@@ -95,6 +95,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: springBootVersion
     compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: springMybatisVersion
+    compile group: 'com.github.pagehelper', name: 'pagehelper', version: pagehelperVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
     compile group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
     compile (group: 'org.herddb', name: 'herddb-jdbc', version: herddbVersion) {
