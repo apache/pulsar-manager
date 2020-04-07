@@ -22,8 +22,6 @@ public interface BrokerStatsService {
 
     String forwardBrokerStatsMetrics(String broker, String requestHost);
 
-    String forwardBrokerStatsTopics(String broker, String requestHost);
-
     void collectStatsToDB(long unixTime, String environment, String cluster, String serviceUrl);
 
     void clearStats(long nowTime, long timeInterval);

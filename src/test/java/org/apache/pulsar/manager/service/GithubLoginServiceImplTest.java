@@ -90,7 +90,7 @@ public class GithubLoginServiceImplTest {
                     "\"token_type\": \"bearer\"" +
                 "}");
         String withCodeResult = thirdPartyLoginService.getAuthToken(parameters);
-        Assert.assertEquals(withCodeResult, "e72e16c7e42f292c6912e7710c838347ae178b4a");
+        Assert.assertEquals("e72e16c7e42f292c6912e7710c838347ae178b4a", withCodeResult);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class GithubLoginServiceImplTest {
         Map<String, String> authenticationMap = Maps.newHashMap();
         UserInfoEntity noTokenUserInfoEntity = thirdPartyLoginService.getUserInfo(authenticationMap);
 
-        Assert.assertEquals(noTokenUserInfoEntity, null);
+        Assert.assertEquals(null, noTokenUserInfoEntity);
 
         authenticationMap.put("access_token", "test-user-token");
         PowerMockito.mockStatic(HttpUtil.class);
@@ -119,11 +119,11 @@ public class GithubLoginServiceImplTest {
                         "\t\"bio\": \"this is description\"" +
                         "}");
         UserInfoEntity withTokenUserInfoEntity = thirdPartyLoginService.getUserInfo(authenticationMap);
-        Assert.assertEquals(withTokenUserInfoEntity.getEmail(), "test@apache.org");
-        Assert.assertEquals(withTokenUserInfoEntity.getName(), "test1");
-        Assert.assertEquals(withTokenUserInfoEntity.getCompany(), "bj");
-        Assert.assertEquals(withTokenUserInfoEntity.getDescription(), "this is description");
-        Assert.assertEquals(withTokenUserInfoEntity.getLocation(), "nw");
-        Assert.assertEquals(withTokenUserInfoEntity.getAccessToken(), "test-user-token");
+        Assert.assertEquals("test@apache.org", withTokenUserInfoEntity.getEmail());
+        Assert.assertEquals("test1", withTokenUserInfoEntity.getName());
+        Assert.assertEquals("bj", withTokenUserInfoEntity.getCompany());
+        Assert.assertEquals("this is description", withTokenUserInfoEntity.getDescription());
+        Assert.assertEquals("nw", withTokenUserInfoEntity.getLocation());
+        Assert.assertEquals("test-user-token", withTokenUserInfoEntity.getAccessToken());
     }
 }

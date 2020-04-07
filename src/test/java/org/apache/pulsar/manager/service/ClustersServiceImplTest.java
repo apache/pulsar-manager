@@ -14,31 +14,30 @@
 package org.apache.pulsar.manager.service;
 
 import com.google.common.collect.Maps;
+
+import org.apache.pulsar.client.admin.Clusters;
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.common.policies.data.ClusterData;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
-import org.apache.pulsar.manager.utils.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
-@PrepareForTest(HttpUtil.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = {
         PulsarManagerApplication.class,
@@ -51,47 +50,48 @@ public class ClustersServiceImplTest {
     @Autowired
     private ClustersService clustersService;
 
-    @Value("${backend.jwt.token}")
-    private static String pulsarJwtToken;
+    @MockBean
+    private BrokersService brokersService;
+
+    @MockBean
+    private PulsarAdminService pulsarAdminService;
+
+    @Mock
+    private Clusters clusters;
 
     @Test
-    public void clusterServiceImplTest() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
-                .thenReturn("[\"standalone\"]");
+    public void clusterServiceImplTest() throws PulsarAdminException {
+        Mockito.when(pulsarAdminService.clusters("http://localhost:8080")).thenReturn(clusters);
+        Mockito.when(pulsarAdminService.clusters("http://localhost:8080").getClusters()).thenReturn(Arrays.asList("standalone"));
+        ClusterData standaloneClusterData = new ClusterData("http://broker-1:8080", null, "pulsar://broker-1:6650", null);
+        Mockito.when(pulsarAdminService.clusters("http://localhost:8080").getCluster("standalone")).thenReturn(standaloneClusterData);
 
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone", header))
-                .thenReturn("{\n" +
-                        "\"serviceUrl\" : \"http://tengdeMBP:8080\",\n" +
-                        "\"brokerServiceUrl\" : \"pulsar://tengdeMBP:6650\"\n" +
-                        "}");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
-                .thenReturn("{\"test\":{\"brokers\":[\"tengdeMBP:8080\"]}}");
+        Map<String, Object> brokerEntity = Maps.newHashMap();
+        brokerEntity.put("broker", "broker-1:8080");
+        brokerEntity.put("failureDomain", null);
+        List<Map<String, Object>> brokersArray = new ArrayList<>();
+        brokersArray.add(brokerEntity);
+        Map<String, Object> brokersMap = new HashMap<>();
+        brokersMap.put("isPage", false);
+        brokersMap.put("total", brokersArray.size());
+        brokersMap.put("data", brokersArray);
+        brokersMap.put("pageNum", 1);
+        brokersMap.put("pageSize", brokersArray.size());
+        Mockito.when(brokersService.getBrokersList(1, 1, "standalone", "http://localhost:8080")).thenReturn(brokersMap);
 
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
-                .thenReturn("[\"tengdeMBP:8080\"]");
         Map<String, Object> result = clustersService.getClustersList(1, 1, "http://localhost:8080", null);
-        Assert.assertEquals(result.get("data").toString(),
-                "[{cluster=standalone, serviceUrlTls=null, brokers=1, serviceUrl=http://tengdeMBP:8080, " +
-                        "brokerServiceUrlTls=null, brokerServiceUrl=pulsar://tengdeMBP:6650}]");
-        Assert.assertEquals(result.get("total"), 1);
-        Assert.assertEquals(result.get("pageSize"), 1);
+        Assert.assertEquals("[{cluster=standalone, serviceUrlTls=null, brokers=1, serviceUrl=http://broker-1:8080, " +
+                        "brokerServiceUrlTls=null, brokerServiceUrl=pulsar://broker-1:6650}]", result.get("data").toString());
+        Assert.assertEquals(1, result.get("total"));
+        Assert.assertEquals(1, result.get("pageSize"));
     }
 
     @Test
-    public void getClusterByAnyBroker() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
-                .thenReturn("[\"standalone\"]");
+    public void getClusterByAnyBroker() throws PulsarAdminException  {
+        Mockito.when(pulsarAdminService.clusters("http://localhost:8080")).thenReturn(clusters);
+        Mockito.when(pulsarAdminService.clusters("http://localhost:8080").getClusters()).thenReturn(Arrays.asList("standalone"));
+
         List<String> clusterList = clustersService.getClusterByAnyBroker("http://localhost:8080");
-        Assert.assertEquals(clusterList.get(0), "standalone");
+        Assert.assertEquals("standalone", clusterList.get(0));
     }
 }

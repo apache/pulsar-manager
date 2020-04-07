@@ -64,18 +64,4 @@ public class BrokerStatsController {
         String result = brokerStatsService.forwardBrokerStatsMetrics(broker, requestHost);
         return ResponseEntity.ok(result);
     }
-
-    @ApiOperation(value = "Get the broker stats topics")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/broker-stats/topics", method =  RequestMethod.GET)
-    public ResponseEntity<String> getBrokerStatsTopics(
-            @RequestParam() String broker) {
-        String requestHost = environmentCacheService.getServiceUrl(request);
-        String result = brokerStatsService.forwardBrokerStatsTopics(broker, requestHost);
-        return ResponseEntity.ok(result);
-    }
-
 }

@@ -55,14 +55,14 @@ public class RolesRepositoryImplTest {
     }
 
     private void validateRole(RoleInfoEntity role) {
-        Assert.assertEquals(role.getRoleName(), "test-role-name");
-        Assert.assertEquals(role.getRoleSource(), "test-tenant");
-        Assert.assertEquals(role.getResourceType(), "tenants");
-        Assert.assertEquals(role.getResourceName(), "tenants");
-        Assert.assertEquals(role.getResourceVerbs(), "admin");
-        Assert.assertEquals(role.getResourceId(), 2);
-        Assert.assertEquals(role.getDescription(), "This is tenants permissions");
-        Assert.assertEquals(role.getFlag(), 0);
+        Assert.assertEquals("test-role-name", role.getRoleName());
+        Assert.assertEquals("test-tenant", role.getRoleSource());
+        Assert.assertEquals("tenants", role.getResourceType());
+        Assert.assertEquals("tenants", role.getResourceName());
+        Assert.assertEquals("admin", role.getResourceVerbs());
+        Assert.assertEquals(2, role.getResourceId());
+        Assert.assertEquals("This is tenants permissions", role.getDescription());
+        Assert.assertEquals(0, role.getFlag());
     }
 
     @Test
@@ -115,10 +115,10 @@ public class RolesRepositoryImplTest {
         Optional<RoleInfoEntity> updateRoleInfo = rolesRepository.findByRoleName(
                 roleInfoEntity.getRoleName(), roleInfoEntity.getRoleSource());
         RoleInfoEntity updateRoleInfoEntity = updateRoleInfo.get();
-        Assert.assertEquals(updateRoleInfoEntity.getResourceType(), "clusters");
-        Assert.assertEquals(updateRoleInfoEntity.getResourceVerbs(), "admin,produce,consume");
-        Assert.assertEquals(updateRoleInfoEntity.getDescription(), "This is update role");
-        Assert.assertEquals(updateRoleInfoEntity.getFlag(), 1);
+        Assert.assertEquals("clusters", updateRoleInfoEntity.getResourceType());
+        Assert.assertEquals("admin,produce,consume", updateRoleInfoEntity.getResourceVerbs());
+        Assert.assertEquals("This is update role", updateRoleInfoEntity.getDescription());
+        Assert.assertEquals(1, updateRoleInfoEntity.getFlag());
 
         rolesRepository.delete(roleInfoEntity.getRoleName(), roleInfoEntity.getRoleSource());
         Optional<RoleInfoEntity> deleteRoleInfo = rolesRepository.findByRoleName(

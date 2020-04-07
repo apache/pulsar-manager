@@ -36,6 +36,9 @@ plugins {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        url "https://yahoo.bintray.com/maven"
+    }
 }
 
 configurations {
@@ -107,7 +110,9 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
     compile group: 'com.google.code.gson', name: 'gson', version: gsonVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-common', version: pulsarVersion
-    compile group: 'org.apache.pulsar', name: 'pulsar-client-admin', version: pulsarVersion
+    compile group: 'org.apache.pulsar', name: 'pulsar-client-admin-original', version: pulsarVersion
+    compile group: 'org.apache.pulsar', name: 'pulsar-client-auth-athenz', version: pulsarVersion
+    compile group: 'org.apache.pulsar', name: 'pulsar-client-auth-sasl', version: pulsarVersion
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggeruiVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-broker', version: brokerVersion
@@ -116,6 +121,6 @@ dependencies {
     compileOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
-    testCompile group: 'org.powermock', name: 'powermock-api-mockito', version: apiMockitoVersion
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: apiMockitoVersion
     testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
 }

@@ -49,31 +49,30 @@ public class UsersServiceImplTest {
         UserInfoEntity userInfoEntity = new UserInfoEntity();
         userInfoEntity.setName(" ");
         Map<String, String> validateNameEmpty = usersService.validateUserInfo(userInfoEntity);
-        Assert.assertEquals(validateNameEmpty.get("error"), "User name cannot be empty");
+        Assert.assertEquals("User name cannot be empty", validateNameEmpty.get("error"));
         userInfoEntity.setName("----====");
         Map<String, String> validateNameIllegal = usersService.validateUserInfo(userInfoEntity);
-        Assert.assertEquals(validateNameIllegal.get("error"), "User name illegal");
+        Assert.assertEquals("User name illegal", validateNameIllegal.get("error"));
 
         userInfoEntity.setName("test");
         userInfoEntity.setEmail("  ");
         Map<String, String> validateEmailEmpty = usersService.validateUserInfo(userInfoEntity);
-        Assert.assertEquals(validateEmailEmpty.get("error"), "User email cannot be empty");
+        Assert.assertEquals("User email cannot be empty", validateEmailEmpty.get("error"));
         userInfoEntity.setEmail("xxxx@");
         Map<String, String> validateEmailIllegal = usersService.validateUserInfo(userInfoEntity);
-        Assert.assertEquals(validateEmailIllegal.get("error"), "Email address illegal");
+        Assert.assertEquals("Email address illegal", validateEmailIllegal.get("error"));
 
         userInfoEntity.setEmail("test@apache.org");
         userInfoEntity.setPassword("  ");
         userInfoEntity.setAccessToken(" ");
         Map<String, String> validatePasswordAndTokenBlank = usersService.validateUserInfo(userInfoEntity);
-        Assert.assertEquals(validatePasswordAndTokenBlank.get("error"),
-                "Fields password and access token cannot be empty at the same time.");
+        Assert.assertEquals("Fields password and access token cannot be empty at the same time.",
+                validatePasswordAndTokenBlank.get("error"));
 
         userInfoEntity.setPassword("password");
         userInfoEntity.setAccessToken("token");
         Map<String, String> validateSuccess = usersService.validateUserInfo(userInfoEntity);
-        Assert.assertEquals(validateSuccess.get("message"),
-                "Validate user success");
+        Assert.assertEquals("Validate user success", validateSuccess.get("message"));
 
     }
 }

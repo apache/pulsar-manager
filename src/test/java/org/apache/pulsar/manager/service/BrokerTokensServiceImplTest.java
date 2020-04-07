@@ -54,6 +54,6 @@ public class BrokerTokensServiceImplTest {
         String role = "test";
         String token = jwtService.createBrokerToken(role, null);
         Claims jwtBody = jwtService.validateBrokerToken(token);
-        Assert.assertEquals(jwtBody.getSubject(), role);
+        Assert.assertEquals(role, jwtBody.getSubject());
     }
 }
