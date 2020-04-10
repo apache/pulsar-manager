@@ -49,3 +49,7 @@ dbdata
 src/main/resources/local.properties
 
 *.key
+
+# Docker
+docker/data
+data
