@@ -272,14 +272,15 @@ public class BrokerStatsServiceImplTest {
         replicationStatsEntities.getResult().forEach((replication) -> {
             checkReplicationStatsResult(replication);
         });
-        long unixTime = System.currentTimeMillis() / 1000L;
-        brokerStatsService.clearStats(unixTime, 0);
 
         try {
-            Thread.sleep(10000);
+            Thread.sleep(1000);
         } catch (Exception e) {
 
         }
+
+        long unixTime = System.currentTimeMillis() / 1000L;
+        brokerStatsService.clearStats(unixTime, 0);
 
         Optional<TopicStatsEntity> deleteTopicStatsEntity = topicsStatsRepository.findMaxTime();
         Assert.assertFalse(deleteTopicStatsEntity.isPresent());
