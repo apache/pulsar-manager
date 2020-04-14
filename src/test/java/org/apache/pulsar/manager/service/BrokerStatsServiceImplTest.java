@@ -276,7 +276,7 @@ public class BrokerStatsServiceImplTest {
         brokerStatsService.clearStats(unixTime, 0);
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(10000);
         } catch (Exception e) {
 
         }
