@@ -13,14 +13,19 @@
  */
 package org.apache.pulsar.manager.interceptor;
 
+import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import javax.annotation.Resource;
 
 @Configuration
 public class WebAppConfigurer implements WebMvcConfigurer {
+
+    private static final Logger log = LoggerFactory.getLogger(WebAppConfigurer.class);
 
     @Resource
     private AdminHandlerInterceptor adminHandlerInterceptor;
@@ -30,6 +35,28 @@ public class WebAppConfigurer implements WebMvcConfigurer {
         registry.addInterceptor(adminHandlerInterceptor).addPathPatterns("/**")
                 .excludePathPatterns("/pulsar-manager/login")
                 .excludePathPatterns("/pulsar-manager/users/superuser")
-                .excludePathPatterns("/pulsar-manager/third-party-login/**");
+                .excludePathPatterns("/pulsar-manager/third-party-login/**")
+                // static front-end resources
+                .excludePathPatterns("/ui")
+                .excludePathPatterns("/static")
+                .excludePathPatterns("/error");
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        File ui = new File("ui");
+        if (ui.isDirectory()) {
+            log.info("Found front-end at " + ui.getAbsolutePath());
+            String uipath = ui.toURI().toString();
+            String uistaticpath = new File(ui, "static").toURI().toString();
+
+            registry.addResourceHandler("/static/**")
+                    .addResourceLocations("/", uistaticpath);
+            registry.addResourceHandler("/ui/**")
+                    .addResourceLocations("/", uipath);
+        } else {
+            log.info("Front-end not found at " + ui.getAbsolutePath()
+                    + ". Maybe you are deploying the front-end as a separate process");
+        }
     }
 }
