@@ -27,7 +27,8 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
     docker run -d -it \
         -p 6650:6650 \
         -p 8080:8080 \
-        -v $PWD/data:/pulsar/data \
+        -v pulsardata:/pulsar/data \
+        -v pulsarconf:/pulsar/conf \
         --name pulsar-standalone \
         apachepulsar/pulsar:latest \
         bin/pulsar standalone
@@ -48,7 +49,7 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
         -e USERNAME=pulsar \
         -e PASSWORD=pulsar \
         -e LOG_LEVEL=DEBUG \
-        -v $PWD:/data \
+        -v pulsarui:/data \
         --link pulsar-standalone \
         apachepulsar/pulsar-manager:v0.1.0
     ```
