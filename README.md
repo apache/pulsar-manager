@@ -67,7 +67,8 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
     * `PASSWORD`: the password of PostgreSQL.
 
     * `LOG_LEVEL`: level of log.
-
+    
+    * `pulsarui` : docker volume to store PostgresSQL data.
 
 ### Use Docker Compose
 
