@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS tenants (
   tenant varchar(255) NOT NULL,
   admin_roles varchar(255),
   allowed_clusters varchar(255),
-  environment_name varchar(255)
+  environment_name varchar(255),
   UNIQUE(tenant)
 )ENGINE=InnoDB CHARACTER SET utf8;
 
