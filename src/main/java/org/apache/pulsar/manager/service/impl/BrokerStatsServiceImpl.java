@@ -131,7 +131,12 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
             clusterLists.forEach((clusterMap) -> {
                 String cluster = (String) clusterMap.get("cluster");
                 Pair<String, String> envCluster = Pair.of(env.getName(), cluster);
-                collectStatsServiceUrls.put(envCluster, (String) clusterMap.get("serviceUrl"));
+                String webServiceUrl = (String) clusterMap.get("serviceUrl");
+                if (webServiceUrl.contains(",")) {
+                    String[] webServiceUrlList = webServiceUrl.split(",");
+                    webServiceUrl = webServiceUrlList[0];
+                }
+                collectStatsServiceUrls.put(envCluster, webServiceUrl);
             });
         }
         collectStatsServiceUrls.forEach((envCluster, serviceUrl) -> {
