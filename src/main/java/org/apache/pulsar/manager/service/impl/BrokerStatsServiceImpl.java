@@ -142,7 +142,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                         if (!url.contains("http://")) {
                             url = "http://" + url;
                         }
-                        String httpTestResult = HttpUtil.doGet( url + "/metrics", header);
+                        String httpTestResult = HttpUtil.doGet( url + "/admin/v2/brokers/health", header);
                         if (httpTestResult == null) {
                             log.error("This service {} is down, please check", url);
                         } else {
