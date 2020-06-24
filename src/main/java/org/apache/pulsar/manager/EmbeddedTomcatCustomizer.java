@@ -17,6 +17,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.servlet.ServletException;
@@ -61,21 +63,33 @@ public class EmbeddedTomcatCustomizer implements
             @Override
             protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
                 try {
-                    log.info("enter getTomcatWebServer with " + tomcat);
                     log.info("Catalina base is " + tomcat.getServer().getCatalinaBase().getAbsolutePath());
                     File lib = new File("lib").getAbsoluteFile();
                     if (lib.isDirectory()) {
                         File bkvmWar = searchWar(lib, "bkvm", ".war");
                         if (bkvmWar != null) {
-                            System.setProperty("bookkeeper.visual.manager.config.path", new File("bkvm.conf").getAbsolutePath());
-                            File file = new File(tomcat.getServer().getCatalinaBase(), "/webapps");
-                            log.info("Webapps directory is " + file.getAbsolutePath());
-                            file.mkdirs();
-                            File bkvmDirectory = new File(file, "bkvm");
-                            unZip(bkvmWar, bkvmDirectory);
-                            Context context = tomcat.addWebapp("/bkvm", bkvmDirectory.getAbsolutePath());
-                            WebappLoader loader = new WebappLoader(Thread.currentThread().getContextClassLoader());
-                            context.setLoader(loader);
+                            File configFile = new File("bkvm.conf");
+                            log.info("looking for BKVM configuration file at " + configFile.getAbsolutePath());
+                            if (configFile.isFile()) {
+                                Properties props = new Properties();
+                                try (FileReader reader = new FileReader(configFile)) {
+                                    props.load(reader);
+                                }
+                                boolean bkvmEnabled = Boolean.parseBoolean(props.getProperty("bkvm.enabled", "false"));
+                                log.info("Read bkvm.enabled = {}", bkvmEnabled);
+                                if (bkvmEnabled) {
+                                    System.setProperty("bookkeeper.visual.manager.config.path", configFile.getAbsolutePath());
+                                    File file = new File(tomcat.getServer().getCatalinaBase(), "/webapps");
+                                    log.info("Tomcat Webapps directory is " + file.getAbsolutePath());
+                                    file.mkdirs();
+                                    File bkvmDirectory = new File(file, "bkvm");
+                                    log.info("Deploying BKVM to " + bkvmDirectory.getAbsolutePath());
+                                    unZip(bkvmWar, bkvmDirectory);
+                                    Context context = tomcat.addWebapp("/bkvm", bkvmDirectory.getAbsolutePath());
+                                    WebappLoader loader = new WebappLoader(Thread.currentThread().getContextClassLoader());
+                                    context.setLoader(loader);
+                                }
+                            }
                         }
                     }
                     return super.getTomcatWebServer(tomcat);

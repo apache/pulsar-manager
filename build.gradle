@@ -82,6 +82,7 @@ distributions {
     main {
         contents {
             from 'src/main/resources/application.properties'
+            from 'src/main/resources/bkvm.conf'
         }
     }
 }
