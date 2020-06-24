@@ -63,6 +63,11 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // allow frontend requests, in case of front-end running on the same process of backend
+        if (request.getRequestURI().startsWith("/ui")
+                || request.getRequestURI().startsWith("/static")) {
+            return true;
+        }
         String token = request.getHeader("token");
         String saveToken = jwtService.getToken(request.getSession().getId());
         Map<String, Object> map = Maps.newHashMap();

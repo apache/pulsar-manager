@@ -81,6 +81,14 @@ dependencyManagement {
   applyMavenExclusions = false
 }
 
+distributions {
+    main {
+        contents {
+            from 'src/main/resources/application.properties'
+        }
+    }
+}
+
 distTar {
     archiveName "pulsar-manager.tar"
 }
@@ -98,9 +106,12 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: springBootVersion
     compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: springMybatisVersion
+    compile group: 'com.github.pagehelper', name: 'pagehelper', version: pagehelperVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
     compile group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
-    compile group: 'org.herddb', name: 'herddb-jdbc', version: herddbVersion
+    compile (group: 'org.herddb', name: 'herddb-jdbc', version: herddbVersion) {
+        exclude group: 'org.slf4j', module: 'slf4j-jdk14'
+        }
     compile group: 'javax.validation', name: 'validation-api', version: javaxValidationVersion
     compile group: 'org.hibernate', name: 'hibernate-validator', 'version': hibernateValidatorVersion
     compile group: 'io.jsonwebtoken', name: 'jjwt-api', version: jsonWebTokenApiVersion
