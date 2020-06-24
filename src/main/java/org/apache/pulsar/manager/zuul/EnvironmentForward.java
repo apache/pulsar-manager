@@ -45,6 +45,9 @@ public class EnvironmentForward extends ZuulFilter {
     @Value("${backend.jwt.token}")
     private String pulsarJwtToken;
 
+    @Value("${tls.enabled}")
+    private boolean tlsEnabled;
+
     private final EnvironmentCacheService environmentCacheService;
 
     private final PulsarEvent pulsarEvent;
@@ -113,8 +116,10 @@ public class EnvironmentForward extends ZuulFilter {
 
         String broker = request.getHeader("x-pulsar-broker");
         if (StringUtils.isNotBlank(broker)) { // the request should be forward to a pulsar broker
-            // TODO: support https://
             String serviceUrl = "http://" + broker;
+            if (tlsEnabled) {
+                serviceUrl = "https://" + broker;
+            }
             return forwardRequest(ctx, request, serviceUrl);
         }
 
