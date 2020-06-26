@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -131,7 +132,26 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
             clusterLists.forEach((clusterMap) -> {
                 String cluster = (String) clusterMap.get("cluster");
                 Pair<String, String> envCluster = Pair.of(env.getName(), cluster);
-                collectStatsServiceUrls.put(envCluster, (String) clusterMap.get("serviceUrl"));
+                String webServiceUrl = (String) clusterMap.get("serviceUrl");
+                if (webServiceUrl.contains(",")) {
+                    String[] webServiceUrlList = webServiceUrl.split(",");
+                    if (StringUtils.isNotBlank(pulsarJwtToken)) {
+                        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+                    }
+                    for (String url : webServiceUrlList) {
+                        if (!url.contains("http://")) {
+                            url = "http://" + url;
+                        }
+                        String httpTestResult = HttpUtil.doGet( url + "/admin/v2/brokers/health", header);
+                        if (httpTestResult == null) {
+                            log.error("This service {} is down, please check", url);
+                        } else {
+                            webServiceUrl = url;
+                            break;
+                        }
+                    }
+                }
+                collectStatsServiceUrls.put(envCluster, webServiceUrl);
             });
         }
         collectStatsServiceUrls.forEach((envCluster, serviceUrl) -> {
