@@ -13,32 +13,29 @@
  */
 package org.apache.pulsar.manager.service;
 
-import com.google.common.collect.Maps;
+import org.apache.pulsar.client.admin.Brokers;
+import org.apache.pulsar.client.admin.Clusters;
+import org.apache.pulsar.common.policies.data.FailureDomain;
 import org.apache.pulsar.manager.PulsarManagerApplication;
-import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
-import org.apache.pulsar.manager.utils.HttpUtil;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
-@PrepareForTest(HttpUtil.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = {
         PulsarManagerApplication.class,
@@ -48,32 +45,36 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles("test")
 public class BrokersServiceImplTest {
 
-    @Value("${backend.jwt.token}")
-    private static String pulsarJwtToken;
+    @MockBean
+    private PulsarAdminService pulsarAdminService;
 
     @Autowired
     private BrokersService brokersService;
 
+    @Mock
+    private Clusters clusters;
+
+    @Mock
+    private Brokers brokers;
+
     @Test
     public void brokersServiceTest() throws Exception{
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
+        FailureDomain fdomain = new FailureDomain();
+        fdomain.setBrokers(new HashSet<String>(Arrays.asList("broker-1:8080")));
+        Map<String, FailureDomain> fMap = new HashMap<>();
+        fMap.put("fdomain-1",fdomain);
+        Mockito.when(pulsarAdminService.clusters("http://localhost:8080")).thenReturn(clusters);
+        Mockito.when(clusters.getFailureDomains("standalone"))
+                .thenReturn(fMap);
 
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
-                .thenReturn("{\"test\":{\"brokers\":[\"tengdeMBP:8080\"]}}");
+        Mockito.when(pulsarAdminService.brokers("http://localhost:8080")).thenReturn(brokers);
+        Mockito.when(brokers.getActiveBrokers("standalone"))
+                .thenReturn(Arrays.asList("broker-1:8080"));
 
-        EnvironmentEntity environmentEntity = new EnvironmentEntity();
-        environmentEntity.setName("test-environment");
-        environmentEntity.setBroker("http://localhost:8080");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
-                .thenReturn("[\"tengdeMBP:8080\"]");
         Map<String, Object> result = brokersService.getBrokersList(
                 1, 1, "standalone", "http://localhost:8080");
-        Assert.assertEquals(result.get("total"), 1);
-        Assert.assertEquals(result.get("data").toString(), "[{failureDomain=[test], broker=tengdeMBP:8080}]");
-        Assert.assertEquals(result.get("pageSize"), 1);
+        Assert.assertEquals(1, result.get("total"));
+        Assert.assertEquals("[{failureDomain=[fdomain-1], broker=broker-1:8080}]", result.get("data").toString());
+        Assert.assertEquals(1, result.get("pageSize"));
     }
 }

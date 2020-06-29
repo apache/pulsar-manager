@@ -16,14 +16,14 @@ package org.apache.pulsar.manager.service.impl;
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
 import org.apache.pulsar.manager.entity.TopicsStatsRepository;
 import org.apache.pulsar.manager.service.BrokerStatsService;
+import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.TenantsService;
-import org.apache.pulsar.manager.utils.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.common.policies.data.TenantInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,34 +42,40 @@ public class TenantsServiceImpl implements TenantsService {
 
     private static final Logger log = LoggerFactory.getLogger(TenantsServiceImpl.class);
 
-
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
-    @Value("${backend.jwt.token}")
-    private String pulsarJwtToken;
+    private final BrokerStatsService brokerStatsService;
+
+    private final TopicsStatsRepository topicsStatsRepository;
+
+    private final PulsarAdminService pulsarAdminService;
+
+    private final HttpServletRequest request;
 
     @Autowired
-    private BrokerStatsService brokerStatsService;
-
-    @Autowired
-    private TopicsStatsRepository topicsStatsRepository;
-
-    @Autowired
-    private HttpServletRequest request;
+    public TenantsServiceImpl(BrokerStatsService brokerStatsService, TopicsStatsRepository topicsStatsRepository, PulsarAdminService pulsarAdminService, HttpServletRequest request) {
+        this.brokerStatsService = brokerStatsService;
+        this.topicsStatsRepository = topicsStatsRepository;
+        this.pulsarAdminService = pulsarAdminService;
+        this.request = request;
+    }
 
     public Map<String, Object> getTenantsList(Integer pageNum, Integer pageSize, String requestHost) {
         Map<String, Object> tenantsMap = Maps.newHashMap();
         List<Map<String, Object>> tenantsArray = new ArrayList<>();
         if (directRequestBroker) {
-            Gson gson = new Gson();
-            Map<String, String> header = Maps.newHashMap();
-            if (StringUtils.isNotBlank(pulsarJwtToken)) {
-                header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+            List<String> tenantsList;
+            try {
+                tenantsList = pulsarAdminService.tenants(requestHost).getTenants();
+            } catch (PulsarAdminException e) {
+                PulsarAdminOperationException pulsarAdminOperationException
+                        = new PulsarAdminOperationException("Failed to get tenants list.");
+                log.error(pulsarAdminOperationException.getMessage(), e);
+                throw pulsarAdminOperationException;
             }
-            String result = HttpUtil.doGet( requestHost + "/admin/v2/tenants", header);
-            if (result != null) {
-                List<String> tenantsList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
+
+            if (!tenantsList.isEmpty()) {
                 Optional<TopicStatsEntity> topicStatsEntityOptional = topicsStatsRepository.findMaxTime();
                 Map<String, TopicStatsEntity> topicStatsEntityMap = Maps.newHashMap();
                 if (topicStatsEntityOptional.isPresent()) {
@@ -86,19 +91,29 @@ public class TenantsServiceImpl implements TenantsService {
                     }
                 }
                 for (String tenant : tenantsList) {
+                    TenantInfo tenantInfo;
+                    try {
+                        tenantInfo = pulsarAdminService.tenants(requestHost).getTenantInfo(tenant);
+                    } catch (PulsarAdminException e) {
+                        PulsarAdminOperationException pulsarAdminOperationException
+                                = new PulsarAdminOperationException("Failed to get tenant info.");
+                        log.error(pulsarAdminOperationException.getMessage(), e);
+                        throw pulsarAdminOperationException;
+                    }
                     Map<String, Object> tenantEntity = Maps.newHashMap();
-                    String info = HttpUtil.doGet( requestHost + "/admin/v2/tenants/" + tenant, header);
-                    TenantInfo tenantInfo = gson.fromJson(info, TenantInfo.class);
                     tenantEntity.put("tenant", tenant);
                     tenantEntity.put("adminRoles", String.join(",", tenantInfo.getAdminRoles()));
                     tenantEntity.put("allowedClusters", String.join(",",  tenantInfo.getAllowedClusters()));
-                    String namespace = HttpUtil.doGet(requestHost + "/admin/v2/namespaces/" + tenant, header);
-                    if (namespace != null) {
-                        List<String> namespacesList = gson.fromJson(namespace, new TypeToken<List<String>>(){}.getType());
-                        tenantEntity.put("namespaces", namespacesList.size());
-                    } else {
-                        tenantEntity.put("namespaces", 0);
+                    List<String> namespacesList;
+                    try {
+                        namespacesList = pulsarAdminService.namespaces(requestHost).getNamespaces(tenant);
+                    } catch (PulsarAdminException e) {
+                        PulsarAdminOperationException pulsarAdminOperationException
+                                = new PulsarAdminOperationException("Failed to get namespaces list.");
+                        log.error(pulsarAdminOperationException.getMessage(), e);
+                        throw pulsarAdminOperationException;
                     }
+                    tenantEntity.put("namespaces", namespacesList.size());
                     if (topicStatsEntityMap.get(tenant) != null ) {
                         TopicStatsEntity topicStatsEntity = topicStatsEntityMap.get(tenant);
                         tenantEntity.put("inMsg", topicStatsEntity.getMsgRateIn());
@@ -122,22 +137,15 @@ public class TenantsServiceImpl implements TenantsService {
     }
 
     public Map<String, String> createTenant(String tenant, String role, String cluster, String requestHost) {
-        Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        Map<String, Object> body = Maps.newHashMap();
-        body.put("adminRoles", Sets.newHashSet(role));
-        // Get cluster from standalone, to do
-        body.put("allowedClusters", Sets.newHashSet(cluster));
-        Gson gson = new Gson();
+        TenantInfo tenantInfo = new TenantInfo(Sets.newHashSet(role), Sets.newHashSet(cluster));
         Map<String, String> result = Maps.newHashMap();
         try {
-            HttpUtil.doPut( requestHost + "/admin/v2/tenants/" + tenant, header, gson.toJson(body));
+            pulsarAdminService.tenants(requestHost).createTenant(tenant, tenantInfo);
             result.put("message", "Create tenant success");
-        } catch (UnsupportedEncodingException e) {
-            log.error("Init tenant failed for user: {}", tenant);
+        } catch (PulsarAdminException e) {
+            PulsarAdminOperationException pulsarAdminOperationException
+                    = new PulsarAdminOperationException("Failed to create tenant.");
+            log.error(pulsarAdminOperationException.getMessage(), e);
             result.put("error", "Create tenant failed");
         }
         return result;

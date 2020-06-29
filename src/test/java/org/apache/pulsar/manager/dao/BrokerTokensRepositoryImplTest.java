@@ -51,8 +51,8 @@ public class BrokerTokensRepositoryImplTest {
         Page<BrokerTokenEntity> brokerTokenEntityPage = brokerTokensRepository.getBrokerTokensList(1, 1);
         brokerTokenEntityPage.count(true);
         brokerTokenEntityPage.getResult().forEach((result) -> {
-            Assert.assertEquals(result.getRole(), brokerTokenEntity.getRole());
-            Assert.assertEquals(result.getDescription(), brokerTokenEntity.getDescription());
+            Assert.assertEquals(brokerTokenEntity.getRole(), result.getRole());
+            Assert.assertEquals(brokerTokenEntity.getDescription(), result.getDescription());
         });
 
         brokerTokenEntity.setDescription("This role for update test");
@@ -60,8 +60,8 @@ public class BrokerTokensRepositoryImplTest {
         brokerTokensRepository.update(brokerTokenEntity);
         Optional<BrokerTokenEntity> optionalBrokerTokenEntity = brokerTokensRepository.findTokenByRole(brokerTokenEntity.getRole());
         BrokerTokenEntity updatedBrokerTokenEntity = optionalBrokerTokenEntity.get();
-        Assert.assertEquals(updatedBrokerTokenEntity.getRole(), brokerTokenEntity.getRole());
-        Assert.assertEquals(updatedBrokerTokenEntity.getDescription(), brokerTokenEntity.getDescription());
+        Assert.assertEquals(brokerTokenEntity.getRole(), updatedBrokerTokenEntity.getRole());
+        Assert.assertEquals(brokerTokenEntity.getDescription(), updatedBrokerTokenEntity.getDescription());
 
         brokerTokensRepository.remove(brokerTokenEntity.getRole());
         Assert.assertFalse(brokerTokensRepository.findTokenByRole(brokerTokenEntity.getRole()).isPresent());

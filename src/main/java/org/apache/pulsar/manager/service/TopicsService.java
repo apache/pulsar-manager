@@ -28,4 +28,10 @@ public interface TopicsService {
 
     List<Map<String, Object>> getTopicsStatsList(String env, String tenant, String namespace,
                                                  String persistent, List<Map<String, String>> topics);
+
+    List<Map<String, Object>> peekMessages(
+            String persistent, String tenant,
+            String namespace, String topic,
+            String subName, Integer messagePosition,
+            String requestHost);
 }

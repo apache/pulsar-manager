@@ -14,14 +14,6 @@
 package org.apache.pulsar.manager.controller;
 
 import com.google.common.collect.Maps;
-import org.apache.pulsar.client.admin.PulsarAdmin;
-import org.apache.pulsar.client.admin.PulsarAdminBuilder;
-import org.apache.pulsar.client.admin.PulsarAdminException;
-import org.apache.pulsar.client.api.AuthenticationFactory;
-import org.apache.pulsar.client.api.Message;
-import org.apache.pulsar.client.api.PulsarClientException;
-import org.apache.pulsar.client.impl.BatchMessageIdImpl;
-import org.apache.pulsar.client.impl.MessageIdImpl;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import org.apache.pulsar.manager.service.TopicsService;
 import io.swagger.annotations.Api;
@@ -43,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,20 +51,8 @@ public class TopicsController {
     private final EnvironmentCacheService environmentCacheService;
     private final HttpServletRequest request;
 
-    @Value("${backend.jwt.token}")
-    private String token;
-
     @Value("${pulsar.peek.message}")
     private boolean peekMessage;
-
-    @Value("${tls.enabled}")
-    private boolean tlsEnabled;
-
-    @Value("${tls.hostname.verifier}")
-    private boolean tlsHostnameVerifier;
-
-    @Value("${tls.pulsar.admin.ca-certs}")
-    private String tlsPulsarAdminCaCerts;
 
     @Autowired
     public TopicsController(
@@ -161,53 +140,10 @@ public class TopicsController {
                     "turn on option pulsar.peek.message in file application.properties");
             return ResponseEntity.ok(result);
         }
-        PulsarAdmin pulsarAdmin = null;
         // to do check permission for non super, waiting for https://github.com/apache/pulsar-manager/pull/238
-        try {
-            PulsarAdminBuilder pulsarAdminBuilder = PulsarAdmin.builder();
-            if (tlsEnabled) {
-                pulsarAdminBuilder
-                        .tlsTrustCertsFilePath(tlsPulsarAdminCaCerts)
-                        .enableTlsHostnameVerification(tlsHostnameVerifier);
-            }
-            if (token != null && token.length() > 0) {
-                pulsarAdminBuilder.authentication(AuthenticationFactory.token(token));
-            }
-            pulsarAdmin = pulsarAdminBuilder.serviceHttpUrl(requestHost).build();
-            String topicFullPath = persistent + "://" + tenant + "/" + namespace + "/" + topic;
-            List<Message<byte[]>> messages = pulsarAdmin.topics().peekMessages(topicFullPath, subName, messagePosition);
-            List<Map<String, Object>> mapList = new ArrayList<>();
-            for (Message<byte[]> msg: messages) {
-                Map<String, Object> message = Maps.newHashMap();
-                if (msg.getMessageId() instanceof BatchMessageIdImpl) {
-                    BatchMessageIdImpl msgId = (BatchMessageIdImpl) msg.getMessageId();
-                    message.put("ledgerId", msgId.getLedgerId());
-                    message.put("entryId", msgId.getEntryId());
-                    message.put("batchIndex", msgId.getBatchIndex());
-                    message.put("batch", true);
-                } else {
-                    MessageIdImpl msgId = (MessageIdImpl) msg.getMessageId();
-                    message.put("batch", false);
-                    message.put("ledgerId", msgId.getLedgerId());
-                    message.put("entryId", msgId.getEntryId());
-                }
-                if (msg.getProperties().size() > 0) {
-                    msg.getProperties().forEach((k, v) -> {
-                        message.put(k, v);
-                    });
-                }
-                message.put("data", msg.getData());
-                mapList.add(message);
-            }
-            result.put("data", mapList);
-        } catch (PulsarClientException clientException) {
-            result.put("error", clientException.getMessage());
-        } catch (PulsarAdminException adminException) {
-            result.put("error", adminException.getMessage());
-        }
-        if (pulsarAdmin != null) {
-            pulsarAdmin.close();
-        }
+        List<Map<String, Object>> mapList = topicsService.peekMessages(
+                persistent, tenant, namespace, topic, subName, messagePosition, requestHost);
+        result.put("data", mapList);
         return ResponseEntity.ok(result);
     }
 }

@@ -14,11 +14,14 @@
 package org.apache.pulsar.manager.service.impl;
 
 import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.common.policies.data.FailureDomain;
+import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.service.BrokersService;
-import org.apache.pulsar.manager.utils.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.pulsar.manager.service.PulsarAdminService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,28 +32,43 @@ import java.util.Map;
 @Service
 public class BrokersServiceImpl implements BrokersService {
 
+    private static final Logger log = LoggerFactory.getLogger(BrokersServiceImpl.class);
+
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
-    @Value("${backend.jwt.token}")
-    private String pulsarJwtToken;
+    private final PulsarAdminService pulsarAdminService;
+
+    @Autowired
+    public BrokersServiceImpl(PulsarAdminService pulsarAdminService) {
+        this.pulsarAdminService = pulsarAdminService;
+    }
 
 
     public Map<String, Object> getBrokersList(Integer pageNum, Integer pageSize, String cluster, String requestHost) {
         Map<String, Object> brokersMap = Maps.newHashMap();
         List<Map<String, Object>> brokersArray = new ArrayList<>();
         if (directRequestBroker) {
-            Gson gson = new Gson();
-            Map<String, String> header = Maps.newHashMap();
-            if (StringUtils.isNotBlank(pulsarJwtToken)) {
-                header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+            Map<String, FailureDomain> failureDomains;
+            try {
+                failureDomains = pulsarAdminService.clusters(requestHost).getFailureDomains(cluster);
+            } catch (PulsarAdminException e) {
+                PulsarAdminOperationException pulsarAdminOperationException
+                        = new PulsarAdminOperationException("Failed to get failureDomains list.");
+                log.error(pulsarAdminOperationException.getMessage(), e);
+                throw pulsarAdminOperationException;
             }
-            String failureDomainsResult = HttpUtil.doGet(
-                    requestHost + "/admin/v2/clusters/" + cluster + "/failureDomains", header);
-            Map<String, Map<String, List<String>>> failureDomains = gson.fromJson(
-                    failureDomainsResult, new TypeToken<Map<String, Map<String, List<String>>>>() {}.getType());
-            String result = HttpUtil.doGet(requestHost + "/admin/v2/brokers/" + cluster, header);
-            List<String> brokersList = gson.fromJson(result, new TypeToken<List<String>>() {}.getType());
+
+            List<String>  brokersList;
+            try {
+                brokersList = pulsarAdminService.brokers(requestHost).getActiveBrokers(cluster);
+            } catch (PulsarAdminException e) {
+                PulsarAdminOperationException pulsarAdminOperationException
+                        = new PulsarAdminOperationException("Failed to get brokers list.");
+                log.error(pulsarAdminOperationException.getMessage(), e);
+                throw pulsarAdminOperationException;
+            }
+
             for (String broker: brokersList) {
                 Map<String, Object> brokerEntity = Maps.newHashMap();
                 List<String> failureDomain = this.getFailureDomain(broker, failureDomains);
@@ -67,15 +85,12 @@ public class BrokersServiceImpl implements BrokersService {
         return brokersMap;
     }
 
-    private List<String> getFailureDomain(String broker, Map<String, Map<String, List<String>>> failureDomains) {
+    private List<String> getFailureDomain(String broker, Map<String, FailureDomain> failureDomains) {
         List<String> failureDomainsList = new ArrayList<>();
         for (String failureDomain: failureDomains.keySet()) {
-            Map<String, List<String>> domains = failureDomains.get(failureDomain);
-            for (String domain: domains.keySet()) {
-                List<String> domainList = domains.get(domain);
-                if (domainList.contains(broker)) {
-                    failureDomainsList.add(failureDomain);
-                }
+            FailureDomain domain = failureDomains.get(failureDomain);
+            if (domain.getBrokers().contains(broker)) {
+                failureDomainsList.add(failureDomain);
             }
         }
         return failureDomainsList;

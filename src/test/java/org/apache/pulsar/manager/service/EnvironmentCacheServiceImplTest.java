@@ -15,38 +15,34 @@ package org.apache.pulsar.manager.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.eq;
 
-import com.google.gson.Gson;
+import org.apache.pulsar.client.admin.Clusters;
+import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
-import org.apache.pulsar.manager.utils.HttpUtil;
+
+import java.util.Arrays;
 import java.util.NoSuchElementException;
+
 import org.apache.pulsar.common.policies.data.ClusterData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Unit test {@link EnvironmentCacheService}.
  */
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
-@PrepareForTest(HttpUtil.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = {
         PulsarManagerApplication.class,
@@ -57,10 +53,22 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class EnvironmentCacheServiceImplTest {
 
     @Autowired
-    private EnvironmentsRepository environmentsRepository;
+    private EnvironmentCacheService environmentCacheService;
 
     @Autowired
-    private EnvironmentCacheService environmentCache;
+    private EnvironmentsRepository environmentsRepository;
+
+    @MockBean
+    private PulsarAdminService pulsarAdminService;
+
+    @Mock
+    private Clusters emptyClusters;
+
+    @Mock
+    private Clusters cluster1Clusters;
+
+    @Mock
+    private Clusters cluster2Clusters;
 
     private EnvironmentEntity environment1;
     private EnvironmentEntity environment2;
@@ -73,7 +81,7 @@ public class EnvironmentCacheServiceImplTest {
     private ClusterData cluster2_1;
 
     @Before
-    public void setup() {
+    public void setup() throws PulsarAdminException {
         // setup 3 environments
         environment1 = new EnvironmentEntity();
         environment1.setBroker("http://cluster1_0:8080");
@@ -95,36 +103,17 @@ public class EnvironmentCacheServiceImplTest {
         cluster2_1 = new ClusterData();
         cluster2_1.setServiceUrl("http://cluster2_1:8080");
 
-        PowerMockito.mockStatic(HttpUtil.class);
-        // empty environment
-        PowerMockito.when(HttpUtil.doGet(
-            eq(emptyEnvironment.getBroker() + "/admin/v2/clusters"),
-            anyMap()
-        )).thenReturn("[]");
+        Mockito.when(pulsarAdminService.clusters(emptyEnvironment.getBroker())).thenReturn(emptyClusters);
+        Mockito.when(emptyClusters.getClusters()).thenReturn(Arrays.asList());
 
-        // environment 1
-        PowerMockito.when(HttpUtil.doGet(
-            eq(cluster1_0.getServiceUrl() + "/admin/v2/clusters"),
-            anyMap()
-        )).thenReturn("[\""+ cluster1_0_name + "\"]");
-        PowerMockito.when(HttpUtil.doGet(
-            eq(cluster1_0.getServiceUrl() + "/admin/v2/clusters/" + cluster1_0_name),
-            anyMap()
-        )).thenReturn(new Gson().toJson(cluster1_0));
+        Mockito.when(pulsarAdminService.clusters(cluster1_0.getServiceUrl())).thenReturn(cluster1Clusters);
+        Mockito.when(cluster1Clusters.getClusters()).thenReturn(Arrays.asList(cluster1_0_name));
+        Mockito.when(cluster1Clusters.getCluster(cluster1_0_name)).thenReturn(cluster1_0);
 
-        // environment 2
-        PowerMockito.when(HttpUtil.doGet(
-            eq(cluster2_0.getServiceUrl() + "/admin/v2/clusters"),
-            anyMap()
-        )).thenReturn("[\""+ cluster2_0_name + "\", \"" + cluster2_1_name + "\"]");
-        PowerMockito.when(HttpUtil.doGet(
-            eq(cluster2_0.getServiceUrl() + "/admin/v2/clusters/" + cluster2_0_name),
-            anyMap()
-        )).thenReturn(new Gson().toJson(cluster2_0));
-        PowerMockito.when(HttpUtil.doGet(
-            eq(cluster2_0.getServiceUrl() + "/admin/v2/clusters/" + cluster2_1_name),
-            anyMap()
-        )).thenReturn(new Gson().toJson(cluster2_1));
+        Mockito.when(pulsarAdminService.clusters(cluster2_0.getServiceUrl())).thenReturn(cluster2Clusters);
+        Mockito.when(cluster2Clusters.getClusters()).thenReturn(Arrays.asList(cluster2_0_name, cluster2_1_name));
+        Mockito.when(cluster2Clusters.getCluster(cluster2_0_name)).thenReturn(cluster2_0);
+        Mockito.when(cluster2Clusters.getCluster(cluster2_1_name)).thenReturn(cluster2_1);
     }
 
     @After
@@ -136,10 +125,10 @@ public class EnvironmentCacheServiceImplTest {
 
     @Test
     public void testEmptyEnvironments() {
-        environmentCache.reloadEnvironments();
+        environmentCacheService.reloadEnvironments();
 
         try {
-            environmentCache.getServiceUrl(environment1.getName(), null);
+            environmentCacheService.getServiceUrl(environment1.getName(), null);
             fail("Should fail to get service url if environments is empty");
         } catch (NoSuchElementException e) {
             // expected
@@ -147,11 +136,14 @@ public class EnvironmentCacheServiceImplTest {
     }
 
     @Test
-    public void testEmptyEnvironment() {
+    public void testEmptyEnvironment() throws PulsarAdminException {
         environmentsRepository.save(emptyEnvironment);
+        PulsarAdminException pulsarAdminException = new PulsarAdminException("Cluster does not exist");
+        Mockito.when(emptyClusters.getCluster(cluster1_0_name)).thenThrow(pulsarAdminException);
+        environmentCacheService.reloadEnvironments();
 
         try {
-            environmentCache.getServiceUrl(emptyEnvironment.getName(), cluster1_0_name);
+            environmentCacheService.getServiceUrl(emptyEnvironment.getName(), cluster1_0_name);
             fail("Should fail to get service url if environments is empty");
         } catch (RuntimeException e) {
             // expected
@@ -171,29 +163,29 @@ public class EnvironmentCacheServiceImplTest {
         // without cluster
 
         assertEquals(cluster1_0.getServiceUrl(),
-            environmentCache.getServiceUrl(environment1.getName(), null));
+            environmentCacheService.getServiceUrl(environment1.getName(), null));
         assertEquals(cluster2_0.getServiceUrl(),
-            environmentCache.getServiceUrl(environment2.getName(), null));
+            environmentCacheService.getServiceUrl(environment2.getName(), null));
 
         // with cluster
 
         assertEquals(cluster1_0.getServiceUrl(),
-            environmentCache.getServiceUrl(environment1.getName(), cluster1_0_name));
+            environmentCacheService.getServiceUrl(environment1.getName(), cluster1_0_name));
         assertEquals(cluster2_0.getServiceUrl(),
-            environmentCache.getServiceUrl(environment2.getName(), cluster2_0_name));
+            environmentCacheService.getServiceUrl(environment2.getName(), cluster2_0_name));
         assertEquals(cluster2_1.getServiceUrl(),
-            environmentCache.getServiceUrl(environment2.getName(), cluster2_1_name));
+            environmentCacheService.getServiceUrl(environment2.getName(), cluster2_1_name));
     }
 
     @Test
     public void testReloadEnvironmentsAddNewEnvironmentsAndRemoveOldEnvironments() {
         environmentsRepository.save(environment1);
+        environmentCacheService.reloadEnvironments();
 
-        environmentCache.reloadEnvironments();
         assertEquals(cluster1_0.getServiceUrl(),
-            environmentCache.getServiceUrl(environment1.getName(), null));
+            environmentCacheService.getServiceUrl(environment1.getName(), null));
         try {
-            environmentCache.getServiceUrl(environment2.getName(), null);
+            environmentCacheService.getServiceUrl(environment2.getName(), null);
             fail("Should fail to get service url if environments is empty");
         } catch (NoSuchElementException e) {
             // expected
@@ -201,12 +193,12 @@ public class EnvironmentCacheServiceImplTest {
 
         environmentsRepository.save(environment2);
         environmentsRepository.remove(environment1.getName());
-        environmentCache.reloadEnvironments();
+        environmentCacheService.reloadEnvironments();
 
         assertEquals(cluster2_0.getServiceUrl(),
-            environmentCache.getServiceUrl(environment2.getName(), null));
+            environmentCacheService.getServiceUrl(environment2.getName(), null));
         try {
-            environmentCache.getServiceUrl(environment1.getName(), null);
+            environmentCacheService.getServiceUrl(environment1.getName(), null);
             fail("Should fail to get service url if environments is empty");
         } catch (NoSuchElementException e) {
             // expected
@@ -214,29 +206,24 @@ public class EnvironmentCacheServiceImplTest {
     }
 
     @Test
-    public void testReloadEnvironmentsAddNewClusterAndRemoveOldCluster() {
+    public void testReloadEnvironmentsAddNewClusterAndRemoveOldCluster() throws PulsarAdminException {
         environmentsRepository.save(environment2);
-        environmentCache.reloadEnvironments();
+        environmentCacheService.reloadEnvironments();
         assertEquals(cluster2_0.getServiceUrl(),
-            environmentCache.getServiceUrl(environment2.getName(), cluster2_0_name));
+            environmentCacheService.getServiceUrl(environment2.getName(), cluster2_0_name));
         assertEquals(cluster2_1.getServiceUrl(),
-            environmentCache.getServiceUrl(environment2.getName(), cluster2_1_name));
+            environmentCacheService.getServiceUrl(environment2.getName(), cluster2_1_name));
 
-        PowerMockito.when(HttpUtil.doGet(
-            eq(cluster2_0.getServiceUrl() + "/admin/v2/clusters"),
-            anyMap()
-        )).thenReturn("[\""+ cluster2_0_name + "\"]");
-        PowerMockito.when(HttpUtil.doGet(
-            eq(cluster2_0.getServiceUrl() + "/admin/v2/clusters/" + cluster2_1_name),
-            anyMap()
-        )).thenReturn(null);
+        Mockito.when(cluster2Clusters.getClusters()).thenReturn(Arrays.asList(cluster2_0_name));
+        PulsarAdminException pulsarAdminException = new PulsarAdminException("Cluster does not exist");
+        Mockito.when(cluster2Clusters.getCluster(cluster2_1_name)).thenThrow(pulsarAdminException);
 
-        environmentCache.reloadEnvironments();
+        environmentCacheService.reloadEnvironments();
         assertEquals(cluster2_0.getServiceUrl(),
-            environmentCache.getServiceUrl(environment2.getName(), cluster2_0_name));
+            environmentCacheService.getServiceUrl(environment2.getName(), cluster2_0_name));
         try {
             assertEquals(cluster2_1.getServiceUrl(),
-                environmentCache.getServiceUrl(environment2.getName(), cluster2_1_name));
+                environmentCacheService.getServiceUrl(environment2.getName(), cluster2_1_name));
             fail("Should fail to get service url if cluster is not found");
         } catch (RuntimeException e) {
             // expected

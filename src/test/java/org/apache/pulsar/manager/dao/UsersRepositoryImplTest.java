@@ -54,15 +54,15 @@ public class UsersRepositoryImplTest {
     }
 
     private void validateUser(UserInfoEntity user, boolean list) {
-        Assert.assertEquals(user.getName(), "test-user");
-        Assert.assertEquals(user.getExpire(), 157900045678l);
-        Assert.assertEquals(user.getPhoneNumber(), "1356789023456");
-        Assert.assertEquals(user.getDescription(), "test-description");
-        Assert.assertEquals(user.getLocation(), "bj");
-        Assert.assertEquals(user.getEmail(), "test@apache.org");
-        Assert.assertEquals(user.getAccessToken(), "test-access-token");
+        Assert.assertEquals("test-user", user.getName());
+        Assert.assertEquals(157900045678l, user.getExpire());
+        Assert.assertEquals("1356789023456", user.getPhoneNumber());
+        Assert.assertEquals("test-description", user.getDescription());
+        Assert.assertEquals("bj", user.getLocation());
+        Assert.assertEquals("test@apache.org", user.getEmail());
+        Assert.assertEquals("test-access-token", user.getAccessToken());
         if (!list) {
-            Assert.assertEquals(user.getPassword(), DigestUtils.sha256Hex("hello-world"));
+            Assert.assertEquals(DigestUtils.sha256Hex("hello-world"), user.getPassword());
         }
     }
 
@@ -95,8 +95,8 @@ public class UsersRepositoryImplTest {
 
         userInfoEntityOptional = usersRepository.findByUserName(userInfoEntity.getName());
         UserInfoEntity updateUserInfoEntity = userInfoEntityOptional.get();
-        Assert.assertEquals(updateUserInfoEntity.getPhoneNumber(), "1356789023456");
-        Assert.assertEquals(updateUserInfoEntity.getEmail(), "test2@apache.org");
+        Assert.assertEquals("1356789023456", updateUserInfoEntity.getPhoneNumber());
+        Assert.assertEquals("test2@apache.org", updateUserInfoEntity.getEmail());
 
         usersRepository.delete(updateUserInfoEntity.getName());
         userInfoEntityOptional = usersRepository.findByUserName(userInfoEntity.getName());

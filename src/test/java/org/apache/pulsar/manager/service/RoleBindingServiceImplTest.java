@@ -80,7 +80,7 @@ public class RoleBindingServiceImplTest {
 
         Map<String, String> validateErrorUser = roleBindingService.validateCurrentUser(
                 "test-error-access-token", roleBindingEntity);
-        Assert.assertEquals(validateErrorUser.get("error"), "User no exist.");
+        Assert.assertEquals("User no exist.", validateErrorUser.get("error"));
 
         TenantEntity tenantEntity = new TenantEntity();
         tenantEntity.setTenant("test-tenant");
@@ -105,12 +105,12 @@ public class RoleBindingServiceImplTest {
         roleBindingEntity.setRoleId(10);
         Map<String, String> validateIllegalUser = roleBindingService.validateCurrentUser(
                 "test-access-token", roleBindingEntity);
-        Assert.assertEquals(validateIllegalUser.get("error"), "This operation is illegal for this user");
+        Assert.assertEquals("This operation is illegal for this user", validateIllegalUser.get("error"));
 
         roleBindingEntity.setRoleId(roleId);
         Map<String, String> validateSuccessUser = roleBindingService.validateCurrentUser(
                 "test-access-token", roleBindingEntity);
-        Assert.assertEquals(validateSuccessUser.get("message"), "Validate current user success");
+        Assert.assertEquals("Validate current user success", validateSuccessUser.get("message"));
 
         roleBindingRepository.delete(roleId, userId);
         rolesRepository.delete("test-role", "test-tenant");
@@ -150,12 +150,12 @@ public class RoleBindingServiceImplTest {
         Map<String, Object> validateErrorUser = roleBindingService.validateCreateRoleBinding(
                 "test-error-access-token", "test-error-tenant",
                 "test-role-name", "test-user-name");
-        Assert.assertEquals(validateErrorUser.get("error"), "The user is not exist");
+        Assert.assertEquals("The user is not exist", validateErrorUser.get("error"));
 
         Map<String, Object> validateErrorRoleName = roleBindingService.validateCreateRoleBinding(
                 "test-access-token", "test-tenant",
                 "test-error-role", "test-user");
-        Assert.assertEquals(validateErrorRoleName.get("error"), "This role is no exist");
+        Assert.assertEquals("This role is no exist", validateErrorRoleName.get("error"));
 
         RoleInfoEntity testRoleInfoEntity = new RoleInfoEntity();
         testRoleInfoEntity.setRoleName("test-no-binding-role");
@@ -185,12 +185,12 @@ public class RoleBindingServiceImplTest {
         Map<String, Object> validateBindingRole = roleBindingService.validateCreateRoleBinding(
                 "test-access-token", "test-tenant",
                 "test-role", "test-user");
-        Assert.assertEquals(validateBindingRole.get("error"), "Role binding already exist");
+        Assert.assertEquals("Role binding already exist", validateBindingRole.get("error"));
 
         Map<String, Object> validateCreateRoleBinding = roleBindingService.validateCreateRoleBinding(
                 "test-access-token", "test-tenant",
                 "test-no-binding-role", "test-user");
-        Assert.assertEquals(validateCreateRoleBinding.get("message"), "Validate create role success");
+        Assert.assertEquals("Validate create role success", validateCreateRoleBinding.get("message"));
 
         roleBindingRepository.delete(roleId, userId);
         rolesRepository.delete("test-role", "test-tenant");
@@ -233,12 +233,12 @@ public class RoleBindingServiceImplTest {
         List<Map<String, Object>> roleBindingMap = roleBindingService.getRoleBindingList(
                 "test-access-token-binding", "test-tenant-binding");
         for (Map<String, Object> stringObjectMap : roleBindingMap) {
-            Assert.assertEquals(stringObjectMap.get("name"), "test-role-binding");
-            Assert.assertEquals(stringObjectMap.get("userId"), userId);
-            Assert.assertEquals(stringObjectMap.get("userName"), "test-user-binding");
-            Assert.assertEquals(stringObjectMap.get("roleId"), roleId);
-            Assert.assertEquals(stringObjectMap.get("roleName"), "test-role-binding");
-            Assert.assertEquals(stringObjectMap.get("description"), "test-role-binding-description");
+            Assert.assertEquals("test-role-binding", stringObjectMap.get("name"));
+            Assert.assertEquals(userId, stringObjectMap.get("userId"));
+            Assert.assertEquals("test-user-binding", stringObjectMap.get("userName"));
+            Assert.assertEquals(roleId, stringObjectMap.get("roleId"));
+            Assert.assertEquals("test-role-binding", stringObjectMap.get("roleName"));
+            Assert.assertEquals("test-role-binding-description", stringObjectMap.get("description"));
         }
 
         roleBindingRepository.delete(roleId, userId);

@@ -14,32 +14,33 @@
 package org.apache.pulsar.manager.service;
 
 import com.google.common.collect.Maps;
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.client.admin.Topics;
+import org.apache.pulsar.client.api.Message;
+import org.apache.pulsar.client.api.Schema;
+import org.apache.pulsar.client.impl.MessageImpl;
+import org.apache.pulsar.common.partition.PartitionedTopicMetadata;
 import org.apache.pulsar.manager.PulsarManagerApplication;
+import org.apache.pulsar.manager.entity.TopicStatsEntity;
+import org.apache.pulsar.manager.entity.TopicsStatsRepository;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
-import org.apache.pulsar.manager.utils.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
-@PrepareForTest(HttpUtil.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = {
         PulsarManagerApplication.class,
@@ -49,92 +50,103 @@ import java.util.Map;
 @ActiveProfiles("test")
 public class TopicsServiceImplTest {
 
+    @MockBean
+    private PulsarAdminService pulsarAdminService;
+
+    @Mock
+    private Topics topics;
+
     @Autowired
     private TopicsService topicsService;
 
     @Autowired
-    private BrokerStatsService brokerStatsService;
-
-    @Value("${backend.jwt.token}")
-    private static String pulsarJwtToken;
-
-    private final String topics = "[" +
-            "\"persistent://public/default/test789\"," +
-            "\"persistent://public/default/test900-partition-0\"," +
-            "\"persistent://public/default/test900-partition-1\"," +
-            "\"persistent://public/default/test900-partition-2\"]";
-
-    private final String partitionedTopics = "[\"persistent://public/default/test900\"]";
+    private TopicsStatsRepository topicsStatsRepository;
 
     @Test
-    public void topicsServiceImplTest() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/persistent/public/default", header))
-                .thenReturn(topics);
-        PowerMockito.when(HttpUtil.doGet(
-                "http://localhost:8080/admin/v2/persistent/public/default/partitioned", header))
-                .thenReturn(partitionedTopics);
-        PowerMockito.when(HttpUtil.doGet(
-                "http://localhost:8080/admin/v2/persistent/public/default/test900/partitions", header))
-                .thenReturn("{\"partitions\":3}");
+    public void topicsServiceImplTest() throws PulsarAdminException {
+        Mockito.when(pulsarAdminService.topics("http://localhost:8080")).thenReturn(topics);
+        Mockito.when(topics.getList("public/default")).thenReturn(
+                Arrays.asList(
+                        "persistent://public/default/test789",
+                        "persistent://public/default/test900-partition-0",
+                        "persistent://public/default/test900-partition-1",
+                        "persistent://public/default/test900-partition-2"
+                )
+        );
+        Mockito.when(topics.getPartitionedTopicList("public/default")).thenReturn(
+                Arrays.asList(
+                        "persistent://public/default/test900"
+                )
+        );
+        Mockito.when(topics.getPartitionedTopicMetadata("persistent://public/default/test900")).thenReturn(
+                new PartitionedTopicMetadata(3)
+        );
         Map<String, Object> topicsMap = topicsService.getTopicsList(
                 1, 1, "public", "default", "http://localhost:8080");
-        Assert.assertEquals(topicsMap.get("total"), 2);
+        Assert.assertEquals(2, topicsMap.get("total"));
         Assert.assertFalse((Boolean) topicsMap.get("isPage"));
-        Assert.assertEquals(topicsMap.get("topics").toString(),
-                "[{partitions=0, topic=test789, persistent=persistent}, {partitions=3, topic=test900, persistent=persistent}]");
+        Assert.assertEquals("[{partitions=0, topic=test789, persistent=persistent}, {partitions=3, topic=test900, persistent=persistent}]", topicsMap.get("topics").toString());
     }
 
     @Test
-    public void getTopicsStatsImplTest() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
-                .thenReturn("[\"standalone\"]");
-
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
-                .thenReturn("[\"localhost:8080\"]");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/broker-stats/topics", header))
-                .thenReturn(BrokerStatsServiceImplTest.testData);
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
-                .thenReturn("{}");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone", header))
-                .thenReturn("{\n" +
-                        "\"serviceUrl\" : \"http://tengdeMBP:8080\",\n" +
-                        "\"brokerServiceUrl\" : \"pulsar://tengdeMBP:6650\"\n" +
-                        "}");
+    public void getTopicsStatsImplTest() throws Exception {
         String environment = "staging";
-        String cluster = "standalone";
-        String serviceUrl = "http://localhost:8080";
-        brokerStatsService.collectStatsToDB(
-            System.currentTimeMillis() / 1000,
-            environment,
-            cluster,
-            serviceUrl
-        );
+        String tenant = "public";
+        String namespace = "functions";
+        String topic = "metadata";
+        String policy = "persistent";
+
+        TopicStatsEntity topicStatsEntity = new TopicStatsEntity();
+        topicStatsEntity.setEnvironment(environment);
+        topicStatsEntity.setCluster("standalone");
+        topicStatsEntity.setBroker("localhost:8080");
+        topicStatsEntity.setPersistent(policy);
+        topicStatsEntity.setTenant(tenant);
+        topicStatsEntity.setNamespace(namespace);
+        topicStatsEntity.setTopic(topic);
+        topicStatsEntity.setBundle("0x40000000_0x80000000");
+        topicStatsEntity.setMsgRateIn(0.0);
+        topicStatsEntity.setSubscriptionCount(1);
+        topicStatsEntity.setProducerCount(1);
+        topicStatsEntity.setTime_stamp((System.currentTimeMillis() / 1000L));
+        topicsStatsRepository.save(topicStatsEntity);
 
         List<Map<String, String>> topics = new ArrayList<>();
-        Map<String, String> topic = Maps.newHashMap();
-        topic.put("topic", "metadata");
-        topic.put("partitions", "0");
-        topics.add(topic);
+        Map<String, String> topicMap = Maps.newHashMap();
+        topicMap.put("topic", topic);
+        topicMap.put("partitions", "0");
+        topics.add(topicMap);
 
         List<Map<String, Object>> topicsList =  topicsService.getTopicsStatsList(
-                environment, "public", "functions", "persistent", topics);
+                environment, tenant, namespace, policy, topics);
         topicsList.forEach((t) -> {
-            Assert.assertEquals(t.get("partitions"), 0);
-            Assert.assertEquals(t.get("subscriptions"), 1);
-            Assert.assertEquals(t.get("inMsg"), 0.0);
-            Assert.assertEquals(t.get("producers"), 1);
-            Assert.assertEquals(t.get("persistent"), "persistent");
-            Assert.assertEquals(t.get("topic"), "metadata");
+            Assert.assertEquals(0, t.get("partitions"));
+            Assert.assertEquals(1, t.get("subscriptions"));
+            Assert.assertEquals(0.0, t.get("inMsg"));
+            Assert.assertEquals(1, t.get("producers"));
+            Assert.assertEquals(policy, t.get("persistent"));
+            Assert.assertEquals(topic, t.get("topic"));
+        });
+    }
+
+    @Test
+    public void peekMessagesTest() throws PulsarAdminException {
+        Mockito.when(pulsarAdminService.topics("http://localhost:8080")).thenReturn(topics);
+        List<Message<byte[]>> messages = new ArrayList<>();
+        messages.add(new MessageImpl<byte[]>("persistent://public/default/test", "1:1", Maps.newTreeMap(), "test".getBytes(), Schema.BYTES));
+        Mockito.when(topics.peekMessages("persistent://public/default/test", "sub-1", 1)).thenReturn(messages);
+
+        List<Map<String, Object>> result = topicsService.peekMessages(
+                "persistent", "public",
+                "default", "test",
+                "sub-1", 1,
+                "http://localhost:8080");
+        Assert.assertEquals(1, result.size());
+        result.forEach((message) -> {
+            Assert.assertEquals(1L, message.get("ledgerId"));
+            Assert.assertEquals(1L, message.get("entryId"));
+            Assert.assertEquals(false, message.get("batch"));
+            Assert.assertEquals(new String("test".getBytes()), new String((byte[]) message.get("data")));
         });
     }
 }

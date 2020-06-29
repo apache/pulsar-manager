@@ -52,10 +52,10 @@ public class RoleBindingRepositoryImplTest {
         Page<RoleBindingEntity> roleBindingEntities = roleBindingRepository.findByUserId(
                 1, 2, 2);
         roleBindingEntities.getResult().forEach((r) -> {
-            Assert.assertEquals(r.getRoleBindingId(), 1);
-            Assert.assertEquals(r.getName(), "test-role-binding");
-            Assert.assertEquals(r.getRoleId(), 1);
-            Assert.assertEquals(r.getDescription(), "this is description");
+            Assert.assertEquals(1, r.getRoleBindingId());
+            Assert.assertEquals("test-role-binding", r.getName());
+            Assert.assertEquals(1, r.getRoleId());
+            Assert.assertEquals("this is description", r.getDescription());
         });
 
         roleBindingEntity.setName("update-role-binding");
@@ -64,10 +64,10 @@ public class RoleBindingRepositoryImplTest {
         Page<RoleBindingEntity> updateRoleBindingEntities = roleBindingRepository.findByUserId(
                 1, 2, 2);
         updateRoleBindingEntities.getResult().forEach((r) -> {
-            Assert.assertEquals(r.getRoleBindingId(), 1);
-            Assert.assertEquals(r.getName(), "update-role-binding");
-            Assert.assertEquals(r.getRoleId(), 1);
-            Assert.assertEquals(r.getDescription(), "this is update description");
+            Assert.assertEquals(1, r.getRoleBindingId());
+            Assert.assertEquals("update-role-binding", r.getName());
+            Assert.assertEquals(1, r.getRoleId());
+            Assert.assertEquals("this is update description", r.getDescription());
         });
     }
 

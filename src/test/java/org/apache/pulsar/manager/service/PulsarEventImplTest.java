@@ -167,17 +167,17 @@ public class PulsarEventImplTest {
     public void validateTenantPermission() {
         Map<String, String> result;
         result = pulsarEvent.validateTenantPermission("/admin/v2/tenants/superTenant", "super-access-token");
-        Assert.assertEquals(result.get("message"), "Validate tenant success");
+        Assert.assertEquals("Validate tenant success", result.get("message"));
         result = pulsarEvent.validateTenantPermission("/admin/v2/tenants/adminTenant", "super-access-token");
-        Assert.assertEquals(result.get("error"), "This user no include this tenant");
+        Assert.assertEquals("This user no include this tenant", result.get("error"));
 
         result = pulsarEvent.validateTenantPermission(
                 "/pulsar-manager/admin/v2/schemas/adminTenant/default/test-topic", "super-access-token");
-        Assert.assertEquals(result.get("message"), "This resource no need validate");
+        Assert.assertEquals("This resource no need validate", result.get("message"));
 
         result = pulsarEvent.validateTenantPermission(
                 "/pulsar-manager/admin/v2/namespaces/adminTenant/default", "admin-access-token");
-        Assert.assertEquals(result.get("message"), "Validate tenant success");
+        Assert.assertEquals("Validate tenant success", result.get("message"));
     }
 
     @Test

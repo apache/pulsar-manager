@@ -15,15 +15,17 @@ package org.apache.pulsar.manager.service.impl;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
 import org.apache.pulsar.manager.entity.TopicsStatsRepository;
 import org.apache.pulsar.manager.service.BrokerStatsService;
 import org.apache.pulsar.manager.service.NamespacesService;
+import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.TopicsService;
-import org.apache.pulsar.manager.utils.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,38 +39,42 @@ public class NamespacesServiceImpl implements NamespacesService {
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
-    @Value("${backend.jwt.token}")
-    private String pulsarJwtToken;
+    private static final Logger log = LoggerFactory.getLogger(NamespacesServiceImpl.class);
 
     private final TopicsStatsRepository topicsStatsRepository;
     private final TopicsService topicsService;
     private final HttpServletRequest request;
     private final BrokerStatsService brokerStatsService;
+    private final PulsarAdminService pulsarAdminService;
 
     @Autowired
     public NamespacesServiceImpl(
             TopicsStatsRepository topicsStatsRepository,
             TopicsService topicsService,
             HttpServletRequest request,
-            BrokerStatsService brokerStatsService) {
+            BrokerStatsService brokerStatsService,
+            PulsarAdminService pulsarAdminService) {
         this.topicsStatsRepository = topicsStatsRepository;
         this.topicsService = topicsService;
         this.request = request;
         this.brokerStatsService = brokerStatsService;
+        this.pulsarAdminService = pulsarAdminService;
     }
 
     public Map<String, Object> getNamespaceList(Integer pageNum, Integer pageSize, String tenant, String requestHost) {
         Map<String, Object> namespacesMap = Maps.newHashMap();
         List<Map<String, Object>> namespacesArray = new ArrayList<>();
         if (directRequestBroker) {
-            Gson gson = new Gson();
-            Map<String, String> header = Maps.newHashMap();
-            if (StringUtils.isNotBlank(pulsarJwtToken)) {
-                header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+            List<String> namespacesList;
+            try {
+                namespacesList = pulsarAdminService.namespaces(requestHost).getNamespaces(tenant);
+            } catch (PulsarAdminException e) {
+                PulsarAdminOperationException pulsarAdminOperationException
+                        = new PulsarAdminOperationException("Failed to get namespaces list.");
+                log.error(pulsarAdminOperationException.getMessage(), e);
+                throw pulsarAdminOperationException;
             }
-            String result = HttpUtil.doGet(requestHost + "/admin/v2/namespaces/" + tenant, header);
-            if (result != null) {
-                List<String> namespacesList = gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
+            if (!namespacesList.isEmpty()) {
                 Optional<TopicStatsEntity> topicStatsEntityOptional = topicsStatsRepository.findMaxTime();
                 Map<String, TopicStatsEntity> topicStatsEntityMap = Maps.newHashMap();
                 if (topicStatsEntityOptional.isPresent()) {

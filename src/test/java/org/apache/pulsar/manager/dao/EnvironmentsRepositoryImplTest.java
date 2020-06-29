@@ -50,8 +50,8 @@ public class EnvironmentsRepositoryImplTest {
         Page<EnvironmentEntity> environmentEntityPage = environmentsRepository.getEnvironmentsList(1, 1);
         environmentEntityPage.count(true);
         environmentEntityPage.getResult().forEach((result) -> {
-            Assert.assertEquals(result.getName(), "test-environment");
-            Assert.assertEquals(result.getBroker(), "http://localhost:8080");
+            Assert.assertEquals("test-environment", result.getName());
+            Assert.assertEquals("http://localhost:8080", result.getBroker());
             environmentsRepository.remove(result.getName());
         });
     }
@@ -65,16 +65,16 @@ public class EnvironmentsRepositoryImplTest {
         Optional<EnvironmentEntity> environmentEntityOptionalGet = environmentsRepository
                 .findByBroker("https://localhost:8080");
         EnvironmentEntity environmentEntityGet = environmentEntityOptionalGet.get();
-        Assert.assertEquals(environmentEntityGet.getName(), "test-environment");
-        Assert.assertEquals(environmentEntityGet.getBroker(), "https://localhost:8080");
+        Assert.assertEquals("test-environment", environmentEntityGet.getName());
+        Assert.assertEquals("https://localhost:8080", environmentEntityGet.getBroker());
 
         environmentEntity.setBroker("https://localhost:8081");
         environmentsRepository.update(environmentEntity);
         Optional<EnvironmentEntity> environmentEntityOptionalUpdate = environmentsRepository
                 .findByName("test-environment");
         EnvironmentEntity environmentEntityUpdate = environmentEntityOptionalUpdate.get();
-        Assert.assertEquals(environmentEntityUpdate.getName(), "test-environment");
-        Assert.assertEquals(environmentEntityUpdate.getBroker(), "https://localhost:8081");
+        Assert.assertEquals("test-environment", environmentEntityUpdate.getName());
+        Assert.assertEquals("https://localhost:8081", environmentEntityUpdate.getBroker());
 
         environmentsRepository.remove(environmentEntityUpdate.getName());
     }

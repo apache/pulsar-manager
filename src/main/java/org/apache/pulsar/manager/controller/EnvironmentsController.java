@@ -14,6 +14,8 @@
 package org.apache.pulsar.manager.controller;
 
 import com.google.common.collect.Maps;
+
+import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
 import org.apache.pulsar.manager.entity.RoleBindingEntity;
@@ -25,18 +27,18 @@ import org.apache.pulsar.manager.entity.TenantsRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
+import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.RolesService;
-import org.apache.pulsar.manager.utils.HttpUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.manager.utils.ResourceType;
 import org.hibernate.validator.constraints.Range;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,8 +63,7 @@ import java.util.Optional;
 @RestController
 public class EnvironmentsController {
 
-    @Value("${backend.jwt.token}")
-    private String pulsarJwtToken;
+    private static final Logger log = LoggerFactory.getLogger(EnvironmentsController.class);
 
     private final EnvironmentsRepository environmentsRepository;
 
@@ -78,8 +79,11 @@ public class EnvironmentsController {
 
     private final RolesService rolesService;
 
+    private final PulsarAdminService pulsarAdminService;
+
     private final HttpServletRequest request;
 
+    @Autowired
     public EnvironmentsController(
             HttpServletRequest request,
             EnvironmentsRepository environmentsRepository,
@@ -88,7 +92,8 @@ public class EnvironmentsController {
             TenantsRepository tenantsRepository,
             RolesRepository rolesRepository,
             RoleBindingRepository roleBindingRepository,
-            RolesService rolesService) {
+            RolesService rolesService,
+            PulsarAdminService pulsarAdminService) {
         this.environmentsRepository = environmentsRepository;
         this.environmentCacheService = environmentCacheService;
         this.request = request;
@@ -97,6 +102,7 @@ public class EnvironmentsController {
         this.rolesRepository = rolesRepository;
         this.roleBindingRepository = roleBindingRepository;
         this.rolesService = rolesService;
+        this.pulsarAdminService = pulsarAdminService;
     }
 
     @ApiOperation(value = "Get the list of existing environments, support paging, the default is 10 per page")
@@ -183,12 +189,10 @@ public class EnvironmentsController {
             result.put("error", "Environment is exist");
             return ResponseEntity.ok(result);
         }
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        String httpTestResult = HttpUtil.doGet(environmentEntity.getBroker() + "/metrics", header);
-        if (httpTestResult == null) {
+        try {
+            pulsarAdminService.clusters(environmentEntity.getBroker()).getClusters();
+        } catch (PulsarAdminException e) {
+            log.error("Failed to get clusters list.", e);
             result.put("error", "This environment is error. Please check it");
             return ResponseEntity.ok(result);
         }
@@ -217,12 +221,10 @@ public class EnvironmentsController {
             result.put("error", "Environment no exist");
             return ResponseEntity.ok(result);
         }
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        String httpTestResult = HttpUtil.doGet(environmentEntity.getBroker() + "/metrics", header);
-        if (httpTestResult == null) {
+        try {
+            pulsarAdminService.clusters(environmentEntity.getBroker()).getClusters();
+        } catch (PulsarAdminException e) {
+            log.error("Failed to get clusters list.", e);
             result.put("error", "This environment is error. Please check it");
             return ResponseEntity.ok(result);
         }

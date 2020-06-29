@@ -71,8 +71,8 @@ public class BookiesServiceImplTest {
                 .thenReturn("{\"192.168.2.116:3181\" : \": {Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}," +
                         "\",\"ClusterInfo: \" : \"{Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}\" }");
         Map<String, Object> result = bookiesService.getBookiesList(1, 1, "standalone");
-        Assert.assertEquals(result.get("total"), 1);
-        Assert.assertEquals(result.get("data").toString(), "[{storage=[48920571904, 250790436864], bookie=192.168.2.116:3181, status=rw}]");
-        Assert.assertEquals(result.get("pageSize"), 1);
+        Assert.assertEquals(1, result.get("total"));
+        Assert.assertEquals("[{storage=[48920571904, 250790436864], bookie=192.168.2.116:3181, status=rw}]", result.get("data").toString());
+        Assert.assertEquals(1, result.get("pageSize"));
     }
 }

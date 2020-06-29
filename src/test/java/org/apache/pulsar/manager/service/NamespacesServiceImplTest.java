@@ -14,30 +14,28 @@
 package org.apache.pulsar.manager.service;
 
 import com.google.common.collect.Maps;
+import org.apache.pulsar.client.admin.BrokerStats;
+import org.apache.pulsar.client.admin.Namespaces;
+import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.PulsarManagerApplication;
+import org.apache.pulsar.manager.entity.TopicStatsEntity;
+import org.apache.pulsar.manager.entity.TopicsStatsRepository;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
-import org.apache.pulsar.manager.utils.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
 import java.util.Map;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
-@PrepareForTest(HttpUtil.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = {
         PulsarManagerApplication.class,
@@ -50,68 +48,59 @@ public class NamespacesServiceImplTest {
     @Autowired
     private NamespacesService namespacesService;
 
-    @Autowired
-    private BrokerStatsService brokerStatsService;
+    @MockBean
+    private PulsarAdminService pulsarAdminService;
 
-    @Value("${backend.jwt.token}")
-    private static String pulsarJwtToken;
+    @MockBean
+    private TopicsService topicsService;
+
+    @Mock
+    private Namespaces namespaces;
+
+    @Autowired
+    private TopicsStatsRepository topicsStatsRepository;
 
     @Test
-    public void namespaceServiceImplTest() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/namespaces/public", header))
-                .thenReturn("[\"public/default\"]");
+    public void namespaceServiceImplTest() throws PulsarAdminException {
+        Mockito.when(pulsarAdminService.namespaces("http://localhost:8080")).thenReturn(namespaces);
+        Mockito.when(namespaces.getNamespaces("public")).thenReturn(Arrays.asList("public/default"));
+        Map<String, Object> topics = Maps.newHashMap();
+        topics.put("total", 1);
+        Mockito.when(topicsService.getTopicsList(0, 0, "public", "default", "http://localhost:8080"))
+                .thenReturn(topics);
 
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/persistent/public/default", header))
-                .thenReturn("[\"persistent://public/default/test789\"]");
-        PowerMockito.when(HttpUtil.doGet(
-                "http://localhost:8080/admin/v2/persistent/public/default/partitioned", header))
-                .thenReturn("[]");
         Map<String, Object> result = namespacesService.getNamespaceList(1, 1, "public", "http://localhost:8080");
-        Assert.assertEquals(result.get("total"), 1);
+        Assert.assertEquals(1, result.get("total"));
         Assert.assertFalse((Boolean) result.get("isPage"));
-        Assert.assertEquals(result.get("data").toString(), "[{topics=1, namespace=default}]");
+        Assert.assertEquals("[{topics=1, namespace=default}]", result.get("data").toString());
     }
 
     @Test
     public void getNamespaceStatsTest() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
-                .thenReturn("[\"standalone\"]");
-
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
-                .thenReturn("[\"localhost:8080\"]");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/broker-stats/topics", header))
-                .thenReturn(BrokerStatsServiceImplTest.testData);
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
-                .thenReturn("{}");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone", header))
-                .thenReturn("{\n" +
-                        "\"serviceUrl\" : \"http://tengdeMBP:8080\",\n" +
-                        "\"brokerServiceUrl\" : \"pulsar://tengdeMBP:6650\"\n" +
-                        "}");
         String environment = "staging";
-        String cluster = "standalone";
-        String serviceUrl = "http://localhost:8080";
-        brokerStatsService.collectStatsToDB(
-                System.currentTimeMillis() / 1000,
-                environment,
-                cluster,
-                serviceUrl
-        );
+        String tenant = "public";
+        String namespace = "functions";
+
+        TopicStatsEntity topicStatsEntity = new TopicStatsEntity();
+        topicStatsEntity.setEnvironment(environment);
+        topicStatsEntity.setCluster("standalone");
+        topicStatsEntity.setBroker("localhost:8080");
+        topicStatsEntity.setPersistent("persistent");
+        topicStatsEntity.setTenant(tenant);
+        topicStatsEntity.setNamespace(namespace);
+        topicStatsEntity.setTopic("metadata");
+        topicStatsEntity.setBundle("0x40000000_0x80000000");
+        topicStatsEntity.setMsgRateIn(0.0);
+        topicStatsEntity.setSubscriptionCount(1);
+        topicStatsEntity.setProducerCount(1);
+        topicStatsEntity.setTime_stamp((System.currentTimeMillis() / 1000L));
+        topicsStatsRepository.save(topicStatsEntity);
+
         Map<String, Object> namespaceStats = namespacesService.getNamespaceStats(
-                environment, "public", "functions");
-        Assert.assertEquals(namespaceStats.get("outMsg"), 0.0);
-        Assert.assertEquals(namespaceStats.get("inMsg"), 0.0);
-        Assert.assertEquals(namespaceStats.get("msgThroughputIn"), 0.0);
-        Assert.assertEquals(namespaceStats.get("msgThroughputOut"), 0.0);
+                tenant, namespace, environment);
+        Assert.assertEquals(0.0, namespaceStats.get("outMsg"));
+        Assert.assertEquals(0.0, namespaceStats.get("inMsg"));
+        Assert.assertEquals(0.0, namespaceStats.get("msgThroughputIn"));
+        Assert.assertEquals(0.0, namespaceStats.get("msgThroughputOut"));
     }
 }

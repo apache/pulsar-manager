@@ -15,14 +15,24 @@ package org.apache.pulsar.manager.service.impl;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+
+import org.apache.pulsar.client.admin.PulsarAdmin;
+import org.apache.pulsar.client.admin.PulsarAdminBuilder;
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.client.api.AuthenticationFactory;
+import org.apache.pulsar.client.api.Message;
+import org.apache.pulsar.client.api.PulsarClientException;
+import org.apache.pulsar.client.impl.BatchMessageIdImpl;
+import org.apache.pulsar.client.impl.MessageIdImpl;
+import org.apache.pulsar.common.naming.TopicDomain;
+import org.apache.pulsar.common.naming.TopicName;
+import org.apache.pulsar.common.partition.PartitionedTopicMetadata;
+import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
 import org.apache.pulsar.manager.entity.TopicStatsEntity.TopicStatsSummary;
 import org.apache.pulsar.manager.entity.TopicsStatsRepository;
+import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.TopicsService;
-import org.apache.pulsar.manager.utils.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,19 +44,21 @@ import java.util.*;
 @Service
 public class TopicsServiceImpl implements TopicsService {
 
+    private static final Logger log = LoggerFactory.getLogger(TopicsServiceImpl.class);
+
     public static final String PARTITIONED_TOPIC_SUFFIX = "-partition-";
 
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
-    @Value("${backend.jwt.token}")
-    private String pulsarJwtToken;
-
     private final TopicsStatsRepository topicsStatsRepository;
 
+    private final PulsarAdminService pulsarAdminService;
+
     @Autowired
-    public TopicsServiceImpl(TopicsStatsRepository topicsStatsRepository) {
+    public TopicsServiceImpl(TopicsStatsRepository topicsStatsRepository, PulsarAdminService pulsarAdminService) {
         this.topicsStatsRepository = topicsStatsRepository;
+        this.pulsarAdminService = pulsarAdminService;
     }
 
     private boolean isPartitionedTopic(List<String> topics, String topic) {
@@ -67,21 +79,50 @@ public class TopicsServiceImpl implements TopicsService {
             String env,
             String serviceUrl) {
         Map<String, Object> topicsMap = Maps.newHashMap();
-        List<Map<String, String>> persistentTopics = this.getTopicListByHttp(
-                tenant, namespace, "persistent", serviceUrl);
-        List<Map<String, Object>> persistentTopicsArray = this.getTopicsStatsList(
-                env, tenant, namespace, "persistent", persistentTopics);
-        List<Map<String, String>> nonPersistentTopics = this.getTopicListByHttp(
-                tenant, namespace, "non-persistent", serviceUrl);
-        List<Map<String, Object>> nonPersistentTopicsArray = this.getTopicsStatsList(
-                env, tenant, namespace, "non-persistent", nonPersistentTopics);
-        persistentTopicsArray.addAll(nonPersistentTopicsArray);
-        topicsMap.put("topics", persistentTopicsArray);
+        List<Map<String, Object>> allTopics = this.getTopicStats(env, tenant, namespace, serviceUrl);
+        topicsMap.put("topics", allTopics);
         topicsMap.put("isPage", false);
-        topicsMap.put("total", persistentTopicsArray.size());
+        topicsMap.put("total", allTopics.size());
         topicsMap.put("pageNum", 1);
-        topicsMap.put("pageSize", persistentTopicsArray.size());
+        topicsMap.put("pageSize", allTopics.size());
         return topicsMap;
+    }
+
+    private List<Map<String, Object>> getTopicStats(
+            String env, String tenant, String namespace, String requestHost) {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        Map<String, List<String>> allTopics
+                = this.getTopicListByPulsarAdmin(tenant, namespace, requestHost);
+        Map<String, List<String>> allPartitionedTopics
+                = this.getPartitionedTopicListByPulsarAdmin(tenant, namespace, requestHost);
+
+        result.addAll(this.getTopicsStatsList(
+                env,
+                tenant,
+                namespace,
+                TopicDomain.persistent.toString(),
+                this.convertTopicList(
+                        allTopics.get(TopicDomain.persistent.toString()),
+                        allPartitionedTopics.get(TopicDomain.persistent.toString()),
+                        TopicDomain.persistent.toString(),
+                        requestHost
+                )
+        ));
+        result.addAll(this.getTopicsStatsList(
+                env,
+                tenant,
+                namespace,
+                TopicDomain.non_persistent.toString(),
+                this.convertTopicList(
+                        allTopics.get(TopicDomain.non_persistent.toString()),
+                        allPartitionedTopics.get(TopicDomain.non_persistent.toString()),
+                        TopicDomain.non_persistent.toString(),
+                        requestHost
+                )
+        ));
+
+        return result;
     }
 
     public List<Map<String, Object>> getTopicsStatsList(String env,
@@ -179,83 +220,125 @@ public class TopicsServiceImpl implements TopicsService {
     public Map<String, Object> getTopicsList(
             Integer pageNum, Integer pageSize, String tenant, String namespace, String requestHost) {
         Map<String, Object> topicsMap = Maps.newHashMap();
-        List<Map<String, String>> persistentTopic = this.getTopicListByHttp(
-                tenant, namespace, "persistent", requestHost);
-        List<Map<String, String>> nonPersistentTopic = this.getTopicListByHttp(
-                tenant, namespace, "non-persistent", requestHost);
-        persistentTopic.addAll(nonPersistentTopic);
-        topicsMap.put("topics", persistentTopic);
+        List<Map<String, String>> allTopics = this.getTopicsList(tenant, namespace, requestHost);
+        topicsMap.put("topics", allTopics);
         topicsMap.put("isPage", false);
-        topicsMap.put("total", persistentTopic.size());
+        topicsMap.put("total", allTopics.size());
         topicsMap.put("pageNum", 1);
-        topicsMap.put("pageSize", persistentTopic.size());
+        topicsMap.put("pageSize", allTopics.size());
         return topicsMap;
     }
 
-    private List<Map<String, String>> getTopicListByHttp(
-            String tenant, String namespace, String persistent, String requestHost) {
-        List<Map<String, String>> topicsArray = new ArrayList<>();
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+    @Override
+    public List<Map<String, Object>> peekMessages(String persistent,
+                                                  String tenant,
+                                                  String namespace,
+                                                  String topic,
+                                                  String subName,
+                                                  Integer messagePosition,
+                                                  String requestHost) {
+        List<Message<byte[]>> messages;
+        String topicFullPath = persistent + "://" + tenant + "/" + namespace + "/" + topic;
+        try {
+            messages = pulsarAdminService.topics(requestHost).peekMessages(topicFullPath, subName, messagePosition);
+        } catch(PulsarAdminException e) {
+            PulsarAdminOperationException pulsarAdminOperationException
+                    = new PulsarAdminOperationException("Failed to peek messages.");
+            log.error(pulsarAdminOperationException.getMessage(), e);
+            throw pulsarAdminOperationException;
         }
-        String prefix = "/admin/v2/" + persistent + "/" + tenant + "/" + namespace;
-        Gson gson = new Gson();
-        String partitionedUrl = requestHost + prefix + "/partitioned";
-        String partitionedTopic = HttpUtil.doGet(partitionedUrl, header);
-        List<String> partitionedTopicsList = Arrays.asList();
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        for (Message<byte[]> msg: messages) {
+            Map<String, Object> message = Maps.newHashMap();
+            if (msg.getMessageId() instanceof BatchMessageIdImpl) {
+                BatchMessageIdImpl msgId = (BatchMessageIdImpl) msg.getMessageId();
+                message.put("ledgerId", msgId.getLedgerId());
+                message.put("entryId", msgId.getEntryId());
+                message.put("batchIndex", msgId.getBatchIndex());
+                message.put("batch", true);
+            } else {
+                MessageIdImpl msgId = (MessageIdImpl) msg.getMessageId();
+                message.put("ledgerId", msgId.getLedgerId());
+                message.put("entryId", msgId.getEntryId());
+                message.put("batch", false);
+            }
+            if (msg.getProperties().size() > 0) {
+                msg.getProperties().forEach((k, v) -> message.put(k, v));
+            }
+            message.put("data", msg.getData());
+            mapList.add(message);
+        }
+        return mapList;
+    }
+
+    private List<Map<String, String>> getTopicsList(
+            String tenant, String namespace, String requestHost) {
+        List<Map<String, String>> result = new ArrayList<>();
+
+        Map<String, List<String>> allTopics
+                = this.getTopicListByPulsarAdmin(tenant, namespace, requestHost);
+        Map<String, List<String>> allPartitionedTopics
+                = this.getPartitionedTopicListByPulsarAdmin(tenant, namespace, requestHost);
+
+        result.addAll(this.convertTopicList(
+                allTopics.get(TopicDomain.persistent.toString()),
+                allPartitionedTopics.get(TopicDomain.persistent.toString()),
+                TopicDomain.persistent.toString(),
+                requestHost
+        ));
+        result.addAll(this.convertTopicList(
+                allTopics.get(TopicDomain.non_persistent.toString()),
+                allPartitionedTopics.get(TopicDomain.non_persistent.toString()),
+                TopicDomain.non_persistent.toString(),
+                requestHost
+        ));
+
+        return result;
+    }
+
+    private List<Map<String, String>> convertTopicList(
+            List<String> topics, List<String> partitionedTopics, String persistent, String requestHost) {
+        List<Map<String, String>> topicsArray = new ArrayList<>();
+
         Map<String, List<String>> partitionedMap = Maps.newHashMap();
-        if (partitionedTopic != null) {
-            partitionedTopicsList = gson.fromJson(
-                    partitionedTopic, new TypeToken<List<String>>(){}.getType());
-            for (String p : partitionedTopicsList) {
-                if (p.startsWith(persistent)) {
-                    partitionedMap.put(this.getTopicName(p), new ArrayList<>());
+        for (String p : partitionedTopics) {
+            if (p.startsWith(persistent)) {
+                partitionedMap.put(this.getTopicName(p), new ArrayList<>());
+            }
+        }
+
+        for (String topic: topics) {
+            if (topic.startsWith(persistent)) {
+                String topicName = this.getTopicName(topic);
+                Map<String, String> topicEntity = Maps.newHashMap();
+                if (isPartitionedTopic(partitionedTopics, topic)) {
+                    String[] name = topicName.split(PARTITIONED_TOPIC_SUFFIX);
+                    partitionedMap.get(name[0]).add(topicName);
+                } else {
+                    topicEntity.put("topic", topicName);
+                    topicEntity.put("partitions", "0");
+                    topicEntity.put("persistent", persistent);
+                    topicsArray.add(topicEntity);
                 }
             }
         }
 
-        String topicUrl = requestHost + prefix;
-        String topics = HttpUtil.doGet(topicUrl, header);
-        if (topics != null) {
-            List<String> topicsList = gson.fromJson(
-                    topics, new TypeToken<List<String>>(){}.getType());
-            for (String topic: topicsList) {
-                if (topic.startsWith(persistent)) {
-                    String topicName = this.getTopicName(topic);
-                    Map<String, String> topicEntity = Maps.newHashMap();
-                    if (isPartitionedTopic(partitionedTopicsList, topic)) {
-                        String[] name = topicName.split(PARTITIONED_TOPIC_SUFFIX);
-                        partitionedMap.get(name[0]).add(topicName);
-                    } else {
-                        topicEntity.put("topic", topicName);
-                        topicEntity.put("partitions", "0");
-                        topicEntity.put("persistent", persistent);
-                        topicsArray.add(topicEntity);
-                    }
-                }
+        for (String s : partitionedTopics) {
+            String topicName = this.getTopicName(s);
+            Map<String, String> topicEntity = Maps.newHashMap();
+            List<String> partitionedTopicList = partitionedMap.get(s);
+            if (partitionedTopicList != null && partitionedTopicList.size() > 0) {
+                topicEntity.put("topic", topicName);
+                topicEntity.put("partitions", String.valueOf(partitionedTopicList.size()));
+                topicEntity.put("persistent", persistent);
+            } else {
+                topicEntity.put("topic", topicName);
+                PartitionedTopicMetadata partitionedTopicMetadata
+                        = this.getPartitionedTopicMetadataByPulsarAdmin(s, requestHost);
+                topicEntity.put("partitions", String.valueOf(partitionedTopicMetadata.partitions));
+                topicEntity.put("persistent", persistent);
             }
-        }
-        if (partitionedTopicsList != null) {
-            for (String s : partitionedTopicsList) {
-                String topicName = this.getTopicName(s);
-                Map<String, String> topicEntity = Maps.newHashMap();
-                List<String> partitionedTopicList = partitionedMap.get(s);
-                if (partitionedTopicList != null && partitionedTopicList.size() > 0) {
-                    topicEntity.put("topic", topicName);
-                    topicEntity.put("partitions", String.valueOf(partitionedTopicList.size()));
-                    topicEntity.put("persistent", persistent);
-                } else {
-                    topicEntity.put("topic", topicName);
-                    String metadataTopicUrl = requestHost + prefix + "/" + topicName + "/partitions";
-                    String metadataTopic = HttpUtil.doGet(metadataTopicUrl, header);
-                    Map<String, Integer> metadata = gson.fromJson(
-                            metadataTopic, new TypeToken<Map<String, Integer>>(){}.getType());
-                    topicEntity.put("partitions", String.valueOf(metadata.get("partitions")));
-                    topicEntity.put("persistent", persistent);
-                }
-                topicsArray.add(topicEntity);
-            }
+            topicsArray.add(topicEntity);
         }
         return topicsArray;
     }
@@ -264,5 +347,67 @@ public class TopicsServiceImpl implements TopicsService {
         String tntPath = topic.split("://")[1];
         String topicName = tntPath.split("/")[2];
         return topicName;
+    }
+
+    private Map<String, List<String>> getTopicListByPulsarAdmin(
+            String tenant, String namespace, String requestHost) {
+        try {
+            return parseTopics(
+                    pulsarAdminService.topics(requestHost).
+                            getList(tenant + "/" + namespace)
+            );
+        } catch (PulsarAdminException e) {
+            PulsarAdminOperationException pulsarAdminOperationException
+                    = new PulsarAdminOperationException("Failed to get topic list.");
+            log.error(pulsarAdminOperationException.getMessage(), e);
+            throw pulsarAdminOperationException;
+        }
+    }
+
+    private Map<String, List<String>> getPartitionedTopicListByPulsarAdmin(
+            String tenant, String namespace, String requestHost) {
+        try {
+            return parseTopics(
+                    pulsarAdminService.topics(requestHost).
+                            getPartitionedTopicList(tenant + "/" + namespace)
+            );
+        } catch (PulsarAdminException e) {
+            PulsarAdminOperationException pulsarAdminOperationException
+                    = new PulsarAdminOperationException("Failed to get partitioned topic list.");
+            log.error(pulsarAdminOperationException.getMessage(), e);
+            throw pulsarAdminOperationException;
+        }
+    }
+
+    private PartitionedTopicMetadata getPartitionedTopicMetadataByPulsarAdmin(
+            String topic, String requestHost) {
+        try {
+            return pulsarAdminService.topics(requestHost).
+                    getPartitionedTopicMetadata(topic);
+        } catch (PulsarAdminException e) {
+            PulsarAdminOperationException pulsarAdminOperationException
+                    = new PulsarAdminOperationException("Failed to get partitioned topic metadata.");
+            log.error(pulsarAdminOperationException.getMessage(), e);
+            throw pulsarAdminOperationException;
+        }
+    }
+
+    private Map<String, List<String>> parseTopics(List<String> topics) {
+        Map<String, List<String>> result = new HashMap<>();
+        List<String> persistentTopics = new ArrayList<>();
+        List<String> nonPersistentTopics = new ArrayList<>();
+
+        for (String topic : topics) {
+            TopicName topicName  = TopicName.get(topic);
+            if (TopicDomain.persistent.equals(topicName.getDomain())) {
+                persistentTopics.add(topic);
+            } else {
+                nonPersistentTopics.add(topic);
+            }
+        }
+
+        result.put(TopicDomain.persistent.toString(), persistentTopics);
+        result.put(TopicDomain.non_persistent.toString(), nonPersistentTopics);
+        return result;
     }
 }

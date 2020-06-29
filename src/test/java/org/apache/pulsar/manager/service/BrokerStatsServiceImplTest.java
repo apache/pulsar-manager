@@ -15,6 +15,9 @@ package org.apache.pulsar.manager.service;
 
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.apache.pulsar.client.admin.BrokerStats;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.entity.ConsumerStatsEntity;
 import org.apache.pulsar.manager.entity.ConsumersStatsRepository;
@@ -23,34 +26,28 @@ import org.apache.pulsar.manager.entity.PublishersStatsRepository;
 import org.apache.pulsar.manager.entity.ReplicationsStatsRepository;
 import org.apache.pulsar.manager.entity.SubscriptionStatsEntity;
 import org.apache.pulsar.manager.entity.SubscriptionsStatsRepository;
-import org.apache.pulsar.manager.utils.HttpUtil;
 import org.apache.pulsar.manager.entity.ReplicationStatsEntity;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
 import org.apache.pulsar.manager.entity.TopicsStatsRepository;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
-@PrepareForTest(HttpUtil.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(
         classes = {
                 PulsarManagerApplication.class,
@@ -59,12 +56,17 @@ import java.util.Optional;
 )
 @ActiveProfiles("test")
 public class BrokerStatsServiceImplTest {
+    @MockBean
+    private PulsarAdminService pulsarAdminService;
 
     @Autowired
     private BrokerStatsService brokerStatsService;
 
-    @Value("${backend.jwt.token}")
-    private static String pulsarJwtToken;
+    @MockBean
+    private BrokersService brokersService;
+
+    @Mock
+    private BrokerStats stats;
 
     @Autowired
     private TopicsStatsRepository topicsStatsRepository;
@@ -151,97 +153,92 @@ public class BrokerStatsServiceImplTest {
             "}";
 
     private void checkTopicStatsResult(TopicStatsEntity topicStatsEntity) {
-        Assert.assertEquals(topicStatsEntity.getAverageMsgSize(), 0.0, 1);
-        Assert.assertEquals(topicStatsEntity.getMsgRateIn(), 0.0, 1);
-        Assert.assertEquals(topicStatsEntity.getMsgRateOut(), 0.0, 1);
-        Assert.assertEquals(topicStatsEntity.getMsgThroughputIn(), 0.0, 1);
-        Assert.assertEquals(topicStatsEntity.getMsgThroughputOut(), 0.0, 1);
-        Assert.assertEquals(topicStatsEntity.getStorageSize(), 0, 0);
-        Assert.assertEquals(topicStatsEntity.getCluster(), "standalone");
-        Assert.assertEquals(topicStatsEntity.getBroker(), "localhost:8080");
-        Assert.assertEquals(topicStatsEntity.getTenant(), "public");
-        Assert.assertEquals(topicStatsEntity.getNamespace(), "functions");
-        Assert.assertEquals(topicStatsEntity.getBundle(), "0x40000000_0x80000000");
-        Assert.assertEquals(topicStatsEntity.getPersistent(), "persistent");
-        Assert.assertEquals(topicStatsEntity.getTopic(), "metadata");
+        Assert.assertEquals(0.0, topicStatsEntity.getAverageMsgSize(), 1);
+        Assert.assertEquals(0.0, topicStatsEntity.getMsgRateIn(), 1);
+        Assert.assertEquals(0.0, topicStatsEntity.getMsgRateOut(), 1);
+        Assert.assertEquals(0.0, topicStatsEntity.getMsgThroughputIn(), 1);
+        Assert.assertEquals(0.0, topicStatsEntity.getMsgThroughputOut(), 1);
+        Assert.assertEquals(0, topicStatsEntity.getStorageSize(), 0);
+        Assert.assertEquals("standalone", topicStatsEntity.getCluster());
+        Assert.assertEquals("localhost:8080", topicStatsEntity.getBroker());
+        Assert.assertEquals("public", topicStatsEntity.getTenant());
+        Assert.assertEquals("functions", topicStatsEntity.getNamespace());
+        Assert.assertEquals("0x40000000_0x80000000", topicStatsEntity.getBundle());
+        Assert.assertEquals("persistent", topicStatsEntity.getPersistent());
+        Assert.assertEquals("metadata", topicStatsEntity.getTopic());
     }
 
     private void checkPublisherStatsResult(PublisherStatsEntity publisherStatsEntity) {
-        Assert.assertEquals(publisherStatsEntity.getMsgRateIn(), 0.0, 1);
-        Assert.assertEquals(publisherStatsEntity.getMsgThroughputIn(), 0.0, 1);
-        Assert.assertEquals(publisherStatsEntity.getAverageMsgSize(), 0.0, 1);
-        Assert.assertEquals(publisherStatsEntity.getAddress(), "/127.0.0.1:59668");
-        Assert.assertEquals(publisherStatsEntity.getProducerId(), 1);
-        Assert.assertEquals(publisherStatsEntity.getProducerName(), "standalone-1-1");
-        Assert.assertEquals(publisherStatsEntity.getConnectedSince(), "2019-08-10T11:37:22.405+08:00");
-        Assert.assertEquals(publisherStatsEntity.getClientVersion(), "2.5.0-SNAPSHOT");
-        Assert.assertEquals(publisherStatsEntity.getMetadata(), "{}");
+        Assert.assertEquals(0.0, publisherStatsEntity.getMsgRateIn(), 1);
+        Assert.assertEquals(0.0, publisherStatsEntity.getMsgThroughputIn(), 1);
+        Assert.assertEquals(0.0, publisherStatsEntity.getAverageMsgSize(), 1);
+        Assert.assertEquals("/127.0.0.1:59668", publisherStatsEntity.getAddress());
+        Assert.assertEquals(1, publisherStatsEntity.getProducerId());
+        Assert.assertEquals("standalone-1-1", publisherStatsEntity.getProducerName());
+        Assert.assertEquals("2019-08-10T11:37:22.405+08:00", publisherStatsEntity.getConnectedSince());
+        Assert.assertEquals("2.5.0-SNAPSHOT", publisherStatsEntity.getClientVersion());
+        Assert.assertEquals("{}", publisherStatsEntity.getMetadata());
     }
 
     private void checkReplicationStatsResult(ReplicationStatsEntity replicationStatsEntity) {
-        Assert.assertEquals(replicationStatsEntity.getCluster(), "test-replications");
-        Assert.assertEquals(replicationStatsEntity.getMsgRateIn(), 123, 0);
-        Assert.assertEquals(replicationStatsEntity.getMsgThroughputIn(), 456, 0);
-        Assert.assertEquals(replicationStatsEntity.getMsgRateOut(), 456, 0);
-        Assert.assertEquals(replicationStatsEntity.getMsgThroughputOut(), 789, 0);
-        Assert.assertEquals(replicationStatsEntity.getMsgRateExpired(), 990, 0);
-        Assert.assertEquals(replicationStatsEntity.getReplicationBacklog(), 100, 0);
+        Assert.assertEquals("test-replications", replicationStatsEntity.getCluster());
+        Assert.assertEquals(123, replicationStatsEntity.getMsgRateIn(), 0);
+        Assert.assertEquals(456, replicationStatsEntity.getMsgThroughputIn(), 0);
+        Assert.assertEquals(456, replicationStatsEntity.getMsgRateOut(), 0);
+        Assert.assertEquals(789, replicationStatsEntity.getMsgThroughputOut(), 0);
+        Assert.assertEquals(990, replicationStatsEntity.getMsgRateExpired(), 0);
+        Assert.assertEquals(100, replicationStatsEntity.getReplicationBacklog(), 0);
         Assert.assertFalse(replicationStatsEntity.isConnected());
-        Assert.assertEquals(replicationStatsEntity.getReplicationDelayInSeconds(), 890, 0);
-        Assert.assertEquals(replicationStatsEntity.getInboundConnection(), "test");
-        Assert.assertEquals(replicationStatsEntity.getInboundConnectedSince(), "test2");
-        Assert.assertEquals(replicationStatsEntity.getOutboundConnection(), "test3");
-        Assert.assertEquals(replicationStatsEntity.getOutboundConnectedSince(), "test4");
+        Assert.assertEquals(890, replicationStatsEntity.getReplicationDelayInSeconds(), 0);
+        Assert.assertEquals("test", replicationStatsEntity.getInboundConnection());
+        Assert.assertEquals("test2", replicationStatsEntity.getInboundConnectedSince());
+        Assert.assertEquals("test3", replicationStatsEntity.getOutboundConnection());
+        Assert.assertEquals("test4", replicationStatsEntity.getOutboundConnectedSince());
     }
 
     private void checkSubscriptionStatsResult(SubscriptionStatsEntity subscriptionStatsEntity) {
-        Assert.assertEquals(subscriptionStatsEntity.getSubscription(), "reader-1ddabdb183");
-        Assert.assertEquals(subscriptionStatsEntity.getMsgBacklog(), 0.0, 0);
-        Assert.assertEquals(subscriptionStatsEntity.getMsgRateOut(), 0.0, 0);
-        Assert.assertEquals(subscriptionStatsEntity.getMsgThroughputOut(), 0.0, 0);
-        Assert.assertEquals(subscriptionStatsEntity.getMsgRateExpired(), 0.0, 0);
-        Assert.assertEquals(subscriptionStatsEntity.getMsgRateRedeliver(), 0.0, 0);
-        Assert.assertEquals(subscriptionStatsEntity.getNumberOfEntriesSinceFirstNotAckedMessage(), 1);
-        Assert.assertEquals(subscriptionStatsEntity.getTotalNonContiguousDeletedMessagesRange(), 0);
-        Assert.assertEquals(subscriptionStatsEntity.getSubscriptionType(), "Exclusive");
+        Assert.assertEquals("reader-1ddabdb183", subscriptionStatsEntity.getSubscription());
+        Assert.assertEquals(0.0, subscriptionStatsEntity.getMsgBacklog(), 0);
+        Assert.assertEquals(0.0, subscriptionStatsEntity.getMsgRateOut(), 0);
+        Assert.assertEquals(0.0, subscriptionStatsEntity.getMsgThroughputOut(), 0);
+        Assert.assertEquals(0.0, subscriptionStatsEntity.getMsgRateExpired(), 0);
+        Assert.assertEquals( 0.0, subscriptionStatsEntity.getMsgRateRedeliver(), 0);
+        Assert.assertEquals(1, subscriptionStatsEntity.getNumberOfEntriesSinceFirstNotAckedMessage());
+        Assert.assertEquals(0, subscriptionStatsEntity.getTotalNonContiguousDeletedMessagesRange());
+        Assert.assertEquals("Exclusive", subscriptionStatsEntity.getSubscriptionType());
     }
 
     private void checkConsumerStatsResult(ConsumerStatsEntity consumerStatsEntity) {
-        Assert.assertEquals(consumerStatsEntity.getConsumer(), "543bd");
-        Assert.assertEquals(consumerStatsEntity.getAddress(), "/127.0.0.1:59668");
-        Assert.assertEquals(consumerStatsEntity.getConnectedSince(), "2019-08-10T11:37:24.306+08:00");
-        Assert.assertEquals(consumerStatsEntity.getAvailablePermits(), 1000, 0);
-        Assert.assertEquals(consumerStatsEntity.getMsgRateOut(), 0.0, 0);
-        Assert.assertEquals(consumerStatsEntity.getMsgThroughputOut(), 0.0, 0);
-        Assert.assertEquals(consumerStatsEntity.getMsgRateRedeliver(), 0.0, 0);
-        Assert.assertEquals(consumerStatsEntity.getClientVersion(), "2.5.0-SNAPSHOT");
-        Assert.assertEquals(consumerStatsEntity.getMetadata(), "{}");
+        Assert.assertEquals("543bd", consumerStatsEntity.getConsumer());
+        Assert.assertEquals("/127.0.0.1:59668", consumerStatsEntity.getAddress());
+        Assert.assertEquals("2019-08-10T11:37:24.306+08:00", consumerStatsEntity.getConnectedSince());
+        Assert.assertEquals(1000, consumerStatsEntity.getAvailablePermits(), 0);
+        Assert.assertEquals(0.0, consumerStatsEntity.getMsgRateOut(), 0);
+        Assert.assertEquals(0.0, consumerStatsEntity.getMsgThroughputOut(), 0);
+        Assert.assertEquals(0.0, consumerStatsEntity.getMsgRateRedeliver(), 0);
+        Assert.assertEquals("2.5.0-SNAPSHOT", consumerStatsEntity.getClientVersion());
+        Assert.assertEquals("{}", consumerStatsEntity.getMetadata());
     }
 
     @Test
-    public void convertStatsToDbTest() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)){
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
-                .thenReturn("[\"standalone\"]");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone", header))
-                .thenReturn("{\n" +
-                        "\"serviceUrl\" : \"http://tengdeMBP:8080\",\n" +
-                        "\"brokerServiceUrl\" : \"pulsar://tengdeMBP:6650\"\n" +
-                        "}");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
-                .thenReturn("[\"localhost:8080\"]");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/broker-stats/topics", header))
-                .thenReturn(testData);
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
-                .thenReturn("{}");
-
+    public void convertStatsToDbTest() throws Exception {
         String environment = "staging";
         String cluster = "standalone";
         String serviceUrl = "http://localhost:8080";
+
+        Map<String, Object> brokersMap = new HashMap<>();
+        List<Map<String, Object>> brokersArray = new ArrayList<>();
+        Map<String, Object> brokerEntity = Maps.newHashMap();
+        brokerEntity.put("broker", "localhost:8080");
+        brokersArray.add(brokerEntity);
+        brokersMap.put("data", brokersArray);
+        Mockito.when(brokersService.getBrokersList(0,0, cluster, serviceUrl))
+                .thenReturn(brokersMap);
+        Mockito.when(pulsarAdminService.brokerStats(serviceUrl)).thenReturn(stats);
+        JsonObject data = new Gson().fromJson(testData, JsonObject.class);
+        Mockito.when(stats.getTopics())
+                .thenReturn(data);
+
         brokerStatsService.collectStatsToDB(
             System.currentTimeMillis() / 1000,
             environment,
@@ -275,53 +272,49 @@ public class BrokerStatsServiceImplTest {
         replicationStatsEntities.getResult().forEach((replication) -> {
             checkReplicationStatsResult(replication);
         });
-        long unixTime = System.currentTimeMillis() / 1000L;
-        brokerStatsService.clearStats(unixTime, 0);
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (Exception e) {
 
         }
+
+        long unixTime = System.currentTimeMillis() / 1000L;
+        brokerStatsService.clearStats(unixTime, 0);
 
         Optional<TopicStatsEntity> deleteTopicStatsEntity = topicsStatsRepository.findMaxTime();
         Assert.assertFalse(deleteTopicStatsEntity.isPresent());
 
         Page<SubscriptionStatsEntity> deleteSubscriptionStatsEntities = subscriptionsStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
-        Assert.assertEquals(deleteSubscriptionStatsEntities.getTotal(), 0);
+        Assert.assertEquals(0, deleteSubscriptionStatsEntities.getTotal());
         Page<PublisherStatsEntity> deletePublisherStatsEntities = publishersStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
-        Assert.assertEquals(deletePublisherStatsEntities.getTotal(), 0);
+        Assert.assertEquals(0, deletePublisherStatsEntities.getTotal());
         Page<ReplicationStatsEntity> deleteReplicationStatsEntities = replicationsStatsRepository.findByTopicStatsId(
                 1, 1, topicStatsEntity1.getTopicStatsId(), topicStatsEntity1.getTime_stamp());
-        Assert.assertEquals(deleteReplicationStatsEntities.getTotal(), 0);
+        Assert.assertEquals(0, deleteReplicationStatsEntities.getTotal());
     }
 
     @Test
-    public void findByMultiTenantOrMultiNamespace() {
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)){
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters", header))
-                .thenReturn("[\"standalone\"]");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone", header))
-                .thenReturn("{\n" +
-                        "\"serviceUrl\" : \"http://tengdeMBP:8080\",\n" +
-                        "\"brokerServiceUrl\" : \"pulsar://tengdeMBP:6650\"\n" +
-                        "}");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
-                .thenReturn("[\"localhost:8080\"]");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/broker-stats/topics", header))
-                .thenReturn(testData);
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/clusters/standalone/failureDomains", header))
-                .thenReturn("{}");
-
+    public void findByMultiTenantOrMultiNamespace() throws Exception {
         String environment = "staging";
         String cluster = "standalone";
         String serviceUrl = "http://localhost:8080";
+
+        Map<String, Object> brokersMap = new HashMap<>();
+        List<Map<String, Object>> brokersArray = new ArrayList<>();
+        Map<String, Object> brokerEntity = Maps.newHashMap();
+        brokerEntity.put("broker", "localhost:8080");
+        brokersArray.add(brokerEntity);
+        brokersMap.put("data", brokersArray);
+        Mockito.when(brokersService.getBrokersList(0,0, cluster, serviceUrl))
+                .thenReturn(brokersMap);
+        Mockito.when(pulsarAdminService.brokerStats(serviceUrl)).thenReturn(stats);
+        JsonObject data = new Gson().fromJson(testData, JsonObject.class);
+        Mockito.when(stats.getTopics())
+                .thenReturn(data);
+
         brokerStatsService.collectStatsToDB(
                 System.currentTimeMillis() / 1000,
                 environment,
@@ -340,12 +333,12 @@ public class BrokerStatsServiceImplTest {
 
 
         tenantAllCountPage.getResult().forEach((result) -> {
-            Assert.assertEquals(result.getAverageMsgSize(), 0.0, 1);
-            Assert.assertEquals(result.getMsgRateIn(), 0.0, 1);
-            Assert.assertEquals(result.getMsgRateOut(), 0.0, 1);
-            Assert.assertEquals(result.getMsgThroughputIn(), 0.0, 1);
-            Assert.assertEquals(result.getMsgThroughputOut(), 0.0, 1);
-            Assert.assertEquals(result.getStorageSize(), 0, 0);
+            Assert.assertEquals(0.0, result.getAverageMsgSize(), 1);
+            Assert.assertEquals(0.0, result.getMsgRateIn(), 1);
+            Assert.assertEquals(0.0, result.getMsgRateOut(), 1);
+            Assert.assertEquals(0.0, result.getMsgThroughputIn(), 1);
+            Assert.assertEquals(0.0, result.getMsgThroughputOut(), 1);
+            Assert.assertEquals(0, result.getStorageSize(), 0);
         });
 
         ArrayList<String> namespaceList = new ArrayList<>();
@@ -360,12 +353,12 @@ public class BrokerStatsServiceImplTest {
 
 
         namespaceAllCountPage.getResult().forEach((result) -> {
-            Assert.assertEquals(result.getAverageMsgSize(), 0.0, 1);
-            Assert.assertEquals(result.getMsgRateIn(), 0.0, 1);
-            Assert.assertEquals(result.getMsgRateOut(), 0.0, 1);
-            Assert.assertEquals(result.getMsgThroughputIn(), 0.0, 1);
-            Assert.assertEquals(result.getMsgThroughputOut(), 0.0, 1);
-            Assert.assertEquals(result.getStorageSize(), 0, 0);
+            Assert.assertEquals(0.0, result.getAverageMsgSize(), 1);
+            Assert.assertEquals(0.0, result.getMsgRateIn(), 1);
+            Assert.assertEquals(0.0, result.getMsgRateOut(), 1);
+            Assert.assertEquals(0.0, result.getMsgThroughputIn(), 1);
+            Assert.assertEquals(0.0, result.getMsgThroughputOut(), 1);
+            Assert.assertEquals(0, result.getStorageSize(), 0);
         });
 
         long unixTime = System.currentTimeMillis() / 1000L;

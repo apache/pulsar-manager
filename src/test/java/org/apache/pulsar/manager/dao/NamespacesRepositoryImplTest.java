@@ -57,16 +57,16 @@ public class NamespacesRepositoryImplTest {
 
     public void checkResult(Page<NamespaceEntity> namespacesEntityPage) {
         long total = namespacesEntityPage.getTotal();
-        Assert.assertEquals(total, 1);
+        Assert.assertEquals(1, total);
         namespacesEntityPage.getResult().forEach((result) -> {
-            Assert.assertEquals(result.getTenant(), "test-namespace-public");
-            Assert.assertEquals(result.getNamespace(), "test-namespace-default");
+            Assert.assertEquals("test-namespace-public", result.getTenant());
+            Assert.assertEquals("test-namespace-default", result.getNamespace());
         });
     }
 
     public void checkDeleteResult(Page<NamespaceEntity> namespacesEntityPage) {
         long total = namespacesEntityPage.getTotal();
-        Assert.assertEquals(total, 0);
+        Assert.assertEquals(0, total);
     }
 
     @Before
@@ -168,8 +168,8 @@ public class NamespacesRepositoryImplTest {
         idList.add(namespaceId);
         Optional<NamespaceEntity> namespacesEntityOptional = namespacesRepository.findByTenantNamespace(
                 namespacesEntity.getTenant(), namespacesEntity.getNamespace());
-        Assert.assertEquals(namespacesEntityOptional.get().getTenant(), "test-namespace-public");
-        Assert.assertEquals(namespacesEntityOptional.get().getNamespace(), "test-namespace-default");
+        Assert.assertEquals("test-namespace-public", namespacesEntityOptional.get().getTenant());
+        Assert.assertEquals("test-namespace-default", namespacesEntityOptional.get().getNamespace());
         namespacesRepository.remove(namespacesEntity.getTenant(), namespacesEntity.getNamespace());
     }
 
@@ -179,8 +179,8 @@ public class NamespacesRepositoryImplTest {
         initNamespaceEntity(namespacesEntity);
         long namespaceId = namespacesRepository.save(namespacesEntity);
         Optional<NamespaceEntity> namespacesEntityOptional = namespacesRepository.findByNamespaceId(namespaceId);
-        Assert.assertEquals(namespacesEntityOptional.get().getTenant(), "test-namespace-public");
-        Assert.assertEquals(namespacesEntityOptional.get().getNamespace(), "test-namespace-default");
+        Assert.assertEquals("test-namespace-public", namespacesEntityOptional.get().getTenant());
+        Assert.assertEquals("test-namespace-default", namespacesEntityOptional.get().getNamespace());
         namespacesRepository.remove(namespacesEntity.getTenant(), namespacesEntity.getNamespace());
     }
 

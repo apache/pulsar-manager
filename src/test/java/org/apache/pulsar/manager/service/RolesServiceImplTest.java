@@ -78,33 +78,33 @@ public class RolesServiceImplTest {
         RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
 
         Map<String, String> roleNameIsEmpty = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(roleNameIsEmpty.get("error"), "Role name cannot be empty");
+        Assert.assertEquals("Role name cannot be empty", roleNameIsEmpty.get("error"));
 
         roleInfoEntity.setRoleName("------");
 
         Map<String, String> resourceNameIsEmpty = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(resourceNameIsEmpty.get("error"), "Resource name cannot be empty");
+        Assert.assertEquals("Resource name cannot be empty", resourceNameIsEmpty.get("error"));
 
         roleInfoEntity.setResourceName("===========");
 
         Map<String, String> roleNameIsIllegal = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(roleNameIsIllegal.get("error"), "Role name is illegal");
+        Assert.assertEquals("Role name is illegal", roleNameIsIllegal.get("error"));
 
         roleInfoEntity.setRoleName("testRoleName");
 
         Map<String, String> resourceNameIsIllegal = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(resourceNameIsIllegal.get("error"), "Resource Name is illegal");
+        Assert.assertEquals("Resource Name is illegal", resourceNameIsIllegal.get("error"));
 
         roleInfoEntity.setResourceName("testResourceName");
 
         roleInfoEntity.setResourceType("test-resourceType");
         Map<String, String> resourceTypeIsIllegal = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(resourceTypeIsIllegal.get("error"), "Resource type is illegal");
+        Assert.assertEquals("Resource type is illegal", resourceTypeIsIllegal.get("error"));
 
         roleInfoEntity.setResourceId(10);
         roleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         Map<String, String> resourceNoExist = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(resourceNoExist.get("error"), "Tenant no exist, please check");
+        Assert.assertEquals("Tenant no exist, please check", resourceNoExist.get("error"));
 
         TenantEntity tenantEntity = new TenantEntity();
         tenantEntity.setTenant("test-tenant");
@@ -116,7 +116,7 @@ public class RolesServiceImplTest {
         roleInfoEntity.setResourceId(20);
         roleInfoEntity.setResourceType(ResourceType.NAMESPACES.name());
         Map<String, String> namespaceNoExist = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(namespaceNoExist.get("error"), "Namespace no exist, please check");
+        Assert.assertEquals("Namespace no exist, please check", namespaceNoExist.get("error"));
 
         NamespaceEntity namespaceEntity = new NamespaceEntity();
         namespaceEntity.setTenant("test-tenant");
@@ -131,18 +131,18 @@ public class RolesServiceImplTest {
         roleInfoEntity.setResourceType(ResourceType.TOPICS.name());
         roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
         Map<String, String> stringMapTopics = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(stringMapTopics.get("error"),
-                "admin should not be excluded for resources of type topic");
+        Assert.assertEquals("admin should not be excluded for resources of type topic",
+                stringMapTopics.get("error"));
 
         roleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         roleInfoEntity.setResourceVerbs(ResourceVerbs.PRODUCE.name() + "," +  ResourceVerbs.CONSUME.name());
         Map<String, String> stringMapTenants = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(stringMapTenants.get("error"), "Type TENANTS include not supported verbs");
+        Assert.assertEquals("Type TENANTS include not supported verbs", stringMapTenants.get("error"));
 
         roleInfoEntity.setResourceType(ResourceType.ALL.name());
         roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
         Map<String, String> stringMapAll = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertEquals(stringMapAll.get("message"), "Role validate success");
+        Assert.assertEquals("Role validate success", stringMapAll.get("message"));
     }
 
     @Test

@@ -14,14 +14,15 @@
 package org.apache.pulsar.manager.service.impl;
 
 import com.github.pagehelper.Page;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+
+import org.apache.pulsar.client.admin.PulsarAdminException;
+import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
-import org.apache.pulsar.manager.utils.HttpUtil;
+import org.apache.pulsar.manager.service.PulsarAdminService;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.common.policies.data.ClusterData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -44,16 +44,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
-    @Value("${backend.jwt.token}")
-    private String pulsarJwtToken;
-
     private final EnvironmentsRepository environmentsRepository;
+
     private final Map<String, Map<String, ClusterData>> environments;
 
+    private final PulsarAdminService pulsarAdminService;
+
     @Autowired
-    public EnvironmentCacheServiceImpl(EnvironmentsRepository environmentsRepository) {
+    public EnvironmentCacheServiceImpl(EnvironmentsRepository environmentsRepository, PulsarAdminService pulsarAdminService) {
         this.environmentsRepository = environmentsRepository;
         this.environments = new ConcurrentHashMap<>();
+        this.pulsarAdminService = pulsarAdminService;
     }
 
     @Override
@@ -100,14 +101,6 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
         return clusterData.getServiceUrl();
     }
 
-    private Map<String, String> jsonHeader() {
-        Map<String, String> header = Maps.newHashMap();
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        return header;
-    }
-
     @Scheduled(
         initialDelay = 0L,
         fixedDelayString = "${cluster.cache.reload.interval.ms}")
@@ -120,7 +113,11 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
         List<EnvironmentEntity> environmentList = environmentPage.getResult();
         while (!environmentList.isEmpty()) {
             environmentList.forEach(env -> {
-                reloadEnvironment(env);
+                try {
+                    reloadEnvironment(env);
+                } catch (PulsarAdminOperationException e) {
+                    log.error(e.getMessage(), e);
+                }
                 newEnvironments.add(env.getName());
             });
             ++pageNum;
@@ -143,13 +140,15 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     }
 
     public void reloadEnvironment(EnvironmentEntity environment) {
-        Gson gson = new Gson();
-        String result = HttpUtil.doGet(
-            environment.getBroker() + "/admin/v2/clusters",
-            jsonHeader()
-        );
-        List<String> clustersList =
-            gson.fromJson(result, new TypeToken<List<String>>(){}.getType());
+        List<String> clustersList;
+        try {
+            clustersList = pulsarAdminService.clusters(environment.getBroker()).getClusters();
+        } catch(PulsarAdminException e) {
+            PulsarAdminOperationException pulsarAdminOperationException
+                    = new PulsarAdminOperationException("Failed to get clusters list.");
+            log.error(pulsarAdminOperationException.getMessage(), e);
+            throw pulsarAdminOperationException;
+        }
         log.info("Reload cluster list for environment {} : {}", environment.getName(), clustersList);
         Set<String> newClusters = Sets.newHashSet(clustersList);
         Map<String, ClusterData> clusterDataMap = environments.computeIfAbsent(
@@ -176,19 +175,15 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     private ClusterData reloadCluster(EnvironmentEntity environment, String cluster) {
         log.info("Reloading cluster data for cluster {} @ environment {} ...",
             cluster, environment.getName());
-        Gson gson = new Gson();
-        String clusterInfoUrl = environment.getBroker() + "/admin/v2/clusters/" + cluster;
-        String result = HttpUtil.doGet(
-            clusterInfoUrl,
-            jsonHeader()
-        );
-        if (null == result) {
-            // fail to fetch the cluster data or the cluster is not found
+        ClusterData clusterData;
+        try {
+            clusterData = pulsarAdminService.clusters(environment.getBroker()).getCluster(cluster);
+        } catch(PulsarAdminException e) {
+            log.error("Failed to get cluster data.", e);
             return null;
         }
-        log.info("Loaded cluster data for cluster {} @ environment {} from {} : {}",
-            cluster, environment.getName(), clusterInfoUrl, result);
-        ClusterData clusterData = gson.fromJson(result, ClusterData.class);
+        log.info("Loaded cluster data for cluster {} @ environment {} : {}",
+            cluster, environment.getName(), clusterData.toString());
         Map<String, ClusterData> clusters = environments.computeIfAbsent(
             environment.getName(),
             (e) -> new ConcurrentHashMap<>());
