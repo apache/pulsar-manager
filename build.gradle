@@ -82,6 +82,7 @@ distributions {
     main {
         contents {
             from 'src/main/resources/application.properties'
+            from 'src/main/resources/bkvm.conf'
         }
     }
 }
@@ -123,6 +124,19 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggeruiVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-broker', version: brokerVersion
     compile group: 'commons-validator', name: 'commons-validator', version: commonsValidatorVersion
+    compile (group: 'org.bkvm', name: 'bkvm', version: bkvmVersion, ext: 'war', classifier:'war-no-libs') {
+        exclude group: 'org.slf4j', module: 'slf4j-jdk14'
+        exclude group: 'org.herddb', module: '*'
+    }
+    compile (group: 'org.bkvm', name: 'bkvm', version: bkvmVersion, classifier:'classes') {
+        exclude group: 'org.slf4j', module: 'slf4j-jdk14'
+        exclude group: 'org.herddb', module: '*'
+    }
+    compile (group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: tomcatVersion)
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: jerseyVersion
+    compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: jerseyVersion
+    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: jerseyVersion
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: jerseyVersion
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     compileOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion

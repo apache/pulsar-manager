@@ -39,7 +39,10 @@ public class WebAppConfigurer implements WebMvcConfigurer {
                 // static front-end resources
                 .excludePathPatterns("/ui")
                 .excludePathPatterns("/static")
-                .excludePathPatterns("/error");
+                .excludePathPatterns("/error")
+                // BKVM
+                .excludePathPatterns("/bkvm")
+                ;
     }
 
     @Override
