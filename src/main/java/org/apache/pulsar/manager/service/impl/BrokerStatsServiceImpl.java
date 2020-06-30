@@ -26,6 +26,7 @@ import org.apache.pulsar.manager.service.BrokerStatsService;
 import org.apache.pulsar.manager.service.BrokersService;
 import org.apache.pulsar.manager.service.ClustersService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
+import org.apache.pulsar.manager.utils.HttpUtil;
 import org.apache.pulsar.manager.entity.ConsumerStatsEntity;
 import org.apache.pulsar.manager.entity.ConsumersStatsRepository;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
@@ -43,13 +44,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -66,6 +67,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     @Value("${backend.directRequestHost}")
     private String directRequestHost;
 
+    @Value("${backend.jwt.token}")
+    private String pulsarJwtToken;
+
     @Value("${clear.stats.interval}")
     private Long clearStatsInterval;
 
@@ -78,6 +82,8 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     private final ReplicationsStatsRepository replicationsStatsRepository;
     private final ConsumersStatsRepository consumersStatsRepository;
     private final PulsarAdminService pulsarAdminService;
+
+    private static final Map<String, String> header = new HashMap<>();
 
     @Autowired
     public BrokerStatsServiceImpl(
@@ -136,6 +142,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                         if (!url.contains("http://")) {
                             url = "http://" + url;
                         }
+                        // TODO Use Pulsar Admin instead of HttpUtil.
                         String httpTestResult = HttpUtil.doGet( url + "/admin/v2/brokers/health", header);
                         if (httpTestResult == null) {
                             log.error("This service {} is down, please check", url);
