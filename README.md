@@ -211,7 +211,7 @@ Use the default account (`pulsar`) and the default password (`pulsar`) to log in
 
 The puslar-manager supports multiple environment configurations and can manage multiple environments conveniently. 
 
-The Service URL represent here the broker service IP, if you are running the standalone version it should be "http://127.0.0.1:8080".
+Here, the service URL represents the service IP address of the broker. If you run Pulsar manager in the standalone mode, it should be set to "http://127.0.0.1:8080".
 You can easily find it in the client.conf file of your pulsar-manager. 
 
 ![pulsar-manager-environments](docs/img/pulsar-manager-environments.gif)
@@ -273,4 +273,3 @@ The JDBC URL will look like this:
 jdbc:herddb:zookeeper:localhost:2181/herddb
 
 In order to start and setup an HerdDB database follow the instructions on the [HerdDB documentation](https://github.com/diennea/herddb/wiki).
-
