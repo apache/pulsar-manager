@@ -164,7 +164,10 @@ If you are deploying Pulsar Manager 0.1.0 using the released container, you can 
 If you are deploying Pulsar Manager using the latest code, you can create a super-user using the following command. Then you can use the super user credentials to log in the Pulsar Manager UI.
 
     ```$xslt
+    CSRF_TOKEN=$(curl http://backend-service:7750/pulsar-manager/csrf-token)
     curl \
+        -H 'X-XSRF-TOKEN: $CSRF_TOKEN' \
+        -H 'Cookie: XSRF-TOKEN=$CSRF_TOKEN;' \
         -H "Content-Type: application/json" \
         -X PUT http://backend-service:7750/pulsar-manager/users/superuser \
         -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'

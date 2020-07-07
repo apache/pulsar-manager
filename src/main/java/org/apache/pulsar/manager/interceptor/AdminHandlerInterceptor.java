@@ -15,7 +15,6 @@ package org.apache.pulsar.manager.interceptor;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import org.apache.commons.lang.StringUtils;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
@@ -27,13 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.Map;
 import java.util.Optional;
 
@@ -64,8 +61,9 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // allow frontend requests, in case of front-end running on the same process of backend
-        if (request.getRequestURI().startsWith("/ui")
-                || request.getRequestURI().startsWith("/static")) {
+
+        if (request.getServletPath().startsWith("/ui")
+                || request.getServletPath().startsWith("/static")) {
             return true;
         }
         String token = request.getHeader("token");
@@ -95,11 +93,11 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
                 return false;
             }
         }
-        String requestUri = request.getRequestURI();
+        String requestUri = request.getServletPath();
         if (!requestUri.equals("/pulsar-manager/users/userInfo")) {
             String environment = request.getHeader("environment");
             Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
-            if (!request.getRequestURI().startsWith("/pulsar-manager/environments") && !environmentEntityOptional.isPresent()) {
+            if (!request.getServletPath().startsWith("/pulsar-manager/environments") && !environmentEntityOptional.isPresent()) {
                 map.put("message", "Currently there is no active environment, please set one");
                 response.setStatus(400);
                 response.getWriter().append(gson.toJson(map));

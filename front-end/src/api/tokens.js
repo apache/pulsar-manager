@@ -56,3 +56,10 @@ export function getToken(role) {
     method: 'get'
   })
 }
+
+export function getCsrfToken() {
+  return request({
+    url: SPRING_BASE_URL + '/csrf-token',
+    method: 'get'
+  })
+}

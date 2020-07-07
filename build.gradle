@@ -142,6 +142,8 @@ dependencies {
     compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: jerseyVersion
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: jerseyVersion
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: jerseyVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+    compile group: 'org.springframework.security', name: 'spring-security-config'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     compileOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion

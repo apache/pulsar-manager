@@ -83,7 +83,8 @@ public class EnvironmentForward extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String redirect = request.getParameter("redirect");
 
-        String requestUri = request.getRequestURI();
+        String requestUri = request.getServletPath();
+        request.getServletPath();
         String token = request.getHeader("token");
 
         if (!rolesService.isSuperUser(token)) {
@@ -129,17 +130,17 @@ public class EnvironmentForward extends ZuulFilter {
     }
 
     private Object forwardRequest(RequestContext ctx, HttpServletRequest request, String serviceUrl) {
-        ctx.put(REQUEST_URI_KEY, request.getRequestURI());
+        ctx.put(REQUEST_URI_KEY, request.getServletPath());
         try {
             Map<String, String> authHeader = pulsarAdminService.getAuthHeader(serviceUrl);
             authHeader.entrySet().forEach(entry -> ctx.addZuulRequestHeader(entry.getKey(), entry.getValue()));
             ctx.setRouteHost(new URL(serviceUrl));
-            pulsarEvent.parsePulsarEvent(request.getRequestURI(), request);
+            pulsarEvent.parsePulsarEvent(request.getServletPath(), request);
             log.info("Forward request to {} @ path {}",
-                    serviceUrl, request.getRequestURI());
+                    serviceUrl, request.getServletPath());
         } catch (MalformedURLException e) {
             log.error("Route forward to {} path {} error: {}",
-                    serviceUrl, request.getRequestURI(), e.getMessage());
+                    serviceUrl, request.getServletPath(), e.getMessage());
         }
         return null;
     }

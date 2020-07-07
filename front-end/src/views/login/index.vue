@@ -72,6 +72,8 @@
 <script>
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
+import { getCsrfToken } from '@/api/tokens'
+import { setCsrfToken } from '@/utils/csrfToken'
 
 export default {
   name: 'Login',
@@ -118,6 +120,7 @@ export default {
   },
   created() {
     // window.addEventListener('hashchange', this.afterQRScan)
+    this.fetchCsrfToken()
   },
   destroyed() {
     window.removeEventListener('hashchange', this.afterQRScan)
@@ -172,6 +175,11 @@ export default {
       //     this.$router.push({ path: '/' })
       //   })
       // }
+    },
+    fetchCsrfToken() {
+      getCsrfToken().then(response => {
+        setCsrfToken(response.headers['x-csrf-token'])
+      })
     }
   }
 }
