@@ -20,13 +20,13 @@ import com.google.gson.reflect.TypeToken;
 
 import java.text.DecimalFormat;
 
+import org.apache.pulsar.client.admin.Brokers;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.service.BrokerStatsService;
 import org.apache.pulsar.manager.service.BrokersService;
 import org.apache.pulsar.manager.service.ClustersService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
-import org.apache.pulsar.manager.utils.HttpUtil;
 import org.apache.pulsar.manager.entity.ConsumerStatsEntity;
 import org.apache.pulsar.manager.entity.ConsumersStatsRepository;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,20 +134,17 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                 String webServiceUrl = (String) clusterMap.get("serviceUrl");
                 if (webServiceUrl.contains(",")) {
                     String[] webServiceUrlList = webServiceUrl.split(",");
-                    if (StringUtils.isNotBlank(pulsarJwtToken)) {
-                        header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-                    }
                     for (String url : webServiceUrlList) {
                         if (!url.contains("http://")) {
                             url = "http://" + url;
                         }
-                        // TODO Use Pulsar Admin instead of HttpUtil.
-                        String httpTestResult = HttpUtil.doGet( url + "/admin/v2/brokers/health", header);
-                        if (httpTestResult == null) {
-                            log.error("This service {} is down, please check", url);
-                        } else {
+                        try {
+                            Brokers brokers = pulsarAdminService.brokers(url);
+                            brokers.healthcheck();
                             webServiceUrl = url;
                             break;
+                        } catch (PulsarAdminException e) {
+                            log.error("This service {} is down, please check", url);
                         }
                     }
                 }
