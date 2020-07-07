@@ -15,6 +15,7 @@ import { loginByUsername, logout } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { setName, removeName } from '@/utils/username'
 import { removeEnvironment } from '@/utils/environment'
+import { removeCsrfToken } from '@/utils/csrfToken'
 import { Message } from 'element-ui'
 import { setTenant, removeTenant } from '../../utils/tenant'
 import { getUserInfo } from '@/api/users'
@@ -104,6 +105,7 @@ const user = {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           removeToken()
+          removeCsrfToken()
           removeName()
           removeTenant()
           removeEnvironment()

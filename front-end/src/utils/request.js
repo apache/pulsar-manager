@@ -20,6 +20,7 @@ import { getName } from '@/utils/username'
 import { getEnvironment } from '@/utils/environment'
 import { getTenant } from '@/utils/tenant'
 import router from '../router'
+import { getCsrfToken } from '@/utils/csrfToken'
 
 // create an axios instance
 const service = axios.create({
@@ -37,6 +38,7 @@ service.interceptors.request.use(
     config.headers['username'] = getName()
     config.headers['tenant'] = getTenant()
     config.headers['environment'] = getEnvironment()
+    config.headers['X-XSRF-TOKEN'] = getCsrfToken()
     return config
   },
   error => {
