@@ -28,7 +28,11 @@ chown -R pulsar:pulsar /data
 chown pulsar:pulsar /pulsar-manager/init_db.sql
 chmod 750 /data
 
-su - pulsar -s /bin/sh /pulsar-manager/startup.sh
+su - pulsar
+if [[ "$URL" = "jdbc:postgresql://127.0.0.1:5432/pulsar_manager" ]]
+then
+/bin/sh /pulsar-manager/startup.sh
+fi
 
 echo 'Starting Pulsar Manager Front end'
 nginx
