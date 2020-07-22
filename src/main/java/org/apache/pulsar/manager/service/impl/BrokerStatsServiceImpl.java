@@ -66,9 +66,6 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     @Value("${backend.directRequestHost}")
     private String directRequestHost;
 
-    @Value("${backend.jwt.token}")
-    private String pulsarJwtToken;
-
     @Value("${clear.stats.interval}")
     private Long clearStatsInterval;
 
@@ -81,8 +78,6 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     private final ReplicationsStatsRepository replicationsStatsRepository;
     private final ConsumersStatsRepository consumersStatsRepository;
     private final PulsarAdminService pulsarAdminService;
-
-    private static final Map<String, String> header = new HashMap<>();
 
     @Autowired
     public BrokerStatsServiceImpl(
