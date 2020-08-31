@@ -34,6 +34,8 @@ public interface TenantsRepository {
 
     List<TenantEntity> findByMultiId(List<Long> tenantIdList);
 
+    List<TenantEntity> findByMultiEnvironmentName(List<String> environmentNameList);
+
     void remove(String tenant);
 
 }

@@ -66,6 +66,14 @@ public interface TenantsMapper {
                     "</script>"})
     List<TenantEntity> findAllByMultiId(@Param("tenantIdList") List<Long> tenantIdList);
 
+    @Select({"<script>",
+            "SELECT tenant, tenant_id as tenantId, admin_roles as adminRoles,allowed_clusters as allowedClusters," +
+                    "environment_name as environmentName " +
+                    " FROM tenants ",
+            "WHERE environment_name IN <foreach collection='environmentNameList' item='environmentName' open='(' separator=',' close=')'> #{environmentName} </foreach>" +
+                    "</script>"})
+    List<TenantEntity> findAllByMultiEnvironmentName(@Param("environmentNameList") List<String> environmentNameList);
+
     @Delete("DELETE FROM tenants WHERE tenant = #{tenant}")
     void delete(String tenant);
 

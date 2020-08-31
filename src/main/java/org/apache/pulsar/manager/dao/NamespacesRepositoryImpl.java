@@ -93,6 +93,12 @@ public class NamespacesRepositoryImpl implements NamespacesRepository {
     }
 
     @Override
+    public List<NamespaceEntity> findByMultiTenant(List<String> tenantList) {
+        List<NamespaceEntity> namespaceEntities = namespacesMapper.findAllByMultiTenant(tenantList);
+        return namespaceEntities;
+    }
+
+    @Override
     public void remove(String tenant, String namespace) {
         namespacesMapper.deleteByTenantNamespace(tenant, namespace);
     }
