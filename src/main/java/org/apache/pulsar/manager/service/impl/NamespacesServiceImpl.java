@@ -100,21 +100,24 @@ public class NamespacesServiceImpl implements NamespacesService {
 
                 }
                 for (String tenantNamespace : namespacesList) {
-                    String namespace = tenantNamespace.split("/")[1];
-                    Map<String, Object> topicsEntity = Maps.newHashMap();
-                    Map<String, Object> topics = topicsService.getTopicsList(
-                            0, 0, tenant, namespace, requestHost);
-                    topicsEntity.put("topics", topics.get("total"));
-                    topicsEntity.put("namespace", namespace);
-                    if (topicStatsEntityMap.get(namespace) != null) {
-                        TopicStatsEntity topicStatsEntity = topicStatsEntityMap.get(namespace);
-                        topicsEntity.put("inMsg", topicStatsEntity.getMsgRateIn());
-                        topicsEntity.put("outMsg", topicStatsEntity.getMsgRateOut());
-                        topicsEntity.put("inBytes", topicStatsEntity.getMsgThroughputIn());
-                        topicsEntity.put("outBytes", topicStatsEntity.getMsgThroughputOut());
-                        topicsEntity.put("storageSize", topicStatsEntity.getStorageSize());
+                    String[] path = tenantNamespace.split("/");
+                    if (path.length > 1) {
+                        String namespace = path[1];
+                        Map<String, Object> topicsEntity = Maps.newHashMap();
+                        Map<String, Object> topics = topicsService.getTopicsList(
+                                0, 0, tenant, namespace, requestHost);
+                        topicsEntity.put("topics", topics.get("total"));
+                        topicsEntity.put("namespace", namespace);
+                        if (topicStatsEntityMap.get(namespace) != null) {
+                            TopicStatsEntity topicStatsEntity = topicStatsEntityMap.get(namespace);
+                            topicsEntity.put("inMsg", topicStatsEntity.getMsgRateIn());
+                            topicsEntity.put("outMsg", topicStatsEntity.getMsgRateOut());
+                            topicsEntity.put("inBytes", topicStatsEntity.getMsgThroughputIn());
+                            topicsEntity.put("outBytes", topicStatsEntity.getMsgThroughputOut());
+                            topicsEntity.put("storageSize", topicStatsEntity.getStorageSize());
+                        }
+                        namespacesArray.add(topicsEntity);
                     }
-                    namespacesArray.add(topicsEntity);
                 }
                 namespacesMap.put("isPage", false);
                 namespacesMap.put("total", namespacesList.size());
