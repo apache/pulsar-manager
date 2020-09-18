@@ -70,6 +70,10 @@ module.exports = {
   location /lookup {
     proxy_pass http://localhost:7750;
   }
+
+  location /bkvm {
+    proxy_pass http://localhost:7750;
+  }
 ```
 
 ### Build file for production

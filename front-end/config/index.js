@@ -41,6 +41,10 @@ module.exports = {
         // target: 'http://localhost:443/',
         target: 'http://localhost:7750/',
         changeOrigin: true
+      },
+      '/bkvm/*': {
+        target: 'http://localhost:7750/',
+        changeOrigin: true
       }
     },
 

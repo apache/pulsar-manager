@@ -122,7 +122,7 @@ Note, now you can now access it at the following address: frontend => http://loc
 
 #### Enable bookkeeper visual manager(optional)
 
-Update the configuration file `pulsar-manager/bkvm.conf`, set bkvm.enabled to true
+Update the configuration file `pulsar-manager/bkvm.conf`, set `bkvm.enabled` to true
 
 bkvm address => http://localhost:7750/bkvm
 
