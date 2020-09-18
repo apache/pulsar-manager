@@ -107,7 +107,7 @@ The Pulsar Manager can be deployed as part of [Pulsar Helm Chart](https://github
 ### Build from bin package
 
 ```
-wget https://dist.apache.org/repos/dist/dev/pulsar/pulsar-manager/apache-pulsar-manager-0.2.0/apache-pulsar-manager-0.2.0-bin.tar.gz
+wget https://dist.apache.org/repos/dist/release/pulsar/pulsar-manager/apache-pulsar-manager-0.2.0/apache-pulsar-manager-0.2.0-bin.tar.gz
 tar -zxvf apache-pulsar-manager-0.2.0-bin.tar.gz
 cd pulsar-manager
 tar -zxvf pulsar-manager.tar
