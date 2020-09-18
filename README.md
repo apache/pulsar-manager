@@ -47,7 +47,7 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
         apachepulsar/pulsar-manager:v0.2.0
     ```
 
-    Enable bookkeeper visual manager(Optional), update the field `bkvm.enabled` to `true` for the file [bkvm.conf](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/bkvm.conf).
+> NOTE: Enable bookkeeper visual manager(Optional), update the field `bkvm.enabled` to `true` for the file [bkvm.conf](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/bkvm.conf).
 
     ```
     docker pull apachepulsar/pulsar-manager:v0.2.0
@@ -59,7 +59,7 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
         apachepulsar/pulsar-manager:v0.2.0
     ```
 
-    * `SPRING_CONFIGURATION_FILE`: Default configuration file for spring.
+* `SPRING_CONFIGURATION_FILE`: Default configuration file for spring.
 
 ### Use Docker Compose
 
