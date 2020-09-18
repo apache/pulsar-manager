@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   pulsar:
-    image: apachepulsar/pulsar:2.5.0
+    image: apachepulsar/pulsar:2.6.0
     command: bin/pulsar standalone
     hostname: pulsar
     ports:
@@ -11,20 +11,13 @@ services:
     volumes:
       - "./data/:/pulsar/data"
   dashboard:
-    image: apachepulsar/pulsar-manager:v0.1.0
+    image: apachepulsar/pulsar-manager:v0.2.0
     ports:
       - "9527:9527"
+      - "7750:7750"
     depends_on:
       - pulsar
     links:
       - pulsar
-    volumes:
-      - "./data/:/data"
     environment:
-      REDIRECT_HOST: "http://127.0.0.1"
-      REDIRECT_PORT: "9527"
-      DRIVER_CLASS_NAME: "org.postgresql.Driver"
-      URL: "jdbc:postgresql://127.0.0.1:5432/pulsar_manager"
-      USERNAME: "pulsar"
-      PASSWORD: "pulsar"
-      LOG_LEVEL: "DEBUG"
+      SPRING_CONFIGURATION_FILE: /pulsar-manager/pulsar-manager/application.properties

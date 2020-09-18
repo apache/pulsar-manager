@@ -26,7 +26,16 @@ For localhost debug
     },
 ```
 
-## Deploy production environment
+## Deploy production environment 
+
+```
+wget https://dist.apache.org/repos/dist/dev/pulsar/pulsar-manager/apache-pulsar-manager-0.2.0/apache-pulsar-manager-0.2.0-bin.tar.gz
+tar -zxvf apache-pulsar-manager-0.2.0-bin.tar.gz
+
+```
+
+
+## Deploy production environment by Nginx server
 
 * Add the following parameters to the Nginx server configuration file [prod.env.js](https://github.com/apache/pulsar-manager/blob/master/front-end/config/prod.env.js).
 ```
