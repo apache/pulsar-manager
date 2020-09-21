@@ -116,13 +116,13 @@ cp -r ../dist ui
 ./bin/pulsar-manager
 ```
 
-Note, now you can now access it at the following address: frontend => http://localhost:7750/ui/index.html
+Now you can now access it at the following address: frontend => http://localhost:7750/ui/index.html.
 
-[Set the administrator account and password](#access-pulsar-manager)
+[Set the administrator account and password](#access-pulsar-manager).
 
-#### Enable bookkeeper visual manager(optional)
+#### Enable BookKeeper visual manager(optional)
 
-Update the configuration file `pulsar-manager/bkvm.conf`, set `bkvm.enabled` to true
+Update the configuration file `pulsar-manager/bkvm.conf`, and set `bkvm.enabled` to `true`.
 
 bkvm address => http://localhost:7750/bkvm
 
