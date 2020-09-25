@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS tokens (
 
 CREATE TABLE IF NOT EXISTS users (
   user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  access_token varchar(256) NOT NULL,
+  access_token varchar(256),
   name varchar(256) NOT NULL,
   description varchar(128),
   email varchar(256),
