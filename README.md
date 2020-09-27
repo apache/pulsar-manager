@@ -116,9 +116,9 @@ cp -r ../dist ui
 ./bin/pulsar-manager
 ```
 
-Now you can now access it at the following address: frontend => http://localhost:7750/ui/index.html.
+Now, you can access it at the following address: frontend => http://localhost:7750/ui/index.html.
 
-[Set the administrator account and password](#access-pulsar-manager).
+For details, see [Set the administrator account and password](#access-pulsar-manager).
 
 #### Enable BookKeeper visual manager(optional)
 
