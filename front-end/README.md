@@ -26,7 +26,8 @@ For localhost debug
     },
 ```
 
-## Deploy production environment
+
+## Deploy production environment by Nginx server
 
 * Add the following parameters to the Nginx server configuration file [prod.env.js](https://github.com/apache/pulsar-manager/blob/master/front-end/config/prod.env.js).
 ```
@@ -59,6 +60,10 @@ module.exports = {
   }
 
   location /lookup {
+    proxy_pass http://localhost:7750;
+  }
+
+  location /bkvm {
     proxy_pass http://localhost:7750;
   }
 ```

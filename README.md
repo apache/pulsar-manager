@@ -39,36 +39,27 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
 > NOTE: the command links the pulsar-manager container with the pulsar standalone container so they are in the same network.
 
     ```
-    docker pull apachepulsar/pulsar-manager:v0.1.0
+    docker pull apachepulsar/pulsar-manager:v0.2.0
     docker run -it \
-        -p 9527:9527 \
-        -e REDIRECT_HOST=127.0.0.1 \
-        -e REDIRECT_PORT=9527 \
-        -e DRIVER_CLASS_NAME=org.postgresql.Driver \
-        -e URL='jdbc:postgresql://127.0.0.1:5432/pulsar_manager' \
-        -e USERNAME=pulsar \
-        -e PASSWORD=pulsar \
-        -e LOG_LEVEL=DEBUG \
-        -v pulsarui:/data \
+        -p 9527:9527 -p 7750:7750 \
+        -e SPRING_CONFIGURATION_FILE=/pulsar-manager/pulsar-manager/application.properties \
         --link pulsar-standalone \
-        apachepulsar/pulsar-manager:v0.1.0
+        apachepulsar/pulsar-manager:v0.2.0
     ```
 
-    * `REDIRECT_HOST`: the IP address of the front-end server.
-        
-    * `REDIRECT_PORT`: the port of the front-end server.
+> NOTE: Enable bookkeeper visual manager(Optional), update the field `bkvm.enabled` to `true` for the file [bkvm.conf](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/bkvm.conf).
 
-    * `DRIVER_CLASS_NAME`: the driver class name of PostgreSQL.
+    ```
+    docker pull apachepulsar/pulsar-manager:v0.2.0
+    docker run -it \
+        -p 9527:9527 -p 7750:7750 \
+        -e SPRING_CONFIGURATION_FILE=/pulsar-manager/pulsar-manager/application.properties \
+        -v $PWD/bkvm.conf:/pulsar-manager/pulsar-manager/bkvm.conf \
+        --link pulsar-standalone \
+        apachepulsar/pulsar-manager:v0.2.0
+    ```
 
-    * `URL`: the jdbc url of your PostgreSQL database, example: jdbc:postgresql://127.0.0.1:5432/pulsar_manager. The docker image automatically start a local instance of PostgresSQL database.
-
-    * `USERNAME`: the username of PostgreSQL.
-
-    * `PASSWORD`: the password of PostgreSQL.
-
-    * `LOG_LEVEL`: level of log.
-    
-    * `pulsarui`: docker volume to store PostgresSQL data.
+* `SPRING_CONFIGURATION_FILE`: Default configuration file for spring.
 
 ### Use Docker Compose
 
@@ -113,6 +104,28 @@ The Pulsar Manager can be deployed as part of [Pulsar Helm Chart](https://github
     ```
     After find the ip address of the Pulsar Manager, you can access the Pulsar Manager at `http://${pulsar-manager-cluster-ip}/#/environments`.
 
+### Build from bin package
+
+```
+wget https://dist.apache.org/repos/dist/release/pulsar/pulsar-manager/apache-pulsar-manager-0.2.0/apache-pulsar-manager-0.2.0-bin.tar.gz
+tar -zxvf apache-pulsar-manager-0.2.0-bin.tar.gz
+cd pulsar-manager
+tar -zxvf pulsar-manager.tar
+cd pulsar-manager
+cp -r ../dist ui
+./bin/pulsar-manager
+```
+
+Now, you can access it at the following address: frontend => http://localhost:7750/ui/index.html.
+
+For details, see [Set the administrator account and password](#access-pulsar-manager).
+
+#### Enable BookKeeper visual manager(optional)
+
+Update the configuration file `pulsar-manager/bkvm.conf`, and set `bkvm.enabled` to `true`.
+
+bkvm address => http://localhost:7750/bkvm
+
 ### Build from source code
 
 #### Prerequisites
@@ -150,7 +163,7 @@ The Pulsar Manager can be deployed as part of [Pulsar Helm Chart](https://github
 
 After running these steps, the Pulsar Manager is running locally at http://127.0.0.1/#/environments.
 
-## Access Pusar Manager
+## Access Pulsar Manager
 
 1. Access Pulsar manager UI at `http://${frontend-end-ip}/#/environments`.
 
