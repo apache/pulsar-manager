@@ -929,6 +929,7 @@ export default {
       localList: [],
       tempTopicsList: [],
       topicsList: [],
+      allTopicList: [],
       topicsTotal: 0,
       // total: 0,
       topicsListQuery: {
@@ -1065,20 +1066,21 @@ export default {
           }
           this.topicsListLoading = false
           this.topicsList.push(topicInfo)
+          this.allTopicList.push(topicInfo)
         }
       })
     },
     handleFilterTopic() {
       if (this.tempTopicsList.length <= 0) {
-        for (var t = 0; t < this.topicsList.length; t++) {
-          this.tempTopicsList.push(this.topicsList[t])
+        for (var t = 0; t < this.allTopicList.length; t++) {
+          this.tempTopicsList.push(this.allTopicList[t])
         }
       }
       if (!validateEmpty(this.searchTopic)) {
         this.searchList = []
-        for (var i = 0; i < this.topicsList.length; i++) {
-          if (this.topicsList[i]['topic'].indexOf(this.searchTopic) !== -1) {
-            this.searchList.push(this.topicsList[i])
+        for (var i = 0; i < this.allTopicList.length; i++) {
+          if (this.allTopicList[i]['topic'].indexOf(this.searchTopic) !== -1) {
+            this.searchList.push(this.allTopicList[i])
           }
         }
         this.topicsList = this.searchList
@@ -1637,6 +1639,7 @@ export default {
         })
         this.dialogFormVisible = false
         this.topicsList = []
+        this.allTopicList = []
         this.tempTopicsList = []
         this.getTopics()
       })
