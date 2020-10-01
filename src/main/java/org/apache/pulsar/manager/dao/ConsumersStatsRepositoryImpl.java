@@ -15,11 +15,14 @@ package org.apache.pulsar.manager.dao;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.pulsar.manager.entity.ConsumerStatsEntity;
 import org.apache.pulsar.manager.entity.ConsumersStatsRepository;
 import org.apache.pulsar.manager.mapper.ConsumerStatsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class ConsumersStatsRepositoryImpl implements ConsumersStatsRepository {
@@ -53,6 +56,10 @@ public class ConsumersStatsRepositoryImpl implements ConsumersStatsRepository {
                                                               long replicationStatsId, long timestamp) {
         PageHelper.startPage(pageNum, pageSize);
         return consumerStatsMapper.findByReplicationStatsId(replicationStatsId, timestamp);
+    }
+
+    public List<ConsumerStatsEntity> findByMultiTopicStatsId(List<Long> topicStatsIdList, long timestamp) {
+        return consumerStatsMapper.findByMultiTopicStatsId(topicStatsIdList, timestamp);
     }
 
     public void remove(long timestamp, long timeInterval) {

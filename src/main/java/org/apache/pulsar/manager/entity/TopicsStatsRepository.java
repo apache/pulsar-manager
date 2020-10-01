@@ -61,5 +61,8 @@ public interface TopicsStatsRepository {
                                              List<String> namespaceList,
                                              long timestamp);
 
+    List<TopicStatsEntity> findByMultiEnvironment(List<String> environmentList,
+                                                     long timestamp);
+
     void remove(long timestamp, long timeInterval);
 }

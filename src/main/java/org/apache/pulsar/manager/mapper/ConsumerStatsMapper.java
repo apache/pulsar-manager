@@ -17,6 +17,8 @@ import com.github.pagehelper.Page;
 import org.apache.pulsar.manager.entity.ConsumerStatsEntity;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
+
 @Mapper
 public interface ConsumerStatsMapper {
 
@@ -55,6 +57,18 @@ public interface ConsumerStatsMapper {
             "where replication_stats_id=#{replicationStatsId} and time_stamp=#{timestamp}")
     Page<ConsumerStatsEntity> findByReplicationStatsId(@Param("replicationStatsId") long replicationStatsId,
                                                        @Param("timestamp") long timestamp);
+
+    @Select({"<script>",
+            "SELECT consumer_stats_id as consumerStatsId,consumer as consumer,topic_stats_id as topicStatsId," +
+                    "replication_stats_id as replicationStatsId,subscription_stats_id as subscriptionStatsId,address as address," +
+                    "available_permits as availablePermits,connected_since as connectedSince,msg_rate_out as msgRateOut," +
+                    "msg_throughput_out as msgThroughputOut,msg_rate_redeliver as msgRateRedeliver," +
+                    "client_version as clientVersion,time_stamp ,metadata as metadata FROM consumers_stats " +
+            "where time_stamp=#{timestamp} and " +
+                    "topic_stats_id IN <foreach collection='topicStatsIdList' item='topicStatsId' open='(' separator=',' close=')'> #{topicStatsId} </foreach>" +
+                    "</script>"})
+    List<ConsumerStatsEntity> findByMultiTopicStatsId(@Param("topicStatsIdList") List<Long> topicStatsIdList,
+                                                      @Param("timestamp") long timestamp);
 
     @Delete("DELETE FROM consumers_stats WHERE time_stamp < #{refTime}")
     void delete(@Param("refTime") long refTime);

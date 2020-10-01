@@ -108,7 +108,6 @@ public interface TopicsStatsMapper {
             @Param("tenantList") List<String> tenantList,
             @Param("timestamp") long timestamp);
 
-
     @Select({"<script>",
             "SELECT environment, tenant, namespace,"
                     + "sum(producer_count) as producerCount,"
@@ -127,6 +126,20 @@ public interface TopicsStatsMapper {
             @Param("environment") String environment,
             @Param("tenant") String tenant,
             @Param("namespaceList") List<String> namespaceList,
+            @Param("timestamp") long timestamp);
+
+    @Select({"<script>",
+            "SELECT topic_stats_id as topicStatsId,environment as environment,cluster as cluster,broker as broker," +
+                    "tenant as tenant,namespace as namespace,bundle as bundle,persistent as persistent," +
+                    "topic as topic,producer_count as producerCount,subscription_count as subscriptionCount," +
+                    "msg_rate_in as msgRateIn,msg_throughput_in as msgThroughputIn,msg_rate_out as msgRateOut," +
+                    "msg_throughput_out as msgThroughputOut,average_msg_size as averageMsgSize,storage_size as storageSize," +
+                    "time_stamp  FROM topics_stats " +
+            "WHERE time_stamp=#{timestamp} and " +
+                    "environment IN <foreach collection='environmentList' item='environment' open='(' separator=',' close=')'> #{environment} </foreach>" +
+                    "</script>"})
+    List<TopicStatsEntity> findByMultiEnvironment(
+            @Param("environmentList") List<String> environmentList,
             @Param("timestamp") long timestamp);
 
     @Delete("DELETE FROM topics_stats WHERE time_stamp < #{refTime}")

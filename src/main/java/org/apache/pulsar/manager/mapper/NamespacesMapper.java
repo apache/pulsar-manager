@@ -67,6 +67,12 @@ public interface NamespacesMapper {
             "FROM namespaces WHERE tenant=#{tenant}")
     Page<NamespaceEntity> findAllByTenant(String tenant);
 
+    @Select({"<script>",
+            "SELECT tenant, namespace, namespace_id as namespaceId FROM namespaces",
+            "WHERE tenant IN <foreach collection='tenantList' item='tenant' open='(' separator=',' close=')'> #{tenant} </foreach>" +
+                    "</script>"})
+    List<NamespaceEntity> findAllByMultiTenant(@Param("tenantList") List<String> tenantList);
+
     @Select("SELECT tenant,namespace,namespace_id as namespaceId FROM namespaces")
     Page<NamespaceEntity> getNamespacesList();
 

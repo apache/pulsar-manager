@@ -14,7 +14,10 @@
 package org.apache.pulsar.manager.entity;
 
 import com.github.pagehelper.Page;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ConsumersStatsRepository {
@@ -29,6 +32,8 @@ public interface ConsumersStatsRepository {
 
     Page<ConsumerStatsEntity> findByReplicationStatsId(Integer pageNum, Integer pageSize,
                                                        long replicationStatsId, long timestamp);
+
+    List<ConsumerStatsEntity> findByMultiTopicStatsId(List<Long> topicStatsIdList, long timestamp);
 
     void remove(long timestamp, long timeInterval);
 }

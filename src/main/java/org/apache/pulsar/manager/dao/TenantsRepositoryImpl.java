@@ -62,6 +62,12 @@ public class TenantsRepositoryImpl implements TenantsRepository {
     }
 
     @Override
+    public List<TenantEntity> findByMultiEnvironmentName(List<String> environmentNameList) {
+        List<TenantEntity> tenantEntities = tenantsMapper.findAllByMultiEnvironmentName(environmentNameList);
+        return tenantEntities;
+    }
+
+    @Override
     public long save(TenantEntity tenantsEntity) {
         tenantsMapper.insert(tenantsEntity);
         return tenantsEntity.getTenantId();

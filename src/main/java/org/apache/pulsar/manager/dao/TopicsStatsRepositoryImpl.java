@@ -91,6 +91,11 @@ public class TopicsStatsRepositoryImpl implements TopicsStatsRepository {
         return topicsStatsMapper.findByMultiNamespace(environment, tenant, namespaceList, timestamp);
     }
 
+    public List<TopicStatsEntity> findByMultiEnvironment(List<String> environmentList,
+                                                         long timestamp) {
+        return topicsStatsMapper.findByMultiEnvironment(environmentList, timestamp);
+    }
+
     public void remove(long timestamp, long timeInterval) {
         topicsStatsMapper.delete(timestamp - timeInterval);
     }

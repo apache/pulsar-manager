@@ -42,6 +42,8 @@ public interface NamespacesRepository {
 
     List<NamespaceEntity> findByTenant(String tenant);
 
+    List<NamespaceEntity> findByMultiTenant(List<String> tenantList);
+
     void remove(String tenant, String namespace);
 
 }
