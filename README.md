@@ -36,7 +36,7 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
 
 2. Start Pulsar Manager in a separate container.
 
-> NOTE: the command links the pulsar-manager container with the pulsar standalone container so they are in the same network.
+    > NOTE: the command links the pulsar-manager container with the pulsar standalone container so they are in the same network.
 
     ```
     docker pull apachepulsar/pulsar-manager:v0.2.0
@@ -47,7 +47,7 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
         apachepulsar/pulsar-manager:v0.2.0
     ```
 
-> NOTE: Enable bookkeeper visual manager(Optional), update the field `bkvm.enabled` to `true` for the file [bkvm.conf](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/bkvm.conf).
+    > NOTE: Enable bookkeeper visual manager(Optional), update the field `bkvm.enabled` to `true` for the file [bkvm.conf](https://github.com/apache/pulsar-manager/blob/master/src/main/resources/bkvm.conf).
 
     ```
     docker pull apachepulsar/pulsar-manager:v0.2.0
@@ -59,7 +59,7 @@ is able to talk to the brokers and bookies in your Pulsar cluster.
         apachepulsar/pulsar-manager:v0.2.0
     ```
 
-* `SPRING_CONFIGURATION_FILE`: Default configuration file for spring.
+    * `SPRING_CONFIGURATION_FILE`: Default configuration file for spring.
 
 ### Use Docker Compose
 
@@ -167,26 +167,27 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
 
 1. Access Pulsar manager UI at `http://${frontend-end-ip}/#/environments`.
 
-If you started Pulsar Manager using docker or docker-compose, the Pulsar Manager is running at port 9527. You can access the Pulsar Manager UI at http://127.0.0.1/#/environments.
+    If you started Pulsar Manager using docker or docker-compose, the Pulsar Manager is running at port 9527. You can access the Pulsar Manager UI at http://127.0.0.1/#/environments.
 
-If you are deploying Pulsar Manager 0.1.0 using the released container, you can log in the Pulsar Manager UI using the following credentials.
+    If you are deploying Pulsar Manager 0.1.0 using the released container, you can log in the Pulsar Manager UI using the following credentials.
 
-   * Account: `pulsar`  
-   * Password: `pulsar`  
-   
-If you are deploying Pulsar Manager using the latest code, you can create a super-user using the following command. Then you can use the super user credentials to log in the Pulsar Manager UI.
+    * Account: `pulsar`  
+    * Password: `pulsar`  
 
-    ```$xslt
+    If you are deploying Pulsar Manager using the latest code, you can create a super-user using the following command. Then you can use the super user credentials to log in the Pulsar Manager UI.
+
+    ```
     CSRF_TOKEN=$(curl http://backend-service:7750/pulsar-manager/csrf-token)
     curl \
-        -H 'X-XSRF-TOKEN: $CSRF_TOKEN' \
-        -H 'Cookie: XSRF-TOKEN=$CSRF_TOKEN;' \
-        -H "Content-Type: application/json" \
+        -H "X-XSRF-TOKEN: $CSRF_TOKEN" \
+        -H "Cookie: XSRF-TOKEN=$CSRF_TOKEN;" \
+        -H 'Content-Type: application/json' \
         -X PUT http://backend-service:7750/pulsar-manager/users/superuser \
         -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
     ```
-   `backend-service`: The IP address or domain name of the backend service.
-   
+
+    * `backend-service`: The IP address or domain name of the backend service.
+
 2. Create an environment. 
 
     An environment represents a Pulsar instance or a group of clusters you want to manage. A Pulsar Manager is capable of managing multiple environments.
