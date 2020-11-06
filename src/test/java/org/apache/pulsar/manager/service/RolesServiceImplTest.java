@@ -202,17 +202,18 @@ public class RolesServiceImplTest {
 
     @Test
     public void isSuperUser_Permits_ifUserManagementIsOff_andDefaultUserIsUsed() {
+        ReflectionTestUtils.setField(rolesService, "userManagementEnabled", false);
         String account = "pulsar";
         String password = "pulsar";
         String token = jwtService.toToken(account + "-" + password);
 
         when(jwtService.getToken(Mockito.anyString())).thenReturn(token);
         assertTrue(rolesService.isSuperUser(token));
+        ReflectionTestUtils.setField(rolesService, "userManagementEnabled", true);
     }
 
     @Test
     public void isSuperUser_Forbids_ifUserManagementIsOn_andDefaultUserIsUsed() {
-        ReflectionTestUtils.setField(rolesService, "userManagementEnabled", true);
         String account = "pulsar";
         String password = "pulsar";
         String token = jwtService.toToken(account + "-" + password);
