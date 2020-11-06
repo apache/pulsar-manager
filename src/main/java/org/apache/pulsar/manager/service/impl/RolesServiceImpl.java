@@ -31,13 +31,18 @@ import org.apache.pulsar.manager.entity.TenantsRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.ClustersService;
+import org.apache.pulsar.manager.service.JwtService;
 import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.service.TenantsService;
 import org.apache.pulsar.manager.utils.ResourceType;
 import org.apache.pulsar.manager.utils.ResourceVerbs;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -46,6 +51,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
@@ -74,6 +81,12 @@ public class RolesServiceImpl implements RolesService {
 
     @Autowired
     private NamespacesRepository namespacesRepository;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Value("${user.management.enable}")
+    private boolean userManagementEnabled;
 
     private final String VERBS_SEPARATOR = ",";
 
@@ -247,7 +260,13 @@ public class RolesServiceImpl implements RolesService {
         result.put("message", "Validate tenant success");
         return result;
     }
+
     public boolean isSuperUser(String token) {
+        if (!userManagementEnabled) {
+            HttpServletRequest request = requireNonNull((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String serverToken = jwtService.getToken(request.getSession().getId());
+            return StringUtils.equalsIgnoreCase(serverToken, token);
+        }
         Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(token);
         if (!userInfoEntityOptional.isPresent()) {
             return false;
