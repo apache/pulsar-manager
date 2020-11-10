@@ -32,6 +32,17 @@
             <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
+        <div class="refresh-container">
+          <el-form-item :label="$t('topic.autoRefresh')">
+            <el-select ref="autoRefreshSelect" v-model="autoRefreshInterval" placeholder="select auto refresh" @change="onAutoRefreshChanged">
+              <el-option :key="off" label="off" value="off"/>
+              <el-option :key="5" label="5s" value="5"/>
+              <el-option :key="10" label="10s" value="10"/>
+              <el-option :key="30" label="30s" value="30"/>
+              <el-option :key="60" label="60s" value="60"/>
+            </el-select>
+          </el-form-item>
+        </div>
       </el-form>
       <el-form v-if="replicatedClusters.length > 0" :inline="true" :model="clusterForm" class="form-container">
         <el-form-item :label="$t('table.cluster')">
@@ -331,6 +342,7 @@ export default {
   },
   data() {
     return {
+      autoRefreshInterval: 'off',
       postForm: Object.assign({}, defaultForm),
       clusterForm: Object.assign({}, defaultClusterForm),
       activeName: 'overview',
@@ -410,6 +422,17 @@ export default {
     this.getReplicatedClusters()
     this.initTopicStats()
     this.initPermissions()
+    let refreshInterval = sessionStorage.getItem('refreshInterval')
+    this.autoRefreshInterval = refreshInterval
+    setTimeout(() => {
+      if (refreshInterval !== null && refreshInterval !== undefined && refreshInterval !== 'off') {
+        refreshInterval = parseInt(refreshInterval)
+        this.refreshIntervalId = setInterval(() => {
+          location.reload()
+          this.$refs.autoRefreshSelect.value = refreshInterval
+        }, refreshInterval * 1000)
+      }
+    }, 1000)
   },
   methods: {
     getRemoteTenantsList() {
@@ -762,6 +785,19 @@ export default {
         this.initTopicStats()
         this.dialogFormVisible = false
       })
+    },
+    onAutoRefreshChanged(val) {
+      if (this.refreshIntervalId !== undefined) {
+        clearInterval(this.refreshIntervalId)
+      }
+      if (val !== 'off') {
+        sessionStorage.setItem('refreshInterval', val)
+        this.refreshIntervalId = setInterval(() => {
+          location.reload()
+        }, val * 1000)
+      } else {
+        sessionStorage.removeItem('refreshInterval')
+      }
     }
   }
 }
@@ -790,5 +826,9 @@ export default {
   -moz-transform: rotate(90deg); 	/* Firefox */
   -webkit-transform: rotate(90deg); /* Safari 和 Chrome */
   -o-transform: rotate(90deg); 	/* Opera */
+}
+
+.refresh-container {
+  float:right;
 }
 </style>
