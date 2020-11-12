@@ -31,16 +31,26 @@ import org.apache.pulsar.manager.utils.ResourceVerbs;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Map;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringRunner.class)
@@ -72,6 +82,9 @@ public class RolesServiceImplTest {
 
     @Autowired
     private NamespacesRepository namespacesRepository;
+
+    @MockBean
+    private JwtService jwtService;
 
     @Test
     public void validateRoleInfoEntityTest() {
@@ -126,7 +139,7 @@ public class RolesServiceImplTest {
 
         roleInfoEntity.setResourceVerbs("xxxx");
         Map<String, String> stringMapVerbs = rolesService.validateRoleInfoEntity(roleInfoEntity);
-        Assert.assertTrue(stringMapVerbs.get("error").startsWith("Verb"));
+        assertTrue(stringMapVerbs.get("error").startsWith("Verb"));
 
         roleInfoEntity.setResourceType(ResourceType.TOPICS.name());
         roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
@@ -186,4 +199,27 @@ public class RolesServiceImplTest {
                 "test-access-token", "test-tenant");
         Assert.assertEquals(currentTenantValidateSuccess.get("message"), "Validate tenant success");
     }
+
+    @Test
+    public void isSuperUser_Permits_ifUserManagementIsOff_andDefaultUserIsUsed() {
+        ReflectionTestUtils.setField(rolesService, "userManagementEnabled", false);
+        String account = "pulsar";
+        String password = "pulsar";
+        String token = jwtService.toToken(account + "-" + password);
+
+        when(jwtService.getToken(Mockito.anyString())).thenReturn(token);
+        assertTrue(rolesService.isSuperUser(token));
+        ReflectionTestUtils.setField(rolesService, "userManagementEnabled", true);
+    }
+
+    @Test
+    public void isSuperUser_Forbids_ifUserManagementIsOn_andDefaultUserIsUsed() {
+        String account = "pulsar";
+        String password = "pulsar";
+        String token = jwtService.toToken(account + "-" + password);
+
+        assertFalse(rolesService.isSuperUser(token));
+        verify(jwtService, never()).getToken(anyString());
+    }
+
 }
