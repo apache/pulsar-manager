@@ -637,7 +637,8 @@ export default {
     deleteTopicMessage: 'Are you sure you want to delete this topic?',
     partitionedTopicName: 'Partitioned Topic Name',
     selectRoleMessage: 'Please Select Role',
-    backlogOpeartion: 'Backlog Operation'
+    backlogOpeartion: 'Backlog Operation',
+    autoRefresh: 'Auto Refresh'
   },
   cluster: {
     label: 'Cluster',
