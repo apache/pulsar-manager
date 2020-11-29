@@ -16,6 +16,7 @@ package org.apache.pulsar.manager.service.impl;
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
@@ -24,8 +25,6 @@ import org.apache.pulsar.manager.service.BrokerStatsService;
 import org.apache.pulsar.manager.service.NamespacesService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.TopicsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,12 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Service
+@Slf4j
 public class NamespacesServiceImpl implements NamespacesService {
 
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
-
-    private static final Logger log = LoggerFactory.getLogger(NamespacesServiceImpl.class);
 
     private final TopicsStatsRepository topicsStatsRepository;
     private final TopicsService topicsService;

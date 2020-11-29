@@ -16,6 +16,7 @@ package org.apache.pulsar.manager.service.impl;
 import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.admin.PulsarAdmin;
 import org.apache.pulsar.client.admin.PulsarAdminBuilder;
 import org.apache.pulsar.client.admin.PulsarAdminException;
@@ -33,8 +34,6 @@ import org.apache.pulsar.manager.entity.TopicStatsEntity.TopicStatsSummary;
 import org.apache.pulsar.manager.entity.TopicsStatsRepository;
 import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.TopicsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -42,9 +41,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j
 public class TopicsServiceImpl implements TopicsService {
-
-    private static final Logger log = LoggerFactory.getLogger(TopicsServiceImpl.class);
 
     public static final String PARTITIONED_TOPIC_SUFFIX = "-partition-";
 

@@ -14,13 +14,12 @@
 package org.apache.pulsar.manager.service.impl;
 
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.common.policies.data.FailureDomain;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.service.BrokersService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,9 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class BrokersServiceImpl implements BrokersService {
-
-    private static final Logger log = LoggerFactory.getLogger(BrokersServiceImpl.class);
 
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;

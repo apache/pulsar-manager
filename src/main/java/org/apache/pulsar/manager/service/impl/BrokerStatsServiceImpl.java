@@ -20,6 +20,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.text.DecimalFormat;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.admin.Brokers;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
@@ -45,8 +46,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -59,9 +58,8 @@ import org.springframework.stereotype.Service;
 @Configuration
 @Component
 @EnableScheduling
+@Slf4j
 public class BrokerStatsServiceImpl implements BrokerStatsService {
-
-    private static final Logger log = LoggerFactory.getLogger(BrokerStatsServiceImpl.class);
 
     @Value("${backend.directRequestHost}")
     private String directRequestHost;

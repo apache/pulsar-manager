@@ -17,6 +17,7 @@ import com.github.pagehelper.Page;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.entity.TopicStatsEntity;
@@ -25,8 +26,6 @@ import org.apache.pulsar.manager.service.BrokerStatsService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.TenantsService;
 import org.apache.pulsar.common.policies.data.TenantInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,9 +37,8 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class TenantsServiceImpl implements TenantsService {
-
-    private static final Logger log = LoggerFactory.getLogger(TenantsServiceImpl.class);
 
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;

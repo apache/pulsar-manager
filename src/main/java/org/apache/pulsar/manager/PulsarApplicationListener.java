@@ -14,12 +14,11 @@
 package org.apache.pulsar.manager;
 
 import com.github.pagehelper.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
 import org.apache.pulsar.manager.service.PulsarAdminService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
@@ -32,9 +31,8 @@ import java.util.Optional;
  * PulsarApplicationListener do something after the spring framework initialization is complete.
  */
 @Component
+@Slf4j
 public class PulsarApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
-
-    private static final Logger log = LoggerFactory.getLogger(PulsarApplicationListener.class);
 
     private final EnvironmentsRepository environmentsRepository;
 
