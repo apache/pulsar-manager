@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.sql.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -27,9 +27,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
+@Slf4j
 public class SqliteDBTestProfile {
-
-    private static final Logger logger = LoggerFactory.getLogger(SqliteDBTestProfile.class);
 
     @Bean
     @Profile("test")
@@ -37,7 +36,7 @@ public class SqliteDBTestProfile {
         Path tempFile = Files.createTempFile("test-pulsar-manager-db", "sqlite");
         tempFile.toFile().deleteOnExit();
         String sqliteDb = "jdbc:sqlite:" + tempFile.toFile().getAbsolutePath();
-        logger.info("Created a temp sqlite db for testing : {}", sqliteDb);
+        log.info("Created a temp sqlite db for testing : {}", sqliteDb);
 
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");

@@ -21,13 +21,12 @@ import java.net.URL;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.PulsarEvent;
 import org.apache.pulsar.manager.service.RolesService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
@@ -39,9 +38,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  * Handle http redirect and forward.
  */
 @Component
+@Slf4j
 public class EnvironmentForward extends ZuulFilter {
-
-    private static final Logger log = LoggerFactory.getLogger(EnvironmentForward.class);
 
     private final EnvironmentCacheService environmentCacheService;
 

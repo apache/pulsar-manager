@@ -15,6 +15,7 @@ package org.apache.pulsar.manager.controller;
 
 import com.google.common.collect.Maps;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
@@ -36,8 +37,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.pulsar.manager.utils.ResourceType;
 import org.hibernate.validator.constraints.Range;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -61,9 +60,8 @@ import java.util.Optional;
 @Api(description = "Support change environments")
 @Validated
 @RestController
+@Slf4j
 public class EnvironmentsController {
-
-    private static final Logger log = LoggerFactory.getLogger(EnvironmentsController.class);
 
     private final EnvironmentsRepository environmentsRepository;
 

@@ -13,6 +13,7 @@
  */
 package org.apache.pulsar.manager.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,8 +32,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -49,6 +48,7 @@ import java.util.Map;
  * http client class, to get info from pulsar broker
  */
 @Component
+@Slf4j
 public class HttpUtil {
 
     private static boolean tlsEnabled;
@@ -58,8 +58,6 @@ public class HttpUtil {
     private static String tlsKeystorePassword;
 
     private static boolean tlsHostnameVerifier;
-
-    private static final Logger log = LoggerFactory.getLogger(HttpUtil.class);
 
     private static CloseableHttpClient httpClient;
 
