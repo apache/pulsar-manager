@@ -39,13 +39,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.apache.pulsar.common.api.proto.PulsarApi;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-    classes = {
-        PulsarManagerApplication.class,
-        HerdDBTestProfile.class
-    }
+        classes = {
+            PulsarManagerApplication.class,
+            HerdDBTestProfile.class
+        }
 )
 @ActiveProfiles("test")
 public class TopicsServiceImplTest {
@@ -117,7 +118,7 @@ public class TopicsServiceImplTest {
         topicMap.put("partitions", "0");
         topics.add(topicMap);
 
-        List<Map<String, Object>> topicsList =  topicsService.getTopicsStatsList(
+        List<Map<String, Object>> topicsList = topicsService.getTopicsStatsList(
                 environment, tenant, namespace, policy, topics);
         topicsList.forEach((t) -> {
             Assert.assertEquals(0, t.get("partitions"));
@@ -133,7 +134,8 @@ public class TopicsServiceImplTest {
     public void peekMessagesTest() throws PulsarAdminException {
         Mockito.when(pulsarAdminService.topics("http://localhost:8080")).thenReturn(topics);
         List<Message<byte[]>> messages = new ArrayList<>();
-        messages.add(new MessageImpl<byte[]>("persistent://public/default/test", "1:1", Maps.newTreeMap(), "test".getBytes(), Schema.BYTES));
+        messages.add(new MessageImpl<>("persistent://public/default/test", "1:1", Maps.newTreeMap(), "test".getBytes(),
+                Schema.BYTES, PulsarApi.MessageMetadata.newBuilder()));
         Mockito.when(topics.peekMessages("persistent://public/default/test", "sub-1", 1)).thenReturn(messages);
 
         List<Map<String, Object>> result = topicsService.peekMessages(
@@ -149,4 +151,5 @@ public class TopicsServiceImplTest {
             Assert.assertEquals(new String("test".getBytes()), new String((byte[]) message.get("data")));
         });
     }
+
 }
