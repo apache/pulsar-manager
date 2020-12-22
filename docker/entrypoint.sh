@@ -27,6 +27,7 @@ addgroup pulsar
 adduser --disabled-password --ingroup pulsar pulsar
 mkdir -p /run/postgresql
 chown -R pulsar:pulsar /run/postgresql/
+mkdir -p /data
 chown -R pulsar:pulsar /data
 chown pulsar:pulsar /pulsar-manager/init_db.sql
 chmod 750 /data
