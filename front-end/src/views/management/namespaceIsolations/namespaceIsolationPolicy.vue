@@ -141,7 +141,7 @@
           :value="item.value"/>
       </el-select>
       <el-form :inline="true" :model="form" :rules="rules">
-        <el-form-item prop="ensembelSize">
+        <el-form-item prop="ensembleSize">
           <span>{{ $t('ip.brokerUsageThresholdLabel') }} (%)</span>
           <el-tooltip :content="brokerUsageThresholdContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
