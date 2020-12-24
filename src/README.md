@@ -187,6 +187,42 @@ Set the `bkvm.enabled` field to `true` in the file [bkvm.conf](https://github.co
         apachepulsar/pulsar-manager:v0.2.0
     ```
 
+### Enable swagger ui
+If you want to enable swagger ui, please set the following option to true in file `application.properties`, default value is true.
+if you don't want to enable swagger ui in production environment, you can set the value false.
+
+```$xslt
+swagger.enabled=true
+```
+
+### How to use swagger to access the API
+1. Please enable swagger ui 'swagger.enabled=true' in `application.properties`
+
+2. Visit http://YOUR_BACKEND_SERVICE_HOST:7750/swagger-ui.html
+
+3. If you directly try apis in swagger, you will receive a 401 response, because it has not been authorized.
+    So please request the login api first, use the username and password of the pulsar manager to login, 
+    and copy the `token` of the response header, next step will use the token.
+    The request body is like this:
+    ```$xslt
+    {
+      "username": "admin",
+      "password": "apachepulsar"
+    }
+    ```
+    Then copy the token of the response header
+    ![swagger-request-login](../docs/img/swagger-request-login.png)
+
+4. Click the `Authorize` button in swagger ui, and then fill in the authorize information of swagger
+     - environment: the environment name you configed in pulsar manager
+     - token: the token you copied above
+     - username: the username you just login
+    
+    ![swagger-authorize](../docs/img/swagger-authorize.png)
+
+5. Then you can directly request other apis and receive correct response, because it has been authorized.
+
+
 #### Third party login options
 
 ```
