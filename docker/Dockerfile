@@ -21,6 +21,10 @@ FROM openjdk:8-jre-alpine
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
+# use default configuration file
+ENV SPRING_CONFIGURATION_FILE=/pulsar-manager/pulsar-manager/application.properties
+# use default PostGreSQL Server
+ENV URL="jdbc:postgresql://127.0.0.1:5432/pulsar_manager"
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="Apache Pulsar Manager" \
       org.label-schema.description="An Apache Pulsar Manager for management Pulsar clusters" \
