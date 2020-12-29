@@ -193,32 +193,30 @@ To enable swagger UI, set `swagger.enabled=true` in the `application.properties`
 If you want to disable swagger UI in the  production environment, you can set `swagger.enabled=false`.
 
 ### How to use swagger to access the API
-1. Please enable swagger ui 'swagger.enabled=true' in `application.properties`
+1. Enable swagger UI by setting 'swagger.enabled=true' in the `application.properties` file.
 
 2. Visit http://YOUR_BACKEND_SERVICE_HOST:7750/swagger-ui.html
 
-3. If you directly try apis in swagger, you will receive a 401 response, because it has not been authorized.
-    So please request the login api first, use the username and password of the pulsar manager to login, 
-    and copy the `token` of the response header, next step will use the token.
-    The request body is like this:
+3. Request the login API, use the username and password of the Pulsar Manager to login, copy the `token` of the response header.
+   
+    The request body is as follows:
     ```$xslt
     {
       "username": "admin",
       "password": "apachepulsar"
     }
     ```
-    Then copy the token of the response header
+    Copy the token of the response header.
     ![swagger-request-login](../docs/img/swagger-request-login.png)
 
-4. Click the `Authorize` button in swagger ui, and then fill in the authorize information of swagger
-     - environment: the environment name you configed in pulsar manager
-     - token: the token you copied above
-     - username: the username you just login
+4. Authorize. Click the `Authorize` button in swagger UI, and then fill in the authorization information of swagger.
+     - environment: the environment name you have configured in Pulsar Manager.
+     - token: the token you have copied in the previous step.
+     - username: the username you login.
     
     ![swagger-authorize](../docs/img/swagger-authorize.png)
 
-5. Then you can directly request other apis and receive correct response, because it has been authorized.
-
+5. Request other APIs.
 
 #### Third party login options
 
