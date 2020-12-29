@@ -187,13 +187,10 @@ Set the `bkvm.enabled` field to `true` in the file [bkvm.conf](https://github.co
         apachepulsar/pulsar-manager:v0.2.0
     ```
 
-### Enable swagger ui
-If you want to enable swagger ui, please set the following option to true in file `application.properties`, default value is true.
-if you don't want to enable swagger ui in production environment, you can set the value false.
+### Enable swagger UI
+To enable swagger UI, set `swagger.enabled=true` in the `application.properties` file. The default value is `true`.
 
-```$xslt
-swagger.enabled=true
-```
+If you want to disable swagger UI in the  production environment, you can set `swagger.enabled=false`.
 
 ### How to use swagger to access the API
 1. Please enable swagger ui 'swagger.enabled=true' in `application.properties`
