@@ -29,6 +29,7 @@ public class WebAppConfigurer implements WebMvcConfigurer {
     @Resource
     private AdminHandlerInterceptor adminHandlerInterceptor;
 
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(adminHandlerInterceptor).addPathPatterns("/**")
@@ -40,6 +41,14 @@ public class WebAppConfigurer implements WebMvcConfigurer {
                 .excludePathPatterns("/ui")
                 .excludePathPatterns("/static")
                 .excludePathPatterns("/error")
+                // swagger
+                .excludePathPatterns("/swagger-ui.html")
+                .excludePathPatterns("/swagger/**")
+                .excludePathPatterns("/swagger-resources/**")
+                .excludePathPatterns("/v2/**")
+                .excludePathPatterns("/webjars/**")
+                .excludePathPatterns("/configuration/**")
+                .excludePathPatterns("/doc.html")
                 // BKVM
                 .excludePathPatterns("/bkvm")
                 ;
