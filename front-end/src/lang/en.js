@@ -407,7 +407,7 @@ export default {
       messageTTLContent: 'Set message TTL in seconds. If the messages are not consumed by any consumers' +
         ' of a subscription, they are marked as `consumed` after the configured TTL period for that subscription.',
       inputMessageTTL: 'Please input Backlog Quotas Limit',
-      retentionSize: 'Retention Size (bytes)',
+      retentionSize: 'Retention Size (megabytes)',
       retentionSizeContent: 'The retention size. Only applied to the messages are acknowledged by all subscriptions.',
       inputRententionSize: 'Please input retention size',
       retentionTime: 'Retention Period (minutes)',
