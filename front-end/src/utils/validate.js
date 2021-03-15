@@ -88,7 +88,6 @@ export function validateServiceUrl(expectedProtocol, allowEmpty) {
 }
 
 export function validateSizeString(str) {
-  console.log('validate size ' + str)
   var last = str.charAt(str.length - 1)
   var subStr = str.substring(0, str.length - 1)
   switch (last) {
