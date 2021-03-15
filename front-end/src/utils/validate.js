@@ -86,3 +86,29 @@ export function validateServiceUrl(expectedProtocol, allowEmpty) {
     }
   }
 }
+
+export function validateSizeString(str) {
+  console.log('validate size ' + str)
+  var last = str.charAt(str.length - 1)
+  var subStr = str.substring(0, str.length - 1)
+  switch (last) {
+    case 'k':
+    case 'K':
+      return Number(subStr) * 1024
+
+    case 'm':
+    case 'M':
+      return Number(subStr) * 1024 * 1024
+
+    case 'g':
+    case 'G':
+      return Number(subStr) * 1024 * 1024 * 1024
+
+    case 't':
+    case 'T':
+      return Number(subStr) * 1024 * 1024 * 1024 * 1024
+
+    default:
+      return Number(str)
+  }
+}
