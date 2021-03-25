@@ -619,10 +619,14 @@ export default {
       unloadTopicSuccess: 'Successfully unload the topic!',
       terminateTopicSuccess: 'Successfully terminate the topic!',
       startCompactionSuccess: 'Successfully start compacting the topic!',
-      startOffloadSuccess: 'Successfully start offloading the topic!',
+      startOffloadSuccess: 'Successfully start offloading the topic',
       expireMessageSuccess: 'Successfully expire messages the topic!',
       resetMessageSuccess: 'Successfully reset messages the topic!',
       clearMessageSuccess: 'Successfully clear messages the topic'
+    },
+    errorLog: {
+      noOffloadData: 'Nothing to offload!',
+      invalidSizeStr: 'Invalid size string! (e.g 200K 50M 1G)'
     },
     info: 'INFO',
     column: 'column',

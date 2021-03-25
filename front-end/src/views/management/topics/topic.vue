@@ -185,23 +185,29 @@
                 class="circle">
                 <span class="circle-font">{{ offload }}</span>
               </el-button>
-              <el-button
-                v-if="offload !== 'RUNNING'"
-                type="primary"
-                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
-                icon="el-icon-refresh"
-                @click="handleOffload">
-                {{ $t('topic.offload') }}
-              </el-button>
-              <el-button
-                v-if="offload === 'RUNNING'"
-                type="success"
-                style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
-                icon="el-icon-refresh"
-                disabled
-                @click="handleOffload">
-                {{ $t('topic.offload') }}
-              </el-button>
+              <el-row type="flex" justify="center" style="margin-top:15px;">
+                <el-col :span="16">
+                  <el-button
+                    :disabled="offloadDisabled"
+                    type="primary"
+                    icon="el-icon-refresh"
+                    @click="handleOffload">
+                    {{ $t('topic.offload') }}
+                  </el-button>
+                </el-col>
+                <el-col :span="8">
+                  <el-tooltip
+                    class="item"
+                    effect="dark"
+                    content="offload threshold (e.g 200k 50m 1g)"
+                    placement="top-start">
+                    <el-input
+                      v-model="offloadThreshold"
+                      :disabled="offloadDisabled"
+                      style="display:block;"/>
+                  </el-tooltip>
+                </el-col>
+              </el-row>
             </el-card>
           </el-col>
         </el-row>
@@ -554,6 +560,7 @@ import Pagination from '@/components/Pagination' // Secondary package based on e
 import { formatBytes } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
 import { putSubscriptionOnCluster, deleteSubscriptionOnCluster } from '@/api/subscriptions'
+import { validateSizeString } from '@/utils/validate'
 
 const defaultForm = {
   persistent: '',
@@ -645,7 +652,9 @@ export default {
       routeTopic: '',
       routeTopicPartition: -1,
       routeCluster: '',
-      loaded: false
+      loaded: false,
+      offloadThreshold: '0K',
+      offloadDisabled: true
     }
   },
   created() {
@@ -739,6 +748,7 @@ export default {
       offloadStatusOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
         if (!response.data) return
         this.offload = response.data.status
+        this.offloadDisabled = this.offload === 'RUNNING'
       })
     },
     getCompactionStatus() {
@@ -1026,15 +1036,72 @@ export default {
       })
     },
     handleOffload() {
-      offloadOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic()).then(response => {
+      var threshold = validateSizeString(this.offloadThreshold)
+      if (isNaN(threshold) || threshold < 0) {
         this.$notify({
-          title: 'success',
-          message: this.$i18n.t('topic.notification.startOffloadSuccess'),
-          type: 'success',
+          title: 'error',
+          message: this.$i18n.t('topic.errorLog.invalidSizeStr'),
+          type: 'error',
           duration: 3000
         })
+        return
+      }
+
+      fetchTopicStatsInternal(this.postForm.persistent, this.getFullTopic()).then(response => {
+        let ledgers = response.data.ledgers
+
+        if (!ledgers || ledgers.length <= 1) {
+          this.$notify({
+            title: 'warn',
+            message: this.$i18n.t('topic.errorLog.noOffloadData'),
+            type: 'warn',
+            duration: 3000
+          })
+          return
+        }
+
+        ledgers[ledgers.length - 1].size = response.data.currentLedgerSize
+        ledgers = ledgers.reverse()
+
+        var totalSize = 0
+        var preLedgerId = ledgers[0].ledgerId
+        var messageId
+        for (var i = 0; i < ledgers.length; i++) {
+          totalSize += ledgers[i].size
+          if (totalSize > threshold) {
+            messageId = {
+              ledgerId: preLedgerId,
+              entryId: 0,
+              partitionIndex: -1
+            }
+            break
+          }
+          preLedgerId = ledgers[i].ledgerId
+        }
+
+        if (!messageId) {
+          this.$notify({
+            title: 'warn',
+            message: this.$i18n.t('topic.errorLog.noOffloadData'),
+            type: 'warn',
+            duration: 3000
+          })
+          return
+        }
+
+        offloadOnCluster(this.getCurrentCluster(), this.postForm.persistent, this.getFullTopic(), messageId)
+          .then(response => {
+            var msg = this.$i18n.t('topic.notification.startOffloadSuccess') +
+                        ' before ' + messageId['ledgerId'] + ':' + messageId['entryId'] + ' !'
+            this.$notify({
+              title: 'success',
+              message: msg,
+              type: 'success',
+              duration: 3000
+            })
+          })
+        this.getOffloadStatus()
       })
-      this.getOffloadStatus()
     },
     handleDeleteTopic() {
       this.dialogStatus = 'delete'
