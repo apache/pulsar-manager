@@ -36,9 +36,6 @@ plugins {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven {
-        url "https://yahoo.bintray.com/maven"
-    }
 }
 
 configurations {
@@ -125,6 +122,7 @@ dependencies {
     compile group: 'org.apache.pulsar', name: 'pulsar-client-admin-original', version: pulsarVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-client-auth-athenz', version: pulsarVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-client-auth-sasl', version: pulsarVersion
+    compile group: 'com.yahoo.athenz', name: 'athenz-zts-java-client', version: athenzVersion
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swagger2Version
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggeruiVersion
     compile group: 'org.apache.pulsar', name: 'pulsar-broker', version: pulsarVersion
