@@ -120,39 +120,39 @@
                   <span>{{ scope.row.persistent }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.producer.producerNumber')" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.producer.producerNumber')" sortable prop="producers" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.producers }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" min-width="30px" align="center">
+              <el-table-column :label="$t('topic.subscription.subscriptionNumber')" sortable prop="subscriptions" min-width="30px" align="center">
                 <template slot-scope="scope">
                   <span>{{ scope.row.subscriptions }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.inMsg')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inMsg')" sortable prop="inMsg" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ scope.row.inMsg }}</span>
+                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ numberFormatter(scope.row.inMsg, 2) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.outMsg')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outMsg')" sortable prop="outMsg" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ scope.row.outMsg }}</span>
+                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ numberFormatter(scope.row.outMsg, 2) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.inBytes')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.inBytes')" sortable prop="inBytes" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ scope.row.inBytes }}</span>
+                  <i class="el-icon-download" style="margin-right: 2px"/><span>{{ formatBytes(scope.row.inBytes) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.outBytes')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.outBytes')" sortable prop="outBytes" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ scope.row.outBytes }}</span>
+                  <i class="el-icon-upload2" style="margin-right: 2px"/><span>{{ formatBytes(scope.row.outBytes) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('common.storageSize')" min-width="30px" align="center">
+              <el-table-column :label="$t('common.storageSize')" sortable prop="storageSize" min-width="30px" align="center">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.storageSize }}</span>
+                  <span>{{ formatBytes(scope.row.storageSize, 0) }}</span>
                 </template>
               </el-table-column>
             </el-table>
@@ -969,6 +969,12 @@ export default {
     this.activeBundleCluster = this.replicationClustersValue.length > 0 ? this.replicationClustersValue[0] : ''
   },
   methods: {
+    formatBytes(value, decimals = 2) {
+      return formatBytes(value, decimals)
+    },
+    numberFormatter(value, digits) {
+      return numberFormatter(value, digits)
+    },
     getNamespaceStats() {
       fetchNamespaceStats(this.postForm.tenant, this.postForm.namespace).then(response => {
         if (!response.data) return
@@ -1012,11 +1018,11 @@ export default {
               'persistent': clusters[j]['persistent'],
               'producers': clusters[j]['producerCount'],
               'subscriptions': clusters[j]['subscriptionCount'],
-              'inMsg': numberFormatter(clusters[j]['msgRateIn'], 2),
-              'outMsg': numberFormatter(clusters[j]['msgRateOut'], 2),
-              'inBytes': formatBytes(clusters[j]['msgThroughputIn']),
-              'outBytes': formatBytes(clusters[j]['msgThroughputOut']),
-              'storageSize': formatBytes(clusters[j]['storageSize'], 0),
+              'inMsg': clusters[j]['msgRateIn'],
+              'outMsg': clusters[j]['msgRateOut'],
+              'inBytes': clusters[j]['msgThroughputIn'],
+              'outBytes': clusters[j]['msgThroughputOut'],
+              'storageSize': clusters[j]['storageSize'],
               'tenantNamespace': this.tenantNamespace,
               'topicLink': topicLink + '?cluster=' + clusters[j]['topic'] + '&tab='
             }
@@ -1055,11 +1061,11 @@ export default {
             'persistent': response.data.topics[i]['persistent'],
             'producers': response.data.topics[i]['producers'],
             'subscriptions': response.data.topics[i]['subscriptions'],
-            'inMsg': numberFormatter(response.data.topics[i]['inMsg'], 2),
-            'outMsg': numberFormatter(response.data.topics[i]['outMsg'], 2),
-            'inBytes': formatBytes(response.data.topics[i]['inBytes']),
-            'outBytes': formatBytes(response.data.topics[i]['outBytes']),
-            'storageSize': formatBytes(response.data.topics[i]['storageSize'], 0),
+            'inMsg': response.data.topics[i]['inMsg'],
+            'outMsg': response.data.topics[i]['outMsg'],
+            'inBytes': response.data.topics[i]['inBytes'],
+            'outBytes': response.data.topics[i]['outBytes'],
+            'storageSize': response.data.topics[i]['storageSize'],
             'children': children,
             'tenantNamespace': this.tenantNamespace,
             'topicLink': topicLink + '?tab='
