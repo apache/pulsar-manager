@@ -185,43 +185,54 @@
         </h4>
         <hr class="split-line">
         <el-form>
-          <el-tag
-            v-for="tag in dynamicTags"
-            :label="tag"
-            :key="tag"
+          <el-form-item
+            v-for="(role,index) in roleList"
+            :key="index"
             :disable-transitions="false"
-            style="margin-top:20px"
+            style="margin-top:20px;"
             class="role-el-tag">
-            <div>
-              <span> {{ tag }} </span>
+            <div v-if="role.name.length > 0">
+              <div>
+                <span style="font-size: 18px;"> {{ role.name }} </span>
+              </div>
+              <div style="margin-top:10px; display: flex; align-items: center;">
+                <el-select
+                  v-model="roleList[index].value"
+                  :placeholder="$t('namespace.policy.selectRole')"
+                  multiple
+                  style="width:300px;"
+                  @change="handleChangeOptions(role)">
+                  <el-option
+                    v-for="item in roleOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                    style="width:300px"/>
+                </el-select>
+                <el-button style="margin-left: 20px;" @click.prevent="handleClose(role)">{{ $t('namespace.policy.deleteRole') }}</el-button>
+              </div>
             </div>
-            <el-select
-              v-model="roleMap[tag]"
-              :placeholder="$t('namespace.policy.selectRole')"
-              multiple
-              style="width:300px;"
-              @change="handleChangeOptions(tag)">
-              <el-option
-                v-for="item in roleMapOptions[tag]"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-                style="width:300px"/>
-            </el-select>
-            <el-button @click.prevent="handleClose(tag)">{{ $t('namespace.policy.deleteRole') }}</el-button>
-          </el-tag>
+
+            <div v-else>
+              <el-select
+                :placeholder="$t('namespace.policy.selectRole')"
+                v-model="roleList[index].name"
+                style="width:300px;"
+                @change="handleChangeOptions(role)">
+                <el-option
+                  v-for="item in mock_role_list"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                  style="width:300px"/>
+              </el-select>
+              <el-button style="margin-left: 20px;" @click.prevent="handleClose(index)">{{ $t('namespace.policy.deleteRole') }}</el-button>
+            </div>
+
+          </el-form-item>
+
           <el-form-item style="margin-top:30px">
-            <el-input
-              v-if="inputVisible"
-              ref="saveTagInput"
-              v-model="inputValue"
-              style="margin-right:10px;width:200px;vertical-align:top"
-              size="small"
-              class="input-new-tag"
-              @keyup.enter.native="handleInputConfirm"
-              @blur="handleInputConfirm"
-            />
-            <el-button @click="showInput()">{{ $t('namespace.policy.addRole') }}</el-button>
+            <el-button :disabled="mock_role_list.length == 0" @click="addRole()">{{ $t('namespace.policy.addRole') }}</el-button>
             <!-- <el-button @click="revokeAllRole()">Revoke All</el-button> -->
           </el-form-item>
         </el-form>
@@ -790,12 +801,8 @@ export default {
         }],
         email: ''
       },
-      dynamicTags: [],
-      inputVisible: false,
-      inputValue: '',
       roleValue: [],
-      roleMap: {},
-      roleMapOptions: {},
+      roleList: [],
       roleOptions: [{
         value: 'consume',
         label: this.$i18n.t('role_actions.consume')
@@ -946,6 +953,22 @@ export default {
       },
       currentTabName: '',
       bundleInfoContent: this.$i18n.t('namespace.bundle.bundleInfoContent')
+    }
+  },
+  computed: {
+    mock_role_list() {
+      return [
+        {
+          label: 'abc@gmail.com',
+          value: 'abc@gmail.com'
+        },
+        {
+          label: 'demo@gmail.com',
+          value: 'demo@gmail.com'
+        }
+      ].filter(item => {
+        return !this.roleList.map(role => role.name).find(name => name === item.value)
+      })
     }
   },
   created() {
@@ -1109,13 +1132,20 @@ export default {
         this.form.markDeleteMaxRate = String(response.data.managedLedgerMaxMarkDeleteRate)
       })
     },
+    addRole() {
+      this.roleList.push({
+        name: '',
+        value: []
+      })
+    },
     initPermissions(tenantNamespace) {
       getPermissions(tenantNamespace).then(response => {
         if (!response.data) return
-        for (var key in response.data) {
-          this.dynamicTags.push(key)
-          this.roleMap[key] = response.data[key]
-          this.roleMapOptions[key] = this.roleOptions
+        for (const key in response.data) {
+          this.roleList.push({
+            name: key,
+            value: response.data[key]
+          })
         }
       })
     },
@@ -1233,54 +1263,23 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
-    handleClose(tag) {
-      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
-      revokePermissions(this.tenantNamespace, tag).then(response => {
+    handleClose(role) {
+      this.roleList.splice(this.roleList.indexOf(role), 1)
+      revokePermissions(this.tenantNamespace, role.name).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('namespace.notification.removeRoleSuccess'),
           type: 'success',
           duration: 3000
         })
-        delete this.roleMap[tag]
-        delete this.roleMapOptions[tag]
       })
-    },
-    showInput() {
-      this.inputVisible = true
-      this.$nextTick(_ => {
-        this.$refs.saveTagInput.$refs.input.focus()
-      })
-    },
-    handleInputConfirm() {
-      const inputValue = this.inputValue
-      if (inputValue) {
-        if (this.roleMap.hasOwnProperty(inputValue)) {
-          this.$message({
-            message: this.$i18n.t('namespace.policy.roleAlreadyExists'),
-            type: 'error'
-          })
-          this.inputVisible = false
-          this.inputValue = ''
-          return
-        }
-        grantPermissions(this.tenantNamespace, inputValue, this.roleMap[inputValue]).then(response => {
-          this.$notify({
-            title: 'success',
-            message: this.$i18n.t('namespace.notification.addRoleSuccess'),
-            type: 'success',
-            duration: 3000
-          })
-          this.dynamicTags.push(inputValue)
-          this.roleMap[inputValue] = []
-          this.roleMapOptions[inputValue] = this.roleOptions
-        })
-      }
-      this.inputVisible = false
-      this.inputValue = ''
     },
     handleChangeOptions(role) {
-      grantPermissions(this.tenantNamespace, role, this.roleMap[role]).then(response => {
+      this.roleList = JSON.parse(JSON.stringify(this.roleList))
+      if (!role.name || !role.value) {
+        return
+      }
+      grantPermissions(this.tenantNamespace, role.name, role.value).then(response => {
         this.$notify({
           title: 'success',
           message: this.$i18n.t('namespace.notification.addRoleActionsSuccess'),
