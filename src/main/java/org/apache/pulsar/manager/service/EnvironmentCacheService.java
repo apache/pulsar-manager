@@ -27,6 +27,12 @@ public interface EnvironmentCacheService {
     String getServiceUrl(HttpServletRequest request);
 
     /**
+     * Return the bookie url for a given http request.
+     * @param request
+     * @return
+     */
+    String getBookieUrl(HttpServletRequest request);
+    /**
      * Return the service url for a given http request for a given cluster.
      *
      * @param request http request

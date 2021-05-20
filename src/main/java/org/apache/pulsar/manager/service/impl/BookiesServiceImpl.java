@@ -17,11 +17,13 @@ import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import org.apache.pulsar.manager.service.BookiesService;
+import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import org.apache.pulsar.manager.utils.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,14 +35,16 @@ import java.util.regex.Pattern;
 @Service
 public class BookiesServiceImpl implements BookiesService {
 
+    private final EnvironmentCacheService environmentCacheService;
+    private final HttpServletRequest request;
     @Value("${backend.directRequestBroker}")
     private boolean directRequestBroker;
 
     @Value("${backend.directRequestHost}")
     private String directRequestHost;
 
-    @Value("${bookie.host}")
-    private String bookieHost;
+//    @Value("${bookie.host}")
+//    private String bookieHost;
 
     @Value("${bookie.enable}")
     private Boolean bookieEnable;
@@ -48,11 +52,18 @@ public class BookiesServiceImpl implements BookiesService {
     @Value("${backend.jwt.token}")
     private static String pulsarJwtToken;
 
+
     private static final Map<String, String> header = new HashMap<String, String>(){{
         put("Authorization", String.format("Bearer %s", pulsarJwtToken));
     }};
 
     private final Pattern pattern = Pattern.compile(" \\d+");;
+
+    public BookiesServiceImpl(EnvironmentCacheService environmentCacheService,HttpServletRequest request) {
+        this.environmentCacheService = environmentCacheService;
+        this.request = request;
+    }
+
     public Map<String, Object> getBookiesList(Integer pageNum, Integer pageSize, String cluster) {
         Map<String, Object> bookiesMap = Maps.newHashMap();
         List<Map<String, Object>> bookiesArray = new ArrayList<>();
@@ -63,16 +74,19 @@ public class BookiesServiceImpl implements BookiesService {
             if (StringUtils.isNotBlank(pulsarJwtToken)) {
                 header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
             }
+
+            String bookieUrl = this.environmentCacheService.getBookieUrl(request);
+
             String rwBookieList = HttpUtil.doGet(
-                    bookieHost + "/api/v1/bookie/list_bookies?type=rw&print_hostnames=true", header);
+                    bookieUrl + "/api/v1/bookie/list_bookies?type=rw&print_hostnames=true", header);
             Map<String, String> rwBookies = gson.fromJson(
                     rwBookieList, new TypeToken<Map<String, String>>() {}.getType());
             String roBookieList = HttpUtil.doGet(
-                    bookieHost + "/api/v1/bookie/list_bookies?type=ro&print_hostnames=true", header);
+                    bookieUrl + "/api/v1/bookie/list_bookies?type=ro&print_hostnames=true", header);
             Map<String, String> roBookies = gson.fromJson(
                     roBookieList, new TypeToken<Map<String, String>>() {}.getType());
             String listBookieInfo = HttpUtil.doGet(
-                    bookieHost + "/api/v1/bookie/list_bookie_info", header);
+                    bookieUrl + "/api/v1/bookie/list_bookie_info", header);
             Map<String, String> listBookies = gson.fromJson(
                     listBookieInfo, new TypeToken<Map<String, String>>() {}.getType());
             for (String key: listBookies.keySet()) {
@@ -123,11 +137,12 @@ public class BookiesServiceImpl implements BookiesService {
 
     public void forwardAutorecovery(List<String> bookieSrc, List<String> bookieDest, Boolean deleteBookie) {
         try {
+            String bookieUrl = this.environmentCacheService.getBookieUrl(request);
             Gson gson = new Gson();
             Map<String, Object> body = Maps.newHashMap();
             body.put("bookie_src", bookieSrc);
             body.put("bookie_dest", bookieDest);
-            HttpUtil.doPut(bookieHost + "/api/v1/autorecovery/bookie/", header, gson.toJson(body));
+            HttpUtil.doPut(bookieUrl + "/api/v1/autorecovery/bookie/", header, gson.toJson(body));
         } catch (UnsupportedEncodingException e) {
 
         }

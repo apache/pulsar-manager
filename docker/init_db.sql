@@ -21,6 +21,7 @@ GRANT ALL PRIVILEGES ON DATABASE pulsar_manager to pulsar;
 CREATE TABLE IF NOT EXISTS environments (
   name varchar(256) NOT NULL,
   broker varchar(1024) NOT NULL,
+  bookie varchar(1024) NOT NULL,
   CONSTRAINT PK_name PRIMARY KEY (name),
   UNIQUE (broker)
 );

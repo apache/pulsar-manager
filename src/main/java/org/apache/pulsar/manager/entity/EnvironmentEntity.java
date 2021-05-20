@@ -26,4 +26,5 @@ import lombok.Setter;
 public class EnvironmentEntity {
     private String name;
     private String broker;
+    private String bookie;
 }
