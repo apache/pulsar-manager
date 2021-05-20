@@ -85,14 +85,14 @@ Alternatively, you can start a standalone and Pulsar Manager using the docker co
 
 ### Deploy Pulsar Manager to Kubernetes
 
-The Pulsar Manager can be deployed as part of [Pulsar Helm Chart](https://github.com/streamnative/charts).
+The Pulsar Manager can be deployed as part of [Pulsar Helm Chart](https://github.com/apache/pulsar-helm-chart).
 
 1. Install the Pulsar cluster with Pulsar Manager
 
     ```bash
-    helm repo add streamnative https://charts.streamnative.io
+    helm repo add apache https://pulsar.apache.org/charts
     helm repo update
-    helm install <release-name> streamnative/pulsar
+    helm install <release-name> apache/pulsar
     ```
 
 2. Access the Pulsar Manager.
