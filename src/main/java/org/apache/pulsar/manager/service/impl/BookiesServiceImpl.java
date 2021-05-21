@@ -43,15 +43,11 @@ public class BookiesServiceImpl implements BookiesService {
     @Value("${backend.directRequestHost}")
     private String directRequestHost;
 
-//    @Value("${bookie.host}")
-//    private String bookieHost;
-
     @Value("${bookie.enable}")
     private Boolean bookieEnable;
 
     @Value("${backend.jwt.token}")
     private static String pulsarJwtToken;
-
 
     private static final Map<String, String> header = new HashMap<String, String>(){{
         put("Authorization", String.format("Bearer %s", pulsarJwtToken));
