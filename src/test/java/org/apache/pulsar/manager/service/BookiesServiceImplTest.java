@@ -72,9 +72,5 @@ public class BookiesServiceImplTest {
                 .thenReturn("{\"192.168.2.116:3181\" : \": {Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}," +
                         "\",\"ClusterInfo: \" : \"{Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}\" }");
         HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header);
-//        Map<String, Object> result = bookiesService.getBookiesList(1, 1, "standalone");
-//        Assert.assertEquals(1, result.get("total"));
-//        Assert.assertEquals("[{storage=[48920571904, 250790436864], bookie=192.168.2.116:3181, status=rw}]", result.get("data").toString());
-//        Assert.assertEquals(1, result.get("pageSize"));
     }
 }
