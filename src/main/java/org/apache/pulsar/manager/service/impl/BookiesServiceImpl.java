@@ -49,6 +49,7 @@ public class BookiesServiceImpl implements BookiesService {
     @Value("${backend.jwt.token}")
     private static String pulsarJwtToken;
 
+
     private static final Map<String, String> header = new HashMap<String, String>(){{
         put("Authorization", String.format("Bearer %s", pulsarJwtToken));
     }};
