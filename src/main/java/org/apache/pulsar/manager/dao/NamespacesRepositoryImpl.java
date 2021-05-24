@@ -105,6 +105,10 @@ public class NamespacesRepositoryImpl implements NamespacesRepository {
 
     @Override
     public long save(NamespaceEntity namespacesEntity) {
+        NamespaceEntity entity = namespacesMapper.findByTenantNamespace(namespacesEntity.getTenant(), namespacesEntity.getNamespace());
+        if (entity != null) {
+            return 0;
+        }
         namespacesMapper.insert(namespacesEntity);
         return namespacesEntity.getNamespaceId();
     }
