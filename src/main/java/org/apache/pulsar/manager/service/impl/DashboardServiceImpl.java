@@ -88,9 +88,6 @@ public class DashboardServiceImpl implements DashboardService {
             List<ConsumerStatsEntity> consumerStatsEntities = consumersStatsRepository.findByMultiTopicStatsId(
                     topicStatsIdList, timestamp);
             totalConsumerCount = consumerStatsEntities.size();
-            totalBookieCount = (int) bookiesService.getBookiesList(
-                    1, 10, "").getOrDefault(
-                            "total", 0);
         }
         dashboardStatsMap.put("totalClusterCount", totalClusterCount);
         dashboardStatsMap.put("totalBrokerCount", totalBrokerCount);
