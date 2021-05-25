@@ -67,6 +67,9 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     public String getBookieUrl(HttpServletRequest request) {
         String environment = request.getHeader("environment");
         Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
+        if(!environmentEntityOptional.isPresent()){
+            return null;
+        }
         EnvironmentEntity environmentEntity = environmentEntityOptional.get();
         return environmentEntity.getBookie();
     }

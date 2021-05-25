@@ -73,7 +73,9 @@ public class BookiesServiceImpl implements BookiesService {
             }
 
             String bookieUrl = this.environmentCacheService.getBookieUrl(request);
-
+            if(StringUtils.isBlank(bookieUrl)){
+                return bookiesMap;
+            }
             String rwBookieList = HttpUtil.doGet(
                     bookieUrl + "/api/v1/bookie/list_bookies?type=rw&print_hostnames=true", header);
             Map<String, String> rwBookies = gson.fromJson(

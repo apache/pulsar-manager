@@ -146,6 +146,6 @@ public class DashboardServiceImplTest {
         Assert.assertEquals(topicCount, dashboardStats.get("totalTopicCount"));
         Assert.assertEquals(topicCount * producerPerTopic, dashboardStats.get("totalProducerCount"));
         Assert.assertEquals(topicCount * consumerPerTopic, dashboardStats.get("totalConsumerCount"));
-        Assert.assertEquals(1, dashboardStats.get("totalBookieCount"));
+        Assert.assertEquals(0, dashboardStats.get("totalBookieCount"));
     }
 }
