@@ -187,6 +187,7 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
     ```
 
     * `backend-service`: The IP address or domain name of the backend service.
+    * `password`: The password should be more than or equal to 6 digits.
 
 2. Create an environment. 
 
