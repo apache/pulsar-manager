@@ -1,0 +1,4 @@
+*
+!/build/distributions/pulsar-manager.tar
+!/docker
+!/front-end/dist

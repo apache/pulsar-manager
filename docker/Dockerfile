@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-FROM openjdk:8-jre-alpine
+FROM openjdk:8-jre
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -31,13 +31,11 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.version=$VERSION \
       org.label-schema.schema-version="1.0"
 
-RUN apk update
+RUN apt-get update
 
-RUN apk add nginx \
-  && apk add supervisor \
-  && apk add postgresql \
+RUN apt-get install --yes nginx supervisor postgresql \
   && rm  -rf /tmp/* \
-  && rm /var/cache/apk/*
+  && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /run/nginx
 
