@@ -254,6 +254,7 @@ export default {
       this.dynamicRoles.splice(this.dynamicRoles.indexOf(tag), 1)
       const data = {}
       data.adminRoles = this.dynamicRoles
+      data.allowedClusters = this.clusterValue
       updateTenant(this.postForm.tenant, data).then(() => {
         this.$notify({
           title: 'success',
