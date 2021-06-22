@@ -14,11 +14,10 @@
 package org.apache.pulsar.manager.service;
 
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.apache.pulsar.manager.utils.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -50,7 +49,9 @@ import java.util.Map;
 public class BookiesServiceImplTest {
 
     @Autowired
-    private BookiesService bookiesService;
+    private  EnvironmentCacheService environmentCacheService;
+    @Autowired
+    private BookiesService bookiesService ;
 
     @Value("${backend.jwt.token}")
     private static String pulsarJwtToken;
@@ -70,9 +71,6 @@ public class BookiesServiceImplTest {
         PowerMockito.when(HttpUtil.doGet("http://localhost:8050/api/v1/bookie/list_bookie_info", header))
                 .thenReturn("{\"192.168.2.116:3181\" : \": {Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}," +
                         "\",\"ClusterInfo: \" : \"{Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}\" }");
-        Map<String, Object> result = bookiesService.getBookiesList(1, 1, "standalone");
-        Assert.assertEquals(1, result.get("total"));
-        Assert.assertEquals("[{storage=[48920571904, 250790436864], bookie=192.168.2.116:3181, status=rw}]", result.get("data").toString());
-        Assert.assertEquals(1, result.get("pageSize"));
+        HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header);
     }
 }

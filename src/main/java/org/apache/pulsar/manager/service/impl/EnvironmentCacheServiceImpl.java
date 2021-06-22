@@ -64,6 +64,17 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     }
 
     @Override
+    public String getBookieUrl(HttpServletRequest request) {
+        String environment = request.getHeader("environment");
+        Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
+        if(!environmentEntityOptional.isPresent()){
+            return null;
+        }
+        EnvironmentEntity environmentEntity = environmentEntityOptional.get();
+        return environmentEntity.getBookie();
+    }
+
+    @Override
     public String getServiceUrl(HttpServletRequest request, String cluster) {
         String environment = request.getHeader("environment");
         return getServiceUrl(environment, cluster);
@@ -96,14 +107,14 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
         if (null == clusterData) {
             // no environment and no cluster
             throw new RuntimeException(
-                "No cluster '" + cluster + "' found in environment '" + environment + "'");
+                    "No cluster '" + cluster + "' found in environment '" + environment + "'");
         }
         return clusterData.getServiceUrl();
     }
 
     @Scheduled(
-        initialDelay = 0L,
-        fixedDelayString = "${cluster.cache.reload.interval.ms}")
+            initialDelay = 0L,
+            fixedDelayString = "${cluster.cache.reload.interval.ms}")
     @Override
     public void reloadEnvironments() {
         int pageNum = 0;
@@ -152,8 +163,8 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
         log.info("Reload cluster list for environment {} : {}", environment.getName(), clustersList);
         Set<String> newClusters = Sets.newHashSet(clustersList);
         Map<String, ClusterData> clusterDataMap = environments.computeIfAbsent(
-            environment.getName(),
-            (e) -> new ConcurrentHashMap<>());
+                environment.getName(),
+                (e) -> new ConcurrentHashMap<>());
         Set<String> oldClusters = clusterDataMap.keySet();
         Set<String> goneClusters = Sets.difference(oldClusters, newClusters);
         for (String cluster : goneClusters) {
@@ -168,13 +179,13 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
     private ClusterData reloadCluster(String environment, String cluster) {
         // if there is no clusters, lookup the clusters
         return environmentsRepository.findByName(environment).map(env ->
-            reloadCluster(env, cluster)
+                reloadCluster(env, cluster)
         ).orElse(null);
     }
 
     private ClusterData reloadCluster(EnvironmentEntity environment, String cluster) {
         log.info("Reloading cluster data for cluster {} @ environment {} ...",
-            cluster, environment.getName());
+                cluster, environment.getName());
         ClusterData clusterData;
         try {
             clusterData = pulsarAdminService.clusters(environment.getBroker()).getCluster(cluster);
@@ -183,13 +194,13 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
             return null;
         }
         log.info("Loaded cluster data for cluster {} @ environment {} : {}",
-            cluster, environment.getName(), clusterData.toString());
+                cluster, environment.getName(), clusterData.toString());
         Map<String, ClusterData> clusters = environments.computeIfAbsent(
-            environment.getName(),
-            (e) -> new ConcurrentHashMap<>());
+                environment.getName(),
+                (e) -> new ConcurrentHashMap<>());
         clusters.put(cluster, clusterData);
         log.info("Successfully loaded cluster data for cluster {} @ environment {} : {}",
-            cluster, environment.getName(), clusterData);
+                cluster, environment.getName(), clusterData);
         return clusterData;
     }
 

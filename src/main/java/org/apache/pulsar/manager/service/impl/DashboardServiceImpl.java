@@ -90,7 +90,7 @@ public class DashboardServiceImpl implements DashboardService {
             totalConsumerCount = consumerStatsEntities.size();
             totalBookieCount = (int) bookiesService.getBookiesList(
                     1, 10, "").getOrDefault(
-                            "total", 0);
+                    "total", 0);
         }
         dashboardStatsMap.put("totalClusterCount", totalClusterCount);
         dashboardStatsMap.put("totalBrokerCount", totalBrokerCount);

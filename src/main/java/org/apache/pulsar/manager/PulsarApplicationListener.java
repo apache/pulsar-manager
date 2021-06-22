@@ -44,6 +44,9 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     @Value("${default.environment.service_url}")
     private String defaultEnvironmentServiceUrl;
 
+    @Value("${default.environment.bookie_url}")
+    private String defaultEnvironmentBookieUrl;
+
     @Autowired
     public PulsarApplicationListener(EnvironmentsRepository environmentsRepository, PulsarAdminService pulsarAdminService) {
         this.environmentsRepository = environmentsRepository;
@@ -77,10 +80,11 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
 
                 EnvironmentEntity environmentEntity = new EnvironmentEntity();
                 environmentEntity.setBroker(defaultEnvironmentServiceUrl);
+                environmentEntity.setBookie(defaultEnvironmentBookieUrl);
                 environmentEntity.setName(defaultEnvironmentName);
                 environmentsRepository.save(environmentEntity);
-                log.info("Successfully added a default environment: name = {}, service_url = {}.",
-                        defaultEnvironmentName, defaultEnvironmentServiceUrl);
+                log.info("Successfully added a default environment: name = {}, service_url = {},bookie_url = {}.",
+                        defaultEnvironmentName, defaultEnvironmentServiceUrl,defaultEnvironmentBookieUrl);
             } else {
                 log.warn("The default environment already exists.");
             }

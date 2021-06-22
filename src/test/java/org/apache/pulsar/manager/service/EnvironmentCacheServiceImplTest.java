@@ -85,13 +85,16 @@ public class EnvironmentCacheServiceImplTest {
         // setup 3 environments
         environment1 = new EnvironmentEntity();
         environment1.setBroker("http://cluster1_0:8080");
+        environment1.setBookie("http://cluster1_0:8000");
         environment1.setName("environment1");
         environment2 = new EnvironmentEntity();
         environment2.setBroker("http://cluster2_0:8080");
+        environment2.setBookie("http://cluster2_0:8000");
         environment2.setName("environment2");
         emptyEnvironment = new EnvironmentEntity();
         emptyEnvironment.setName("emptyEnvironment");
         emptyEnvironment.setBroker("http://empty_env:8080");
+        emptyEnvironment.setBookie("http://empty_env:8000");
 
         // setup 3 clusters
         cluster1_0 = new ClusterData();

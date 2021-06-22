@@ -46,6 +46,7 @@ public class EnvironmentsRepositoryImplTest {
         EnvironmentEntity environmentEntity = new EnvironmentEntity();
         environmentEntity.setName("test-environment");
         environmentEntity.setBroker("http://localhost:8080");
+        environmentEntity.setBookie("http://localhost:8000");
         environmentsRepository.save(environmentEntity);
         Page<EnvironmentEntity> environmentEntityPage = environmentsRepository.getEnvironmentsList(1, 1);
         environmentEntityPage.count(true);
@@ -61,6 +62,7 @@ public class EnvironmentsRepositoryImplTest {
         EnvironmentEntity environmentEntity = new EnvironmentEntity();
         environmentEntity.setName("test-environment");
         environmentEntity.setBroker("https://localhost:8080");
+        environmentEntity.setBookie("https://localhost:8000");
         environmentsRepository.save(environmentEntity);
         Optional<EnvironmentEntity> environmentEntityOptionalGet = environmentsRepository
                 .findByBroker("https://localhost:8080");
@@ -69,6 +71,7 @@ public class EnvironmentsRepositoryImplTest {
         Assert.assertEquals("https://localhost:8080", environmentEntityGet.getBroker());
 
         environmentEntity.setBroker("https://localhost:8081");
+        environmentEntity.setBookie("https://localhost:8001");
         environmentsRepository.update(environmentEntity);
         Optional<EnvironmentEntity> environmentEntityOptionalUpdate = environmentsRepository
                 .findByName("test-environment");
