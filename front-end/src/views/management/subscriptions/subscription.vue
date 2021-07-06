@@ -471,10 +471,17 @@ export default {
         })
         return
       }
+      // If it is a partition topic, you can only view the messages under one of the partitions. For the specific reason, see'Pulsar PR[8181]'.
+      var tenantNamespaceTopic = this.tenantNamespaceTopic
+      if (this.postForm.persistent === 'persistent' && parseInt(this.postForm.partition) !== -1) {
+        tenantNamespaceTopic = tenantNamespaceTopic + '-partition-' + this.postForm.partition
+      }
+      console.log('tenantNamespaceTopic: ' + tenantNamespaceTopic + '; -1 partition :' + this.postForm.partition)
+      console.log('partition:' + (parseInt(this.postForm.partition) !== -1) + '--' + (parseInt(this.postForm.partition) + 1))
       peekMessagesOnCluster(
         this.getCurrentCluster(),
         this.postForm.persistent,
-        this.tenantNamespaceTopic,
+        tenantNamespaceTopic,
         this.postForm.subscription,
         this.form.peekNumMessages).then(response => {
         if (!response.data) return

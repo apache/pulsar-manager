@@ -832,7 +832,6 @@ export default {
         this.terminateStatus = response.data.state
         this.segments = response.data.ledgers.length
         var lastIndex = this.segments - 1
-        console.log('topic.vue: ' + response.data)
         for (var i in response.data.ledgers) {
           if (lastIndex === parseInt(i)) {
             this.segmentsList.push({

@@ -59,7 +59,15 @@ export function deleteSubscriptionOnCluster(cluster, persistent, tenantNamespace
     method: 'delete'
   })
 }
-
+/**
+ * peek message from cluster
+ * @param {*} cluster
+ * @param {*} persistent
+ * @param {*} tenantNamespaceTopic
+ * @param {*} subName
+ * @param {*} messagePosition
+ * @returns
+ */
 export function peekMessagesOnCluster(cluster, persistent, tenantNamespaceTopic, subName, messagePosition) {
   return request({
     headers: {

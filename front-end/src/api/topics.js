@@ -245,7 +245,14 @@ export function unloadOnCluster(cluster, persistent, tenantNamespaceTopic) {
     method: 'put'
   })
 }
-
+/**
+ * skip message
+ * @param {*} persistent
+ * @param {*} tenantNamespaceTopic
+ * @param {*} subName
+ * @param {*} numMessages
+ * @returns
+ */
 export function skip(persistent, tenantNamespaceTopic, subName, numMessages) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/skip/${numMessages}`,
@@ -310,7 +317,14 @@ export function expireMessagesAllSubscriptionsOnCluster(cluster, persistent, ten
     method: 'post'
   })
 }
-
+/**
+ * peek message
+ * @param {*} persistent
+ * @param {*} tenantNamespaceTopic
+ * @param {*} subName
+ * @param {*} messagePosition
+ * @returns
+ */
 export function peekMessages(persistent, tenantNamespaceTopic, subName, messagePosition) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/position/${messagePosition}`,
