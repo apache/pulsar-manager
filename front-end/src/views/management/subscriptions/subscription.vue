@@ -476,8 +476,6 @@ export default {
       if (this.postForm.persistent === 'persistent' && parseInt(this.postForm.partition) !== -1) {
         tenantNamespaceTopic = tenantNamespaceTopic + '-partition-' + this.postForm.partition
       }
-      console.log('tenantNamespaceTopic: ' + tenantNamespaceTopic + '; -1 partition :' + this.postForm.partition)
-      console.log('partition:' + (parseInt(this.postForm.partition) !== -1) + '--' + (parseInt(this.postForm.partition) + 1))
       peekMessagesOnCluster(
         this.getCurrentCluster(),
         this.postForm.persistent,
