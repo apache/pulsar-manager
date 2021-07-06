@@ -63,14 +63,26 @@ export function fetchTopicStats(persistent, tenantNamespaceTopic) {
     method: 'get'
   })
 }
-
+/**
+ * topic detail
+ * @param {*}} persistent
+ * @param {*} tenantNamespaceTopic
+ * @returns
+ */
 export function fetchTopicStatsInternal(persistent, tenantNamespaceTopic) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/internalStats`,
     method: 'get'
   })
 }
-
+/**
+ *  topic stat
+ * <a href="https://pulsar.apache.org/docs/en/2.7.1/admin-api-topics/#get-stats">topic stat</a>
+ * @param {*} persistent
+ * @param {*} tenantNamespaceTopic
+ * @param {*} perPartition
+ * @returns
+ */
 export function fetchPartitionTopicStats(persistent, tenantNamespaceTopic, perPartition) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/partitioned-stats?perPartition=${perPartition}`,

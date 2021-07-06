@@ -50,6 +50,7 @@
       </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
+      <!--overview in topic partition start -->
       <el-tab-pane :label="$t('tabs.overview')" name="overview">
         <el-row :gutter="12">
           <el-col :span="12">
@@ -344,6 +345,8 @@
           </el-col>
         </el-row>
       </el-tab-pane>
+      <!--overview in topic partition end-->
+      <!--storage in topic partition start-->
       <el-tab-pane v-if="nonPersistent===false" :label="$t('tabs.storage')" name="storage">
         <el-row :gutter="12">
           <el-col :span="8">
@@ -461,6 +464,8 @@
           </el-col>
         </el-row>
       </el-tab-pane>
+      <!--storage in topic partition end-->
+      <!--storage in topic policies start-->
       <el-tab-pane :label="$t('tabs.policies')" name="policies">
         <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
@@ -513,6 +518,7 @@
         <hr class="danger-line">
         <el-button type="danger" class="button" @click="handleDeleteTopic">{{ $t('topic.deleteTopic') }}</el-button>
       </el-tab-pane>
+      <!--storage in topic end start-->
     </el-tabs>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-position="top">
@@ -826,6 +832,7 @@ export default {
         this.terminateStatus = response.data.state
         this.segments = response.data.ledgers.length
         var lastIndex = this.segments - 1
+        console.log('topic.vue: ' + response.data)
         for (var i in response.data.ledgers) {
           if (lastIndex === parseInt(i)) {
             this.segmentsList.push({
@@ -845,6 +852,7 @@ export default {
             })
           }
         }
+        // 被跟踪的消息总数
         this.entries = numberFormatter(response.data.numberOfEntries, 0)
         for (var c in response.data.cursors) {
           this.cursorsList.push({
