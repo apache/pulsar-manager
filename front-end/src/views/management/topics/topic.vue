@@ -852,7 +852,7 @@ export default {
             })
           }
         }
-        // 被跟踪的消息总数
+        // Total number of messages tracked
         this.entries = numberFormatter(response.data.numberOfEntries, 0)
         for (var c in response.data.cursors) {
           this.cursorsList.push({
