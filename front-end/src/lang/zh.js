@@ -63,7 +63,7 @@ export default {
     'menu1-2-2': '菜单 1-2-2',
     'menu1-3': '菜单 1-3',
     menu2: '菜单 2',
-    Table: '表',
+    Table: '表格',
     dynamicTable: '动态表',
     dragTable: '拖拽表',
     inlineEditTable: '在线编辑',
