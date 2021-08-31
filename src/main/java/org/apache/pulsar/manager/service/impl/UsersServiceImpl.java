@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,6 +52,11 @@ public class UsersServiceImpl implements UsersService {
             validateResult.put("error", "Fields password and access token cannot be empty at the same time.");
             return validateResult;
         }
+        if (userInfoEntity.getPassword().length() < 6) {
+            validateResult.put("error", "The password can not be less than 6 digits.");
+            return validateResult;
+        }
+
         validateResult.put("message", "Validate user success");
         return validateResult;
     }
