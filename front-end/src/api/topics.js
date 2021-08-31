@@ -466,3 +466,10 @@ export function getTopicBrokerOnCluster(cluster, persistent, tenantNamespaceTopi
     method: 'get'
   })
 }
+
+export function fetchTopicSchemaFromBroker(tenantNamespaceTopic) {
+  return request({
+    url: BASE_URL_V2 + `/schemas/${tenantNamespaceTopic}/schema`,
+    method: 'get'
+  })
+}
