@@ -52,6 +52,10 @@ public class UsersServiceImpl implements UsersService {
             validateResult.put("error", "Fields password and access token cannot be empty at the same time.");
             return validateResult;
         }
+        if (userInfoEntity.getPassword().length() < 6) {
+            validateResult.put("error", "The password can not be less than 6 digits.");
+            return validateResult;
+        }
         validateResult.put("message", "Validate user success");
         return validateResult;
     }
