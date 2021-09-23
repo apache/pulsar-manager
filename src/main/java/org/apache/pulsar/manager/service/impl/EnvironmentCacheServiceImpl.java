@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -87,8 +88,23 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
             EnvironmentEntity environmentEntity = environmentEntityOptional.get();
             return environmentEntity.getBroker();
         } else {
-            return getServiceUrl(environment, cluster, 0);
+            String webServiceUrl = getServiceUrl(environment, cluster, 0);
+            return pickOneServiceUrl(webServiceUrl);
         }
+    }
+
+    private String pickOneServiceUrl(String webServiceUrl) {
+        if (webServiceUrl.contains(",")) {
+            String[] webServiceUrlList = webServiceUrl.split(",");
+            int index = ThreadLocalRandom.current().nextInt(0, webServiceUrlList.length);
+            String url = webServiceUrlList[index];
+            if (!url.contains("http://")) {
+                url = "http://" + url;
+            }
+            log.info("pick web url:{}", url);
+            return url;
+        }
+        return webServiceUrl;
     }
 
     private String getServiceUrl(String environment, String cluster, int numReloads) {
