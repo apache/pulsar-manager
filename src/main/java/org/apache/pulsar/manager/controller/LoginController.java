@@ -170,4 +170,25 @@ public class LoginController {
         jwtService.removeToken(request.getSession().getId());
         return ResponseEntity.ok(result);
     }
+
+    @RequestMapping(value = "/login", method =  RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> loginByAccessToken(
+            HttpServletRequest request)  {
+        String token = request.getParameter("token");
+        Optional<UserInfoEntity> userInfoEntity =  usersRepository.findByAccessToken(token);
+        Map<String, Object> result = Maps.newHashMap();
+        if (!userInfoEntity.isPresent())
+        {
+            result.put("error", "No user found with the access token");
+            return ResponseEntity.ok(result);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        if (userInfoEntity.isPresent()){
+            UserInfoEntity user = userInfoEntity.get();
+            headers.add("token",token);
+            headers.add("username", user.getName());
+            headers.add("tenant", user.getName());
+        }
+        return new ResponseEntity<>(result, headers, HttpStatus.OK);
+    }
 }

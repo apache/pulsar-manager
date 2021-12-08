@@ -142,6 +142,7 @@ dependencies {
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: jerseyVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
     compile group: 'org.springframework.security', name: 'spring-security-config'
+    compile group: 'org.opensaml', name: 'opensaml', version: '2.6.4'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     compileOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion

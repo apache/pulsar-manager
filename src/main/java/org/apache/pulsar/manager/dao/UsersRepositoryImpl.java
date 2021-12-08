@@ -75,4 +75,9 @@ public class UsersRepositoryImpl implements UsersRepository {
     public void delete(String name) {
         this.usersMapper.delete(name);
     }
+
+    @Override
+    public Optional<UserInfoEntity> findByEmail(String email) {
+        return Optional.ofNullable(this.usersMapper.findByEmail(email));
+    }
 }
