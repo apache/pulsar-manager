@@ -29,7 +29,7 @@
         <item v-if="item.meta" :icon="item.meta.icon" :title="generateTitle(item.meta.title)" />
       </template>
 
-      <template v-for="child in item.children" v-if="!child.hidden">
+      <template v-for="child in item.children" v-if="isAccessible(child)">
         <sidebar-item
           v-if="child.children&&child.children.length>0"
           :is-nest="true"
@@ -56,7 +56,7 @@ import { isExternal } from '@/utils'
 import Item from './Item'
 import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
-
+import store from '@/store'
 export default {
   name: 'SidebarItem',
   components: { Item, AppLink },
@@ -81,10 +81,13 @@ export default {
       onlyOneChild: null
     }
   },
+  created() {
+    this.roles = store.getters && store.getters.roles
+  },
   methods: {
     hasOneShowingChild(children, parent) {
       const showingChildren = children.filter(item => {
-        if (item.hidden) {
+        if (!this.isAccessible(item)) {
           return false
         } else {
           // Temp set(will be used if only has one showing child)
@@ -114,6 +117,13 @@ export default {
     },
     isExternalLink(routePath) {
       return isExternal(routePath)
+    },
+    isAccessible(item) {
+      const accessibleItemList = item.meta.roles.filter(i => {
+        if (this.roles.includes(i)) { return true } else { return false }
+      })
+      if (accessibleItemList.length > 0) { return true }
+      return false
     },
     generateTitle
   }
