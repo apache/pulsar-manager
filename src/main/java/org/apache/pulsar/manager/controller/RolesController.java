@@ -24,6 +24,8 @@ import org.apache.pulsar.manager.entity.NamespaceEntity;
 import org.apache.pulsar.manager.entity.NamespacesRepository;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
 import org.apache.pulsar.manager.entity.RolesRepository;
+import org.apache.pulsar.manager.entity.TenantEntity;
+import org.apache.pulsar.manager.entity.TenantsRepository;
 import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.utils.ResourceType;
 import org.hibernate.validator.constraints.Range;
@@ -59,15 +61,19 @@ public class RolesController {
 
     private final HttpServletRequest request;
 
+    private TenantsRepository tenantsRepository;
+
     public RolesController(
             RolesRepository rolesRepository,
             RolesService rolesService,
             NamespacesRepository namespacesRepository,
+            TenantsRepository tenantsRepository,
             HttpServletRequest request) {
         this.rolesRepository = rolesRepository;
         this.rolesService = rolesService;
         this.namespacesRepository = namespacesRepository;
         this.request = request;
+        this.tenantsRepository = tenantsRepository;
     }
 
     @ApiOperation(value = "Get the list of existing roles, support paging, the default is 10 per page")
@@ -228,6 +234,7 @@ public class RolesController {
     public ResponseEntity<Map<String, Object>> getResourceType() {
         Map<String, Object> result = Maps.newHashMap();
         Set<String> resourceTypeList = Sets.newHashSet();
+        resourceTypeList.add(ResourceType.TENANTS.name());
         resourceTypeList.add(ResourceType.NAMESPACES.name());
         resourceTypeList.add(ResourceType.TOPICS.name());
         resourceTypeList.add(ResourceType.SCHEMAS.name());
@@ -247,18 +254,30 @@ public class RolesController {
         Map<String, Object> result = Maps.newHashMap();
         String token = request.getHeader("token");
         String tenant = request.getHeader("tenant");
+        String environment = request.getHeader("environment");
         Map<String, String> validateResult = rolesService.validateCurrentTenant(token, tenant);
         if (validateResult.get("error") != null) {
             result.put("error", validateResult.get("error"));
             return ResponseEntity.ok(result);
         }
-        List<NamespaceEntity> namespaceEntities = namespacesRepository.findByTenant(tenant);
         Set<Map<String, Object>> nameSet = Sets.newHashSet();
-        for (NamespaceEntity namespaceEntity : namespaceEntities) {
-            Map<String, Object> namespace = Maps.newHashMap();
-            namespace.put("name", namespaceEntity.getNamespace());
-            namespace.put("id", namespaceEntity.getNamespaceId());
-            nameSet.add(namespace);
+        if(ResourceType.TENANTS.name().equals(resourceType)){
+            List<TenantEntity> tenantEntities = tenantsRepository.findByEnvironment(environment);
+            tenantEntities.forEach(tenantEntity -> {
+                Map<String, Object> tenantMap = Maps.newHashMap();
+                tenantMap.put("name", tenantEntity.getTenant());
+                tenantMap.put("id", tenantEntity.getTenantId());
+                nameSet.add(tenantMap);
+            });
+
+        } else if(ResourceType.NAMESPACES.name().equals(resourceType)) {
+            List<NamespaceEntity> namespaceEntities = namespacesRepository.findByTenant(tenant);
+            for (NamespaceEntity namespaceEntity : namespaceEntities) {
+                Map<String, Object> namespace = Maps.newHashMap();
+                namespace.put("name", namespaceEntity.getNamespace());
+                namespace.put("id", namespaceEntity.getNamespaceId());
+                nameSet.add(namespace);
+            }
         }
         result.put("data", nameSet);
         return ResponseEntity.ok(result);

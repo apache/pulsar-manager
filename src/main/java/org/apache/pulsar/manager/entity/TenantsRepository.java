@@ -38,5 +38,7 @@ public interface TenantsRepository {
 
     void remove(String tenant);
 
+    List<TenantEntity> findByEnvironment(String environment);
+
 }
 

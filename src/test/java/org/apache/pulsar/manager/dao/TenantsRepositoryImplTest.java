@@ -129,4 +129,20 @@ public class TenantsRepositoryImplTest {
         Assert.assertEquals("test-cluster", getTenantEntity.getAllowedClusters());
         Assert.assertEquals("test-environment", getTenantEntity.getEnvironmentName());
     }
+
+    @Test
+    public void findByEnvironment() {
+        TenantEntity tenantEntity = new TenantEntity();
+        tenantEntity.setTenant("test");
+        tenantEntity.setAdminRoles("test-role");
+        tenantEntity.setAllowedClusters("test-cluster");
+        tenantEntity.setEnvironmentName("test-environment");
+        long tenantId = tenantsRepository.save(tenantEntity);
+        List<TenantEntity> result = tenantsRepository.findByEnvironment("test-environment");
+        TenantEntity getTenantEntity = result.get(0);
+        Assert.assertEquals("test", getTenantEntity.getTenant());
+        Assert.assertEquals("test-role", getTenantEntity.getAdminRoles());
+        Assert.assertEquals("test-cluster", getTenantEntity.getAllowedClusters());
+        Assert.assertEquals("test-environment", getTenantEntity.getEnvironmentName());
+    }
 }
