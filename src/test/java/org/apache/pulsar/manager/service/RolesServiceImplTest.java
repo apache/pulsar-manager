@@ -182,6 +182,7 @@ public class RolesServiceImplTest {
         roleInfoEntity.setResourceName("test-tenant-resource");
         roleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        roleInfoEntity.setAccess("read");
         long roleId = rolesRepository.save(roleInfoEntity);
 
         RoleBindingEntity roleBindingEntity = new RoleBindingEntity();

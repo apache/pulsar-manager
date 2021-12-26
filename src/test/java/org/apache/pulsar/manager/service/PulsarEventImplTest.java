@@ -97,6 +97,7 @@ public class PulsarEventImplTest {
         superRoleInfoEntity.setResourceName("super-tenant-resource");
         superRoleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         superRoleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        superRoleInfoEntity.setAccess("write");
         superRoleId = rolesRepository.save(superRoleInfoEntity);
         RoleBindingEntity superRoleBindingEntity = new RoleBindingEntity();
         superRoleBindingEntity.setDescription("This is role binding description");
@@ -123,6 +124,7 @@ public class PulsarEventImplTest {
         adminRoleInfoEntity.setResourceName("admin-tenant-resource");
         adminRoleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         adminRoleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        adminRoleInfoEntity.setAccess("read");
         adminRoleId = rolesRepository.save(adminRoleInfoEntity);
         RoleBindingEntity adminRoleBindingEntity = new RoleBindingEntity();
         adminRoleBindingEntity.setDescription("This is role binding description");

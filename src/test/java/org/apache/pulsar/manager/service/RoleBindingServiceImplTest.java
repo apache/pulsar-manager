@@ -95,6 +95,7 @@ public class RoleBindingServiceImplTest {
         roleInfoEntity.setResourceName("test-tenant-resource");
         roleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        roleInfoEntity.setAccess("read");
         long roleId = rolesRepository.save(roleInfoEntity);
         roleBindingEntity.setUserId(userId);
         roleBindingEntity.setRoleId(roleId);
@@ -140,6 +141,7 @@ public class RoleBindingServiceImplTest {
         roleInfoEntity.setResourceName("test-tenant-resource");
         roleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        roleInfoEntity.setAccess("read");
         long roleId = rolesRepository.save(roleInfoEntity);
         roleBindingEntity.setUserId(userId);
         roleBindingEntity.setRoleId(roleId);
@@ -165,6 +167,7 @@ public class RoleBindingServiceImplTest {
         testRoleInfoEntity.setResourceName("test-no-binding-tenant-resource");
         testRoleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         testRoleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        testRoleInfoEntity.setAccess("read");
         rolesRepository.save(testRoleInfoEntity);
 
         TenantEntity testNoBindingTenantEntity = new TenantEntity();
@@ -180,6 +183,7 @@ public class RoleBindingServiceImplTest {
         testNoBindingRoleInfoEntity.setResourceName("test-no-binding-tenant-resource");
         testNoBindingRoleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         testNoBindingRoleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        testNoBindingRoleInfoEntity.setAccess("read");
         rolesRepository.save(testNoBindingRoleInfoEntity);
 
         Map<String, Object> validateBindingRole = roleBindingService.validateCreateRoleBinding(
@@ -223,6 +227,7 @@ public class RoleBindingServiceImplTest {
         roleInfoEntity.setResourceName("test-tenant-resource");
         roleInfoEntity.setResourceType(ResourceType.TENANTS.name());
         roleInfoEntity.setResourceVerbs(ResourceVerbs.ADMIN.name());
+        roleInfoEntity.setAccess("read");
         long roleId = rolesRepository.save(roleInfoEntity);
         roleBindingEntity.setUserId(userId);
         roleBindingEntity.setRoleId(roleId);

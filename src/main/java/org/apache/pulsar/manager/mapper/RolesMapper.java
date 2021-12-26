@@ -29,45 +29,45 @@ import java.util.List;
 public interface RolesMapper {
 
     @Insert("INSERT INTO roles (role_name, description, resource_type, resource_name, resource_verbs," +
-            "resource_id, role_source, flag) " +
+            "resource_id, role_source, flag, access) " +
             "VALUES (#{roleName}, #{description}, #{resourceType}, #{resourceName}, #{resourceVerbs}," +
-            "#{resourceId}, #{roleSource}, #{flag})")
+            "#{resourceId}, #{roleSource}, #{flag}, #{access})")
     @Options(useGeneratedKeys=true, keyProperty="roleId", keyColumn="role_id")
     long save(RoleInfoEntity roleInfoEntity);
 
     @Select("SELECT role_id AS roleId, role_name AS roleName, description, resource_type AS resourceType," +
             "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
-            "role_source AS roleSource, flag " +
+            "role_source AS roleSource, access AS access, flag " +
             "FROM roles " +
             "WHERE role_name = #{roleName} and role_source = #{roleSource}")
     RoleInfoEntity findByRoleName(@Param("roleName") String roleName, @Param("roleSource") String roleSource);
 
     @Select("SELECT role_id AS roleId, role_name AS roleName, description, resource_type AS resourceType," +
             "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
-            "role_source AS roleSource, flag " +
+            "role_source AS roleSource, access AS access, flag " +
             "FROM roles " +
             "WHERE flag=#{flag} limit 1")
     RoleInfoEntity findByRoleFlag(@Param("flag") int flag);
 
     @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
             "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
-            "role_source AS roleSource, flag FROM roles")
+            "role_source AS roleSource, access AS access, flag FROM roles")
     Page<RoleInfoEntity> findRoleList();
 
     @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
             "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
-            "role_source AS roleSource, flag FROM roles")
+            "role_source AS roleSource, access AS access, flag FROM roles")
     List<RoleInfoEntity> findAllRoleList();
 
     @Select("SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
             "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
-            "role_source AS roleSource, flag FROM roles WHERE role_source=#{roleSource}")
+            "role_source AS roleSource, access AS access, flag FROM roles WHERE role_source=#{roleSource}")
     List<RoleInfoEntity> findRoleListByRoleSource(String roleSource);
 
     @Select({"<script>",
             "SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
                     "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
-                    "role_source AS roleSource, flag FROM roles",
+                    "role_source AS roleSource, access AS access, flag FROM roles",
             "WHERE role_id IN <foreach collection='roleIdList' item='roleId' open='(' separator=',' close=')'> #{roleId} </foreach>" +
                     "</script>"})
     Page<RoleInfoEntity> findByMultiId(@Param("roleIdList") List<Long> roleIdList);
@@ -75,7 +75,7 @@ public interface RolesMapper {
     @Select({"<script>",
             "SELECT role_name AS roleName, role_id AS roleId, description, resource_type AS resourceType," +
                     "resource_name AS resourceName, resource_verbs AS resourceVerbs, resource_id as resourceId," +
-                    "role_source AS roleSource, flag FROM roles",
+                    "role_source AS roleSource, access AS access , flag FROM roles",
             "WHERE role_id IN <foreach collection='roleIdList' item='roleId' open='(' separator=',' close=')'> #{roleId} </foreach>" +
                     "</script>"})
     List<RoleInfoEntity> findAllByMultiId(@Param("roleIdList") List<Long> roleIdList);

@@ -52,6 +52,8 @@ public class RolesRepositoryImplTest {
         roleInfoEntity.setResourceId(2);
         roleInfoEntity.setDescription("This is tenants permissions");
         roleInfoEntity.setFlag(0);
+        roleInfoEntity.setAccess("read");
+
     }
 
     private void validateRole(RoleInfoEntity role) {
@@ -63,6 +65,7 @@ public class RolesRepositoryImplTest {
         Assert.assertEquals(2, role.getResourceId());
         Assert.assertEquals("This is tenants permissions", role.getDescription());
         Assert.assertEquals(0, role.getFlag());
+        Assert.assertEquals("read",role.getAccess());
     }
 
     @Test
