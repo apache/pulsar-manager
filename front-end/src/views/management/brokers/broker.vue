@@ -23,7 +23,7 @@
           </el-select>
         </el-form-item>
         <el-form-item class="postInfo-container-item" label="Broker">
-          <el-select v-model="postForm.broker" placeholder="select broker" @change="changeBrokerInfo()">
+          <el-select v-model="postForm.broker" filterable placeholder="select broker" @change="changeBrokerInfo()">
             <el-option v-for="(item,index) in brokersListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
