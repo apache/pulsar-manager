@@ -79,4 +79,9 @@ public class TenantsRepositoryImpl implements TenantsRepository {
         tenantsMapper.delete(tenant);
     }
 
+    @Override
+    public List<TenantEntity> findByEnvironment(String environment) {
+        return tenantsMapper.findAll(environment);
+    }
+
 }

@@ -20,6 +20,8 @@ import org.apache.pulsar.manager.entity.RoleBindingEntity;
 import org.apache.pulsar.manager.entity.RoleBindingRepository;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
 import org.apache.pulsar.manager.entity.RolesRepository;
+import org.apache.pulsar.manager.entity.TenantEntity;
+import org.apache.pulsar.manager.entity.TenantsRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.JwtService;
@@ -27,6 +29,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.pulsar.manager.utils.ResourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -81,6 +84,9 @@ public class LoginController {
     @Autowired
     private RoleBindingRepository roleBindingRepository;
 
+    @Autowired
+    private TenantsRepository tenantsRepository;
+
     @ApiOperation(value = "Login pulsar manager")
     @ApiResponses({
             @ApiResponse(code = 200, message = "ok"),
@@ -112,7 +118,7 @@ public class LoginController {
             result.put("login", "success");
             headers.add("token", token);
             headers.add("username", userAccount);
-            headers.add("tenant", userAccount);
+
             jwtService.setToken(request.getSession().getId(), token);
             List<RoleBindingEntity> roleBindingEntities = roleBindingRepository.
                     findByUserId(userInfoEntity.getUserId());
@@ -123,6 +129,10 @@ public class LoginController {
             if (!roleIdList.isEmpty()) {
                 List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
                 for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
+                    if(roleInfoEntity.getResourceType().equals(ResourceType.TENANTS.name())){
+                        Optional<TenantEntity> tenantEntity = tenantsRepository.findByTenantId(roleInfoEntity.getResourceId());
+                        headers.add("tenant",tenantEntity.get().getTenant());
+                    }
                     if (roleInfoEntity.getFlag() == 0) {
                         // Super users can access all types
                         return new ResponseEntity<>(result, headers, HttpStatus.OK);

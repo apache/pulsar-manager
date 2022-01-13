@@ -77,4 +77,8 @@ public interface TenantsMapper {
     @Delete("DELETE FROM tenants WHERE tenant = #{tenant}")
     void delete(String tenant);
 
+    @Select("SELECT tenant, tenant_id as tenantId, admin_roles as adminRoles,allowed_clusters as allowedClusters," +
+            "environment_name as environmentName " +
+            "FROM tenants WHERE environment_name = #{environment}")
+    List<TenantEntity> findAll(String environment);
 }

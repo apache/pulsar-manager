@@ -124,7 +124,9 @@ public class TenantsController {
                 List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
                 List<Long> tenantsIdList = new ArrayList<>();
                 for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
-                    tenantsIdList.add(roleInfoEntity.getResourceId());
+                    if(roleInfoEntity.getResourceType().equals(ResourceType.TENANTS.name())) {
+                        tenantsIdList.add(roleInfoEntity.getResourceId());
+                    }
                 }
                 if (!tenantsIdList.isEmpty()) {
                     tenantEntities = tenantsRepository.findByMultiId(tenantsIdList);
