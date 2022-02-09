@@ -20,11 +20,11 @@
        with:
          java-version: 1.8
      - name: Build with Gradle
-       run: ./gradlew build && ls -
+       run: ls -iloha && ./gradlew build && ls -iloha
 
      - uses: actions/download-artifact@v2
        with:
          name: my-artifact
 
      - name: Display structure of downloaded files
-       run: ls -R
+       run: ls -iloha
