@@ -18,7 +18,7 @@
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
         <el-form-item class="postInfo-container-item" label="Tenant">
-          <el-select v-model="postForm.tenant" :placeholder="$t('tenant.selectTenantMessage')" @change="getNamespacesList(postForm.tenant)">
+          <el-select v-model="postForm.tenant" :placeholder="$t('tenant.selectTenantMessage')" filterable @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>

@@ -18,22 +18,22 @@
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
         <el-form-item :label="$t('tenant.label')">
-          <el-select v-model="postForm.tenant" placeholder="select tenant" @change="getNamespacesList(postForm.tenant)">
+          <el-select v-model="postForm.tenant" placeholder="select tenant" filterable @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('namespace.label')">
-          <el-select v-model="postForm.namespace" placeholder="select namespace" @change="getTopicsList()">
+          <el-select v-model="postForm.namespace" placeholder="select namespace" filterable @change="getTopicsList()">
             <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('topic.label')">
-          <el-select v-model="postForm.topic" placeholder="select topic" @change="generatePartitions()">
+          <el-select v-model="postForm.topic" placeholder="select topic" filterable @change="generatePartitions()">
             <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('topic.partition')">
-          <el-select v-model="postForm.partition" :disabled="partitionDisabled" placeholder="select partition" @change="onPartitionChanged()">
+          <el-select v-model="postForm.partition" :disabled="partitionDisabled" filterable placeholder="select partition" @change="onPartitionChanged()">
             <el-option v-for="(item,index) in partitionsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>

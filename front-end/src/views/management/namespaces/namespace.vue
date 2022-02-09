@@ -18,12 +18,12 @@
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" class="form-container">
         <el-form-item :label="$t('tenant.label')" class="postInfo-container-item">
-          <el-select v-model="postForm.tenant" :placeholder="$t('tenant.name')" @change="getNamespacesList(postForm.tenant)">
+          <el-select v-model="postForm.tenant" :placeholder="$t('tenant.name')" filterable @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('namespace.label')" class="postInfo-container-item">
-          <el-select v-model="postForm.namespace" :placeholder="$t('namespace.name')" @change="getNamespaceInfo(postForm.tenant, postForm.namespace)">
+          <el-select v-model="postForm.namespace" :placeholder="$t('namespace.name')" filterable @change="getNamespaceInfo(postForm.tenant, postForm.namespace)">
             <el-option v-for="(item,index) in namespacesListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
