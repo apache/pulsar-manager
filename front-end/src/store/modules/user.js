@@ -19,6 +19,7 @@ import { removeCsrfToken } from '@/utils/csrfToken'
 import { Message } from 'element-ui'
 import { setTenant, removeTenant } from '../../utils/tenant'
 import { getUserInfo } from '@/api/users'
+import { loginByCasdoor } from '../../api/login'
 
 const user = {
   state: {
@@ -73,6 +74,23 @@ const user = {
               type: 'error',
               duration: 5 * 1000
             })
+            reject('login error')
+          }
+          commit('SET_TOKEN', response.headers.token)
+          setToken(response.headers.token)
+          setName(response.headers.username)
+          setTenant(response.headers.tenant)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    LoginByCasdoor({ commit }, code, state) {
+      return new Promise((resolve, reject) => {
+        loginByCasdoor(code, state).then(response => {
+          if (response.data.hasOwnProperty('error') && response.data.error.length >= 0) {
             reject('login error')
           }
           commit('SET_TOKEN', response.headers.token)
