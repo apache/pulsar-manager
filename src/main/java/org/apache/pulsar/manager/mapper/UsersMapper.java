@@ -76,4 +76,10 @@ public interface UsersMapper {
 
     @Delete("DELETE FROM users WHERE name=#{name}")
     void delete(String name);
+
+    @Select("SELECT access_token AS accessToken, user_id AS userId, name, description, email," +
+            "phone_number AS phoneNumber, location, company, expire, password " +
+            "FROM users " +
+            "WHERE email = #{email}")
+    UserInfoEntity findByEmail(String email);
 }

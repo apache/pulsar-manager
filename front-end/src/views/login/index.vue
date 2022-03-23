@@ -128,6 +128,11 @@ export default {
   mounted() {
     window.addEventListener('message', this.handleMessage)
   },
+  beforeMount() {
+    if (location.search.includes('token')) {
+      this.handleLoginByToken()
+    }
+  },
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
@@ -156,6 +161,17 @@ export default {
           console.log('error submit!!')
           return false
         }
+      })
+    },
+    handleLoginByToken() {
+      const urlParams = new URLSearchParams(window.location.search)
+      const token = (urlParams.get('token'))
+      this.$store.dispatch('LoginByToken', token).then(() => {
+        this.loading = false
+        window.location = '/'
+        this.$router.push({ path: '/' })
+      }).catch(() => {
+        this.loading = false
       })
     },
     afterQRScan() {

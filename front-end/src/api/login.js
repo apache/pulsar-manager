@@ -40,3 +40,11 @@ export function getUserInfo(token) {
     params: { token }
   })
 }
+
+export function loginByToken(token) {
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: '/pulsar-manager/login?token=' + token,
+    method: 'get'
+  })
+}

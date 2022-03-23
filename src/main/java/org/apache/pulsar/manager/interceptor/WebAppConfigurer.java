@@ -51,6 +51,7 @@ public class WebAppConfigurer implements WebMvcConfigurer {
                 .excludePathPatterns("/doc.html")
                 // BKVM
                 .excludePathPatterns("/bkvm")
+                .excludePathPatterns("/pulsar-manager/saml/**")
                 ;
     }
 

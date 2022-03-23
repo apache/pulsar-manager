@@ -76,4 +76,12 @@ public interface UsersRepository  {
      * @param name username
      */
     void delete(String name);
+
+    /**
+     * Get a user information by email.
+     * @param email The email
+     * @return UserInfoEntity
+     */
+    Optional<UserInfoEntity> findByEmail(String email);
+
 }
