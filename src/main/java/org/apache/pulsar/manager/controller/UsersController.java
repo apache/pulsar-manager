@@ -21,13 +21,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.HashMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.pulsar.manager.entity.NamespacesRepository;
 import org.apache.pulsar.manager.entity.RoleBindingEntity;
 import org.apache.pulsar.manager.entity.RoleBindingRepository;
 import org.apache.pulsar.manager.entity.RoleInfoEntity;
 import org.apache.pulsar.manager.entity.RolesRepository;
+import org.apache.pulsar.manager.entity.TenantsRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.RolesService;
@@ -81,6 +84,10 @@ public class UsersController {
 
     private final HttpServletRequest request;
 
+    private final TenantsRepository tenantsRepository;
+
+    private final NamespacesRepository namespacesRepository;
+
     @Autowired
     public UsersController(
             UsersRepository usersRepository,
@@ -88,13 +95,15 @@ public class UsersController {
             RolesRepository rolesRepository,
             RoleBindingRepository roleBindingRepository,
             RolesService rolesService,
-            HttpServletRequest request) {
+            HttpServletRequest request,TenantsRepository tenantsRepository,NamespacesRepository namespacesRepository) {
         this.usersRepository = usersRepository;
         this.usersService = usersService;
         this.rolesRepository = rolesRepository;
         this.roleBindingRepository = roleBindingRepository;
         this.rolesService = rolesService;
         this.request = request;
+        this.tenantsRepository = tenantsRepository;
+        this.namespacesRepository = namespacesRepository;
     }
 
     @ApiOperation(value = "Get users list")
@@ -227,7 +236,20 @@ public class UsersController {
                 roleIdList.add(roleBindingEntity.getRoleId());
             }
             List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
+            Map<String,Map<String,String>> access = Maps.newHashMap();
             for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
+                String resourceName = null;
+                if(!access.containsKey(roleInfoEntity.getResourceType())){
+                    access.put(roleInfoEntity.getResourceType(),new HashMap<>());
+                }
+                if(roleInfoEntity.getResourceType().equals(ResourceType.TENANTS.name())){
+                    resourceName = tenantsRepository.findByTenantId(roleInfoEntity.getResourceId()).get().getTenant();
+                }
+                else if(roleInfoEntity.getResourceType().equals(ResourceType.NAMESPACES.name())){
+                    resourceName = namespacesRepository.findByNamespaceId(roleInfoEntity.getResourceId()).get().getNamespace();
+                }
+                access.get(roleInfoEntity.getResourceType()).put(resourceName,roleInfoEntity.getAccess());
+                result.put("access",access);
                 if (roleInfoEntity.getFlag() == 0) {
                     result.put("message", "Get user info success");
                     result.put("userName", userInfoEntity.getName());

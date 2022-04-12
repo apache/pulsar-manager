@@ -51,4 +51,8 @@ public class RoleInfoEntity {
     @SerializedName("resource_verbs")
     private String resourceVerbs;
     private int flag;
+
+    @SerializedName("access")
+    private String access;
+
 }

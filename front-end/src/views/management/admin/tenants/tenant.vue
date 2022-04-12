@@ -33,7 +33,7 @@
             style="width: 200px;"
             @keyup.enter.native="handleFilterNamespace"/>
           <el-button type="primary" icon="el-icon-search" @click="handleFilterNamespace"/>
-          <el-button type="primary" icon="el-icon-plus" @click="handleCreateNamespace">{{ $t('namespace.newNamespace') }}</el-button>
+          <el-button v-if="hasAccess(postForm.tenant,'write')" type="primary" icon="el-icon-plus" @click="handleCreateNamespace">{{ $t('namespace.newNamespace') }}</el-button>
         </div>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
@@ -59,7 +59,7 @@
                   </router-link>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
+              <el-table-column v-if="hasAccess(postForm.tenant,'write')" :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                   <router-link :to="'/management/namespaces/' + scope.row.tenant +'/' + scope.row.namespace + '/namespace'">
                     <el-button type="primary" size="mini">{{ $t('table.edit') }}</el-button>
@@ -101,6 +101,7 @@ import {
   deleteNamespace
 } from '@/api/namespaces'
 import { validateEmpty } from '@/utils/validate'
+import { hasPermissionToResource } from '../../../../store/modules/user'
 
 const defaultForm = {
   tenant: getTenant()
@@ -243,6 +244,9 @@ export default {
         this.listNamespaces = []
         this.getNamespacesList()
       })
+    },
+    hasAccess(tenant, permission) {
+      return hasPermissionToResource('TENANTS', tenant, permission)
     }
   }
 }

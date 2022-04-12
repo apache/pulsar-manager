@@ -64,6 +64,7 @@
                 <el-table-column :label="$t('topic.data')" prop="data"/>
               </el-table>
               <el-button
+                v-if="hasAccess(postForm.namespace,'write')"
                 class="filter-item"
                 type="danger"
                 style="margin-top:15px;"
@@ -96,7 +97,7 @@
                 type="primary"
                 style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
                 icon="el-icon-close"
-                @click="handleTerminate">
+                @click="handleTerminate" >
                 {{ $t('topic.terminate') }}
               </el-button>
               <el-button
@@ -105,7 +106,7 @@
                 style="display:block;margin-top:15px;margin-left:auto;margin-right:auto;"
                 icon="el-icon-close"
                 disabled
-                @click="handleTerminate">
+                @click="handleTerminate" >
                 {{ $t('topic.terminate') }}
               </el-button>
             </el-card>
@@ -271,6 +272,7 @@
         </el-row>
         <h4>{{ $t('topic.subscription.subscriptions') }}</h4>
         <el-button
+          v-if="hasAccess(postForm.namespace,'write')"
           class="filter-item"
           type="success"
           style="margin-bottom: 15px"
@@ -461,7 +463,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane :label="$t('tabs.policies')" name="policies">
+      <el-tab-pane v-if="hasAccess(postForm.namespace,'write')" :label="$t('tabs.policies')" name="policies">
         <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
@@ -561,6 +563,7 @@ import { formatBytes } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
 import { putSubscriptionOnCluster, deleteSubscriptionOnCluster } from '@/api/subscriptions'
 import { validateSizeString } from '@/utils/validate'
+import { hasPermissionToResource } from '../../../store/modules/user'
 
 const defaultForm = {
   persistent: '',
@@ -1160,6 +1163,9 @@ export default {
         this.initTopicStats()
         this.dialogFormVisible = false
       })
+    },
+    hasAccess(namespace, permission) {
+      return hasPermissionToResource('NAMESPACES', namespace, permission)
     }
   }
 }

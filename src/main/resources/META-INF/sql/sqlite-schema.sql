@@ -144,7 +144,8 @@ CREATE TABLE IF NOT EXISTS roles (
   resource_type varchar(48) NOT NULL,
   resource_name varchar(48) NOT NULL,
   resource_verbs varchar(256) NOT NULL,
-  flag INT NOT NULL
+  flag INT NOT NULL,
+  access varchar(10) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tenants (

@@ -1,4 +1,5 @@
 <!--
+<!--
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -61,8 +62,8 @@
         <el-tabs v-model="activeBundleCluster" type="border-card" @tab-click="handleBundleTabClick">
           <el-tab-pane v-for="(item,index) in replicationClustersValue" :key="item+index" :label="item" :name="item">
             <div class="filter-container">
-              <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadAll">Unload All</el-button>
-              <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
+              <el-button v-if="hasAccess(postForm.namespace,'write')" class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadAll">Unload All</el-button>
+              <el-button v-if="hasAccess(postForm.namespace,'write')" class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-close" @click="hanldeClearAllBacklog">Clear All Backlog</el-button>
             </div>
             <el-table
               :key="tableKey"
@@ -76,7 +77,7 @@
                   <span>{{ scope.row.bundle }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('namespace.bundle.operation')" align="center" class-name="small-padding fixed-width">
+              <el-table-column v-if="hasAccess(postForm.namespace,'write')" :label="$t('namespace.bundle.operation')" align="center" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                   <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-share" @click="handleSplitBundle(scope.row)">{{ $t('namespace.bundle.split') }}</el-button>
                   <el-button size="medium" style="margin-left: 10px;" type="danger" icon="el-icon-download" @click="handleUnloadBundle(scope.row)">{{ $t('namespace.bundle.unload') }}</el-button>
@@ -92,7 +93,7 @@
       <el-tab-pane :label="$t('tabs.topic')" name="topics">
         <el-input v-model="searchTopic" :placeholder="$t('namespace.searchTopics')" style="width: 200px;" @keyup.enter.native="handleFilterTopic"/>
         <el-button type="primary" icon="el-icon-search" @click="handleFilterTopic"/>
-        <el-button type="primary" icon="el-icon-plus" @click="handleCreateTopic">{{ $t('namespace.newTopic') }}</el-button>
+        <el-button v-if="hasAccess(postForm.namespace,'write')" type="primary" icon="el-icon-plus" @click="handleCreateTopic" >{{ $t('namespace.newTopic') }}</el-button>
         <el-row :gutter="24">
           <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="margin-top:15px">
             <el-table
@@ -159,7 +160,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane :label="$t('tabs.policies')" name="policies">
+      <el-tab-pane v-if="hasAccess(postForm.namespace,'write')" :label="$t('tabs.policies')" name="policies" >
         <h4>{{ $t('namespace.policy.cluster') }}</h4>
         <hr class="split-line">
         <div class="component-item">
@@ -208,7 +209,7 @@
                 :value="item.value"
                 style="width:300px"/>
             </el-select>
-            <el-button @click.prevent="handleClose(tag)">{{ $t('namespace.policy.deleteRole') }}</el-button>
+            <el-button v-if="hasAccess(postForm.namespace,'write')" @click.prevent="handleClose(tag)">{{ $t('namespace.policy.deleteRole') }}</el-button>
           </el-tag>
           <el-form-item style="margin-top:30px">
             <el-input
@@ -756,6 +757,7 @@ import MdInput from '@/components/MDinput'
 import { validateEmpty } from '@/utils/validate'
 import { formatBytes } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
+import { hasPermissionToResource } from '../../../store/modules/user'
 
 const defaultForm = {
   tenant: '',
@@ -1663,6 +1665,9 @@ export default {
           }
         }
       })
+    },
+    hasAccess(namespace, permission) {
+      return hasPermissionToResource('NAMESPACES', namespace, permission)
     }
   }
 }

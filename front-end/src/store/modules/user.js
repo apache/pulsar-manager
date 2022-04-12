@@ -20,6 +20,22 @@ import { Message } from 'element-ui'
 import { setTenant, removeTenant } from '../../utils/tenant'
 import { getUserInfo } from '@/api/users'
 
+export function hasPermissionToResource(resourceType, resourceName, permission) {
+  if (isSuperAdmin(user)) { // Super admin will have access to everything
+    return true
+  }
+  if (user.state.access.hasOwnProperty(resourceType)) {
+    if (user.state.access[resourceType].hasOwnProperty(resourceName)) {
+      return user.state.access[resourceType][resourceName] === permission
+    }
+  }
+  return false
+}
+
+export function isSuperAdmin(user) {
+  return user.state.roles.indexOf('super') != -1
+}
+
 const user = {
   state: {
     user: '',
@@ -32,6 +48,9 @@ const user = {
     roles: [],
     setting: {
       articlePlatform: []
+    },
+    access: {
+
     }
   },
 
@@ -59,7 +78,11 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_ACCESS: (state, access) => {
+      state.access = access
     }
+
   },
 
   actions: {
@@ -93,6 +116,7 @@ const user = {
           commit('SET_ROLES', response.data.roles)
           commit('SET_NAME', 'admin')
           commit('SET_INTRODUCTION', 'Pulsar Manager')
+          commit('SET_ACCESS', response.data.access)
           resolve(response)
         })
       })
@@ -104,6 +128,7 @@ const user = {
         logout(state.token).then(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
+          commit('SET_ACCESS', {})
           removeToken()
           removeCsrfToken()
           removeName()

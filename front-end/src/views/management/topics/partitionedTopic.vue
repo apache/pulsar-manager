@@ -68,6 +68,7 @@
         </el-table>
         <h4>{{ $t('topic.subscription.subscriptions') }}</h4>
         <el-button
+          v-if="hasAccess(postForm.namespace,'write')"
           class="filter-item"
           type="success"
           style="margin-bottom: 15px"
@@ -217,7 +218,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="POLICIES" name="policies">
+      <el-tab-pane v-if="hasAccess(postForm.namespace,'write')" label="POLICIES" name="policies">
         <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
             <i class="el-icon-info"/>
@@ -325,6 +326,7 @@ import Pagination from '@/components/Pagination' // Secondary package based on e
 import { formatBytes } from '@/utils/index'
 import { numberFormatter } from '@/filters/index'
 import { putSubscriptionOnCluster, deleteSubscriptionOnCluster } from '@/api/subscriptions'
+import { hasPermissionToResource } from '../../../store/modules/user'
 
 const defaultForm = {
   persistent: '',
@@ -798,6 +800,9 @@ export default {
       } else {
         sessionStorage.removeItem('refreshInterval')
       }
+    },
+    hasAccess(namespace, permission) {
+      return hasPermissionToResource('NAMESPACES', namespace, permission)
     }
   }
 }
