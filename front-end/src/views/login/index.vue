@@ -71,13 +71,12 @@
 
 <script>
 import LangSelect from '@/components/LangSelect'
-import SocialSign from './socialsignin'
 import { getCsrfToken } from '@/api/tokens'
 import { setCsrfToken } from '@/utils/csrfToken'
 
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
+  components: { LangSelect },
   data() {
     // const validateUsername = (rule, value, callback) => {
     //   console.log(isvalidUsername(value))

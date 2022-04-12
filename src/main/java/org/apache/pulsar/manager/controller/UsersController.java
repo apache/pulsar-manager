@@ -24,16 +24,9 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.pulsar.manager.entity.RoleBindingEntity;
-import org.apache.pulsar.manager.entity.RoleBindingRepository;
-import org.apache.pulsar.manager.entity.RoleInfoEntity;
-import org.apache.pulsar.manager.entity.RolesRepository;
 import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
-import org.apache.pulsar.manager.service.RolesService;
 import org.apache.pulsar.manager.service.UsersService;
-import org.apache.pulsar.manager.utils.ResourceType;
-import org.apache.pulsar.manager.utils.ResourceVerbs;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,8 +42,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -73,27 +64,15 @@ public class UsersController {
 
     private final UsersService usersService;
 
-    private final RolesRepository rolesRepository;
-
-    private final RoleBindingRepository roleBindingRepository;
-
-    private final RolesService rolesService;
-
     private final HttpServletRequest request;
 
     @Autowired
     public UsersController(
             UsersRepository usersRepository,
             UsersService usersService,
-            RolesRepository rolesRepository,
-            RoleBindingRepository roleBindingRepository,
-            RolesService rolesService,
             HttpServletRequest request) {
         this.usersRepository = usersRepository;
         this.usersService = usersService;
-        this.rolesRepository = rolesRepository;
-        this.roleBindingRepository = roleBindingRepository;
-        this.rolesService = rolesService;
         this.request = request;
     }
 
@@ -142,13 +121,6 @@ public class UsersController {
         }
         userInfoEntity.setPassword(DigestUtils.sha256Hex(userInfoEntity.getPassword()));
         usersRepository.save(userInfoEntity);
-        // Create default role and tenant
-        Map<String, String> defaultRoleCreate = rolesService.createDefaultRoleAndTenant(
-                userInfoEntity.getName(), request.getHeader("environment"));
-        if (defaultRoleCreate.get("error") != null) {
-            result.put("error", defaultRoleCreate.get("error"));
-            return ResponseEntity.ok(result);
-        }
         result.put("message", "Create user success");
         return ResponseEntity.ok(result);
     }
@@ -212,41 +184,17 @@ public class UsersController {
     public ResponseEntity<Map<String, Object>> getUserInfo() {
         Map<String, Object> result = Maps.newHashMap();
         Set<String> roles  = Sets.newHashSet();
-        if (userManagementEnable) {
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-            String token = request.getHeader("token");
-            Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(token);
-            if (!userInfoEntityOptional.isPresent()) {
-                result.put("error", "User is no exist");
-                return ResponseEntity.ok(result);
-            }
-            UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
-            List<RoleBindingEntity> roleBindingEntities = roleBindingRepository.findByUserId(userInfoEntity.getUserId());
-            List<Long> roleIdList = new ArrayList<>();
-            for (RoleBindingEntity roleBindingEntity : roleBindingEntities) {
-                roleIdList.add(roleBindingEntity.getRoleId());
-            }
-            List<RoleInfoEntity> roleInfoEntities = rolesRepository.findAllRolesByMultiId(roleIdList);
-            for (RoleInfoEntity roleInfoEntity : roleInfoEntities) {
-                if (roleInfoEntity.getFlag() == 0) {
-                    result.put("message", "Get user info success");
-                    result.put("userName", userInfoEntity.getName());
-                    result.put("description", userInfoEntity.getDescription());
-                    roles.add("super");
-                    result.put("roles", roles);
-                    return ResponseEntity.ok(result);
-                }
-            }
-            result.put("message", "Get user info success");
-            result.put("userName", userInfoEntity.getName());
-            result.put("description", userInfoEntity.getDescription());
-            roles.add("admin");
-            result.put("roles", roles);
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String token = request.getHeader("token");
+        Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByAccessToken(token);
+        if (!userInfoEntityOptional.isPresent()) {
+            result.put("error", "User is no exist");
             return ResponseEntity.ok(result);
         }
+        UserInfoEntity userInfoEntity = userInfoEntityOptional.get();
         result.put("message", "Get user info success");
-        result.put("description", "This is super account");
-        result.put("userName", account);
+        result.put("userName", userInfoEntity.getName());
+        result.put("description", userInfoEntity.getDescription());
         roles.add("super");
         result.put("roles", roles);
         return ResponseEntity.ok(result);
@@ -261,12 +209,6 @@ public class UsersController {
     @RequestMapping(value = "/users/superuser", method = RequestMethod.PUT)
     public ResponseEntity<Map<String, Object>> createSuperUser(@RequestBody UserInfoEntity userInfoEntity) {
         Map<String, Object> result = Maps.newHashMap();
-        // 0 is super role
-        Optional<RoleInfoEntity> roleInfoEntityOptional = rolesRepository.findByRoleFlag(0);
-        if (roleInfoEntityOptional.isPresent()) {
-            result.put("error", "Super user role is exist, this interface is no longer available");
-            return ResponseEntity.ok(result);
-        }
         Map<String, String> userValidateResult = usersService.validateUserInfo(userInfoEntity);
         if (userValidateResult.get("error") != null) {
             result.put("error", userValidateResult.get("error"));
@@ -277,24 +219,8 @@ public class UsersController {
             return ResponseEntity.ok(result);
         }
 
-        RoleInfoEntity roleInfoEntity = new RoleInfoEntity();
-        roleInfoEntity.setRoleName(userInfoEntity.getName());
-        roleInfoEntity.setResourceId(0);
-        roleInfoEntity.setRoleSource(roleInfoEntity.getRoleName());
-        roleInfoEntity.setResourceType(ResourceType.ALL.name());
-        roleInfoEntity.setResourceName("superuser");
-        roleInfoEntity.setResourceVerbs(ResourceVerbs.SUPER_USER.name());
-        roleInfoEntity.setFlag(0);
-        roleInfoEntity.setDescription("This is super role");
-        long roleId = rolesRepository.save(roleInfoEntity);
         userInfoEntity.setPassword(DigestUtils.sha256Hex(userInfoEntity.getPassword()));
-        long userId = usersRepository.save(userInfoEntity);
-        RoleBindingEntity roleBindingEntity = new RoleBindingEntity();
-        roleBindingEntity.setDescription("This is super role binding");
-        roleBindingEntity.setName("super_user_role_binding");
-        roleBindingEntity.setRoleId(roleId);
-        roleBindingEntity.setUserId(userId);
-        roleBindingRepository.save(roleBindingEntity);
+        usersRepository.save(userInfoEntity);
         result.put("message", "Add super user success, please login");
         return ResponseEntity.ok(result);
     }

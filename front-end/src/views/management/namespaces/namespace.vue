@@ -260,49 +260,6 @@
         </el-select>
         <h4>{{ $t('namespace.policy.storage') }}</h4>
         <hr class="split-line">
-        <div class="section-title">
-          <span>{{ $t('namespace.policy.replicationFactor') }}</span>
-          <el-tooltip class="item" effect="dark" placement="top">
-            <div slot="content">
-              {{ $t('namespace.policy.replicationFactorContent') }}
-              <ul>
-                <li>{{ $t('namespace.policy.ensembleSize') }}{{ $t('namespace.policy.ensembleSizeDescription') }}</li>
-                <li>{{ $t('namespace.policy.writeQuorumSize') }}{{ $t('namespace.policy.writeQuorumSizeDescription') }}</li>
-                <li>{{ $t('namespace.policy.readQuorumSize') }}{{ $t('namespace.policy.ackQuorumSizeDescription') }}</li>
-              </ul>
-            </div>
-            <i class="el-icon-info"/>
-          </el-tooltip>
-        </div>
-        <el-form :inline="true" :model="form" :rules="rules">
-          <el-form-item prop="ensembleSize">
-            <span>{{ $t('namespace.policy.ensembleSize') }}</span>
-            <md-input
-              v-model="form.ensembleSize"
-              :placeholder="$t('namespace.policy.inputEnsemble')"
-              class="md-input-style"
-              name="ensembleSize"
-              @keyup.enter.native="handlePersistence"/>
-          </el-form-item>
-          <el-form-item prop="writeQuorumSize">
-            <span>{{ $t('namespace.policy.writeQuorumSize') }}</span>
-            <md-input
-              v-model="form.writeQuorumSize"
-              :placeholder="$t('namespace.policy.inputWriteQuorumSize')"
-              class="md-input-style"
-              name="writeQuorumSize"
-              @keyup.enter.native="handlePersistence"/>
-          </el-form-item>
-          <el-form-item prop="readQuorumSize">
-            <span>{{ $t('namespace.policy.readQuorumSize') }}</span>
-            <md-input
-              v-model="form.readQuorumSize"
-              :placeholder="$t('namespace.policy.inputReadQuorumSize')"
-              class="md-input-style"
-              name="readQuorumSize"
-              @keyup.enter.native="handlePersistence"/>
-          </el-form-item>
-        </el-form>
         <el-form :inline="true" :model="form" :rules="rules">
           <el-form-item prop="markDeleteMaxRate">
             <span>{{ $t('namespace.policy.markDeleteRate') }}</span>
@@ -1135,8 +1092,10 @@ export default {
       this.replicationClustersValue = policies.replication_clusters
       this.activeBundleCluster = this.activeBundleCluster || this.replicationClustersValue.length > 0 ? this.replicationClustersValue[0] : ''
       this.subscriptionAuthenticationMode = policies.subscription_auth_mode
-      this.form.backlogQuotasLimit = String(policies.backlog_quota_map.destination_storage.limit)
-      this.form.backlogRententionPolicy = String(policies.backlog_quota_map.destination_storage.policy)
+      if (policies.backlog_quota_map.destination_storage) {
+        this.form.backlogQuotasLimit = String(policies.backlog_quota_map.destination_storage.limit)
+        this.form.backlogRententionPolicy = String(policies.backlog_quota_map.destination_storage.policy)
+      }
       if (policies.encryption_required) {
         this.form.encryptionRequireRadio = 'Enabled'
       }
