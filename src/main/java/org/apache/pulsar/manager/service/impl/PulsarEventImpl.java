@@ -13,16 +13,13 @@
  */
 package org.apache.pulsar.manager.service.impl;
 
-import com.google.common.collect.Maps;
 import org.apache.pulsar.manager.entity.NamespaceEntity;
 import org.apache.pulsar.manager.entity.NamespacesRepository;
 import org.apache.pulsar.manager.service.PulsarEvent;
-import org.apache.pulsar.manager.service.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 @Service
 public class PulsarEventImpl implements PulsarEvent {
@@ -54,9 +51,6 @@ public class PulsarEventImpl implements PulsarEvent {
     private static final String PULSAR_MANAGER_TOPIC_PREFIX = "/pulsar-manager/admin/v2/topics";
 
     private static final String PULSAR_MANAGER_PREFIX = "/pulsar-manager";
-
-    @Autowired
-    private RolesService rolesService;
 
     @Autowired
     private NamespacesRepository namespacesRepository;
@@ -117,33 +111,6 @@ public class PulsarEventImpl implements PulsarEvent {
             return true;
         }
         return false;
-    }
-
-    public boolean validateRoutePermission(String path, String token) {
-        if (isCluster(path) || isBroker(path) || isBrokerStats(path) || isResourceQuota(path)) {
-            if (rolesService.isSuperUser(token)) {
-                return true;
-            }
-            return false;
-        }
-        return true;
-    }
-
-    public Map<String, String> validateTenantPermission(String path, String token) {
-        Map<String, String> result = Maps.newHashMap();
-        if (isTenant(path) || isNamespace(path) || isTopic(path)) {
-            String[] pathList = path.split(SEPARATOR);
-            String tenant;
-            if (path.startsWith(PULSAR_MANAGER_PREFIX)) {
-                tenant = pathList[5];
-            } else {
-                tenant = pathList[4];
-            }
-            result = rolesService.validateCurrentTenant(token, tenant);
-            return result;
-        }
-        result.put("message", "This resource no need validate");
-        return result;
     }
 
     public void parsePulsarEvent(String path, HttpServletRequest request) {

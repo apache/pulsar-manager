@@ -136,7 +136,8 @@ export const asyncRouterMap = [
           title: 'Clusters',
           noCache: true,
           roles: ['super']
-        }
+        },
+        hidden: true
       },
       {
         path: 'clusters/:cluster/cluster',
@@ -338,28 +339,6 @@ export const asyncRouterMap = [
           title: 'Users',
           noCache: true,
           roles: ['super']
-        },
-        hidden: true
-      },
-      {
-        path: '/roles',
-        component: () => import('@/views/management/roles/index'),
-        name: 'Roles',
-        meta: {
-          title: 'Roles',
-          noCache: true,
-          roles: ['super', 'admin']
-        },
-        hidden: true
-      },
-      {
-        path: '/roleBinding',
-        component: () => import('@/views/management/roleBinding/index'),
-        name: 'RoleBinding',
-        meta: {
-          title: 'RoleBinding',
-          noCache: true,
-          roles: ['super', 'admin']
         },
         hidden: true
       },
