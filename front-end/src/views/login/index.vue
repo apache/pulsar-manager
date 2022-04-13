@@ -53,9 +53,10 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ $t('login.logIn') }}</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-left:0;" @click="loginWithCasdoor">{{ $t('login.casdoor') }}</el-button>
       <!-- <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-        Or connect with
-      </el-button> -->
+              Or connect with
+            </el-button> -->
     </el-form>
 
     <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog" append-to-body>
@@ -179,6 +180,14 @@ export default {
       getCsrfToken().then(response => {
         setCsrfToken(response.headers['x-csrf-token'])
       })
+    },
+    loginWithCasdoor() {
+      window.location.href = 'http://localhost:7001/login/oauth/authorize' +
+        '?client_id=6ba06c1e1a30929fdda7' +
+        '&response_type=code' +
+        '&redirect_uri=http://localhost:9527/callback' +
+        '&scope=read' +
+        '&state=pulsar'
     }
   }
 }

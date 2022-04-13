@@ -23,7 +23,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.casbin.casdoor.service.CasdoorAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +60,15 @@ public class LoginController {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private CasdoorAuthService casdoorAuthService;
+
+    @Value("${pulsar-manager.account}")
+    private String account;
+
+    @Value("${pulsar-manager.password}")
+    private String password;
 
     @ApiOperation(value = "Login pulsar manager")
     @ApiResponses({
@@ -115,5 +126,32 @@ public class LoginController {
         userInfoEntity.setAccessToken("");
         usersRepository.update(userInfoEntity);
         return ResponseEntity.ok(result);
+    }
+
+    @ApiOperation(value = "Logout pulsar manager")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "ok"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
+    @RequestMapping(value = "/casdoor", method =  RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> callback(
+            @RequestBody Map<String, String> body) {
+        Map<String, Object> result = Maps.newHashMap();
+        String code = body.get("code");
+        String state = body.get("state");
+        String token = casdoorAuthService.getOAuthToken(code, state);
+        if(!token.startsWith("error")){
+            result.put("error", token.substring(7));
+            return ResponseEntity.ok(result);
+        }
+        result.put("login", "success");
+        HttpHeaders headers = new HttpHeaders();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String jwtToken = jwtService.toToken(account + "-" + password);
+        jwtService.setToken(request.getSession().getId(), jwtToken);
+        headers.add("token", jwtToken);
+        headers.add("tenant","pulsar");
+        headers.add("username", "pulsar");
+        return new ResponseEntity<>(result, headers, HttpStatus.OK);
     }
 }
