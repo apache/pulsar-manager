@@ -26,6 +26,19 @@ export function loginByUsername(username, password) {
   })
 }
 
+export function loginByCasdoor(code, state) {
+  const data = {
+    code,
+    state
+  }
+  return request({
+    headers: { 'Content-Type': 'application/json' },
+    url: '/pulsar-manager/casdoor',
+    method: 'post',
+    data
+  })
+}
+
 export function logout() {
   return request({
     url: '/pulsar-manager/logout',
