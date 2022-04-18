@@ -13,7 +13,6 @@
  */
 package org.apache.pulsar.manager.controller;
 
-import com.google.common.collect.Maps;
 import org.apache.pulsar.manager.service.ClustersService;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import io.swagger.annotations.Api;
@@ -21,7 +20,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.pulsar.manager.service.RolesService;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -59,9 +56,6 @@ public class ClustersController {
         this.request = request;
     }
 
-    @Autowired
-    private RolesService rolesService;
-
     @ApiOperation(value = "Get the list of existing clusters, support paging, the default is 10 per page")
     @ApiResponses({
             @ApiResponse(code = 200, message = "ok"),
@@ -78,17 +72,7 @@ public class ClustersController {
             @Range(min = 1, max = 1000, message = "page_size is incorrect, should be greater than 0 and less than 1000.")
                     Integer pageSize) {
         String requestHost = environmentCacheService.getServiceUrl(request);
-        String token = request.getHeader("token");
-        Map<String, Object> result = Maps.newHashMap();
-        if (!rolesService.isSuperUser(token)) {
-            result.put("isPage", false);
-            result.put("total", 0);
-            result.put("data", new ArrayList());
-            result.put("pageNum", 0);
-            result.put("pageSize", 0);
-            return ResponseEntity.ok(result);
-        }
-        result = clusterService.getClustersList(
+        Map<String, Object> result = clusterService.getClustersList(
             pageNum, pageSize, requestHost, cluster -> {
                 String environment = request.getHeader("environment");
                 if (null == environment) {

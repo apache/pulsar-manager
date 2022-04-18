@@ -21,9 +21,7 @@ import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.JwtService;
 import org.apache.pulsar.manager.service.PulsarEvent;
-import org.apache.pulsar.manager.service.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
@@ -49,12 +47,6 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private UsersRepository usersRepository;
 
-    @Value("${user.management.enable}")
-    private boolean userManagementEnable;
-
-    @Autowired
-    private RolesService rolesService;
-
     @Autowired
     private PulsarEvent pulsarEvent;
 
@@ -76,22 +68,20 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
             response.getWriter().append(gson.toJson(map));
             return false;
         }
-        if (userManagementEnable) {
-            Optional<UserInfoEntity> optionalUserInfoEntity = usersRepository.findByAccessToken(token);
-            if (!optionalUserInfoEntity.isPresent()) {
-                map.put("message", "Please login.");
-                response.setStatus(401);
-                response.getWriter().append(gson.toJson(map));
-                return false;
-            }
-            String username = request.getHeader("username");
-            UserInfoEntity userInfoEntity = optionalUserInfoEntity.get();
-            if (!userInfoEntity.getName().equals(username)) {
-                map.put("message", "Please login.");
-                response.setStatus(401);
-                response.getWriter().append(gson.toJson(map));
-                return false;
-            }
+        Optional<UserInfoEntity> optionalUserInfoEntity = usersRepository.findByAccessToken(token);
+        if (!optionalUserInfoEntity.isPresent()) {
+            map.put("message", "Please login.");
+            response.setStatus(401);
+            response.getWriter().append(gson.toJson(map));
+            return false;
+        }
+        String username = request.getHeader("username");
+        UserInfoEntity userInfoEntity = optionalUserInfoEntity.get();
+        if (!userInfoEntity.getName().equals(username)) {
+            map.put("message", "Please login.");
+            response.setStatus(401);
+            response.getWriter().append(gson.toJson(map));
+            return false;
         }
         String requestUri = request.getServletPath();
         if (!requestUri.equals("/pulsar-manager/users/userInfo")) {
@@ -104,32 +94,19 @@ public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {
                 return false;
             }
         }
-        if (!rolesService.isSuperUser(token)) {
-            if (requestUri.startsWith("/admin/v2/clusters")
-                    || requestUri.startsWith("/admin/v2/brokers")) {
+        if (requestUri.startsWith("/admin/v2/clusters")
+                || requestUri.startsWith("/admin/v2/brokers")) {
+            map.put("message", "This user no permissions for this resource");
+            response.setStatus(401);
+            response.getWriter().append(gson.toJson(map));
+            return false;
+        }
+        if (requestUri.startsWith("/admin/v2/tenants")) {
+            if (request.getMethod() != "GET") {
                 map.put("message", "This user no permissions for this resource");
                 response.setStatus(401);
                 response.getWriter().append(gson.toJson(map));
                 return false;
-            }
-            if (requestUri.startsWith("/admin/v2/tenants")) {
-                if (request.getMethod() != "GET") {
-                    map.put("message", "This user no permissions for this resource");
-                    response.setStatus(401);
-                    response.getWriter().append(gson.toJson(map));
-                    return false;
-                }
-            }
-            if (requestUri.startsWith("/pulsar-manager/admin/v2/namespaces")
-                    || requestUri.startsWith("/pulsar-manager/admin/v2/persistent")
-                    || requestUri.startsWith("/pulsar-manager/admin/v2/non-persistent")) {
-                Map<String, String> result = pulsarEvent.validateTenantPermission(requestUri, token);
-                if (result.get("error") != null) {
-                    map.put("message", result.get("error"));
-                    response.setStatus(401);
-                    response.getWriter().append(gson.toJson(map));
-                    return false;
-                }
             }
         }
         return true;

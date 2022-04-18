@@ -55,6 +55,11 @@ export const constantRouterMap = [
     hidden: true
   },
   {
+    path: '/callback',
+    component: () => import('@/views/callback/index'),
+    hidden: true
+  },
+  {
     path: '/auth-redirect',
     component: () => import('@/views/login/authredirect'),
     hidden: true
@@ -72,7 +77,7 @@ export const constantRouterMap = [
 ]
 
 export default new Router({
-  // mode: 'history', // require service support
+  mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
@@ -131,7 +136,8 @@ export const asyncRouterMap = [
           title: 'Clusters',
           noCache: true,
           roles: ['super']
-        }
+        },
+        hidden: true
       },
       {
         path: 'clusters/:cluster/cluster',
@@ -333,28 +339,6 @@ export const asyncRouterMap = [
           title: 'Users',
           noCache: true,
           roles: ['super']
-        },
-        hidden: true
-      },
-      {
-        path: '/roles',
-        component: () => import('@/views/management/roles/index'),
-        name: 'Roles',
-        meta: {
-          title: 'Roles',
-          noCache: true,
-          roles: ['super', 'admin']
-        },
-        hidden: true
-      },
-      {
-        path: '/roleBinding',
-        component: () => import('@/views/management/roleBinding/index'),
-        name: 'RoleBinding',
-        meta: {
-          title: 'RoleBinding',
-          noCache: true,
-          roles: ['super', 'admin']
         },
         hidden: true
       },

@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "axios": "0.18.1",
+    "casdoor-js-sdk": "^0.2.5",
     "clipboard": "1.7.1",
     "codemirror": "5.39.2",
     "connect": "3.6.6",
@@ -97,7 +98,6 @@
     "request": "^2.88.0",
     "rimraf": "2.6.2",
     "sass-loader": "7.0.3",
-    "script-ext-html-webpack-plugin": "2.0.1",
     "script-loader": "0.7.2",
     "semver": "5.5.0",
     "serve-static": "1.13.2",
@@ -115,8 +115,7 @@
     "webpack-merge": "4.1.4"
   },
   "engines": {
-    "node": ">= 6.0.0",
-    "npm": ">= 3.0.0"
+    "node": ">=12.0.0 <=12.22.10"
   },
   "browserslist": [
     "> 1%",

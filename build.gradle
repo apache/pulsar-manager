@@ -55,6 +55,10 @@ apply plugin: 'application'
 
 mainClassName = 'org.apache.pulsar.manager.PulsarManagerApplication'
 
+startScripts {
+    classpath  = files('$APP_HOME/lib/*')
+}
+
 task licenseFormatNode(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
     source = fileTree(dir: "src").include("**/*")
     source = fileTree(dir: "front-end/src").include("**/*")
@@ -144,6 +148,7 @@ dependencies {
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: jerseyVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
     compile group: 'org.springframework.security', name: 'spring-security-config'
+    compile group: 'org.casbin', name: 'casdoor-spring-boot-starter', version: '1.2.0'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
     compileOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion

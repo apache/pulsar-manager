@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.apache.pulsar.manager.service.PulsarEvent;
-import org.apache.pulsar.manager.service.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
@@ -45,17 +44,14 @@ public class EnvironmentForward extends ZuulFilter {
 
     private final PulsarEvent pulsarEvent;
 
-    private final RolesService rolesService;
-
     private final PulsarAdminService pulsarAdminService;
 
     @Autowired
     public EnvironmentForward(
             EnvironmentCacheService environmentCacheService, PulsarEvent pulsarEvent,
-            RolesService rolesService, PulsarAdminService pulsarAdminService) {
+            PulsarAdminService pulsarAdminService) {
         this.environmentCacheService = environmentCacheService;
         this.pulsarEvent = pulsarEvent;
-        this.rolesService = rolesService;
         this.pulsarAdminService = pulsarAdminService;
     }
 
@@ -85,24 +81,6 @@ public class EnvironmentForward extends ZuulFilter {
         request.getServletPath();
         String token = request.getHeader("token");
 
-        if (!rolesService.isSuperUser(token)) {
-            if (!pulsarEvent.validateRoutePermission(requestUri, token)) {
-                ctx.setResponseBody("This operation does not have permission");
-                return null;
-            }
-            if (requestUri.startsWith("/admin/v2/tenants/")
-                    || requestUri.startsWith("/admin/v2/namespaces")
-                    || requestUri.startsWith("/admin/v2/persistent")
-                    || requestUri.startsWith("/admin/v2/non-persistent")) {
-                Map<String, String> result = pulsarEvent.validateTenantPermission(
-                        requestUri, token);
-                if (result.get("error") != null) {
-                    log.error("This operation does not have permission");
-                    ctx.setResponseBody(result.get("error"));
-                    return null;
-                }
-            }
-        }
 
         if (redirect != null && redirect.equals("true")) {
             String redirectScheme = request.getParameter("redirect.scheme");

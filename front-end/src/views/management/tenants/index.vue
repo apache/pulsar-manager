@@ -51,9 +51,7 @@
                 v-for="tag in scope.row.allowedClusters"
                 :key="tag"
                 class="list-el-tag">
-                <router-link :to="'/management/clusters/' + tag + '/cluster?tab=brokers'" class="link-type">
-                  {{ tag }}
-                </router-link>
+                {{ tag }}
               </span>
             </template>
           </el-table-column>
