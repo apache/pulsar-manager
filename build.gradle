@@ -103,8 +103,6 @@ jar {
     }
 }
 
-ext['log4j2.version'] = '2.17.1'
-
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
