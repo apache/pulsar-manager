@@ -55,9 +55,9 @@ apply plugin: 'application'
 
 mainClassName = 'org.apache.pulsar.manager.PulsarManagerApplication'
 
-startScripts {
-    classpath  = files('$APP_HOME/lib/*')
-}
+// startScripts {
+//     classpath  = files('$APP_HOME/lib/*')
+// }
 
 task licenseFormatNode(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
     source = fileTree(dir: "src").include("**/*")
