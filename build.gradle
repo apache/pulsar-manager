@@ -55,10 +55,6 @@ apply plugin: 'application'
 
 mainClassName = 'org.apache.pulsar.manager.PulsarManagerApplication'
 
-// startScripts {
-//     classpath  = files('$APP_HOME/lib/*')
-// }
-
 task licenseFormatNode(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
     source = fileTree(dir: "src").include("**/*")
     source = fileTree(dir: "front-end/src").include("**/*")
@@ -102,6 +98,8 @@ jar {
         )
     }
 }
+
+ext['log4j2.version'] = '2.17.1'
 
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
