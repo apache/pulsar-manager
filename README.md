@@ -197,6 +197,7 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
     - Input the "Environment Name". The environment name is used for identifying an environment.
     - Input the "Service URL". The Service URL is the admin service url of your Pulsar cluster.
         - You need to make sure the service url that Pulsar Manager is able to access. In this example, both pulsar container and pulsar-manager container are linked. So you can use pulsar container name as the domain name of the pulsar standalone cluster. Thus you can type `http://pulsar-standalone:8080`.
+    - Input the "Bookie URL". In this example, you can type `http://pulsar-standalone:6650`
 
 ## Configure Pulsar Manager
 
@@ -231,6 +232,8 @@ The puslar-manager supports multiple environment configurations and can manage m
 
 Here, the service URL represents the service IP address of the broker. If you run Pulsar manager in the standalone mode, it should be set to "http://127.0.0.1:8080".
 You can easily find it in the client.conf file of your pulsar-manager. 
+
+And the bookie URL represents the service IP address of the bookkeeper. If you run Pulsar manager in the standalone mode, it should be set to "http://127.0.0.1:6650". 
 
 ![pulsar-manager-environments](docs/img/pulsar-manager-environments.gif)
 
