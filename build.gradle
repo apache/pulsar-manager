@@ -151,4 +151,10 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: apiMockitoVersion
     testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
+
+    constraints {
+        compile("org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}")
+        compile("org.bouncycastle:bcprov-ext-jdk15on:${bouncycastleVersion}")
+        compile("org.bouncycastle:bcpkix-jdk15on:${bouncycastleVersion}")
+    }
 }
