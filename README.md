@@ -167,7 +167,7 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
 
 1. Access Pulsar manager UI at `http://${frontend-end-ip}/#/environments`.
 
-    If you started Pulsar Manager using docker or docker-compose, the Pulsar Manager is running at port 9527. You can access the Pulsar Manager UI at http://127.0.0.1/#/environments.
+    If you started Pulsar Manager using docker or docker-compose, the Pulsar Manager is running at port 9527. You can access the Pulsar Manager UI at http://127.0.0.1:9527/#/environments.
 
     If you are deploying Pulsar Manager 0.1.0 using the released container, you can log in the Pulsar Manager UI using the following credentials.
 
