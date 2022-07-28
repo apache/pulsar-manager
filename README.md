@@ -161,7 +161,7 @@ bkvm address => http://localhost:7750/bkvm
     npm run dev
     ```
 
-After running these steps, the Pulsar Manager is running locally at http://127.0.0.1/#/environments.
+After running these steps, the Pulsar Manager is running locally at http://127.0.0.1:9527/#/environments.
 
 ## Access Pulsar Manager
 
