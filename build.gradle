@@ -40,6 +40,8 @@ repositories {
 
 configurations {
     testPlugins {}
+    all*.exclude group: 'org.bouncycastle', module: 'bc-fips'
+    all*.exclude group: 'io.netty', module: 'netty-tcnative-classes'
 }
 
 dependencies {
