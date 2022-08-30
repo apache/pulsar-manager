@@ -130,7 +130,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
                     "No cluster '" + cluster + "' found in environment '" + environment + "'");
         }
         String webServiceUrl = clusterData.getServiceUrl();
-        if(tlsEnabled) {
+        if (tlsEnabled) {
             webServiceUrl = clusterData.getServiceUrlTls();
         }
         return webServiceUrl;
