@@ -53,6 +53,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @Configuration
@@ -66,6 +67,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
 
     @Value("${clear.stats.interval}")
     private Long clearStatsInterval;
+
+    @Value("${tls.enabled}")
+    private boolean tlsEnabled;
 
     private final EnvironmentsRepository environmentsRepository;
     private final ClustersService clustersService;
@@ -125,11 +129,17 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                 String cluster = (String) clusterMap.get("cluster");
                 Pair<String, String> envCluster = Pair.of(env.getName(), cluster);
                 String webServiceUrl = (String) clusterMap.get("serviceUrl");
+                if(tlsEnabled) {
+                    webServiceUrl = (String) clusterMap.get("serviceUrlTls");
+                }
                 if (webServiceUrl.contains(",")) {
                     String[] webServiceUrlList = webServiceUrl.split(",");
                     for (String url : webServiceUrlList) {
-                        if (!url.contains("http://")) {
+                        if (!tlsEnabled && !url.contains("http://")) {
                             url = "http://" + url;
+                        }
+                       if (!tlsEnabled && !url.contains("https://")) {
+                            url = "https://" + url;
                         }
                         try {
                             Brokers brokers = pulsarAdminService.brokers(url);
@@ -159,8 +169,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         List<HashMap<String, Object>> brokerLists = (List<HashMap<String, Object>>) brokerObject.get("data");
         brokerLists.forEach((brokerMap) -> {
             String tempBroker = (String) brokerMap.get("broker");
-            // TODO: handle other protocols
-            String broker = "http://" + tempBroker;
+            String brokerHost = tempBroker.substring(0, tempBroker.indexOf(":"));
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUrl);
+            String broker = builder.host(brokerHost).toUriString();
             JsonObject result;
             try {
                 result = pulsarAdminService.brokerStats(broker).getTopics();
@@ -280,6 +291,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
             });
         });
     }
+
 
     public void clearStats(long nowTime, long timeInterval) {
         consumersStatsRepository.remove(nowTime, timeInterval);

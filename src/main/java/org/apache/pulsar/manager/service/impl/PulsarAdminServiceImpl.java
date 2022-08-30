@@ -87,7 +87,7 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
         return getPulsarAdmin(url).brokers();
     }
 
-    public Tenants tenants(String url) {
+    public Tenants tenants(String url) { ;
         return getPulsarAdmin(url).tenants();
     }
 
