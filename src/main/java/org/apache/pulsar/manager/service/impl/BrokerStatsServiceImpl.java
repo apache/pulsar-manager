@@ -129,11 +129,10 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
             clusterLists.forEach((clusterMap) -> {
                 String cluster = (String) clusterMap.get("cluster");
                 Pair<String, String> envCluster = Pair.of(env.getName(), cluster);
+
                 String serviceUrlTls = (String) clusterMap.get("serviceUrlTls");
                 tlsEnabled = tlsEnabled && StringUtils.isNotBlank(serviceUrlTls);
-
-                String webServiceUrl =  tlsEnabled ? serviceUrlTls : (String) clusterMap.get("serviceUrl");
-
+                String webServiceUrl = tlsEnabled ? serviceUrlTls : (String) clusterMap.get("serviceUrl");
                 if (webServiceUrl.contains(",")) {
                     String[] webServiceUrlList = webServiceUrl.split(",");
                     for (String url : webServiceUrlList) {
