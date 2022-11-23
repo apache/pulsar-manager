@@ -103,7 +103,6 @@ public class EnvironmentsController {
     public ResponseEntity<Map<String, Object>> addEnvironment(
             @RequestBody EnvironmentEntity environmentEntity) {
         Map<String, Object> result = Maps.newHashMap();
-        String token = request.getHeader("token");
         Optional<EnvironmentEntity> environmentEntityBrokerOptional = environmentsRepository
                 .findByBroker(environmentEntity.getBroker());
         if (environmentEntityBrokerOptional.isPresent()) {
@@ -141,7 +140,6 @@ public class EnvironmentsController {
     @RequestMapping(value = "/environments/environment", method =  RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> updateEnvironment(@RequestBody EnvironmentEntity environmentEntity) {
         Map<String, Object> result = Maps.newHashMap();
-        String token = request.getHeader("token");
         Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository
                 .findByName(environmentEntity.getName());
         if (!environmentEntityOptional.isPresent()) {

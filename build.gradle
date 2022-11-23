@@ -42,6 +42,7 @@ configurations {
     testPlugins {}
     all*.exclude group: 'org.bouncycastle', module: 'bc-fips'
     all*.exclude group: 'io.netty', module: 'netty-tcnative-classes'
+    all*.exclude group: 'log4j', module: 'log4j'
 }
 
 dependencies {
