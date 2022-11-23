@@ -18,8 +18,8 @@
 # under the License.
 #
 
-initdb -D /data/postgresql
-pg_ctl -D /data/postgresql start
+/usr/lib/postgresql/13/bin/initdb -D /data/postgresql
+/usr/lib/postgresql/13/bin/pg_ctl -D /data/postgresql start
 createdb
 psql -f /pulsar-manager/init_db.sql
 
