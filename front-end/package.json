@@ -87,7 +87,6 @@
     "mini-css-extract-plugin": "0.4.1",
     "nightwatch": "^1.0.19",
     "node-notifier": "5.2.1",
-    "node-sass": "^4.7.2",
     "optimize-css-assets-webpack-plugin": "5.0.0",
     "ora": "3.0.0",
     "path-to-regexp": "2.4.0",
@@ -97,7 +96,9 @@
     "postcss-url": "7.3.2",
     "request": "^2.88.0",
     "rimraf": "2.6.2",
-    "sass-loader": "7.0.3",
+    "sass": "^1.56.1",
+    "sass-loader": "^7.3.1",
+    "script-ext-html-webpack-plugin": "^2.1.5",
     "script-loader": "0.7.2",
     "semver": "5.5.0",
     "serve-static": "1.13.2",
@@ -112,8 +113,7 @@
     "webpack": "4.16.5",
     "webpack-cli": "3.1.0",
     "webpack-dev-server": "3.2.1",
-    "webpack-merge": "4.1.4",
-    "script-ext-html-webpack-plugin": "^2.1.5"
+    "webpack-merge": "4.1.4"
   },
   "engines": {
     "node": ">=12.0.0 <=12.22.10",
