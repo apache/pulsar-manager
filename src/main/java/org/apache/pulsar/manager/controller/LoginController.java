@@ -143,6 +143,7 @@ public class LoginController {
         } else {
             userInfoEntity = userInfoEntityOptional.get();
         }
+           String userAccount, userPassword, token;
         userAccount = casdoorUser.getName();
         userPassword = casdoorUser.getPassword();
         token = jwtService.toToken(userAccount + userPassword + System.currentTimeMillis());
