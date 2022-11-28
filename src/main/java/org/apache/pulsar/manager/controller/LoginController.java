@@ -150,6 +150,7 @@ public class LoginController {
         Map<String, Object> result = Maps.newHashMap();
         result.put("login", "success");
         usersRepository.update(userInfoEntity);
+        HttpHeaders headers = new HttpHeaders();
         headers.add("token", token);
         headers.add("username", userAccount);
 
