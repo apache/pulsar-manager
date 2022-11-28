@@ -148,6 +148,7 @@ public class LoginController {
         userPassword = casdoorUser.getPassword();
         token = jwtService.toToken(userAccount + userPassword + System.currentTimeMillis());
         userInfoEntity.setAccessToken(token);
+        Map<String, Object> result = Maps.newHashMap();
         result.put("login", "success");
         usersRepository.update(userInfoEntity);
         headers.add("token", token);
