@@ -129,7 +129,6 @@ public class LoginController {
         String state = body.get("state");
         String casdoortoken = casdoorAuthService.getOAuthToken(code, state);
         CasdoorUser casdoorUser = casdoorAuthService.parseJwtToken(casdoortoken);
-        HttpHeaders headers = new HttpHeaders();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(casdoorUser.getName());
         UserInfoEntity userInfoEntity = new UserInfoEntity();
