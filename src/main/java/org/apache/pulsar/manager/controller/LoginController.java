@@ -2,9 +2,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -72,13 +72,9 @@ public class LoginController {
     private String password;
 
     @ApiOperation(value = "Login pulsar manager")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/login", method =  RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> login(
-            @RequestBody Map<String, String> body) {
+    @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> body) {
         String userAccount = body.get("username");
         String userPassword = body.get("password");
         Map<String, Object> result = Maps.newHashMap();
@@ -108,11 +104,8 @@ public class LoginController {
     }
 
     @ApiOperation(value = "Logout pulsar manager")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/logout", method =  RequestMethod.POST)
+    @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> logout() {
         Map<String, Object> result = Maps.newHashMap();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -130,16 +123,13 @@ public class LoginController {
     }
 
     @ApiOperation(value = "casdoor Login pulsar manager")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/casdoor", method =  RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> callback(
-            @RequestBody Map<String, String> body) {
+    @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
+    @RequestMapping(value = "/casdoor", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> callback(@RequestBody Map<String, String> body) {
+        String userAccount, userPassword, token;
         String code = body.get("code");
-        String state = "pulsar";
-        String casdoortoken = casdoorAuthService.getOAuthToken(code,state);
+        String state = body.get("state");
+        String casdoortoken = casdoorAuthService.getOAuthToken(code, state);
         CasdoorUser casdoorUser = casdoorAuthService.parseJwtToken(casdoortoken);
         Map<String, Object> result = Maps.newHashMap();
         HttpHeaders headers = new HttpHeaders();
@@ -152,12 +142,12 @@ public class LoginController {
             userInfoEntity.setPassword(casdoorUser.getPassword());
             userInfoEntity.setExpire(0);
             usersRepository.save(userInfoEntity);
-        }else{
+        } else {
             userInfoEntity = userInfoEntityOptional.get();
         }
-        String userAccount = casdoorUser.getName();
-        String userPassword = casdoorUser.getPassword();
-        String token = jwtService.toToken(userAccount + password + System.currentTimeMillis());
+        userAccount = casdoorUser.getName();
+        userPassword = casdoorUser.getPassword();
+        token = jwtService.toToken(userAccount + userPassword + System.currentTimeMillis());
         userInfoEntity.setAccessToken(token);
         result.put("login", "success");
         usersRepository.update(userInfoEntity);
