@@ -124,7 +124,7 @@ public class LoginController {
     @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
     @RequestMapping(value = "/casdoor", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> callback(@RequestBody Map<String, String> body) {
-        String userAccount, userPassword, token;
+     
         String code = body.get("code");
         String state = body.get("state");
         String casdoortoken = casdoorAuthService.getOAuthToken(code, state);
