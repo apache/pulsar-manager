@@ -124,7 +124,6 @@ public class LoginController {
     @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
     @RequestMapping(value = "/casdoor", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> callback(@RequestBody Map<String, String> body) {
-     
         String code = body.get("code");
         String state = body.get("state");
         String casdoortoken = casdoorAuthService.getOAuthToken(code, state);
@@ -141,20 +140,22 @@ public class LoginController {
         } else {
             userInfoEntity = userInfoEntityOptional.get();
         }
-           String userAccount, userPassword, token;
-        userAccount = casdoorUser.getName();
-        userPassword = casdoorUser.getPassword();
-        token = jwtService.toToken(userAccount + userPassword + System.currentTimeMillis());
+        String userAccount = casdoorUser.getName();
+        String userPassword = casdoorUser.getPassword();
+        String token = jwtService.toToken(userAccount + userPassword + System.currentTimeMillis());
         userInfoEntity.setAccessToken(token);
+        usersRepository.update(userInfoEntity);
+
+        jwtService.setToken(request.getSession().getId(), token);
+
         Map<String, Object> result = Maps.newHashMap();
         result.put("login", "success");
-        usersRepository.update(userInfoEntity);
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("token", token);
         headers.add("username", userAccount);
-
-        jwtService.setToken(request.getSession().getId(), token);
         headers.add("role", "super");
+
         return new ResponseEntity<>(result, headers, HttpStatus.OK);
     }
 }
