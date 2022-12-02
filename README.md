@@ -273,7 +273,8 @@ The pulsar-manager can monitor topics and subscriptions.
 
 ![pulsar-manager-token](docs/img/pulsar-manager-token.gif)
 
-<h2> Casdoor
+## Casdoor
+
 
 ### Casdoor Installation
 
