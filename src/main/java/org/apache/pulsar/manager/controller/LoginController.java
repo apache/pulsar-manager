@@ -23,6 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.casbin.casdoor.entity.CasdoorUser;
 import org.casbin.casdoor.service.CasdoorAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,13 +72,9 @@ public class LoginController {
     private String password;
 
     @ApiOperation(value = "Login pulsar manager")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/login", method =  RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> login(
-            @RequestBody Map<String, String> body) {
+    @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> body) {
         String userAccount = body.get("username");
         String userPassword = body.get("password");
         Map<String, Object> result = Maps.newHashMap();
@@ -107,11 +104,8 @@ public class LoginController {
     }
 
     @ApiOperation(value = "Logout pulsar manager")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/logout", method =  RequestMethod.POST)
+    @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> logout() {
         Map<String, Object> result = Maps.newHashMap();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -128,30 +122,42 @@ public class LoginController {
         return ResponseEntity.ok(result);
     }
 
-    @ApiOperation(value = "Logout pulsar manager")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "ok"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
-    @RequestMapping(value = "/casdoor", method =  RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> callback(
-            @RequestBody Map<String, String> body) {
-        Map<String, Object> result = Maps.newHashMap();
+    @ApiOperation(value = "casdoor Login pulsar manager")
+    @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
+    @RequestMapping(value = "/casdoor", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> callback(@RequestBody Map<String, String> body) {
         String code = body.get("code");
         String state = body.get("state");
-        String token = casdoorAuthService.getOAuthToken(code, state);
-        if(!token.startsWith("error")){
-            result.put("error", token.substring(7));
-            return ResponseEntity.ok(result);
-        }
-        result.put("login", "success");
-        HttpHeaders headers = new HttpHeaders();
+        String casdoortoken = casdoorAuthService.getOAuthToken(code, state);
+        CasdoorUser casdoorUser = casdoorAuthService.parseJwtToken(casdoortoken);
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String jwtToken = jwtService.toToken(account + "-" + password);
-        jwtService.setToken(request.getSession().getId(), jwtToken);
-        headers.add("token", jwtToken);
-        headers.add("tenant","pulsar");
-        headers.add("username", "pulsar");
+        Optional<UserInfoEntity> userInfoEntityOptional = usersRepository.findByUserName(casdoorUser.getName());
+        UserInfoEntity userInfoEntity = new UserInfoEntity();
+        if (!userInfoEntityOptional.isPresent()) {
+            userInfoEntity.setUserId(0);
+            userInfoEntity.setName(casdoorUser.getName());
+            userInfoEntity.setPassword(casdoorUser.getPassword());
+            userInfoEntity.setExpire(0);
+            usersRepository.save(userInfoEntity);
+        } else {
+            userInfoEntity = userInfoEntityOptional.get();
+        }
+        String userAccount = casdoorUser.getName();
+        String userPassword = casdoorUser.getPassword();
+        String token = jwtService.toToken(userAccount + userPassword + System.currentTimeMillis());
+        userInfoEntity.setAccessToken(token);
+        usersRepository.update(userInfoEntity);
+
+        jwtService.setToken(request.getSession().getId(), token);
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("login", "success");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("token", token);
+        headers.add("username", userAccount);
+        headers.add("role", "super");
+
         return new ResponseEntity<>(result, headers, HttpStatus.OK);
     }
 }
