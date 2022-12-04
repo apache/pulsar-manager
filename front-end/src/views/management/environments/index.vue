@@ -67,6 +67,10 @@
           <el-input v-model="form.bookie" :placeholder="$t('env.newEnvBookieUrlPlaceHolder')"/>
         </el-form-item>
 
+        <el-form-item v-if="dialogStatus==='create'" :label="$t('env.newEnvTokenLabel')" prop="token">
+          <el-input v-model="form.token" :placeholder="$t('env.newEnvTokenPlaceHolder')"/>
+        </el-form-item>
+
         <el-form-item v-if="dialogStatus==='update'" :label="$t('env.updateEnvNameLabel')">
           <el-tag type="primary" size="medium">{{ form.environment }}</el-tag>
         </el-form-item>
@@ -77,6 +81,11 @@
         <el-form-item v-if="dialogStatus==='update'" :label="$t('env.updateEnvBookieUrlLabel')" prop="bookie">
           <el-input v-model="form.bookie" :placeholder="$t('env.updateEnvBookieUrlPlaceHolder')"/>
         </el-form-item>
+
+        <el-form-item v-if="dialogStatus==='update'" :label="$t('env.updateEnvTokenLabel')" prop="token">
+          <el-input v-model="form.token" :placeholder="$t('env.updateEnvTokenPlaceHolder')"/>
+        </el-form-item>
+
         <el-form-item v-if="dialogStatus==='delete'">
           <h4>{{ $t('env.deleteEnvDialogText') }}</h4>
         </el-form-item>
@@ -111,19 +120,22 @@
         form: {
           environment: '',
           broker: '',
-          bookie: ''
+          bookie: '',
+          token: null
         },
         temp: {
           'name': '',
           'broker': '',
-          'bookie': ''
+          'bookie': '',
+          'token': '',
         },
         superUser: false,
         roles: [],
         rules: {
           environment: [{ required: true, message: this.$i18n.t('env.envNameIsRequired'), trigger: 'blur' }],
           broker: [{ required: true, message: this.$i18n.t('env.serviceUrlIsRequired'), trigger: 'blur' }],
-          bookie: [{ required: true, message: this.$i18n.t('env.bookieUrlIsRequired'), trigger: 'blur' }]
+          bookie: [{ required: true, message: this.$i18n.t('env.bookieUrlIsRequired'), trigger: 'blur' }],
+          token: [{ required: false }]
         }
       }
     },
@@ -145,7 +157,8 @@
             this.environmentList.push({
               'environment': response.data.data[i].name,
               'broker': response.data.data[i].broker,
-              'bookie': response.data.data[i].bookie
+              'bookie': response.data.data[i].bookie,
+              'token': response.data.data[i].token
             })
           }
         })
@@ -166,6 +179,7 @@
         this.form.environment = row.environment
         this.form.broker = row.broker
         this.form.bookie = row.bookie
+        this.form.token = row.token
         this.dialogFormVisible = true
         this.dialogStatus = 'update'
       },
@@ -190,7 +204,8 @@
         const data = {
           'name': this.form.environment,
           'broker': this.form.broker,
-          'bookie': this.form.bookie
+          'bookie': this.form.bookie,
+          'token': this.form.token
         }
         putEnvironment(data).then(response => {
           if (!response.data) return
@@ -243,7 +258,8 @@
         const data = {
           'name': this.form.environment,
           'broker': this.form.broker,
-          'bookie': this.form.bookie
+          'bookie': this.form.bookie,
+          'token': this.form.token
         }
         updateEnvironment(data).then(response => {
           if (!response.data) return
