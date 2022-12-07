@@ -304,7 +304,7 @@ Configure casdoor can refer to [casdoor](https://door.casdoor.com/login)(Configu
 
 You also should configure the organization, and application, you also can refer to [casdoor](https://door.casdoor.com/login).
 
-##### step2.1 you should create a organization
+##### step2.1 you should create an organization
 
 ![organization](/docs/img/Pulsar-manager_editOrganization.svg)
 
