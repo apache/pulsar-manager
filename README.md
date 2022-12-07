@@ -280,11 +280,11 @@ The pulsar-manager can monitor topics and subscriptions.
 
 You can use casdoor to realize sso.
 
-Casdoor can connect to Pulsar-manager simplely.
+Casdoor can connect to Pulsar-manager simply.
 
-Because the code for connecting casdoor have been add in Pulsar-manager,so we just need configure application.yml in back-end and open front switch.
+Because the code for connecting the casdoor has been added in Pulsar-manager, we need to configure the casdoor in the back-end and front-end.
 
-#### Step1.Deploy Casdoor
+#### Step1. Deploy Casdoor
 
 Firstly, the Casdoor should be deployed. 
 
@@ -296,19 +296,19 @@ After a successful deployment, you need to ensure:
 - Open your favorite browser and visit **http://localhost:7001**, you will see the login page of Casdoor.
 - Input `admin` and `123` to test login functionality is working fine.
 
-Then you can quickly implement a casdoor based login page in your own app with the following steps.
+Then you can quickly implement a casdoor based login page in your app with the following steps.
 
-#### stpe2.Configure Casdoor 
+#### step2. Configure Casdoor 
 
 Configure casdoor can refer to [casdoor](https://door.casdoor.com/login)(Configure casdoor's browser better not use one browser with your develop browser).
 
-You also should configure organization, application, you also can refer to [casdoor](https://door.casdoor.com/login).
+You also should configure the organization, and application, you also can refer to [casdoor](https://door.casdoor.com/login).
 
-##### step2.1 you should create a organization
+##### step2.1 you should create an organization
 
 ![organization](/docs/img/Pulsar-manager_editOrganization.svg)
 
-##### step2.2 you should create a application
+##### step2.2 you should create an application
 
 ![application](/docs/img/Pulsar-manager_editApplication.svg)
 
@@ -317,9 +317,9 @@ You also should configure organization, application, you also can refer to [casd
 You should configure casdoor's Configuration in the Line 154 of pulsar-manager/src/main/resources/application.properties
 
 ```ini
-casdoor.endpoint = http://localhost:8000
-casdoor.clientId = <client id in previous step>
-casdoor.clientSecret = <client Secret in previous step>
+casdoor.endpoint=http://localhost:8000
+casdoor.clientId=<client id in previous step>
+casdoor.clientSecret=<client Secret in previous step>
 casdoor.certificate=<client certificate in previous step>
 casdoor.organizationName=pulsar
 casdoor.applicationName=app-pulsar
