@@ -280,7 +280,7 @@ The pulsar-manager can monitor topics and subscriptions.
 
 You can use casdoor to realize sso.
 
-Casdoor can connect to Pulsar-manager simplely.
+Casdoor can connect to Pulsar-manager simply.
 
 Because the code for connecting casdoor have been add in Pulsar-manager,so we just need configure application.yml in back-end and open front switch.
 
