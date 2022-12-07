@@ -298,7 +298,7 @@ After a successful deployment, you need to ensure:
 
 Then you can quickly implement a casdoor based login page in your own app with the following steps.
 
-#### stpe2.Configure Casdoor 
+#### step2. Configure Casdoor 
 
 Configure casdoor can refer to [casdoor](https://door.casdoor.com/login)(Configure casdoor's browser better not use one browser with your develop browser).
 
