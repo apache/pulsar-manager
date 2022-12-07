@@ -312,15 +312,7 @@ You also should configure organization, application, you also can refer to [casd
 
 ![application](/docs/img/Pulsar-manager_editApplication.svg)
 
-#### Step3. Open Pulsar-manager front-end switch.
-
-Open this switch to make code and state send to back-end.
-
-This switch in the Line 80 of pulsar-manager/front-end/src/router/index.js
-
-![frontSwitch](/docs/img/Pulsar-manager_frontSwitch.svg)
-
-#### Step4. Configure back-end code
+#### Step3. Configure back-end code
 
 You should configure casdoor's Configuration in the Line 154 of pulsar-manager/src/main/resources/application.properties
 
