@@ -302,7 +302,7 @@ Then you can quickly implement a casdoor based login page in your app with the f
 
 Configure casdoor can refer to [casdoor](https://door.casdoor.com/login)(Configure casdoor's browser better not use one browser with your develop browser).
 
-You also should configure organization, application, you also can refer to [casdoor](https://door.casdoor.com/login).
+You also should configure the organization, and application, you also can refer to [casdoor](https://door.casdoor.com/login).
 
 ##### step2.1 you should create a organization
 
