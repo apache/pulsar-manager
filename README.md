@@ -327,7 +327,7 @@ You should configure casdoor's Configuration in the Line 154 of pulsar-manager/s
 ```ini
 casdoor.endpoint=http://localhost:8000
 casdoor.clientId=<client id in previous step>
-casdoor.clientSecret = <client Secret in previous step>
+casdoor.clientSecret=<client Secret in previous step>
 casdoor.certificate=<client certificate in previous step>
 casdoor.organizationName=pulsar
 casdoor.applicationName=app-pulsar
