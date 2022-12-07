@@ -282,7 +282,7 @@ You can use casdoor to realize sso.
 
 Casdoor can connect to Pulsar-manager simply.
 
-Because the code for connecting casdoor have been add in Pulsar-manager,so we just need configure application.yml in back-end and open front switch.
+Because the code for connecting the casdoor has been added in Pulsar-manager, we need to configure the casdoor in the back-end and front-end.
 
 #### Step1. Deploy Casdoor
 
