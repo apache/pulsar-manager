@@ -296,7 +296,7 @@ After a successful deployment, you need to ensure:
 - Open your favorite browser and visit **http://localhost:7001**, you will see the login page of Casdoor.
 - Input `admin` and `123` to test login functionality is working fine.
 
-Then you can quickly implement a casdoor based login page in your own app with the following steps.
+Then you can quickly implement a casdoor based login page in your app with the following steps.
 
 #### step2. Configure Casdoor 
 
