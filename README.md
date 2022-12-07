@@ -308,7 +308,7 @@ You also should configure the organization, and application, you also can refer 
 
 ![organization](/docs/img/Pulsar-manager_editOrganization.svg)
 
-##### step2.2 you should create a application
+##### step2.2 you should create an application
 
 ![application](/docs/img/Pulsar-manager_editApplication.svg)
 
