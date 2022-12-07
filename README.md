@@ -284,7 +284,7 @@ Casdoor can connect to Pulsar-manager simply.
 
 Because the code for connecting casdoor have been add in Pulsar-manager,so we just need configure application.yml in back-end and open front switch.
 
-#### Step1.Deploy Casdoor
+#### Step1. Deploy Casdoor
 
 Firstly, the Casdoor should be deployed. 
 
