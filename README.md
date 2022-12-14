@@ -325,6 +325,22 @@ casdoor.organizationName=pulsar
 casdoor.applicationName=app-pulsar
 ```
 
+#### Step4. Configure front-end code
+
+You also need configure casdoor's Configuration in the Line 50 of pulsar-manager/front-end/src/main.js
+
+```
+const config = {
+  serverUrl: "http://localhost:7001",
+  clientId: "6ba06c1e1a30929fdda7",
+  organizationName: "casbin",
+  appName: "plusar",
+  redirectPath: "/#callback",
+};
+```
+
+Now you can use Casdoor.
+
 ## Development
 
 ### Default Test database HerdDB
