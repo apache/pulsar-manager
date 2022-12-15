@@ -333,8 +333,8 @@ You also need configure casdoor's Configuration in the Line 50 of pulsar-manager
 const config = {
   serverUrl: "http://localhost:7001",
   clientId: "6ba06c1e1a30929fdda7",
-  organizationName: "casbin",
-  appName: "plusar",
+  organizationName: "pulsar",
+  appName: "app-plusar",
   redirectPath: "/#callback",
 };
 ```
