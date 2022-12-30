@@ -17,6 +17,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.ssl.SSLContexts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -46,6 +47,12 @@ public class HttpsClientConfiguration {
 
     @Bean
     public CloseableHttpClient httpClient() throws Exception {
+        LaxRedirectStrategy customLaxRedirectStrategy = new LaxRedirectStrategy() {
+            @Override
+            protected boolean isRedirectable(final String method) {
+                return true;
+            }
+        };
         if (tlsEnabled) {
             Resource resource = new FileSystemResource(tlsKeystore);
             File trustStoreFile = resource.getFile();
@@ -68,9 +75,10 @@ public class HttpsClientConfiguration {
                     hostnameVerifier);
 
             return HttpClients.custom()
+                    .setRedirectStrategy(customLaxRedirectStrategy)
                     .setSSLSocketFactory(sslsf)
                     .build();
         }
-        return HttpClients.custom().build();
+        return HttpClients.custom().setRedirectStrategy(customLaxRedirectStrategy).build();
     }
 }
