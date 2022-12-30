@@ -81,14 +81,14 @@ export function fetchPartitionTopicStats(persistent, tenantNamespaceTopic, perPa
 export function putTopic(persistent, tenant, namespace, topic, data) {
   var url = `/${persistent}/${tenant}/${namespace}/${topic}`
   if (data > 0) {
-    url += '/partitions'
+    return putTopicByPartition(persistent, tenant, namespace, topic, data)
+  } else {
+    return request({
+      headers: {'Content-Type': 'application/json'},
+      url: BASE_URL_V2 + url,
+      method: 'put'
+    })
   }
-  return request({
-    headers: { 'Content-Type': 'application/json' },
-    url: BASE_URL_V2 + url,
-    method: 'put',
-    data
-  })
 }
 
 export function putTopicByPartition(persistent, tenant, namespace, topic, data) {
