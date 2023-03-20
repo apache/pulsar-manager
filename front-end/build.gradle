@@ -12,32 +12,14 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
-    }
+plugins {
+    id 'base'
+    id "com.github.node-gradle.node" version "3.5.1"
 }
-apply plugin: 'base'
-apply plugin: 'com.moowork.node' // gradle-node-plugin
 
 node {
-    /* gradle-node-plugin configuration
-       https://github.com/srs/gradle-node-plugin/blob/master/docs/node.md
-       Task name pattern:
-       ./gradlew npm_<command> Executes an NPM command.
-    */
-    // Version of node to use.
     version = '10.14.1'
-    // Version of npm to use.
     npmVersion = '6.4.1'
-    // If true, it will download node using above parameters.
-    // If false, it will try to use globally installed node.
     download = true
 }
 
@@ -49,7 +31,6 @@ npm_run_build {
 task npmBuildProd(type: NpmTask) {
   args = ['run', 'build:prod']
 }
-
 
 assemble.dependsOn npm_run_build
 
