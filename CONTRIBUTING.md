@@ -76,6 +76,16 @@ Follow the instructions [here](https://howtodoinjava.com/automation/lombok-eclip
     git push origin your_branch
     ```
 
+> **Note**
+>
+> Pulsar Manager is released under Apache License 2.0.
+>
+> If you commit new files, run the following command to add the license header for each file:
+>
+> ```bash
+> ./gradlew licenseFormat
+> ```
+
 ## Code style
 
 Follow the code styles below to keep code consistent and easy to maintain.
