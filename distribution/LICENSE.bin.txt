@@ -224,7 +224,7 @@ The Apache Software License, Version 2.0
    - io.jsonwebtoken-jjwt-jackson-0.10.5.jar
 * Guava
    - com.google.guava-guava-21.0.jar
-* Gson 
+* Gson
    - com.google.code.gson-gson-2.8.2.jar
 * Pulsar
    - org.apache.pulsar-pulsar-common-2.4.1.jar
@@ -340,7 +340,7 @@ MIT License
 * hash-sum
    - hash-sum@2.0.0 -- licenses/LICENSE-hash-sum.txt
 * html-webpack-plugin
-   - html-webpack-plugin@3.2.0 -- licenses/LICENSE-html-webpack-plugin.txt
+   - html-webpack-plugin@4.0.0 -- licenses/LICENSE-html-webpack-plugin.txt
 * husky
    - husky@3.0.9 -- licenses/LICENSE-husky.txt
 * lint-staged
@@ -370,7 +370,7 @@ MIT License
 * sass-loader
    - sass-loader@8.0.0 -- licenses/LICENSE-sass-loader.txt
 * script-ext-html-webpack-plugin
-   - script-ext-html-webpack-plugin@2.1.4 -- licenses/LICENSE-script-ext-html-webpack-plugin.txt
+   - script-ext-html-webpack-plugin@2.1.5 -- licenses/LICENSE-script-ext-html-webpack-plugin.txt
 * script-loader
    - script-loader@0.7.2 -- licenses/LICENSE-script-loader.txt
 * serve-static
