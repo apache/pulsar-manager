@@ -228,7 +228,7 @@ Use the default account (`pulsar`) and the default password (`pulsar`) to log in
 
 ### Configure environment
 
-The puslar-manager supports multiple environment configurations and can manage multiple environments conveniently.
+The pulsar-manager supports multiple environment configurations and can manage multiple environments conveniently.
 
 Here, the service URL represents the service IP address of the broker. If you run Pulsar manager in the standalone mode, it should be set to "http://127.0.0.1:8080".
 You can easily find it in the client.conf file of your pulsar-manager.
