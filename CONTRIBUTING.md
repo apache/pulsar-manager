@@ -13,7 +13,7 @@ If you have not installed Java and Node, follow the instructions below.
 | Dependency | Installation guide                |
 | ---------- | --------------------------------- |
 | Java 8     | https://openjdk.java.net/install/ |
-| Node 10.15 | https://nodejs.org/en/            |
+| Node 18    | https://nodejs.org/en/            |
 
 ### Fork pulsar-manager repository
 
