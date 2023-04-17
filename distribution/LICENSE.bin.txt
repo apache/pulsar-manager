@@ -238,7 +238,7 @@ The Apache Software License, Version 2.0
 * xlsx
    - xlsx@0.15.1
 * node-chromediver
-   - chromedriver@78.0.1
+   - chromedriver@112.0.0
 * request
    - request@2.88.0
 
@@ -352,7 +352,7 @@ MIT License
 * node-notifier
    - node-notifier@6.0.0 -- licenses/LICENSE-node-notifier.txt
 * node-sass
-   - node-sass@4.13.0 -- licenses/LICENSE-node-sass.txt
+   - node-sass@8.0.0 -- licenses/LICENSE-node-sass.txt
 * optimize-css-assets-webpack-plugin
    - optimize-css-assets-webpack-plugin@5.0.3 -- licenses/LICENSE-optimize-css-assets-webpack-plugin.txt
 * ora
