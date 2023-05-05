@@ -182,12 +182,7 @@ export default {
       })
     },
     loginWithCasdoor() {
-      window.location.href = 'http://localhost:7001/login/oauth/authorize' +
-        '?client_id=6ba06c1e1a30929fdda7' +
-        '&response_type=code' +
-        '&redirect_uri=http://localhost:9527/callback' +
-        '&scope=read' +
-        '&state=pulsar'
+      window.location.href = this.getSigninUrl();
     }
   }
 }

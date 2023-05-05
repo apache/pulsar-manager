@@ -2,8 +2,8 @@
   "name": "pulsar-manager",
   "version": "0.3.0",
   "description": "A tool for managing Apache Pulsar.",
-  "author": "<eguangning@gmail.com>",
-  "license": "Apache License 2.0",
+  "author": "<dev@pulsar.apache.org>",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "cross-env BABEL_ENV=development webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "build:prod": "cross-env NODE_ENV=production env_config=prod node build/build.js",
@@ -34,8 +34,9 @@
     "url": "https://github.com/apache/pulsar-manager/issues"
   },
   "dependencies": {
+    "@vue/composition-api": "^1.7.1",
     "axios": "0.18.1",
-    "casdoor-js-sdk": "^0.2.5",
+    "casdoor-vue-sdk": "^1.5.1",
     "clipboard": "1.7.1",
     "codemirror": "5.39.2",
     "connect": "3.6.6",
@@ -50,7 +51,7 @@
     "nprogress": "0.2.0",
     "showdown": "1.8.6",
     "sortablejs": "1.7.0",
-    "vue": "2.5.17",
+    "vue": "2.6.0",
     "vue-i18n": "7.3.2",
     "vue-router": "3.0.1",
     "vuedraggable": "^2.16.0",
@@ -70,7 +71,7 @@
     "babel-preset-env": "1.7.0",
     "babel-preset-stage-2": "6.24.1",
     "chalk": "2.4.1",
-    "chromedriver": "^2.46.0",
+    "chromedriver": "112.0.0",
     "copy-webpack-plugin": "4.5.2",
     "cross-env": "5.2.0",
     "css-loader": "1.0.0",
@@ -81,7 +82,7 @@
     "file-loader": "1.1.11",
     "friendly-errors-webpack-plugin": "1.7.0",
     "hash-sum": "1.0.2",
-    "html-webpack-plugin": "4.0.0-alpha",
+    "html-webpack-plugin": "4.0.0",
     "husky": "0.14.3",
     "lint-staged": "7.2.2",
     "mini-css-extract-plugin": "0.4.1",
@@ -109,15 +110,15 @@
     "url-loader": "1.0.1",
     "vue-loader": "15.3.0",
     "vue-style-loader": "4.1.2",
-    "vue-template-compiler": "2.5.17",
+    "vue-template-compiler": "2.6.0",
     "webpack": "4.16.5",
     "webpack-cli": "3.1.0",
     "webpack-dev-server": "3.2.1",
     "webpack-merge": "4.1.4"
   },
   "engines": {
-    "node": ">=12.0.0 <=12.22.10",
-    "npm": ">=6.14.16"
+    "node": ">=16",
+    "npm": ">=8"
   },
   "browserslist": [
     "> 1%",
