@@ -78,9 +78,12 @@ exports.cssLoaders = function(options) {
     postcss: generateLoaders(),
     less: generateLoaders('less'),
     sass: generateLoaders('sass', {
-      indentedSyntax: true
+      indentedSyntax: true,
+      implementation: require('sass')
     }),
-    scss: generateLoaders('sass'),
+    scss: generateLoaders('sass', {
+      implementation: require('sass')
+    }),
     stylus: generateLoaders('stylus'),
     styl: generateLoaders('stylus')
   }
