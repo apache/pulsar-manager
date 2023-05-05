@@ -6,7 +6,7 @@ Pulsar manager backend is a supplement and improvement to Pulsar broker.
 * Route requests (add, delete, update) to brokers
 * Support multi broker, dynamic change environment
 
-### Supported configurations of backend 
+### Supported configurations of backend
 
 | Name | Default |Description
 | ------- | ------- | ------- |
@@ -26,7 +26,7 @@ Pulsar manager backend is a supplement and improvement to Pulsar broker.
 
 ### Use custom databases
 
-If you have a large amount of data, you can use a custom database. The following is an example of PostgreSQL.   
+If you have a large amount of data, you can use a custom database. The following is an example of PostgreSQL.
 
 1. Initialize database and table structures using [file](https://github.com/apache/pulsar-manager/tree/master/src/main/resources/META-INF/sql/postgresql-schema.sql).
 
@@ -112,7 +112,7 @@ jwt.broker.token.mode=PRIVATE
 jwt.broker.public.key=file:///path/broker-public.key
 jwt.broker.private.key=file:///path/broker-private.key
 
-or 
+or
 jwt.broker.token.mode=SECRET
 jwt.broker.secret.key=file:///path/broker-secret.key
 ```
@@ -188,17 +188,17 @@ Set the `bkvm.enabled` field to `true` in the file [bkvm.conf](https://github.co
     ```
 
 ### Enable swagger UI
+
 To enable swagger UI, set `swagger.enabled=true` in the `application.properties` file. The default value is `true`.
 
-If you want to disable swagger UI in the  production environment, you can set `swagger.enabled=false`.
+If you want to disable swagger UI in the production environment, you can set `swagger.enabled=false`.
 
 ### How to use swagger to access the API
+
 1. Enable swagger UI by setting 'swagger.enabled=true' in the `application.properties` file.
-
 2. Visit http://YOUR_BACKEND_SERVICE_HOST:7750/swagger-ui.html
-
 3. Request the login API, use the username and password of the Pulsar Manager to login, copy the `token` of the response header.
-   
+
     The request body is as follows:
     ```$xslt
     {
@@ -213,7 +213,7 @@ If you want to disable swagger UI in the  production environment, you can set `s
      - environment: the environment name you have configured in Pulsar Manager.
      - token: the token you have copied in the previous step.
      - username: the username you login.
-    
+
     ![swagger-authorize](../docs/img/swagger-authorize.png)
 
 5. Request other APIs.
