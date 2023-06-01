@@ -51,6 +51,20 @@ public interface EnvironmentCacheService {
     String getServiceUrl(String environment, String cluster);
 
     /**
+     * Return the environment name for a given service url.
+     * @param serviceUrl
+     * @return
+     */
+    String getEnvironment(String serviceUrl);
+
+    /**
+     * Set the mapping of serviceUrl and environment.
+     * @param serviceUrl
+     * @param environment
+     */
+    void setServiceUrlEnvironmentMapping(String serviceUrl, String environment);
+
+    /**
      * Refresh all the environments.
      */
     void reloadEnvironments();

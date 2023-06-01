@@ -120,7 +120,7 @@ public class EnvironmentsController {
             return ResponseEntity.ok(result);
         }
         try {
-            pulsarAdminService.clusters(environmentEntity.getBroker()).getClusters();
+            pulsarAdminService.clusters(environmentEntity.getBroker(), environmentEntity.getToken()).getClusters();
         } catch (PulsarAdminException e) {
             log.error("Failed to get clusters list.", e);
             result.put("error", "This environment is error. Please check it");
@@ -147,7 +147,7 @@ public class EnvironmentsController {
             return ResponseEntity.ok(result);
         }
         try {
-            pulsarAdminService.clusters(environmentEntity.getBroker()).getClusters();
+            pulsarAdminService.clusters(environmentEntity.getBroker(), environmentEntity.getToken()).getClusters();
         } catch (PulsarAdminException e) {
             log.error("Failed to get clusters list.", e);
             result.put("error", "This environment is error. Please check it");
