@@ -16,7 +16,8 @@
 CREATE TABLE IF NOT EXISTS environments (
   name varchar(256) NOT NULL PRIMARY KEY,
   broker varchar(1024) NOT NULL,
-  bookie varchar(1024) NOT NULL
+  bookie varchar(1024) NOT NULL,
+  token varchar(1024)
 );
 
 CREATE TABLE IF NOT EXISTS topics_stats (

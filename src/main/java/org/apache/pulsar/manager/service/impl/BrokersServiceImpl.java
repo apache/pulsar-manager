@@ -19,6 +19,7 @@ import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.common.policies.data.FailureDomain;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
 import org.apache.pulsar.manager.service.BrokersService;
+import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,9 +38,12 @@ public class BrokersServiceImpl implements BrokersService {
 
     private final PulsarAdminService pulsarAdminService;
 
+    private final EnvironmentCacheService environmentCacheService;
+
     @Autowired
-    public BrokersServiceImpl(PulsarAdminService pulsarAdminService) {
+    public BrokersServiceImpl(PulsarAdminService pulsarAdminService, EnvironmentCacheService environmentCacheService) {
         this.pulsarAdminService = pulsarAdminService;
+        this.environmentCacheService = environmentCacheService;
     }
 
 
@@ -67,7 +71,10 @@ public class BrokersServiceImpl implements BrokersService {
                 throw pulsarAdminOperationException;
             }
 
+            String environment = environmentCacheService.getEnvironment(requestHost);
+
             for (String broker: brokersList) {
+                environmentCacheService.setServiceUrlEnvironmentMapping("http://" + broker, environment);
                 Map<String, Object> brokerEntity = Maps.newHashMap();
                 List<String> failureDomain = this.getFailureDomain(broker, failureDomains);
                 brokerEntity.put("broker", broker);

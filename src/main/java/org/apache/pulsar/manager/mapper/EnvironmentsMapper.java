@@ -22,28 +22,28 @@ import java.util.List;
 @Mapper
 public interface EnvironmentsMapper {
 
-    @Insert("INSERT INTO environments(name,broker,bookie) VALUES(#{name},#{broker},#{bookie})")
+    @Insert("INSERT INTO environments(name,broker,bookie,token) VALUES(#{name},#{broker},#{bookie},#{token})")
     void insert(EnvironmentEntity environmentEntity);
 
-    @Select("SELECT name,broker,bookie FROM environments where broker=#{broker}")
+    @Select("SELECT name,broker,bookie,token FROM environments where broker=#{broker}")
     EnvironmentEntity findByBroker(String broker);
 
-    @Select("SELECT name,broker,bookie FROM environments where name=#{name}")
+    @Select("SELECT name,broker,bookie,token FROM environments where name=#{name}")
     EnvironmentEntity findByName(String name);
 
-    @Select("SELECT name,broker,bookie FROM environments")
+    @Select("SELECT name,broker,bookie,token FROM environments")
     Page<EnvironmentEntity> findEnvironmentsList();
 
     @Select({"<script>",
-            "SELECT name,broker,bookie FROM environments",
+            "SELECT name,broker,bookie,token FROM environments",
             "WHERE name IN <foreach collection='nameList' item='name' open='(' separator=',' close=')'> #{name} </foreach>" +
                     "</script>"})
     Page<EnvironmentEntity> findEnvironmentsListByMultiName(@Param("nameList") List<String> nameList);
 
-    @Select("SELECT name,broker,bookie FROM environments")
+    @Select("SELECT name,broker,bookie,token FROM environments")
     List<EnvironmentEntity> getAllEnvironments();
 
-    @Update("UPDATE environments set broker=#{broker},bookie=#{bookie} where name=#{name}")
+    @Update("UPDATE environments set broker=#{broker},bookie=#{bookie},token=#{token} where name=#{name}")
     void update(EnvironmentEntity environmentEntity);
 
     @Delete("DELETE FROM environments WHERE name=#{name}")

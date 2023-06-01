@@ -27,4 +27,5 @@ public class EnvironmentEntity {
     private String name;
     private String broker;
     private String bookie;
+    private String token;
 }

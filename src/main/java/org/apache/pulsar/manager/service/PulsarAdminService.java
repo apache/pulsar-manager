@@ -27,6 +27,7 @@ public interface PulsarAdminService {
     PulsarAdmin getPulsarAdmin(String url);
     BrokerStats brokerStats(String url);
     Clusters clusters(String url);
+    Clusters clusters(String url, String token);
     Brokers brokers(String url);
     Tenants tenants(String url);
     Namespaces namespaces(String url);
