@@ -48,6 +48,9 @@ public class BrokersServiceImplTest {
     @MockBean
     private PulsarAdminService pulsarAdminService;
 
+    @MockBean
+    private EnvironmentCacheService environmentCacheService;
+
     @Autowired
     private BrokersService brokersService;
 
@@ -70,6 +73,9 @@ public class BrokersServiceImplTest {
         Mockito.when(pulsarAdminService.brokers("http://localhost:8080")).thenReturn(brokers);
         Mockito.when(brokers.getActiveBrokers("standalone"))
                 .thenReturn(Arrays.asList("broker-1:8080"));
+
+        Mockito.when(environmentCacheService.getEnvironment("http://localhost:8080"))
+                .thenReturn("env");
 
         Map<String, Object> result = brokersService.getBrokersList(
                 1, 1, "standalone", "http://localhost:8080");
