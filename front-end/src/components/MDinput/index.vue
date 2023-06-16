@@ -276,7 +276,7 @@ export default {
     }
     .material-input {
       font-size: $font-size-base;
-      padding: $spacer $spacer $spacer - $apixel * 10 $spacer / 2;
+      padding: $spacer $spacer $spacer - $apixel * 10 calc($spacer / 2);
       display: block;
       width: 100%;
       border: none;
