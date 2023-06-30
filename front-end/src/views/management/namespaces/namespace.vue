@@ -286,8 +286,8 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleEncryption()">
-              <el-radio :label="$t('common.enabled')"/>
-              <el-radio :label="$t('common.disabled')"/>
+              <el-radio label="Enabled">{{ $t('common.enabled') }}</el-radio>
+              <el-radio label="Disabled">{{ $t('common.disabled') }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item prop="deduplication">
@@ -301,8 +301,8 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleDeduplication()">
-              <el-radio :label="$t('common.enabled')"/>
-              <el-radio :label="$t('common.disabled')"/>
+              <el-radio label="Enabled">{{ $t('common.enabled') }}</el-radio>
+              <el-radio label="Disabled">{{ $t('common.disabled') }}</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -394,8 +394,8 @@
               size="medium"
               style="margin-top:8px;width:300px"
               @change="handleSchemaValidationEnforced()">
-              <el-radio :label="$t('common.enabled')"/>
-              <el-radio :label="$t('common.disabled')"/>
+              <el-radio label="Enabled">{{ $t('common.enabled') }}</el-radio>
+              <el-radio label="Disabled">{{ $t('common.disabled') }}</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -643,8 +643,8 @@
             <el-radio-group
               v-model="form.isPersistent"
               size="medium">
-              <el-radio :label="$t('topic.persistent')"/>
-              <el-radio :label="$t('topic.nonPersistent')"/>
+              <el-radio label="Persistent">{{ $t('topic.persistent') }}</el-radio>
+              <el-radio label="Non-persistent">{{ $t('topic.nonPersistent') }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item :label="$t('topic.topicName')" prop="topic">
@@ -786,9 +786,9 @@ export default {
         autoUpdateStrategy: '',
         messageTTL: '',
         retentionTime: '',
-        encryptionRequireRadio: this.$i18n.t('common.disabled'),
-        deduplicationRadio: this.$i18n.t('common.disabled'),
-        schemaValidationEnforcedRadio: this.$i18n.t('common.disabled'),
+        encryptionRequireRadio: 'Disabled',
+        deduplicationRadio: 'Disabled',
+        schemaValidationEnforcedRadio: 'Disabled',
         dispatchRatePerTopicBytes: '',
         dispatchRatePerTopicMessage: '',
         dispatchRatePerTopicPeriod: '',
