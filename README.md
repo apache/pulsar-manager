@@ -174,20 +174,31 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
     * Account: `pulsar`
     * Password: `pulsar`
 
-    If you are deploying Pulsar Manager using the latest code, you can create a super-user using the following command. Then you can use the super user credentials to log in the Pulsar Manager UI.
+    If you are deploying Pulsar Manager using the latest code, you can create a super-user using the following command.
+    Then you can use the super user credentials to log in the Pulsar Manager UI.
+   
+   You need to provide the following information in the command:
 
-    ```
-    CSRF_TOKEN=$(curl http://backend-service:7750/pulsar-manager/csrf-token)
+   - `BACKEND_SERVICE`: The IP address or domain name of the backend service.
+   - `SU_PASSWORD`: The password should be more than or equal to 6 digits.
+
+    ```shell
+    # (1) User needs to these values
+    BACKEND_SERVICE='your_backend_service'
+    SU_PASSWORD='your_password'
+
+    # (2) CSRF token retrieval
+    CSRF_TOKEN=$(curl http://$BACKEND_SERVICE:7750/pulsar-manager/csrf-token)
+
+    # (3) curl command with CSRF_TOKEN, BACKEND_SERVICE, and SU_PASSWORD variables
     curl \
-        -H "X-XSRF-TOKEN: $CSRF_TOKEN" \
-        -H "Cookie: XSRF-TOKEN=$CSRF_TOKEN;" \
-        -H 'Content-Type: application/json' \
-        -X PUT http://backend-service:7750/pulsar-manager/users/superuser \
-        -d '{"name": "admin", "password": "apachepulsar", "description": "test", "email": "username@test.org"}'
+    -H "X-XSRF-TOKEN: $CSRF_TOKEN" \
+    -H "Cookie: XSRF-TOKEN=$CSRF_TOKEN;" \
+    -H 'Content-Type: application/json' \
+    -X PUT \
+    -d "{\"name\": \"admin\", \"password\": \"$SU_PASSWORD\", \"description\": \"test\", \"email\": \"username@test.org\"}" \
+    http://$BACKEND_SERVICE:7750/pulsar-manager/users/superuser
     ```
-
-    * `backend-service`: The IP address or domain name of the backend service.
-    * `password`: The password should be more than or equal to 6 digits.
 
 2. Create an environment.
 
