@@ -175,12 +175,13 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
     * Password: `pulsar`
 
     If you are deploying Pulsar Manager using the latest code, you can create a super-user using the following command.
-    Then you can use the super user credentials to log in the Pulsar Manager UI.
-   
-   You need to provide the following information in the command:
+    Then you can use the super user credentials to log in the Pulsar Manager UI. 
+    Provide the following information in the command:
 
    - `BACKEND_SERVICE`: The IP address or domain name of the backend service.
    - `SU_PASSWORD`: The password should be more than or equal to 6 digits.
+   
+    ...then run 
 
     ```shell
     # (1) User needs to these values
