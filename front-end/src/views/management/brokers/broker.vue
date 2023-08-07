@@ -222,7 +222,7 @@ export default {
         for (var policy in res.data) {
           for (var i in res.data[policy].primary) {
             var regexPrimary = new RegExp(res.data[policy].primary[i])
-            if (regexPrimary.test(this.postFormbroker)) {
+            if (regexPrimary.test(this.postForm.broker)) {
               if (tempIsolationPolicy.indexOf(policy) < 0) {
                 tempIsolationPolicy.push(policy)
               }
@@ -230,7 +230,7 @@ export default {
           }
           for (var j in res.data[policy].secondary) {
             var regexSecondary = new RegExp(res.data[policy].secondary[j])
-            if (regexSecondary.test(this.postFormbroker)) {
+            if (regexSecondary.test(this.postForm.broker)) {
               if (tempIsolationPolicy.indexOf(policy) < 0) {
                 tempIsolationPolicy.push(policy)
               }
