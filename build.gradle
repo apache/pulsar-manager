@@ -14,7 +14,7 @@
 
 buildscript {
   ext {
-    springBootVersion = '2.0.2.RELEASE'
+    springBootVersion = '2.5.3'
   }
   repositories {
     mavenCentral()
@@ -72,12 +72,13 @@ task incrementVersion {
 dependencyManagement {
   imports {
     mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
-    mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.SR2'
+    mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.6'
   }
   applyMavenExclusions = false
 }
 
 distributions {
+
     main {
         contents {
             from 'src/main/resources/application.properties'
@@ -86,9 +87,10 @@ distributions {
     }
 }
 
-distTar {
-    archiveName "pulsar-manager.tar"
-}
+//distTar {
+//
+//    archiveName "pulsar-manager.tar"
+//}
 
 jar {
     manifest {
@@ -108,7 +110,7 @@ dependencies {
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: springBootVersion
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
     implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: springMybatisVersion
     implementation group: 'com.github.pagehelper', name: 'pagehelper', version: pagehelperVersion
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: springBootVersion
@@ -152,8 +154,6 @@ dependencies {
     compileOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
     testImplementation group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: apiMockitoVersion
-    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: mockitoJunit4Version
 
     constraints {
         implementation("org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}")

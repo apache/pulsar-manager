@@ -13,41 +13,45 @@
  */
 package org.apache.pulsar.manager.service;
 
-import com.google.common.collect.Maps;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.manager.PulsarManagerApplication;
-import org.apache.pulsar.manager.entity.*;
+import org.apache.pulsar.manager.entity.ConsumerStatsEntity;
+import org.apache.pulsar.manager.entity.ConsumersStatsRepository;
+import org.apache.pulsar.manager.entity.NamespaceEntity;
+import org.apache.pulsar.manager.entity.NamespacesRepository;
+import org.apache.pulsar.manager.entity.TenantEntity;
+import org.apache.pulsar.manager.entity.TenantsRepository;
+import org.apache.pulsar.manager.entity.TopicStatsEntity;
+import org.apache.pulsar.manager.entity.TopicsStatsRepository;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.apache.pulsar.manager.utils.HttpUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.Mockito;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
-@PrepareForTest(HttpUtil.class)
-@TestPropertySource(locations= "classpath:test-bookie.properties")
+
+@RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:test-bookie.properties")
 @SpringBootTest(
-    classes = {
-        PulsarManagerApplication.class,
-        HerdDBTestProfile.class
-    }
+		classes = {
+				PulsarManagerApplication.class,
+				HerdDBTestProfile.class
+		}
 )
 @ActiveProfiles("test")
 public class DashboardServiceImplTest {
@@ -67,6 +71,9 @@ public class DashboardServiceImplTest {
     @Autowired
     NamespacesRepository namespacesRepository;
 
+	@MockBean
+	HttpUtil httpUtil;
+
     @Value("${backend.jwt.token}")
     private static String pulsarJwtToken;
 
@@ -81,19 +88,18 @@ public class DashboardServiceImplTest {
         int producerPerTopic = 1;
         int consumerPerTopic = 1;
 
-        PowerMockito.mockStatic(HttpUtil.class);
-        Map<String, String> header = Maps.newHashMap();
-        header.put("Content-Type", "application/json");
-        if (StringUtils.isNotBlank(pulsarJwtToken)) {
-            header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
-        }
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8050/api/v1/bookie/list_bookies?type=rw&print_hostnames=true", header))
-                .thenReturn("{\"192.168.2.116:3181\" : \"192.168.2.116\"}");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
-                .thenReturn("{ }");
-        PowerMockito.when(HttpUtil.doGet("http://localhost:8050/api/v1/bookie/list_bookie_info", header))
-                .thenReturn("{\"192.168.2.116:3181\" : \": {Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}," +
-                        "\",\"ClusterInfo: \" : \"{Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}\" }");
+		Map<String, String> header = Maps.newHashMap();
+		header.put("Content-Type", "application/json");
+		if (StringUtils.isNotBlank(pulsarJwtToken)) {
+			header.put("Authorization", String.format("Bearer %s", pulsarJwtToken));
+		}
+		Mockito.when(httpUtil.doGet("http://localhost:8050/api/v1/bookie/list_bookies?type=rw&print_hostnames=true", header))
+				.thenReturn("{\"192.168.2.116:3181\" : \"192.168.2.116\"}");
+		Mockito.when(httpUtil.doGet("http://localhost:8080/admin/v2/brokers/standalone", header))
+				.thenReturn("{ }");
+		Mockito.when(httpUtil.doGet("http://localhost:8050/api/v1/bookie/list_bookie_info", header))
+				.thenReturn("{\"192.168.2.116:3181\" : \": {Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}," +
+							"\",\"ClusterInfo: \" : \"{Free: 48920571904(48.92GB), Total: 250790436864(250.79GB)}\" }");
 
         long topicStatsId = 0L;
         for (String tenant: tenantList) {

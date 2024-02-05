@@ -13,6 +13,8 @@
  */
 package org.apache.pulsar.manager.service;
 
+import java.util.Optional;
+
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.entity.NamespaceEntity;
 import org.apache.pulsar.manager.entity.NamespacesRepository;
@@ -20,21 +22,15 @@ import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Optional;
 
-
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PowerMockIgnore( {"javax.*", "sun.*", "com.sun.*", "org.xml.*", "org.w3c.*"})
+@RunWith(SpringRunner.class)
 @SpringBootTest(
         classes = {
                 PulsarManagerApplication.class,
