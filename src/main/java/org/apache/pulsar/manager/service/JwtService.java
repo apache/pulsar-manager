@@ -13,10 +13,6 @@
  */
 package org.apache.pulsar.manager.service;
 
-import io.jsonwebtoken.Claims;
-import org.springframework.stereotype.Service;
-
-import java.security.Key;
 import java.util.Optional;
 
 public interface JwtService {
@@ -26,8 +22,6 @@ public interface JwtService {
     Optional<String> getSubFromToken(String token);
 
     String createBrokerToken(String role, String expiryTime);
-
-    Claims validateBrokerToken(String token);
 
     void setToken(String key, String value);
 
