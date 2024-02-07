@@ -11,11 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.pulsar.manager.service;
+package org.apache.pulsar.manager.service.impl;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Jwts;
 import org.apache.pulsar.manager.PulsarManagerApplication;
 import org.apache.pulsar.manager.profiles.HerdDBTestProfile;
+import org.apache.pulsar.manager.service.impl.JwtServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +30,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.security.Key;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringRunner.class)
@@ -47,13 +52,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class BrokerTokensServiceImplTest {
 
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtService;
+
+    public Claims validateBrokerToken(String token) {
+        Key validationKey = jwtService.getSigningKey();
+        Jwt jwt = Jwts.parser()
+                .setSigningKey(validationKey)
+                .parse(token);
+        return (Claims) jwt.getBody();
+    }
 
     @Test
     public void createBrokerTokenTest() {
         String role = "test";
         String token = jwtService.createBrokerToken(role, null);
-        Claims jwtBody = jwtService.validateBrokerToken(token);
+        Claims jwtBody = validateBrokerToken(token);
         Assert.assertEquals(role, jwtBody.getSubject());
     }
 }

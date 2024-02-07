@@ -13,6 +13,7 @@
  */
 package org.apache.pulsar.manager.service.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.apache.pulsar.manager.service.JwtService;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
@@ -111,16 +113,21 @@ public class JwtServiceImpl implements JwtService {
         }
     }
 
-    public String createBrokerToken(String role, String expiryTime) {
-        Key signingKey;
+    @VisibleForTesting
+    @Nullable
+    Key getSigningKey() {
         if (jwtBrokerTokenMode.equals("SECRET")) {
-            signingKey = decodeBySecretKey();
+            return decodeBySecretKey();
         } else if (jwtBrokerTokenMode.equals("PRIVATE")){
-            signingKey = decodeByPrivateKey();
+            return decodeByPrivateKey();
         } else {
             log.info("Default disable JWT auth, please set jwt.broker.token.mode.");
             return null;
         }
+    }
+
+    public String createBrokerToken(String role, String expiryTime) {
+        Key signingKey = getSigningKey();
         if (signingKey == null) {
             log.error("JWT Auth failed, signingKey is not empty");
             return null;
@@ -143,21 +150,5 @@ public class JwtServiceImpl implements JwtService {
             log.error("Decode failed by private key, error: {}", e.getMessage());
             return null;
         }
-    }
-
-    public Claims validateBrokerToken(String token) {
-        Key validationKey;
-        if (jwtBrokerTokenMode.equals("SECRET")) {
-            validationKey = decodeBySecretKey();
-        } else if (jwtBrokerTokenMode.equals("PRIVATE")){
-            validationKey = decodeByPrivateKey();
-        } else {
-            log.info("Default disable JWT auth, please set jwt.broker.token.mode.");
-            return null;
-        }
-        Jwt<?, Claims> jwt = Jwts.parser()
-                .setSigningKey(validationKey)
-                .parse(token);
-        return jwt.getBody();
     }
 }
