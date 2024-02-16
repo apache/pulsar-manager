@@ -87,10 +87,9 @@ distributions {
     }
 }
 
-//distTar {
-//
-//    archiveName "pulsar-manager.tar"
-//}
+distTar {
+	archiveFileName = "pulsar-manager.tar"
+}
 
 jar {
     manifest {
