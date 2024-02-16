@@ -130,7 +130,7 @@ public class HttpUtil {
         }
     }
 
-    public static String doGet(String url, Map<String, String> header){
+    public String doGet(String url, Map<String, String> header){
         HttpGet request = new HttpGet(url);
         return httpRequest(request, header);
     }
@@ -143,21 +143,21 @@ public class HttpUtil {
      * @return HTTP response information
      * @throws UnsupportedEncodingException
      */
-    public static String doPost(String url, Map<String, String> header, String body)
+    public String doPost(String url, Map<String, String> header, String body)
             throws UnsupportedEncodingException {
         HttpPost request = new HttpPost(url);
         request.setEntity(new StringEntity(body));
         return httpRequest(request, header);
     }
 
-    public static String doPut(String url, Map<String, String> header, String body)
+    public String doPut(String url, Map<String, String> header, String body)
             throws UnsupportedEncodingException {
         HttpPut request = new HttpPut(url);
         request.setEntity(new StringEntity(body));
         return httpRequest(request, header);
     }
 
-    public static String httpRequest(HttpUriRequest request, Map<String, String> header) {
+    public String httpRequest(HttpUriRequest request, Map<String, String> header) {
         CloseableHttpResponse response = null;
         try {
             for (Map.Entry<String, String> entry: header.entrySet()) {

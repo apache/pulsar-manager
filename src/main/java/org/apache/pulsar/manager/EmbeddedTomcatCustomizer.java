@@ -93,7 +93,7 @@ public class EmbeddedTomcatCustomizer implements
                         }
                     }
                     return super.getTomcatWebServer(tomcat);
-                } catch (IOException | ServletException ex) {
+                } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
             }

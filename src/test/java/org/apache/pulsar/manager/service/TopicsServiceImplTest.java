@@ -91,7 +91,7 @@ public class TopicsServiceImplTest {
 
     @Test
     public void getTopicsStatsImplTest() throws Exception {
-        String environment = "staging";
+        String environment = "topic-stats-test-environment";
         String tenant = "public";
         String namespace = "functions";
         String topic = "metadata";
