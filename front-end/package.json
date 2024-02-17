@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@vue/composition-api": "^1.7.1",
-    "axios": "0.18.1",
+    "axios": "1.6.0",
     "casdoor-vue-sdk": "^1.5.1",
     "clipboard": "1.7.1",
     "codemirror": "5.39.2",
