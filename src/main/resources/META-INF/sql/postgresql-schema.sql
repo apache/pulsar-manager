@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS topics_stats (
   time_stamp BIGINT
 );
 
+CREATE INDEX IF NOT EXISTS ix_topics_stats_timestamp on topics_stats(time_stamp);
+
 CREATE TABLE IF NOT EXISTS publishers_stats (
   publisher_stats_id BIGSERIAL PRIMARY KEY,
   producer_id BIGINT,
