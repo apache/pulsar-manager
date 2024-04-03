@@ -12,7 +12,10 @@
 -- limitations under the License.
 --
 
-ALTER USER pulsar WITH PASSWORD 'pulsar';
+\set username `echo "$USERNAME"`
+\set password `echo "$PASSWORD"`
+
+ALTER USER :username WITH PASSWORD :'password';
 CREATE DATABASE pulsar_manager OWNER pulsar;
 GRANT ALL PRIVILEGES ON DATABASE pulsar_manager to pulsar;
 
