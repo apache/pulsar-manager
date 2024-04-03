@@ -16,8 +16,8 @@
 \set password `echo "$PASSWORD"`
 
 ALTER USER :username WITH PASSWORD :'password';
-CREATE DATABASE pulsar_manager OWNER pulsar;
-GRANT ALL PRIVILEGES ON DATABASE pulsar_manager to pulsar;
+CREATE DATABASE pulsar_manager OWNER :username;
+GRANT ALL PRIVILEGES ON DATABASE pulsar_manager to :username;
 
 \c pulsar_manager;
 
