@@ -12,8 +12,8 @@
 -- limitations under the License.
 --
 
-\set username `echo "$USERNAME"`
-\set password `echo "$PASSWORD"`
+\set username `echo "${USERNAME:-pulsar}"`
+\set password `echo "${PASSWORD:-pulsar}"`
 
 ALTER USER :username WITH PASSWORD :'password';
 CREATE DATABASE pulsar_manager OWNER :username;
