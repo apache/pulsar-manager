@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.common.policies.data.ClusterData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,8 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
     private final PulsarAdminService pulsarAdminService;
 
+    @Value("${tls.enabled}")
+    private boolean tlsEnabled;
     private final Map<String, String> serviceUrlEnvironmentMap;
 
     @Autowired
@@ -138,7 +141,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
             throw new RuntimeException(
                     "No cluster '" + cluster + "' found in environment '" + environment + "'");
         }
-        return clusterData.getServiceUrl();
+        return tlsEnabled && StringUtils.isNotBlank(clusterData.getServiceUrlTls()) ? clusterData.getServiceUrlTls() : clusterData.getServiceUrl();
     }
 
     @Scheduled(
