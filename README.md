@@ -131,8 +131,8 @@ bkvm address => http://localhost:7750/bkvm
 #### Prerequisites
 
 * Java JDK 1.8
-* Node 10.15.3 or later
-* Npm 6.4.1 or later
+* Node.js 16 or later
+* npm 8 later
 * Pulsar 2.4.0 or later
 
 #### Build instructions
@@ -144,7 +144,7 @@ bkvm address => http://localhost:7750/bkvm
     ```
 
 2. Build and start the backend.
-    
+
     ```
     cd pulsar-manager
     ./gradlew build -x test
@@ -171,8 +171,8 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
 
     If you are deploying Pulsar Manager 0.1.0 using the released container, you can log in the Pulsar Manager UI using the following credentials.
 
-    * Account: `pulsar`  
-    * Password: `pulsar`  
+    * Account: `pulsar`
+    * Password: `pulsar`
 
     If you are deploying Pulsar Manager using the latest code, you can create a super-user using the following command. Then you can use the super user credentials to log in the Pulsar Manager UI.
 
@@ -189,7 +189,7 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
     * `backend-service`: The IP address or domain name of the backend service.
     * `password`: The password should be more than or equal to 6 digits.
 
-2. Create an environment. 
+2. Create an environment.
 
     An environment represents a Pulsar instance or a group of clusters you want to manage. A Pulsar Manager is capable of managing multiple environments.
 
@@ -228,12 +228,12 @@ Use the default account (`pulsar`) and the default password (`pulsar`) to log in
 
 ### Configure environment
 
-The puslar-manager supports multiple environment configurations and can manage multiple environments conveniently. 
+The pulsar-manager supports multiple environment configurations and can manage multiple environments conveniently.
 
 Here, the service URL represents the service IP address of the broker. If you run Pulsar manager in the standalone mode, it should be set to "http://127.0.0.1:8080".
-You can easily find it in the client.conf file of your pulsar-manager. 
+You can easily find it in the client.conf file of your pulsar-manager.
 
-And the bookie URL represents the service IP address of the bookkeeper. If you run Pulsar manager in the standalone mode, it should be set to "http://127.0.0.1:6650". 
+And the bookie URL represents the service IP address of the bookkeeper. If you run Pulsar manager in the standalone mode, it should be set to "http://127.0.0.1:6650".
 
 ![pulsar-manager-environments](docs/img/pulsar-manager-environments.gif)
 
@@ -272,6 +272,74 @@ The pulsar-manager can monitor topics and subscriptions.
 ### Manage token
 
 ![pulsar-manager-token](docs/img/pulsar-manager-token.gif)
+
+## Casdoor
+
+
+### Casdoor Installation
+
+You can use casdoor to realize sso.
+
+Casdoor can connect to Pulsar-manager simply.
+
+Because the code for connecting the casdoor has been added in Pulsar-manager, we need to configure the casdoor in the back-end and front-end.
+
+#### Step1. Deploy Casdoor
+
+Firstly, the Casdoor should be deployed.
+
+You can refer to the Casdoor official documentation for the [Casdoor](https://casdoor.org/docs/overview)
+
+After a successful deployment, you need to ensure:
+
+- The Casdoor server is successfully running on **http://localhost:8000**.
+- Open your favorite browser and visit **http://localhost:7001**, you will see the login page of Casdoor.
+- Input `admin` and `123` to test login functionality is working fine.
+
+Then you can quickly implement a casdoor based login page in your app with the following steps.
+
+#### step2. Configure Casdoor
+
+Configure casdoor can refer to [casdoor](https://door.casdoor.com/login)(Configure casdoor's browser better not use one browser with your develop browser).
+
+You also should configure the organization, and application, you also can refer to [casdoor](https://door.casdoor.com/login).
+
+##### step2.1 you should create an organization
+
+![organization](/docs/img/Pulsar-manager_editOrganization.svg)
+
+##### step2.2 you should create an application
+
+![application](/docs/img/Pulsar-manager_editApplication.svg)
+
+#### Step3. Configure back-end code
+
+You should configure casdoor's Configuration in the Line 154 of pulsar-manager/src/main/resources/application.properties
+
+```ini
+casdoor.endpoint=http://localhost:8000
+casdoor.clientId=<client id in previous step>
+casdoor.clientSecret=<client Secret in previous step>
+casdoor.certificate=<client certificate in previous step>
+casdoor.organizationName=pulsar
+casdoor.applicationName=app-pulsar
+```
+
+#### Step4. Configure front-end code
+
+You also need configure casdoor's Configuration in the Line 50 of pulsar-manager/front-end/src/main.js
+
+```
+const config = {
+  serverUrl: "http://localhost:7001",
+  clientId: "6ba06c1e1a30929fdda7",
+  organizationName: "pulsar",
+  appName: "app-plusar",
+  redirectPath: "/#callback",
+};
+```
+
+Now you can use Casdoor.
 
 ## Development
 

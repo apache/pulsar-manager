@@ -18,8 +18,11 @@
 # under the License.
 #
 
-initdb -D /data/postgresql
-pg_ctl -D /data/postgresql start
+# Start Postgres
+/usr/lib/postgresql/13/bin/pg_ctl -D /data/postgresql start || \
+  # If it fails, maybe the database is not intialized yet, so do it
+  (/usr/lib/postgresql/13/bin/initdb -D /data/postgresql && \
+  # Then try to start Postgres again
+  /usr/lib/postgresql/13/bin/pg_ctl -D /data/postgresql start)
 createdb
 psql -f /pulsar-manager/init_db.sql
-

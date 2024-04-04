@@ -54,12 +54,14 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
 
     @Value("${tls.enabled}")
     private boolean tlsEnabled;
+    private final Map<String, String> serviceUrlEnvironmentMap;
 
     @Autowired
     public EnvironmentCacheServiceImpl(EnvironmentsRepository environmentsRepository, PulsarAdminService pulsarAdminService) {
         this.environmentsRepository = environmentsRepository;
         this.environments = new ConcurrentHashMap<>();
         this.pulsarAdminService = pulsarAdminService;
+        this.serviceUrlEnvironmentMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -95,6 +97,16 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
             String webServiceUrl = getServiceUrl(environment, cluster, 0);
             return pickOneServiceUrl(webServiceUrl);
         }
+    }
+
+    @Override
+    public void setServiceUrlEnvironmentMapping(String serviceUrl, String environment) {
+        serviceUrlEnvironmentMap.put(serviceUrl, environment);
+    }
+
+    @Override
+    public String getEnvironment(String serviceUrl) {
+        return serviceUrlEnvironmentMap.get(serviceUrl);
     }
 
     private String pickOneServiceUrl(String webServiceUrl) {
@@ -219,6 +231,7 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
                 environment.getName(),
                 (e) -> new ConcurrentHashMap<>());
         clusters.put(cluster, clusterData);
+        serviceUrlEnvironmentMap.put(environment.getBroker(), environment.getName());
         log.info("Successfully loaded cluster data for cluster {} @ environment {} : {}",
                 cluster, environment.getName(), clusterData);
         return clusterData;

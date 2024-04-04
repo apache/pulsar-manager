@@ -17,8 +17,8 @@
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
       <el-breadcrumb-item v-for="(item,index) in levelList" :key="item.path">
-        <span v-if="item.redirect==='noredirect'||index==levelList.length-1" class="no-redirect">{{ generateTitle(item.meta.title) }}</span>
-        <router-link v-else :to="item.path">{{ generateTitle(item.meta.title) }}</router-link>
+        <span v-if="item.redirect==='noredirect'||index==levelList.length-1" class="no-redirect">{{ generateTitle(item.meta.title, 'breadcrumb') }}</span>
+        <router-link v-else :to="item.path">{{ generateTitle(item.meta.title, 'breadcrumb') }}</router-link>
       </el-breadcrumb-item>
     </transition-group>
   </el-breadcrumb>
@@ -62,7 +62,7 @@ export default {
             'path': matched[i].path,
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.management')
+              'title': 'management'
             }
           })
         }
@@ -71,21 +71,21 @@ export default {
           route.push({
             'path': '/management/clusters',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.clusters')
+              'title': 'clusters'
             },
             'redirect': matched[i].redirect
           })
           route.push({
             'path': '/management/clusters/' + pathList[3] + '/cluster?tab=brokers',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.brokers')
+              'title': 'brokers'
             },
             'redirect': matched[i].redirect
           })
           route.push({
             'path': matched[i].path,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.brokerInfo')
+              'title': 'brokerInfo'
             },
             'redirect': matched[i].redirect
           })
@@ -93,21 +93,21 @@ export default {
           route.push({
             'path': '/management/clusters',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.clusters')
+              'title': 'clusters'
             },
             'redirect': matched[i].redirect
           })
           route.push({
             'path': '/management/clusters/' + pathList[3] + '/cluster?tab=isolationPolicies',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.isolationPolicies')
+              'title': 'isolationPolicies'
             },
             'redirect': matched[i].redirect
           })
           route.push({
             'path': matched[i].path,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.isolationPolicyInfo')
+              'title': 'isolationPolicyInfo'
             },
             'redirect': matched[i].redirect
           })
@@ -115,21 +115,21 @@ export default {
           route.push({
             'path': '/management/clusters',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.clusters')
+              'title': 'clusters'
             },
             'redirect': matched[i].redirect
           })
           route.push({
             'path': '/management/clusters/' + pathList[3] + '/cluster?tab=failureDomains',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.failureDomains')
+              'title': 'failureDomains'
             },
             'redirect': matched[i].redirect
           })
           route.push({
             'path': matched[i].path,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.failureDomainInfo')
+              'title': 'failureDomainInfo'
             },
             'redirect': matched[i].redirect
           })
@@ -137,14 +137,14 @@ export default {
           route.push({
             'path': '/management/clusters',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.clusters')
+              'title': 'clusters'
             },
             'redirect': matched[i].redirect
           })
           route.push({
             'path': matched[i].path,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.clusterInfo')
+              'title': 'clusterInfo'
             },
             'redirect': matched[i].redirect
           })
@@ -152,7 +152,7 @@ export default {
           route.push({
             'path': '/management/clusters',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.clusters')
+              'title': 'clusters'
             },
             'redirect': matched[i].redirect
           })
@@ -160,7 +160,7 @@ export default {
           route.push({
             'path': '/management/tenants',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.tenants')
+              'title': 'tenants'
             },
             'redirect': matched[i].redirect
           })
@@ -168,35 +168,35 @@ export default {
             'path': '/management/tenants/tenantInfo/' + pathList[4] + '?tab=namespaces',
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.namespaces')
+              'title': 'namespaces'
             }
           })
           route.push({
             'path': '/management/namespaces/' + pathList[4] + '/' + pathList[5] + '/namespace' + '?tab=topics',
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.topics')
+              'title': 'topics'
             }
           })
           route.push({
             'path': '/management/topics/' + pathList[3] + '/' + pathList[4] + '/' + pathList[5] + '/' + pathList[6] + '/topic',
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.subscriptions')
+              'title': 'subscriptions'
             }
           })
           route.push({
             'path': matched[i].path,
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.subscriptionInfo')
+              'title': 'subscriptionInfo'
             }
           })
         } else if (pathList.indexOf('topics') === 2) {
           route.push({
             'path': '/management/tenants',
             'meta': {
-              'title': this.$i18n.t('breadcrumb.tenants')
+              'title': 'tenants'
             },
             'redirect': matched[i].redirect
           })
@@ -204,21 +204,21 @@ export default {
             'path': '/management/tenants/tenantInfo/' + pathList[4] + '?tab=namespaces',
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.namespaces')
+              'title': 'namespaces'
             }
           })
           route.push({
             'path': '/management/namespaces/' + pathList[4] + '/' + pathList[5] + '/namespace' + '?tab=topics',
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.topics')
+              'title': 'topics'
             }
           })
           route.push({
             'path': matched[i].path,
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.topicInfo')
+              'title': 'topicInfo'
             }
           })
         } else if (pathList.indexOf('namespaces') === 2) {
@@ -226,21 +226,21 @@ export default {
             'path': '/management/tenants',
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.tenants')
+              'title': 'tenants'
             }
           })
           route.push({
             'path': '/management/tenants/tenantInfo/' + pathList[3] + '?tab=namespaces',
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.namespaces')
+              'title': 'namespaces'
             }
           })
           route.push({
             'path': matched[i].path,
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.namespaceInfo')
+              'title': 'namespaceInfo'
             }
           })
         } else if (pathList.indexOf('tenantInfo') === 3) {
@@ -248,14 +248,14 @@ export default {
             'path': '/management/tenants',
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.tenants')
+              'title': 'tenants'
             }
           })
           route.push({
             'path': matched[i].path,
             'redirect': matched[i].redirect,
             'meta': {
-              'title': this.$i18n.t('breadcrumb.tenantInfo')
+              'title': 'tenantInfo'
             }
           })
         }

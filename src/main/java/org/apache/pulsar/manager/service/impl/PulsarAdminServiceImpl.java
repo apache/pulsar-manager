@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,7 +36,11 @@ import org.apache.pulsar.client.api.AuthenticationDataProvider;
 import org.apache.pulsar.client.api.AuthenticationFactory;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
+import org.apache.pulsar.manager.entity.EnvironmentEntity;
+import org.apache.pulsar.manager.entity.EnvironmentsRepository;
+import org.apache.pulsar.manager.service.EnvironmentCacheService;
 import org.apache.pulsar.manager.service.PulsarAdminService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +68,12 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
 
     private Map<String, PulsarAdmin> pulsarAdmins = new HashMap<>();
 
+    @Autowired
+    private EnvironmentsRepository environmentsRepository;
+
+    @Autowired
+    private EnvironmentCacheService environmentCacheService;
+
     @PreDestroy
     public void destroy() {
         pulsarAdmins.values().forEach(value -> value.close());
@@ -70,9 +81,13 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
 
     public synchronized PulsarAdmin getPulsarAdmin(String url) {
         if (!pulsarAdmins.containsKey(url)) {
-            pulsarAdmins.put(url, this.createPulsarAdmin(url));
+            pulsarAdmins.put(url, this.createPulsarAdmin(url, null));
         }
         return pulsarAdmins.get(url);
+    }
+
+    public PulsarAdmin getPulsarAdmin(String url, String token) {
+        return this.createPulsarAdmin(url, token);
     }
 
     public BrokerStats brokerStats(String url) {
@@ -81,6 +96,11 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
 
     public Clusters clusters(String url) {
         return getPulsarAdmin(url).clusters();
+    }
+
+    @Override
+    public Clusters clusters(String url, String token) {
+        return getPulsarAdmin(url, token).clusters();
     }
 
     public Brokers brokers(String url) {
@@ -129,13 +149,28 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
         return result;
     }
 
-    private PulsarAdmin createPulsarAdmin(String url) {
+    private String getEnvironmentToken(String url) {
+        Optional<EnvironmentEntity> optionalEnvironmentEntity = environmentsRepository.findByBroker(url);
+        if (optionalEnvironmentEntity.isPresent()) {
+            return optionalEnvironmentEntity.get().getToken();
+        }
+        String environment = environmentCacheService.getEnvironment(url);
+        Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
+        return environmentEntityOptional.map(EnvironmentEntity::getToken).orElse(null);
+    }
+
+    private PulsarAdmin createPulsarAdmin(String url, String token) {
         try {
             log.info("Create Pulsar Admin instance. url={}, authPlugin={}, authParams={}, tlsAllowInsecureConnection={}, tlsTrustCertsFilePath={}, tlsEnableHostnameVerification={}",
                     url, authPlugin, authParams, tlsAllowInsecureConnection, tlsTrustCertsFilePath, tlsEnableHostnameVerification);
             PulsarAdminBuilder pulsarAdminBuilder = PulsarAdmin.builder();
             pulsarAdminBuilder.serviceHttpUrl(url);
-            if (StringUtils.isNotBlank(pulsarJwtToken)) {
+            if (null == token) {
+                token = getEnvironmentToken(url);
+            }
+            if (StringUtils.isNotBlank(token)) {
+                pulsarAdminBuilder.authentication(AuthenticationFactory.token(token));
+            } else if (StringUtils.isNotBlank(pulsarJwtToken)) {
                 pulsarAdminBuilder.authentication(AuthenticationFactory.token(pulsarJwtToken));
             } else {
                 pulsarAdminBuilder.authentication(authPlugin, authParams);

@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-FROM openjdk:8-jre
+FROM eclipse-temurin:17-jre-jammy
 
 ARG BUILD_DATE
 ARG VCS_REF
