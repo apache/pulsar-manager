@@ -21,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 import java.text.DecimalFormat;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.client.admin.Brokers;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.controller.exception.PulsarAdminOperationException;
@@ -53,6 +54,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @Configuration
@@ -66,6 +68,9 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
 
     @Value("${clear.stats.interval}")
     private Long clearStatsInterval;
+
+    @Value("${tls.enabled}")
+    private boolean tlsEnabled;
 
     private final EnvironmentsRepository environmentsRepository;
     private final ClustersService clustersService;
@@ -124,12 +129,16 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
             clusterLists.forEach((clusterMap) -> {
                 String cluster = (String) clusterMap.get("cluster");
                 Pair<String, String> envCluster = Pair.of(env.getName(), cluster);
-                String webServiceUrl = (String) clusterMap.get("serviceUrl");
+
+                String serviceUrlTls = (String) clusterMap.get("serviceUrlTls");
+                tlsEnabled = tlsEnabled && StringUtils.isNotBlank(serviceUrlTls);
+                String webServiceUrl = tlsEnabled ? serviceUrlTls : (String) clusterMap.get("serviceUrl");
                 if (webServiceUrl.contains(",")) {
                     String[] webServiceUrlList = webServiceUrl.split(",");
                     for (String url : webServiceUrlList) {
-                        if (!url.contains("http://")) {
-                            url = "http://" + url;
+                        // making sure the protocol is appended in case the env was added without the protocol
+                        if (!tlsEnabled && !url.contains("http://")) {
+                            url = (tlsEnabled ? "https://" : "http://") + url;
                         }
                         try {
                             Brokers brokers = pulsarAdminService.brokers(url);
@@ -158,9 +167,16 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         Map<String, Object> brokerObject = brokersService.getBrokersList(0, 0, cluster, serviceUrl);
         List<HashMap<String, Object>> brokerLists = (List<HashMap<String, Object>>) brokerObject.get("data");
         brokerLists.forEach((brokerMap) -> {
+            // returns [Broker Hostname]:[Broker non Tls port]
             String tempBroker = (String) brokerMap.get("broker");
-            // TODO: handle other protocols
+            //default to http
             String broker = "http://" + tempBroker;
+            // if tls enabled the protocol and port is extracted from service url
+            if (tlsEnabled && tempBroker.contains(":")) {
+                String brokerHost = tempBroker.substring(0, tempBroker.indexOf(":"));
+                UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUrl);
+                broker = builder.host(brokerHost).toUriString();
+            }
             JsonObject result;
             try {
                 result = pulsarAdminService.brokerStats(broker).getTopics();
