@@ -142,6 +142,7 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-jdk14'
         exclude group: 'org.herddb', module: '*'
     }
+    implementation (group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatVersion)
     implementation (group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: tomcatVersion)
     implementation group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: jerseyVersion
     implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: jerseyVersion
