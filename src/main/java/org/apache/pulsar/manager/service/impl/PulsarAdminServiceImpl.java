@@ -79,19 +79,25 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
         pulsarAdmins.values().forEach(value -> value.close());
     }
 
-    public synchronized PulsarAdmin getPulsarAdmin(String url) {
-        if (!pulsarAdmins.containsKey(url)) {
-            pulsarAdmins.put(url, this.createPulsarAdmin(url, null));
-        }
-        return pulsarAdmins.get(url);
+
+    public PulsarAdmin getPulsarAdmin(String url) {
+        return this.createPulsarAdmin(url, null, null);
     }
 
     public PulsarAdmin getPulsarAdmin(String url, String token) {
-        return this.createPulsarAdmin(url, token);
+        return this.createPulsarAdmin(url, null, token);
+    }
+
+    public PulsarAdmin getPulsarAdmin(String url, String env, String token) {
+        return this.createPulsarAdmin(url, env, token);
     }
 
     public BrokerStats brokerStats(String url) {
-        return getPulsarAdmin(url).brokerStats();
+        return getPulsarAdmin(url, null, null).brokerStats();
+    }
+
+    public BrokerStats brokerStats(String url, String env) {
+        return getPulsarAdmin(url, env, null).brokerStats();
     }
 
     public Clusters clusters(String url) {
@@ -149,24 +155,23 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
         return result;
     }
 
-    private String getEnvironmentToken(String url) {
+    private String getEnvironmentToken(String url, String env) {
         Optional<EnvironmentEntity> optionalEnvironmentEntity = environmentsRepository.findByBroker(url);
         if (optionalEnvironmentEntity.isPresent()) {
             return optionalEnvironmentEntity.get().getToken();
         }
-        String environment = environmentCacheService.getEnvironment(url);
-        Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(environment);
+        Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(env);
         return environmentEntityOptional.map(EnvironmentEntity::getToken).orElse(null);
     }
 
-    private PulsarAdmin createPulsarAdmin(String url, String token) {
+    private PulsarAdmin createPulsarAdmin(String url, String env, String token) {
         try {
             log.info("Create Pulsar Admin instance. url={}, authPlugin={}, authParams={}, tlsAllowInsecureConnection={}, tlsTrustCertsFilePath={}, tlsEnableHostnameVerification={}",
                     url, authPlugin, authParams, tlsAllowInsecureConnection, tlsTrustCertsFilePath, tlsEnableHostnameVerification);
             PulsarAdminBuilder pulsarAdminBuilder = PulsarAdmin.builder();
             pulsarAdminBuilder.serviceHttpUrl(url);
             if (null == token) {
-                token = getEnvironmentToken(url);
+                token = getEnvironmentToken(url, env);
             }
             if (StringUtils.isNotBlank(token)) {
                 pulsarAdminBuilder.authentication(AuthenticationFactory.token(token));
