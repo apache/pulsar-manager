@@ -16,9 +16,10 @@ package org.apache.pulsar.manager;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {ErrorMvcAutoConfiguration.class})
 @EnableZuulProxy
 @MapperScan("org.apache.pulsar.manager.mapper")
 public class PulsarManagerApplication {
