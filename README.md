@@ -174,6 +174,9 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
     * Account: `pulsar`
     * Password: `pulsar`
 
+    #### Setting up super-user
+
+    ##### Acquiring token and seeding super-user manually
     If you are deploying Pulsar Manager using the latest code, you can create a super-user using the following command. Then you can use the super user credentials to log in the Pulsar Manager UI.
 
     ```
@@ -188,6 +191,22 @@ After running these steps, the Pulsar Manager is running locally at http://127.0
 
     * `backend-service`: The IP address or domain name of the backend service.
     * `password`: The password should be more than or equal to 6 digits.
+  
+    #### Seeding default super-user via application.properties
+
+    Application properties expose variables which allow you to configure default super-user that will be seeded on application startup.
+
+    Mark `default.superuser.enable` flag as true and configure the rest of the required fields.
+
+    Keep in mind that passwords adhere to standard password policies.
+
+    ```
+    # default superuser configuration
+    default.superuser.enable=
+    default.superuser.name=
+    default.superuser.password=
+    default.superuser.email=
+    ```
 
 2. Create an environment.
 
