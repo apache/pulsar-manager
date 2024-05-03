@@ -61,7 +61,7 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     private String defaultEnvironmentBookieUrl;
 
     @Value("${default.superuser.enable}")
-    private Boolean defaultSuperuserEnable;
+    private Boolean defaultSuperuserEnable = false;
 
     @Value("${default.superuser.name}")
     private String defaultSuperuserName;
