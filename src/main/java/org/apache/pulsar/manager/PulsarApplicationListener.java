@@ -94,7 +94,7 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     }
 
     private void seedDefaultSuperuser() {
-        if(defaultSuperuserEnable) {
+        if(defaultSuperuserEnable == false) {
             log.debug("Superuser seed disabled");
             return;
         }
