@@ -49,27 +49,17 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     @Value("${default.environment.bookie_url}")
     private String defaultEnvironmentBookieUrl;
 
+    @Value("${default.superuser.enable}")
+    private String defaultSuperuserEnable;
+
     @Value("${default.superuser.name}")
     private String defaultSuperuserName;
-
-    @Value("${default.superuser.password}")
-    private String defaultSuperuserPassword;
-
-    @Value("${default.superuser.description}")
-    private String defaultSuperuserDescription;
-
-    @Value("${default.superuser.location}")
-    private String defaultSuperuserLocation;
-
-    @Value("${default.superuser.company}")
-    private String defaultSuperuserCompany;
-
-    @Value("${default.superuser.phoneNumber}")
-    private String defaultSuperuserPhoneNumber;
 
     @Value("${default.superuser.email}")
     private String defaultSuperuserEmail;
 
+    @Value("${default.superuser.password}")
+    private String defaultSuperuserPassword;
 
     @Autowired
     public PulsarApplicationListener(
@@ -91,14 +81,15 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     }
 
     private void seedDefaultSuperuser() {
+        if(defaultSuperuserEnable) {
+            log.debug("Superuser seed disabled");
+            return;
+        }
+        
         UserInfoEntity userInfoEntity = new UserInfoEntity();
         userInfoEntity.setName(defaultSuperuserName);
-        userInfoEntity.setPassword(defaultSuperuserPassword);
-        userInfoEntity.setDescription(defaultSuperuserDescription);
-        userInfoEntity.setLocation(defaultSuperuserLocation);
-        userInfoEntity.setCompany(defaultSuperuserCompany);
-        userInfoEntity.setPhoneNumber(defaultSuperuserPhoneNumber);
         userInfoEntity.setEmail(defaultSuperuserEmail);
+        userInfoEntity.setPassword(defaultSuperuserPassword);
 
         Map<String, String> userValidateResult = usersService.validateUserInfo(userInfoEntity);
         if (userValidateResult.get("error") != null) {
@@ -112,7 +103,7 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
         
         Optional<UserInfoEntity> optionalUserEntity =  usersRepository.findByUserName(userInfoEntity.getName());
         if (optionalUserEntity.isPresent()) {
-            log.error("Superuser already exists.");
+            log.warn("Superuser already exists.");
             return;
         }
 
