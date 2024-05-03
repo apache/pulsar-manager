@@ -13,20 +13,28 @@
  */
 package org.apache.pulsar.manager;
 
-import com.github.pagehelper.Page;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+import java.util.Optional;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
+import org.apache.pulsar.manager.entity.UserInfoEntity;
 import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.PulsarAdminService;
+import org.apache.pulsar.manager.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import com.github.pagehelper.Page;
+
+import lombok.extern.slf4j.Slf4j;
+
 
 /**
  * PulsarApplicationListener do something after the spring framework initialization is complete.
@@ -41,6 +49,8 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
 
     private final UsersRepository usersRepository;
 
+    private final UsersService usersService;
+
     @Value("${default.environment.name}")
     private String defaultEnvironmentName;
 
@@ -51,7 +61,7 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     private String defaultEnvironmentBookieUrl;
 
     @Value("${default.superuser.enable}")
-    private String defaultSuperuserEnable;
+    private Boolean defaultSuperuserEnable;
 
     @Value("${default.superuser.name}")
     private String defaultSuperuserName;
@@ -66,11 +76,13 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     public PulsarApplicationListener(
         EnvironmentsRepository environmentsRepository, 
         PulsarAdminService pulsarAdminService,
-        UsersRepository usersRepository
+        UsersRepository usersRepository,
+        UsersService usersService
     ) {
         this.environmentsRepository = environmentsRepository;
         this.pulsarAdminService = pulsarAdminService;
         this.usersRepository = usersRepository;
+        this.usersService = usersService;
     }
 
     @Override
