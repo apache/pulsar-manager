@@ -218,6 +218,11 @@ public class UsersController {
             result.put("error", "Please provider password");
             return ResponseEntity.ok(result);
         }
+        Optional<UserInfoEntity> optionalUserEntity =  usersRepository.findByUserName(userInfoEntity.getName());
+        if (optionalUserEntity.isPresent()) {
+            result.put("error", "Superuser already exists");
+            return ResponseEntity.ok(result);
+        }
 
         userInfoEntity.setPassword(DigestUtils.sha256Hex(userInfoEntity.getPassword()));
         usersRepository.save(userInfoEntity);
