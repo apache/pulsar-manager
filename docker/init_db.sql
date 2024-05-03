@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS environments (
   name varchar(256) NOT NULL,
   broker varchar(1024) NOT NULL,
   bookie varchar(1024) NOT NULL,
+  token varchar(1024),
   CONSTRAINT PK_name PRIMARY KEY (name),
   UNIQUE (broker)
 );
