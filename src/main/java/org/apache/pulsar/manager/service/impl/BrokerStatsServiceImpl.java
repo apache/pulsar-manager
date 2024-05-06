@@ -54,6 +54,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
@@ -122,24 +123,24 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         List<EnvironmentEntity> environmentEntities = environmentsRepository.getAllEnvironments();
         Map<Pair<String, String>, String> collectStatsServiceUrls = new HashMap<>();
         for (EnvironmentEntity env : environmentEntities) {
-            String serviceUrl = checkServiceUrl(null, env.getBroker());
+            String brokerUrl = env.getBroker();
             Map<String, Object> clusterObject =
-                clustersService.getClustersList(0, 0, serviceUrl, (c) -> serviceUrl);
+                clustersService.getClustersList(0, 0, brokerUrl, (c) -> brokerUrl);
             List<HashMap<String, Object>> clusterLists = (List<HashMap<String, Object>>) clusterObject.get("data");
             clusterLists.forEach((clusterMap) -> {
                 String cluster = (String) clusterMap.get("cluster");
                 Pair<String, String> envCluster = Pair.of(env.getName(), cluster);
 
+                log.debug(envCluster.toString());
+
                 String serviceUrlTls = (String) clusterMap.get("serviceUrlTls");
-                tlsEnabled = tlsEnabled && StringUtils.isNotBlank(serviceUrlTls);
-                String webServiceUrl = tlsEnabled ? serviceUrlTls : (String) clusterMap.get("serviceUrl");
+                String serviceUrl = (String) clusterMap.get("serviceUrl");
+
+                String webServiceUrl = StringUtils.isNotBlank(serviceUrlTls) ? serviceUrlTls : serviceUrl;
                 if (webServiceUrl.contains(",")) {
                     String[] webServiceUrlList = webServiceUrl.split(",");
                     for (String url : webServiceUrlList) {
-                        // making sure the protocol is appended in case the env was added without the protocol
-                        if (!tlsEnabled && !url.contains("http://")) {
-                            url = (tlsEnabled ? "https://" : "http://") + url;
-                        }
+
                         try {
                             Brokers brokers = pulsarAdminService.brokers(url);
                             brokers.healthcheck();
@@ -150,14 +151,10 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                         }
                     }
                 }
-                collectStatsServiceUrls.put(envCluster, webServiceUrl);
+                log.info("Start collecting stats from env {} / cluster {} @ {}", envCluster.getLeft(), envCluster.getRight(), serviceUrl);
+                collectStatsToDB(unixTime, envCluster.getLeft(), envCluster.getRight(), webServiceUrl);
             });
         }
-        collectStatsServiceUrls.forEach((envCluster, serviceUrl) -> {
-            log.info("Start collecting stats from env {} / cluster {} @ {}",
-                envCluster.getLeft(), envCluster.getRight(), serviceUrl);
-            collectStatsToDB(unixTime, envCluster.getLeft(), envCluster.getRight(), serviceUrl);
-        });
 
         log.info("Start clearing stats from broker");
         clearStats(unixTime, clearStatsInterval / 1000);
@@ -168,18 +165,21 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
         List<HashMap<String, Object>> brokerLists = (List<HashMap<String, Object>>) brokerObject.get("data");
         brokerLists.forEach((brokerMap) -> {
             // returns [Broker Hostname]:[Broker non Tls port]
-            String tempBroker = (String) brokerMap.get("broker");
-            //default to http
-            String broker = "http://" + tempBroker;
-            // if tls enabled the protocol and port is extracted from service url
-            if (tlsEnabled && tempBroker.contains(":")) {
-                String brokerHost = tempBroker.substring(0, tempBroker.indexOf(":"));
-                UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUrl);
-                broker = builder.host(brokerHost).toUriString();
-            }
+            String broker = (String) brokerMap.get("broker");
+            log.info("processing broker: {}", broker);
+
+            // use web service url scheme to replace host part with broker
+            UriComponents serviceURI = UriComponentsBuilder.fromHttpUrl(serviceUrl).build();
+            UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+                    .scheme(serviceURI.getScheme())
+                    .host(broker.split(":")[0])
+                    .port(serviceURI.getPort());
+            String finalBroker = builder.toUriString();
+
             JsonObject result;
             try {
-                result = pulsarAdminService.brokerStats(broker).getTopics();
+                log.info("Start collecting stats from broker {}", finalBroker);
+                result = pulsarAdminService.brokerStats(finalBroker, env).getTopics();
             } catch(PulsarAdminException e) {
                 log.error("Failed to get broker metrics.", e);
                 return;
@@ -197,7 +197,7 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
                             String[] topicPath = this.parseTopic(topic);
                             topicStatsEntity.setEnvironment(env);
                             topicStatsEntity.setCluster(cluster);
-                            topicStatsEntity.setBroker(tempBroker);
+                            topicStatsEntity.setBroker(finalBroker);
                             topicStatsEntity.setTenant(topicPath[0]);
                             topicStatsEntity.setNamespace(topicPath[1]);
                             topicStatsEntity.setBundle(bundle);
@@ -308,10 +308,6 @@ public class BrokerStatsServiceImpl implements BrokerStatsService {
     public static String checkServiceUrl(String serviceUrl, String requestHost) {
         if (serviceUrl == null || serviceUrl.length() <= 0) {
             serviceUrl = requestHost;
-        }
-
-        if (!serviceUrl.startsWith("http")) {
-            serviceUrl = "http://" + serviceUrl;
         }
         return serviceUrl;
     }

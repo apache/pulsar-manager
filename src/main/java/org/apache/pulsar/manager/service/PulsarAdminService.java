@@ -24,7 +24,8 @@ import org.apache.pulsar.client.admin.Tenants;
 import org.apache.pulsar.client.admin.Topics;
 
 public interface PulsarAdminService {
-    PulsarAdmin getPulsarAdmin(String url);
+    PulsarAdmin getPulsarAdmin(String url, String env, String token);
+    BrokerStats brokerStats(String url, String env);
     BrokerStats brokerStats(String url);
     Clusters clusters(String url);
     Clusters clusters(String url, String token);

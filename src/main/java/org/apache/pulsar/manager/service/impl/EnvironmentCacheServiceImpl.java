@@ -114,9 +114,6 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
             String[] webServiceUrlList = webServiceUrl.split(",");
             int index = ThreadLocalRandom.current().nextInt(0, webServiceUrlList.length);
             String url = webServiceUrlList[index];
-            if (!url.contains("http://")) {
-                url = "http://" + url;
-            }
             log.info("pick web url:{}", url);
             return url;
         }
@@ -141,7 +138,8 @@ public class EnvironmentCacheServiceImpl implements EnvironmentCacheService {
             throw new RuntimeException(
                     "No cluster '" + cluster + "' found in environment '" + environment + "'");
         }
-        return tlsEnabled && StringUtils.isNotBlank(clusterData.getServiceUrlTls()) ? clusterData.getServiceUrlTls() : clusterData.getServiceUrl();
+
+        return StringUtils.isNotBlank(clusterData.getServiceUrlTls()) ? clusterData.getServiceUrlTls() : clusterData.getServiceUrl();
     }
 
     @Scheduled(

@@ -21,11 +21,15 @@ import { getEnvironment } from '@/utils/environment'
 import { getTenant } from '@/utils/tenant'
 import router from '../router'
 import { getCsrfToken } from '@/utils/csrfToken'
+import qs from "qs";
 
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.BASE_API, // api 的 base_url
-  timeout: 60000 // request timeout
+  timeout: 60000, // request timeout
+  paramsSerializer: function(params) {
+    return qs.stringify(params, { arrayFormat: 'repeat' })
+  }
 })
 
 // request interceptor
