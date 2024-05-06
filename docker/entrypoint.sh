@@ -39,14 +39,28 @@ echo 'Starting Pulsar Manager Front end'
 nginx
 
 echo 'Starting Pulsar Manager Back end'
-/pulsar-manager/pulsar-manager/bin/pulsar-manager \
-    --redirect.host=${REDIRECT_HOST} \
-    --redirect.port=${REDIRECT_PORT} \
-    --spring.datasource.driver-class-name=${DRIVER_CLASS_NAME} \
-    --spring.datasource.url=${URL} \
-    --spring.datasource.username=${USERNAME} \
-    --spring.datasource.password=${PASSWORD} \
-    --spring.datasource.initialization-mode=never \
-    --logging.level.org.apache=${LOG_LEVEL} \
-    --backend.jwt.token=${JWT_TOKEN}
-    --tls.enabled=${TLS:=false}
+
+touch /pulsar-manager/supervisor.sock
+chmod 777 /pulsar-manager/supervisor.sock
+
+
+if [[ -n "$JWT_TOKEN" ]] && [[ -n "$PUBLIC_KEY" ]] && [[ -n "$PRIVATE_KEY" ]]
+then
+  echo "Use public key and private key to init JWT."
+  supervisord -c /etc/supervisord-private-key.conf -n
+elif [[ -n "$JWT_TOKEN" ]] && [[ -n "$SECRET_KEY" ]]
+then
+  echo "Use secret key to init JWT."
+  supervisord -c /etc/supervisord-secret-key.conf -n
+elif [[ -n "$JWT_TOKEN" ]]
+then
+  echo "Enable JWT auth."
+  supervisord -c /etc/supervisord-token.conf -n
+elif [[ -n "$SPRING_CONFIGURATION_FILE" ]]
+then
+  echo "Start Pulsar Manager by specifying a configuration file."
+  supervisord -c /etc/supervisord-configuration-file.conf -n
+else
+  echo "Start servie no enable JWT."
+  supervisord -c /etc/supervisord.conf -n
+fi
