@@ -65,12 +65,6 @@ public class LoginController {
     @Autowired
     private CasdoorAuthService casdoorAuthService;
 
-    @Value("${pulsar-manager.account}")
-    private String account;
-
-    @Value("${pulsar-manager.password}")
-    private String password;
-
     @ApiOperation(value = "Login pulsar manager")
     @ApiResponses({@ApiResponse(code = 200, message = "ok"), @ApiResponse(code = 500, message = "Internal server error")})
     @RequestMapping(value = "/login", method = RequestMethod.POST)

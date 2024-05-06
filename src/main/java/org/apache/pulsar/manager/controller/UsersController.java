@@ -54,12 +54,6 @@ import java.util.Set;
 @Api(description = "Functions under this class are available to super user.")
 public class UsersController {
 
-    @Value("${user.management.enable}")
-    private boolean userManagementEnable;
-
-    @Value("${pulsar-manager.account}")
-    private String account;
-
     private final UsersRepository usersRepository;
 
     private final UsersService usersService;
