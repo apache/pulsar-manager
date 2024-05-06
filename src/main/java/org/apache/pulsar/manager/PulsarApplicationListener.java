@@ -13,19 +13,28 @@
  */
 package org.apache.pulsar.manager;
 
-import com.github.pagehelper.Page;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+import java.util.Optional;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.pulsar.client.admin.PulsarAdminException;
 import org.apache.pulsar.manager.entity.EnvironmentEntity;
 import org.apache.pulsar.manager.entity.EnvironmentsRepository;
+import org.apache.pulsar.manager.entity.UserInfoEntity;
+import org.apache.pulsar.manager.entity.UsersRepository;
 import org.apache.pulsar.manager.service.PulsarAdminService;
+import org.apache.pulsar.manager.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import com.github.pagehelper.Page;
+
+import lombok.extern.slf4j.Slf4j;
+
 
 /**
  * PulsarApplicationListener do something after the spring framework initialization is complete.
@@ -38,6 +47,10 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
 
     private final PulsarAdminService pulsarAdminService;
 
+    private final UsersRepository usersRepository;
+
+    private final UsersService usersService;
+
     @Value("${default.environment.name}")
     private String defaultEnvironmentName;
 
@@ -47,20 +60,79 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     @Value("${default.environment.bookie_url}")
     private String defaultEnvironmentBookieUrl;
 
+    @Value("${default.superuser.enable}")
+    private Boolean defaultSuperuserEnable = false;
+
+    @Value("${default.superuser.name}")
+    private String defaultSuperuserName;
+
+    @Value("${default.superuser.email}")
+    private String defaultSuperuserEmail;
+
+    @Value("${default.superuser.password}")
+    private String defaultSuperuserPassword;
+
     @Autowired
-    public PulsarApplicationListener(EnvironmentsRepository environmentsRepository, PulsarAdminService pulsarAdminService) {
+    public PulsarApplicationListener(
+        EnvironmentsRepository environmentsRepository, 
+        PulsarAdminService pulsarAdminService,
+        UsersRepository usersRepository,
+        UsersService usersService
+    ) {
         this.environmentsRepository = environmentsRepository;
         this.pulsarAdminService = pulsarAdminService;
+        this.usersRepository = usersRepository;
+        this.usersService = usersService;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("Start onApplicationEvent");
-        Page<EnvironmentEntity> environmentEntities = environmentsRepository
-                .getEnvironmentsList(1, 1);
+        
+        seedDefaultSuperuser();
+        seedDefaultEnvironment();
+    }
+
+    private void seedDefaultSuperuser() {
+        if(defaultSuperuserEnable == false) {
+            log.debug("Superuser seed disabled");
+            return;
+        }
+        
+        UserInfoEntity userInfoEntity = new UserInfoEntity();
+        userInfoEntity.setName(defaultSuperuserName);
+        userInfoEntity.setEmail(defaultSuperuserEmail);
+        userInfoEntity.setPassword(defaultSuperuserPassword);
+
+        Map<String, String> userValidateResult = usersService.validateUserInfo(userInfoEntity);
+        if (userValidateResult.get("error") != null) {
+            log.error("Superuser seed failed.", userValidateResult.get("error"));
+            System.exit(-1);
+        }
+        if (StringUtils.isBlank(userInfoEntity.getPassword())) {
+            log.error("Superuser seed failed. Password is required.");
+            System.exit(-1);
+        }
+        
+        Optional<UserInfoEntity> optionalUserEntity =  usersRepository.findByUserName(userInfoEntity.getName());
+        if (optionalUserEntity.isPresent()) {
+            log.warn("Superuser already exists.");
+            return;
+        }
+
+        userInfoEntity.setPassword(DigestUtils.sha256Hex(userInfoEntity.getPassword()));
+        usersRepository.save(userInfoEntity);
+
+         log.info("Successfully added a default superuser: name = {}, email = {}, password = {}.",
+                        defaultSuperuserName, defaultSuperuserEmail, defaultSuperuserPassword);
+    }
+
+    private void seedDefaultEnvironment() {
+        Page<EnvironmentEntity> environmentEntities = environmentsRepository.getEnvironmentsList(1, 1);
+        
         if (environmentEntities.getResult().size() <= 0) {
-            Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository
-                    .findByName(defaultEnvironmentName);
+            Optional<EnvironmentEntity> environmentEntityOptional = environmentsRepository.findByName(defaultEnvironmentName);
+            
             if (defaultEnvironmentName != null
                     && defaultEnvironmentServiceUrl != null
                     && defaultEnvironmentName.length() > 0
@@ -89,6 +161,7 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
                 log.warn("The default environment already exists.");
             }
         }
+
         log.debug("Environments already exist.");
     }
 }
