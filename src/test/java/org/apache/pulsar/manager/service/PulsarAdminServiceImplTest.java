@@ -50,7 +50,7 @@ public class PulsarAdminServiceImplTest {
 
     @Test
     public void getPulsarAdminTest() {
-        String serviceUrl = pulsarAdminService.getPulsarAdmin("http://localhost:8080").getServiceUrl();
+        String serviceUrl = pulsarAdminService.getPulsarAdmin("http://localhost:8080", null, null).getServiceUrl();
         Assert.assertEquals("http://localhost:8080", serviceUrl);
     }
 
