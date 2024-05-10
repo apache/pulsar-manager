@@ -60,8 +60,8 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     @Value("${default.environment.bookie_url}")
     private String defaultEnvironmentBookieUrl;
 
-    @Value("${default.superuser.enable}")
-    private Boolean defaultSuperuserEnable = false;
+    @Value("${default.superuser.enabled}")
+    private Boolean defaultSuperuserEnabled;
 
     @Value("${default.superuser.name}")
     private String defaultSuperuserName;
@@ -94,8 +94,8 @@ public class PulsarApplicationListener implements ApplicationListener<ContextRef
     }
 
     private void seedDefaultSuperuser() {
-        if(defaultSuperuserEnable == false) {
-            log.debug("Superuser seed disabled");
+        if(defaultSuperuserEnabled == false) {
+            log.info("Superuser seed via application.properties is disabled");
             return;
         }
         
