@@ -71,9 +71,6 @@ public class PulsarAdminServiceImpl implements PulsarAdminService {
     @Autowired
     private EnvironmentsRepository environmentsRepository;
 
-    @Autowired
-    private EnvironmentCacheService environmentCacheService;
-
     @PreDestroy
     public void destroy() {
         pulsarAdmins.values().forEach(value -> value.close());
