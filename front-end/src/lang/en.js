@@ -296,7 +296,10 @@ export default {
     outBytes: 'Out Throughput',
     storageSize: 'Storage Size',
     enabled: 'Enabled',
-    disabled: 'Disabled'
+    disabled: 'Disabled',
+    msgBacklog: 'Backlog',
+    numberOfEntries: 'All Entries',
+    unackedMessages: 'Unack Msg'
   },
   tenant: {
     label: 'Tenant',

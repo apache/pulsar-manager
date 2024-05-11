@@ -17,6 +17,7 @@
   <div class="app-container">
     <div class="createPost-container">
       <el-form :inline="true" :model="postForm" label-position="top" class="form-container">
+        <!--tenant namespace topic select  start-->
         <el-form-item :label="$t('tenant.label')">
           <el-select v-model="postForm.tenant" placeholder="select tenant" filterable @change="getNamespacesList(postForm.tenant)">
             <el-option v-for="(item,index) in tenantsListOptions" :key="item+index" :label="item" :value="item"/>
@@ -32,6 +33,7 @@
             <el-option v-for="(item,index) in topicsListOptions" :key="item+index" :label="item" :value="item"/>
           </el-select>
         </el-form-item>
+        <!--tenant namespace topic select  end-->
         <div class="refresh-container">
           <el-form-item :label="$t('topic.autoRefresh')">
             <el-select ref="autoRefreshSelect" v-model="autoRefreshInterval" placeholder="select auto refresh" @change="onAutoRefreshChanged">
@@ -56,6 +58,7 @@
       </el-form>
     </div>
     <el-tabs v-model="activeName" @tab-click="handleClick">
+      <!-- topic overview start-->
       <el-tab-pane :label="$t('tabs.overview')" name="overview">
         <el-table
           :data="partitionTopicStats"
@@ -65,6 +68,9 @@
           <el-table-column :label="$t('common.outMsg')" prop="outMsg"/>
           <el-table-column :label="$t('common.inBytes')" prop="inBytes"/>
           <el-table-column :label="$t('common.outBytes')" prop="outBytes"/>
+          <el-table-column :label="$t('common.numberOfEntries')" prop="numberOfEntries"/>
+          <el-table-column :label="$t('common.msgBacklog')" prop="msgBacklog"/>
+          <el-table-column :label="$t('common.unackedMessages')" prop="unackedMessages"/>
         </el-table>
         <h4>{{ $t('topic.subscription.subscriptions') }}</h4>
         <el-button
@@ -217,6 +223,9 @@
           </el-col>
         </el-row>
       </el-tab-pane>
+      <!-- topic overview end-->
+
+      <!-- topic policies start-->
       <el-tab-pane label="POLICIES" name="policies">
         <h4>{{ $t('topic.policy.authentication') }}
           <el-tooltip :content="authorizationContent" class="item" effect="dark" placement="top">
@@ -269,6 +278,7 @@
         <hr class="danger-line">
         <el-button type="danger" class="button" @click="handleDeletePartitionTopic">{{ $t('topic.deleteTopic') }}</el-button>
       </el-tab-pane>
+      <!-- topic policies end-->
     </el-tabs>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="30%">
       <el-form ref="form" :model="form" :rules="rules" label-position="top">
@@ -311,6 +321,7 @@
 import { fetchTenants } from '@/api/tenants'
 import { fetchNamespaces, getClusters } from '@/api/namespaces'
 import {
+  fetchTopicStatsInternal,
   fetchPartitionTopicStats,
   deletePartitionTopicOnCluster,
   expireMessagesAllSubscriptionsOnCluster,
@@ -457,6 +468,7 @@ export default {
       }
     },
     initTopicStats() {
+      // get topic stat detail
       fetchPartitionTopicStats(this.postForm.persistent, this.tenantNamespaceTopic, true).then(response => {
         if (!response.data) return
         this.partitionTopicStats = []
@@ -464,11 +476,18 @@ export default {
           inMsg: numberFormatter(response.data.msgRateIn, 2),
           outMsg: numberFormatter(response.data.msgRateOut, 2),
           inBytes: formatBytes(response.data.msgThroughputIn),
-          outBytes: formatBytes(response.data.msgThroughputOut)
+          outBytes: formatBytes(response.data.msgThroughputOut),
+          // The total number of topics
+          numberOfEntries: 0,
+          // Max backlog
+          msgBacklog: 0,
+          // Max number of messages without ACK
+          unackedMessages: 0
         })
         var prefix = this.postForm.persistent + '://' + this.tenantNamespaceTopic
         var tempPartitionsList = Object.keys(response.data.partitions)
         this.partitionsList = []
+        // Traverse each partition
         for (var i = 0; i < tempPartitionsList.length; i++) {
           var key = prefix + '-partition-' + i
           if (response.data.partitions.hasOwnProperty(key)) {
@@ -488,6 +507,15 @@ export default {
               'storageSize': formatBytes(response.data.partitions[key].storageSize, 0),
               'partitionTopicLink': '/management/topics/' + this.postForm.persistent + '/' + this.tenantNamespaceTopic + '-partition-' + i + '/topic'
             })
+
+            // Calculate the sum of each partition message
+            fetchTopicStatsInternal(this.postForm.persistent, this.postForm.tenant + '/' + this.postForm.namespace + '/' + partition).then(response => {
+              if (!response.data) return
+              // is number
+              if (typeof response.data.numberOfEntries === 'number' && !isNaN(response.data.numberOfEntries)) {
+                this.partitionTopicStats[0].numberOfEntries = this.partitionTopicStats[0].numberOfEntries + response.data.numberOfEntries
+              }
+            })
           }
         }
         var index = 0
@@ -497,17 +525,32 @@ export default {
           var type = 'Exclusive'
           var children = []
           for (var j in response.data.partitions) {
+            // tenant + namespace + partition
             var subSplitPartition = j.split('://')
+            // partition
             var subPartition = subSplitPartition[1].split('/')[2]
             if (response.data.partitions[j].hasOwnProperty('subscriptions')) {
               for (var p in response.data.partitions[j].subscriptions) {
                 if (p === s) {
+                  // msgBacklog is number
+                  if (typeof response.data.partitions[j].subscriptions[p].msgBacklog === 'number' && !isNaN(response.data.partitions[j].subscriptions[p].msgBacklog)) {
+                    if (this.partitionTopicStats[0].msgBacklog < response.data.partitions[j].subscriptions[p].msgBacklog) {
+                      this.partitionTopicStats[0].msgBacklog = response.data.partitions[j].subscriptions[p].msgBacklog
+                    }
+                  }
+                  // unackedMessages is number
+                  if (typeof response.data.partitions[j].subscriptions[p].unackedMessages === 'number' && !isNaN(response.data.partitions[j].subscriptions[p].unackedMessages)) {
+                    if (this.partitionTopicStats[0].unackedMessages < response.data.partitions[j].subscriptions[p].unackedMessages) {
+                      this.partitionTopicStats[0].unackedMessages = response.data.partitions[j].subscriptions[p].unackedMessages
+                    }
+                  }
                   children.push({
                     'id': 1000000 * (index + 1) + j,
                     'subscription': subPartition,
                     'outMsg': numberFormatter(response.data.partitions[j].subscriptions[p].msgRateOut, 2),
                     'outBytes': formatBytes(response.data.partitions[j].subscriptions[p].msgThroughputOut),
                     'msgExpired': numberFormatter(response.data.partitions[j].subscriptions[p].msgRateExpired, 2),
+                    // Backlog of messages in the topic
                     'backlog': response.data.partitions[j].subscriptions[p].msgBacklog,
                     'type': response.data.partitions[j].subscriptions[p].type,
                     'subscriptionLink': '/management/subscriptions/' + this.postForm.persistent + '/' + subSplitPartition[1] + '/' + s + '/subscription',
