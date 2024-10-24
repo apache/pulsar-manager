@@ -52,7 +52,7 @@
     "qs": "^6.12.1",
     "showdown": "1.9.1",
     "sortablejs": "1.7.0",
-    "vue": "2.6.0",
+    "vue": "3.0.0",
     "vue-i18n": "7.3.2",
     "vue-router": "3.0.1",
     "vuedraggable": "^2.16.0",
