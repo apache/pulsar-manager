@@ -48,11 +48,11 @@ Vue.config.productionTip = false
 import Casdoor from 'casdoor-vue-sdk'
 import VueCompositionAPI from '@vue/composition-api'
 const config = {
-  serverUrl: "http://localhost:7001",
-  clientId: "6ba06c1e1a30929fdda7",
-  organizationName: "casbin",
-  appName: "plusar",
-  redirectPath: "/#callback",
+  serverUrl: process.env.VUE_APP_CASDOOR_SERVER_URL || "http://localhost:7001",
+  clientId: process.env.VUE_APP_CASDOOR_CLIENT_ID || "6ba06c1e1a30929fdda7",
+  organizationName: process.env.VUE_APP_CASDOOR_ORG || "casbin",
+  appName: process.env.VUE_APP_CASDOOR_APP || "plusar",
+  redirectPath: process.env.VUE_APP_CASDOOR_REDIRECT_PATH || "/#callback",
 };
 Vue.use(VueCompositionAPI)
 Vue.use(Casdoor,config)
