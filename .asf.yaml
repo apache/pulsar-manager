@@ -41,15 +41,28 @@ github:
     projects: true
   enabled_merge_buttons:
     # enable squash button:
-    squash:  true
+    squash: true
     # disable merge button:
-    merge:   false
+    merge: false
     # disable rebase button:
-    rebase:  false
+    rebase: false
 
+  rulesets:
+    - name: "Default Branch Protection"
+      type: branch
+      branches:
+        includes:
+          - "~DEFAULT_BRANCH"
+          - "release/*"
+          - "rel/*"
+        excludes: []
+      bypass_teams:
+        - root
+      restrict_deletion: true
+      restrict_force_push: true
 notifications:
-  commits:      commits@pulsar.apache.org
-  issues:       commits@pulsar.apache.org
+  commits: commits@pulsar.apache.org
+  issues: commits@pulsar.apache.org
   pullrequests: commits@pulsar.apache.org
-  discussions:  dev@pulsar.apache.org
+  discussions: dev@pulsar.apache.org
   jira_options: link label
