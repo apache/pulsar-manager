@@ -18,27 +18,16 @@
 #
 
 github:
-  description: "Apache Pulsar Manager"
-  homepage: https://pulsar.apache.org/
+  description: "Apache Pulsar Manager (no longer maintained, not recommended for use). For alternatives see https://pulsar.apache.org/docs/administration-ui"
+  homepage: https://pulsar.apache.org/docs/administration-ui
   labels:
-    - pulsar
-    - pubsub
-    - messaging
-    - streaming
-    - queuing
-    - event-streaming
-    - apache-pulsar
-    - admin-dashboard
-    - vuejs
-    - pulsar-ui
-    - messaging
+    - unmaintained
+    - deprecated
   features:
-    # Enable wiki for documentation
-    wiki: true
-    # Enable issues management
-    issues: true
-    # Enable projects for project management boards
-    projects: true
+    # The project is no longer maintained
+    wiki: false
+    issues: false
+    projects: false
   enabled_merge_buttons:
     # enable squash button:
     squash:  true

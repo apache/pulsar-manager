@@ -17,11 +17,9 @@
 
 name: Java CI
 
+# Pulsar Manager is no longer maintained, so CI only runs when started manually.
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+  workflow_dispatch:
 
 jobs:
   build:
