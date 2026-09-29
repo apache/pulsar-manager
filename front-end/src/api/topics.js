@@ -63,14 +63,26 @@ export function fetchTopicStats(persistent, tenantNamespaceTopic) {
     method: 'get'
   })
 }
-
+/**
+ * topic detail
+ * @param {*}} persistent
+ * @param {*} tenantNamespaceTopic
+ * @returns
+ */
 export function fetchTopicStatsInternal(persistent, tenantNamespaceTopic) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/internalStats`,
     method: 'get'
   })
 }
-
+/**
+ *  topic stat
+ * <a href="https://pulsar.apache.org/docs/en/2.7.1/admin-api-topics/#get-stats">topic stat</a>
+ * @param {*} persistent
+ * @param {*} tenantNamespaceTopic
+ * @param {*} perPartition
+ * @returns
+ */
 export function fetchPartitionTopicStats(persistent, tenantNamespaceTopic, perPartition) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/partitioned-stats?perPartition=${perPartition}`,
@@ -233,7 +245,14 @@ export function unloadOnCluster(cluster, persistent, tenantNamespaceTopic) {
     method: 'put'
   })
 }
-
+/**
+ * skip message
+ * @param {*} persistent
+ * @param {*} tenantNamespaceTopic
+ * @param {*} subName
+ * @param {*} numMessages
+ * @returns
+ */
 export function skip(persistent, tenantNamespaceTopic, subName, numMessages) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/skip/${numMessages}`,
@@ -298,7 +317,14 @@ export function expireMessagesAllSubscriptionsOnCluster(cluster, persistent, ten
     method: 'post'
   })
 }
-
+/**
+ * peek message
+ * @param {*} persistent
+ * @param {*} tenantNamespaceTopic
+ * @param {*} subName
+ * @param {*} messagePosition
+ * @returns
+ */
 export function peekMessages(persistent, tenantNamespaceTopic, subName, messagePosition) {
   return request({
     url: BASE_URL_V2 + `/${persistent}/${tenantNamespaceTopic}/subscription/${subName}/position/${messagePosition}`,
