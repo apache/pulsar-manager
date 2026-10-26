@@ -4,6 +4,8 @@
 > Apache Pulsar Manager is no longer maintained, and using it is not recommended.
 > To find alternative solutions, see the [Administration UI documentation](https://pulsar.apache.org/docs/administration-ui).
 
+[CVE-2026-105944: Apache Pulsar Manager: Missing authentication and authorization and disclosure of the Pulsar admin credential; end of life](https://pulsar.apache.org/security/CVE-2026-105944/)
+
 ## Project status
 
 Apache Pulsar Manager is no longer maintained by the Apache Pulsar project. It will not receive new
